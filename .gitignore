@@ -27,3 +27,7 @@ graft/
 
 # Russian docs (local only)
 *_RU.md
+
+# OpenAPI contract artifacts (current snapshot and diff report)
+openapi_current.json
+OPENAPI_DIFF.md

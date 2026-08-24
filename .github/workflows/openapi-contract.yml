@@ -1,0 +1,40 @@
+name: OpenAPI Contract Check
+
+on:
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  openapi-diff:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read   # to checkout the repo
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # needed to access baseline
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt
+
+      - name: Run OpenAPI snapshot & diff check
+        id: openapi_check
+        run: |
+          python3 scripts/openapi_snapshot.py
+        # The step will fail (non-zero exit) if breaking changes are found
+
+      - name: Upload diff report as artifact
+        if: always()   # upload even if the check fails
+        uses: actions/upload-artifact@v4
+        with:
+          name: openapi-diff-report
+          path: OPENAPI_DIFF.md
