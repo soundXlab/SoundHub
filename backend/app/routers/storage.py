@@ -390,6 +390,109 @@ def get_storage_usage(
     )
 
 
+# ── Resumable upload (for large files on Cloud Run) ────────────────
+
+class ResumableUploadRequest(BaseModel):
+    filename: str = ""
+    content_type: str = "application/octet-stream"
+    file_size: int = 0
+    sha256: str = ""
+    kind: str = "artifact"
+    project_id: Optional[int] = None
+    commit_id: Optional[int] = None
+
+
+class ResumableUploadResponse(BaseModel):
+    object_id: int
+    upload_url: str
+    object_name: str
+    chunk_size: int = 8388608  # 8MB
+    expires_in: int = 86400
+
+
+@router.post("/resumable-upload", response_model=ResumableUploadResponse, status_code=status.HTTP_201_CREATED)
+def create_resumable_upload(
+    body: ResumableUploadRequest,
+    request: Request,
+    user=Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Create a resumable upload session for large files.
+
+    Flow:
+        1. Client asks for upload intent with file_size → API returns object_id + resumable upload URL.
+        2. Client uploads chunks directly to GCS via the upload_url.
+        3. Client POSTs to /uploads/{object_id}/complete.
+    """
+    storage = get_storage()
+
+    # Check if we can use resumable uploads (GCS only)
+    if not hasattr(storage, 'create_resumable_upload_url'):
+        raise HTTPException(
+            status.HTTP_501_NOT_IMPLEMENTED,
+            "Resumable uploads are only supported with GCS storage backend."
+        )
+
+    # If sha256 provided, check for existing dedup
+    if body.sha256:
+        existing = db.scalar(
+            select(StorageObject).where(StorageObject.sha256 == body.sha256)
+        )
+        if existing and existing.status not in ("deleted", "failed"):
+            _audit(db, existing, "resumable_dedup", user.id, request, "dedup-hit")
+            db.commit()
+            storage_key = _content_address_key(existing.sha256)
+            upload_info = storage.create_resumable_upload_url(
+                storage_key, body.content_type, body.file_size
+            )
+            return ResumableUploadResponse(
+                object_id=existing.id,
+                upload_url=upload_info["upload_url"],
+                object_name=upload_info["object_name"],
+                chunk_size=upload_info["chunk_size"],
+            )
+
+    # Determine storage key
+    if body.sha256:
+        storage_key = _content_address_key(body.sha256)
+        sha256_value = body.sha256
+    else:
+        # Generate unique placeholder sha256 for pending uploads
+        sha256_value = f"pending-{hashlib.sha256(str(datetime.now(timezone.utc).timestamp()).encode()).hexdigest()[:32]}"
+        storage_key = f"pending/{sha256_value}"
+
+    obj = StorageObject(
+        sha256=sha256_value,
+        storage_provider="gcs",
+        storage_key=storage_key,
+        original_filename=body.filename,
+        content_type=body.content_type or "application/octet-stream",
+        byte_size=body.file_size,
+        kind=body.kind,
+        status="pending_upload" if not body.sha256 else "uploaded",
+        uploaded_by_id=user.id,
+        project_id=body.project_id,
+        commit_id=body.commit_id,
+    )
+    db.add(obj)
+    db.flush()
+
+    _audit(db, obj, "resumable_intent", user.id, request, f"filename={body.filename}")
+    db.commit()
+    db.refresh(obj)
+
+    upload_info = storage.create_resumable_upload_url(
+        storage_key, body.content_type or "application/octet-stream", body.file_size
+    )
+
+    return ResumableUploadResponse(
+        object_id=obj.id,
+        upload_url=upload_info["upload_url"],
+        object_name=upload_info["object_name"],
+        chunk_size=upload_info["chunk_size"],
+    )
+
+
 @router.post("/cleanup")
 def cleanup_stale_uploads(
     ttl_minutes: int = 60,

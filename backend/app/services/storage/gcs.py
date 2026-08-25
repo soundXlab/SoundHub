@@ -1,11 +1,13 @@
 """Google Cloud Storage object storage backend.
 
 Uses the Google Cloud Storage client library.
+Supports both signed URLs and resumable uploads (for Cloud Run).
 """
 from __future__ import annotations
 
 import hashlib
 import os
+import urllib.parse
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -134,32 +136,168 @@ class GCSObjectStorage:
         except Exception:
             return 0
 
+    def _resolve_gcs_name(self, key: str) -> str:
+        """Resolve a storage key to a GCS object name."""
+        if len(key) == 64 and all(c in "0123456789abcdef" for c in key):
+            return self._key_from_sha(key)
+        return key
+
     def create_upload_url(self, key: str, content_type: str, expires_in: int = 900) -> str:
-        """
-        Generate a signed PUT URL so the client can upload directly to GCS.
-        Note: GCS signed URLs for upload require specifying the content-type and using PUT method.
+        """Generate a signed PUT URL so the client can upload directly to GCS.
+
+        Falls back to IAM-based signing on Cloud Run where default credentials
+        don't support direct signing.
         """
         try:
             bucket = self._get_bucket()
-            # Check if key is already a SHA-256 hash (content-addressed)
-            if len(key) == 64 and all(c in "0123456789abcdef" for c in key):
-                gcs_name = self._key_from_sha(key)
-            else:
-                gcs_name = key
-
+            gcs_name = self._resolve_gcs_name(key)
             blob = bucket.blob(gcs_name)
 
-            # Generate a signed URL for PUT (upload) with content-type specified
+            # Try standard signed URL first
             url = blob.generate_signed_url(
                 version="v4",
                 expiration=expires_in,
                 method="PUT",
                 content_type=content_type,
             )
-
             return url
-        except Exception as exc:
-            raise RuntimeError(f"Failed to generate signed upload URL: {exc}") from exc
+        except Exception:
+            # Fallback: try IAM-based signing (Cloud Run)
+            try:
+                return self._generate_signed_url_via_iam(key, content_type, expires_in)
+            except Exception as exc:
+                raise RuntimeError(
+                    f"Failed to generate signed upload URL: {exc}. "
+                    "Ensure the service account has roles/iam.serviceAccountTokenCreator "
+                    "or set GOOGLE_APPLICATION_CREDENTIALS to a service account key file."
+                ) from exc
+
+    def _generate_signed_url_via_iam(self, key: str, content_type: str, expires_in: int) -> str:
+        """Generate signed URL using IAM signBlob API (works on Cloud Run)."""
+        import time
+        from google.auth.transport.requests import Request
+        from google.oauth2 import credentials as ga_credentials
+
+        # Get an access token from the metadata server
+        auth_req = Request()
+        token_creds = ga_credentials.Credentials(
+            token=None,
+            refresh_token=None,
+            token_uri="http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token",
+        )
+        # For Compute Engine / Cloud Run, use metadata-based credentials
+        from google.auth import compute_engine
+        creds = compute_engine.IDTokenCredentials(
+            request=auth_req,
+            target_audience="https://storage.googleapis.com/",
+        )
+        creds.refresh(auth_req)
+
+        # Build the canonical request for signing
+        bucket = self._get_bucket()
+        gcs_name = self._resolve_gcs_name(key)
+        expiry_epoch = int(time.time()) + expires_in
+
+        # Use the IAM signBlob API
+        import google.auth.transport.requests
+        from google.oauth2 import credentials as oauth2_creds
+
+        # Get access token from metadata server
+        import urllib.request
+        metadata_url = "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token"
+        req = urllib.request.Request(metadata_url, headers={"Metadata-Flavor": "Google"})
+        with urllib.request.urlopen(req) as resp:
+            token_data = __import__("json").loads(resp.read())
+            access_token = token_data["access_token"]
+
+        # Sign via IAM signBlob
+        service_account = self._client._credentials.service_account_email
+        if not service_account:
+            # Get default service account email from metadata
+            sa_url = "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/email"
+            sa_req = urllib.request.Request(sa_url, headers={"Metadata-Flavor": "Google"})
+            with urllib.request.urlopen(sa_req) as resp:
+                service_account = resp.read().decode()
+
+        sign_url = f"https://iam.googleapis.com/v1/projects/-/serviceAccounts/{service_account}:signBlob"
+        sign_payload = __import__("json").dumps({
+            "payload": hashlib.sha256(
+                f"PUT\n\n{content_type}\n{expiry_epoch}\n/{self.bucket_name}/{gcs_name}".encode()
+            ).hexdigest()
+        }).encode()
+
+        sign_req = urllib.request.Request(
+            sign_url,
+            data=sign_payload,
+            headers={
+                "Authorization": f"Bearer {access_token}",
+                "Content-Type": "application/json",
+            },
+        )
+        with urllib.request.urlopen(sign_req) as resp:
+            sign_data = __import__("json").loads(resp.read())
+            signature = sign_data["signedBlob"]
+
+        # Construct the signed URL
+        from urllib.parse import quote
+        encoded_name = quote(gcs_name, safe="")
+        signed_url = (
+            f"https://storage.googleapis.com/{self.bucket_name}/{encoded_name}"
+            f"?X-Goog-Algorithm=GOOG4-RSA-SHA256"
+            f"&X-Goog-Credential={service_account}%2F{time.strftime('%Y%m%d')}%2Fauto%2Fstorage%2Fgoog4_request"
+            f"&X-Goog-Date={time.strftime('%Y%m%dT%H%M%SZ')}"
+            f"&X-Goog-Expires={expires_in}"
+            f"&X-Goog-Signature={signature}"
+        )
+        return signed_url
+
+    def create_resumable_upload_url(
+        self, key: str, content_type: str, content_length: int, expires_in: int = 86400
+    ) -> dict:
+        """Create a resumable upload session directly with GCS.
+
+        Returns dict with upload_url and object_name for the client to use.
+        This is the preferred method for large files on Cloud Run.
+        """
+        import urllib.request
+        import json as _json
+
+        gcs_name = self._resolve_gcs_name(key)
+
+        # Get access token from metadata server
+        metadata_url = "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token"
+        req = urllib.request.Request(metadata_url, headers={"Metadata-Flavor": "Google"})
+        with urllib.request.urlopen(req) as resp:
+            token_data = _json.loads(resp.read())
+            access_token = token_data["access_token"]
+
+        # Initiate resumable upload via GCS REST API
+        upload_url = (
+            f"https://storage.googleapis.com/upload/storage/v1/b/{self.bucket_name}/o"
+            f"?uploadType=resumable&name={urllib.parse.quote(gcs_name, safe='')}")
+        metadata = {"contentType": content_type}
+        payload = _json.dumps(metadata).encode()
+
+        upload_req = urllib.request.Request(
+            upload_url,
+            data=payload,
+            headers={
+                "Authorization": f"Bearer {access_token}",
+                "Content-Type": "application/json",
+                "X-Upload-Content-Type": content_type,
+                "X-Upload-Content-Length": str(content_length),
+            },
+            method="POST",
+        )
+        with urllib.request.urlopen(upload_req) as resp:
+            resumable_uri = resp.headers.get("Location", "")
+
+        return {
+            "upload_url": resumable_uri,
+            "object_name": gcs_name,
+            "bucket": self.bucket_name,
+            "chunk_size": 8 * 1024 * 1024,
+        }
 
     def create_download_url(self, key: str, expires_in: int = 900) -> str:
         """Generate a signed GET URL for the client to download a file."""
@@ -175,49 +313,72 @@ class GCSObjectStorage:
             )
 
             return url
-        except Exception as exc:
-            raise RuntimeError(f"Failed to generate signed download URL: {exc}") from exc
+        except Exception:
+            # Fallback: try IAM-based signing (Cloud Run)
+            try:
+                return self._generate_download_url_via_iam(key, expires_in)
+            except Exception as exc:
+                raise RuntimeError(f"Failed to generate signed download URL: {exc}") from exc
 
-    # Storage class mapping for tiers (GCS uses storage classes)
-    _STORAGE_CLASS_MAP = {
-        # Note: GCS storage classes are different from S3
-        # We'll map our tiers to nearest GCS equivalents
-        # For now, we'll use STANDARD for all tiers since implementing
-        # automatic tier transitions in GCS requires Object Lifecycle Management
-        # which is bucket-level, not object-level.
-        # TODO: Implement proper tiering using GCS Object Lifecycle Management
-        # or by rewriting objects with different storage classes.
-        # For now, we'll just return HOT and not implement set_tier.
-    }
+    def _generate_download_url_via_iam(self, key: str, expires_in: int) -> str:
+        """Generate download signed URL using IAM signBlob API."""
+        import time
+        import hashlib
+        from urllib.parse import quote
+
+        gcs_name = self._key_from_sha(key)
+        bucket = self._get_bucket()
+        expiry_epoch = int(time.time()) + expires_in
+
+        import urllib.request
+        # Get access token
+        metadata_url = "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token"
+        req = urllib.request.Request(metadata_url, headers={"Metadata-Flavor": "Google"})
+        with urllib.request.urlopen(req) as resp:
+            token_data = __import__("json").loads(resp.read())
+            access_token = token_data["access_token"]
+
+        # Get service account email
+        sa_url = "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/email"
+        sa_req = urllib.request.Request(sa_url, headers={"Metadata-Flavor": "Google"})
+        with urllib.request.urlopen(sa_req) as resp:
+            service_account = resp.read().decode()
+
+        # Sign via IAM
+        sign_url = f"https://iam.googleapis.com/v1/projects/-/serviceAccounts/{service_account}:signBlob"
+        canonical = f"GET\n\n\n{expiry_epoch}\n/{self.bucket_name}/{gcs_name}"
+        sign_payload = __import__("json").dumps({
+            "payload": hashlib.sha256(canonical.encode()).hexdigest()
+        }).encode()
+
+        sign_req = urllib.request.Request(
+            sign_url, data=sign_payload,
+            headers={"Authorization": f"Bearer {access_token}", "Content-Type": "application/json"},
+        )
+        with urllib.request.urlopen(sign_req) as resp:
+            sign_data = __import__("json").loads(resp.read())
+            signature = sign_data["signedBlob"]
+
+        encoded_name = quote(gcs_name, safe="")
+        return (
+            f"https://storage.googleapis.com/{self.bucket_name}/{encoded_name}"
+            f"?X-Goog-Algorithm=GOOG4-RSA-SHA256"
+            f"&X-Goog-Credential={service_account}%2F{time.strftime('%Y%m%d')}%2Fauto%2Fstorage%2Fgoog4_request"
+            f"&X-Goog-Date={time.strftime('%Y%m%dT%H%M%SZ')}"
+            f"&X-Goog-Expires={expires_in}"
+            f"&X-Goog-Signature={signature}"
+        )
+
+    # Storage class mapping for tiers
+    _STORAGE_CLASS_MAP = {}
 
     def get_tier(self, key: str) -> int:
-        """Return the current storage tier for a blob.
-        For GCS, we don't implement automatic tiering in this version,
-        so we always return HOT (0).
-        TODO: Implement proper tier detection using GCS Object Lifecycle
-        Management or by checking object's storage class.
-        """
-        # For now, return HOT as we don't have tiering implemented
-        # To properly implement, we would need to:
-        # 1. Check the object's storage class via blob.reload()
-        # 2. Map GCS storage classes to our StorageTier enum
         return 0  # StorageTier.HOT
 
     def set_tier(self, key: str, tier: int) -> None:
-        """Move a blob to the specified storage tier.
-        For GCS, changing storage class requires rewriting the object.
-        TODO: Implement this by copying the object with a different storage class.
-        """
-        # Not implemented in this version
-        # To implement:
-        # 1. Get the current blob
-        # 2. Copy it to a temporary location with the desired storage class
-        # 3. Delete the original
-        # 4. Rename the temporary to the original name
-        pass
+        pass  # Not implemented
 
     def get_object_metadata(self, key: str) -> dict:
-        """Get metadata about an object including its creation time and storage class."""
         try:
             bucket = self._get_bucket()
             gcs_name = self._key_from_sha(key)
@@ -226,8 +387,7 @@ class GCSObjectStorage:
             if not blob.exists():
                 return {}
 
-            blob.reload()  # Fetch latest metadata
-
+            blob.reload()
             return {
                 "sha256": key,
                 "size": blob.size,

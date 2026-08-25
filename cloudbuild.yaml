@@ -10,14 +10,14 @@ steps:
     - '.'
   waitFor: ['-']
 
-# Push with Artifact Registry auth
+# Push with Artifact Registry auth using gcloud CLI
 - name: 'gcr.io/cloud-builders/docker'
   id: 'Push'
   entrypoint: 'bash'
   args:
     - '-c'
     - |
-      # Configure Docker to use gcloud as credential helper
+      # Set up Docker authentication with gcloud
       gcloud auth configure-docker us-docker.pkg.dev --quiet
       docker push us-docker.pkg.dev/$PROJECT_ID/docker/soundhub
   waitFor: ['Build']
@@ -37,6 +37,8 @@ steps:
     - '--region'
     - 'us-central1'
     - '--allow-unauthenticated'
+    - '--service-account'
+    - '634858473264-compute@developer.gserviceaccount.com'
     - '--set-env-vars'
     - 'SOUNDHUB_STORAGE_PROVIDER=gcs,SOUNDHUB_GCS_BUCKET=soundhub-assets-$PROJECT_ID,SOUNDHUB_ENV=production,SOUNDHUB_CORS_ORIGINS=*'
   waitFor: ['Push']
