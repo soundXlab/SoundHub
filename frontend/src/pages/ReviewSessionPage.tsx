@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { api, getToken } from "../api";
 import { fmtClock, WaveformCanvas, CommentComposer, ApprovalPanel, VersionDiffPanel } from "../components/ReviewShared";
+import { Box, Wrench, Check, Folder, ExternalLink, Repeat, DollarSign, Mail, Users, Slash, CreditCard } from "lucide-react";
 import ABCompare from "../components/ABCompare";
 import ReferenceCompare from "../components/ReferenceCompare";
 import UsdcPayButton from "../components/UsdcPayButton";
@@ -123,18 +124,17 @@ function ledgerText(e: LedgerEntry): string {
       return e.event.replace(/\./g, " ");
   }
 }
-
-function ledgerIcon(e: LedgerEntry): string {
-  if (e.event.startsWith("package.") || e.event.startsWith("deliverable.") || e.event.startsWith("delivery.") || e.event.startsWith("invoice.")) return "📦";
-  if (e.event.startsWith("request.")) return "🔧";
-  if (e.event.startsWith("approval")) return "✅";
-  if (e.event.startsWith("round")) return "🗂";
-  if (e.event.startsWith("version")) return "⬆";
-  if (e.event.startsWith("change_order")) return "🔄";
-  if (e.event.startsWith("deposit")) return "💰";
-  if (e.event.startsWith("notification") || e.event.startsWith("reminders")) return "📧";
-  if (e.event.startsWith("team")) return "👥";
-  return "✎";
+function ledgerIcon(e: LedgerEntry) {
+  if (e.event.startsWith("package.") || e.event.startsWith("deliverable.") || e.event.startsWith("delivery.") || e.event.startsWith("invoice.")) return <Box size={14} />;
+  if (e.event.startsWith("request.")) return <Wrench size={14} />;
+  if (e.event.startsWith("approval")) return <Check size={14} />;
+  if (e.event.startsWith("round")) return <Folder size={14} />;
+  if (e.event.startsWith("version")) return <ExternalLink size={14} />;
+  if (e.event.startsWith("change_order")) return <Repeat size={14} />;
+  if (e.event.startsWith("deposit")) return <DollarSign size={14} />;
+  if (e.event.startsWith("notification") || e.event.startsWith("reminders")) return <Mail size={14} />;
+  if (e.event.startsWith("team")) return <Users size={14} />;
+  return <Slash size={14} />;
 }
 
 function DecisionLog({ sessionId }: { sessionId: number }) {
@@ -588,7 +588,7 @@ function ReleasePackagePanel({
                     }}
                     title="Open Stripe Checkout (card / Apple Pay / Google Pay)"
                   >
-                    💳 Open checkout
+                    <CreditCard size={14} className="mr-1" />Open checkout
                   </button>
                   <UsdcPayButton
                     target={{ packageId: pkg.id, kind: pkg.invoice_status === "deposit_due" ? "deposit" : "package", purposeLabel: "release package invoice" }}
@@ -1291,7 +1291,7 @@ function ChangeOrdersPanel({ sessionId }: { sessionId: number }) {
                   })
                 }
               >
-                💳 Open checkout
+                <CreditCard size={14} className="mr-1" />Open checkout
               </button>
             </div>
           )}
@@ -1951,7 +1951,7 @@ function SessionDetail({ session, onBack }: { session: ReviewSession; onBack: ()
       {/* header */}
       <div className="rs-head">
         <div className="rs-title">
-          <span className="rs-title-icon">🎧</span>
+          <Volume2 size={14} className="rs-title-icon" />
           <div>
             <div className="rs-name">{session.name}</div>
             <div className="rs-sub">
@@ -2002,7 +2002,7 @@ function SessionDetail({ session, onBack }: { session: ReviewSession; onBack: ()
                 {v.label}
                 {v.watermarked && (
                   <span className="rs-wm-chip" title="Guests hear an audible watermark on this preview — approved versions are clean">
-                    🔊
+                    <Volume2 size={14} className="mr-1" />
                   </span>
                 )}
                 <span className="rs-tab-msg">{v.message || v.filename}</span>
@@ -2146,7 +2146,7 @@ function SessionDetail({ session, onBack }: { session: ReviewSession; onBack: ()
                 {current.filename} · {humanSize(current.size)} · {current.audio_format}
                 {current.watermarked && (
                   <span className="rs-wm-chip" title="Audible watermark is mixed into the guest preview of this version">
-                    🔊 watermarked preview
+                    <Volume2 size={14} className="mr-1" /> watermarked preview
                   </span>
                 )}
               </span>
@@ -2226,7 +2226,7 @@ function SessionDetail({ session, onBack }: { session: ReviewSession; onBack: ()
                         )}
                         {c.fixed_in != null && versions.length >= 2 && (
                           <button type="button" className="rs-link" onClick={() => void openComparison(c)}>
-                            🎧 Compare around request
+                            <Volume2 size={14} className="mr-1" />Compare around request
                           </button>
                         )}
                         {c.fixed_in != null && (
@@ -2351,7 +2351,7 @@ function SessionDetail({ session, onBack }: { session: ReviewSession; onBack: ()
                             onClick={() => void pay("extra_round")}
                             title="Stripe Checkout — card / Apple Pay / Google Pay"
                           >
-                            💳 Pay for extra round{extraRoundCents ? ` · $${(extraRoundCents / 100).toFixed(2)}` : ""}
+                            <CreditCard size={14} className="mr-1" />Pay for extra round{extraRoundCents ? ` · $${(extraRoundCents / 100).toFixed(2)}` : ""}
                           </button>
                         </div>
                       )}
@@ -2474,7 +2474,7 @@ function SessionDetail({ session, onBack }: { session: ReviewSession; onBack: ()
                       <div className="rs-pay-prompt">
                         <span>Client pays the booking deposit via the share link</span>
                         <button type="button" className="rs-btn approve sm" onClick={() => void pay("deposit")}>
-                          💳 Pay deposit{depositCents ? ` · $${(depositCents / 100).toFixed(2)}` : ""}
+                          <CreditCard size={14} className="mr-1" />Pay deposit{depositCents ? ` · $${(depositCents / 100).toFixed(2)}` : ""}
                         </button>
                       </div>
                     )}
@@ -2681,7 +2681,7 @@ export default function ReviewSessionPage() {
         {sessions.map((s) => (
           <div key={s.id} className="session-row" onClick={() => setOpenId(s.id)}>
             <div className="session-row-main">
-              <span className="session-row-icon">🎧</span>
+              <span className="session-row-icon"><Volume2 size={14} /></span>
               <div>
                 <div className="session-row-name">{s.name}</div>
                 <div className="session-row-meta">

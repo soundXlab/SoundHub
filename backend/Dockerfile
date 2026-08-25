@@ -18,7 +18,7 @@ COPY frontend/public ./public
 COPY frontend/src ./src
 
 # Build frontend for production
-RUN npm run build
+RUN npx vite build
 
 # Stage 2: Build backend with frontend static files
 FROM python:3.12-slim
@@ -31,11 +31,11 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy Python dependencies
-COPY requirements.txt .
+COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy backend source code
-COPY . .
+COPY backend/ .
 
 # Copy built frontend from frontend-builder stage
 COPY --from=frontend-builder /app/frontend/dist ./app/static
@@ -47,4 +47,4 @@ RUN mkdir -p data/blobs data/tmp
 EXPOSE 8000
 
 # Use PORT environment variable if set (for Cloud Run), otherwise default to 8000
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "${PORT:-8000}"]
+CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]

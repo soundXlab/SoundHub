@@ -12,6 +12,7 @@ import {
   type Deployment,
 } from "../web3/contracts";
 import { setTargetChainId, useWallet } from "../web3/useWallet";
+import { FileText, Download, Settings2, ShoppingCart } from "lucide-react";
 
 interface Listing {
   id: bigint;
@@ -64,10 +65,10 @@ function LicenseReceiptCard({ receipt }: { receipt: LicenseReceipt }) {
   return (
     <div className="receipt">
       <div className="row" style={{ marginBottom: 6 }}>
-        <h2 style={{ margin: 0 }}>📄 License receipt</h2>
+        <h2 style={{ margin: 0 }}><FileText size={20} className="mr-2" />License receipt</h2>
         <span className="spacer" />
         <button className="btn ghost sm" onClick={download}>
-          ⤓ .json
+          <Download size={14} className="mr-1" /> .json
         </button>
       </div>
       <div className="receipt-title">
@@ -289,7 +290,7 @@ export default function MarketplacePage() {
       const faucet = await getFaucet(signer, deployment.faucet);
       setBusy(true);
       await (await faucet.claim()).wait();
-      setMsg("100 SND claimed! Buy something. 🎧");
+      setMsg("100 SND claimed! Buy something.");
       await refresh();
     } catch (e2) {
       setErr(e2 instanceof Error ? e2.message : "Claim failed");
@@ -550,7 +551,7 @@ export default function MarketplacePage() {
                   const sold = l.escrowed > 0n;
                   return (
                     <div className="file-row" key={l.id.toString()}>
-                      <span className="file-icon">🎛</span>
+                      <span className="file-icon"><Settings2 size={14} /></span>
                       <div style={{ flex: 1 }}>
                         <div>
                           <strong>{l.name}</strong>{" "}

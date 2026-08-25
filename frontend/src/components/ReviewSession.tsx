@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { Headphones } from "lucide-react";
 
 type Comment = {
   id: number;
@@ -108,7 +109,7 @@ export default function ReviewSession({ compact = false }: { compact?: boolean }
       {/* header */}
       <div className="rs-head">
         <div className="rs-title">
-          <span className="rs-title-icon">🎧</span>
+          <Headphones className="rs-title-icon" size={20} />
           <div>
             <div className="rs-name">Neon Warehouse</div>
             <div className="rs-sub">track_v13.wav · 3:20 · stems: drums, bass, vocal, synths</div>

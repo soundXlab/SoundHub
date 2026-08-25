@@ -1,10 +1,27 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { useParams } from "react-router-dom";
 import { api } from "../api";
 import ReferenceCompare from "../components/ReferenceCompare";
 import { fmtClock, WaveformCanvas, ApprovalPanel, VersionDiffPanel } from "../components/ReviewShared";
+
+interface FeedbackTemplate {
+  id: string;
+  label: React.ReactNode;
+  text: string;
+}
 import ABCompare from "../components/ABCompare";
 import VoiceRecorder from "../components/VoiceRecorder";
+import {
+  List,
+  Volume2,
+  CreditCard,
+  CloudFog,
+  Zap,
+  Target,
+  Settings2,
+  Heart,
+  Lock,
+} from "lucide-react";
 import {
   fmtTime,
   humanSize,
@@ -18,13 +35,13 @@ import {
   type VersionDiff,
 } from "../types";
 
-const FEEDBACK_TEMPLATES = [
-  { id: "too_loud", label: "🔊 Something is too loud / quiet", text: "Something is too loud / quiet" },
-  { id: "masked", label: "🌫 Something is unclear or masked", text: "Something is unclear or masked" },
-  { id: "energy", label: "⚡ The energy changes here", text: "The energy changes here" },
-  { id: "reference", label: "🎯 This differs from the reference", text: "This differs from the reference" },
-  { id: "technical", label: "🔧 Technical issue / click / edit", text: "Technical issue / click / edit" },
-  { id: "keep", label: "❤️ I like this — keep it", text: "I like this — keep it" },
+const FEEDBACK_TEMPLATES: FeedbackTemplate[] = [
+  { id: "too_loud", label: (<><Volume2 size={14} className="feedback-template-icon" /> Something is too loud / quiet</>), text: "Something is too loud / quiet" },
+  { id: "masked", label: (<><CloudFog size={14} className="feedback-template-icon" /> Something is unclear or masked</>), text: "Something is unclear or masked" },
+  { id: "energy", label: (<><Zap size={14} className="feedback-template-icon" /> The energy changes here</>), text: "The energy changes here" },
+  { id: "reference", label: (<><Target size={14} className="feedback-template-icon" /> This differs from the reference</>), text: "This differs from the reference" },
+  { id: "technical", label: (<><Settings2 size={14} className="feedback-template-icon" /> Technical issue / click / edit</>), text: "Technical issue / click / edit" },
+  { id: "keep", label: (<><Heart size={14} className="feedback-template-icon" /> I like this — keep it</>), text: "I like this — keep it" },
 ];
 
 const ELEMENTS = ["Vocal", "Bass", "Drums", "Synths", "Other"];
@@ -334,7 +351,10 @@ export default function PublicReviewPage() {
   if (err) {
     return (
       <div className="session-page">
-        <div className="card error">🔗 {err} — this review link doesn't exist.</div>
+        <div className="card error">
+          <Link size={16} className="mr-1" />
+          {err} — this review link doesn't exist.
+        </div>
       </div>
     );
   }
@@ -343,7 +363,10 @@ export default function PublicReviewPage() {
     return (
       <div className="session-page">
         <div className="card">
-          <h2 className="session-title">🔒 Password protected</h2>
+          <h2 className="session-title">
+  <Lock size={20} className="mr-1" />
+  Password protected
+</h2>
           <p className="muted">This review link is protected. Enter the password the owner shared with you.</p>
           <form
             className="session-create"
@@ -452,7 +475,10 @@ export default function PublicReviewPage() {
         if (briefBits.length === 0 && refs.length === 0 && !session.do_not_change) return null;
         return (
           <div className="public-brief">
-            <div className="public-brief-head">📋 The brief — what was agreed</div>
+            <div className="public-brief-head">
+  <List size={16} className="mr-1" />
+  The brief — what was agreed
+</div>
             <div className="public-brief-grid">
               {briefBits.map(([k, v]) => (
                 <div key={k} className="public-brief-chip">
@@ -545,7 +571,8 @@ export default function PublicReviewPage() {
             {current.waveform_synthetic && <div className="public-review-note">Waveform is illustrative — this file isn't a WAV.</div>}
             {current.watermarked && (
               <div className="public-review-note wm">
-                🔊 This preview carries an audible watermark — the clean files arrive after the final delivery.
+                <Volume2 size={14} className="mr-1" />
+                This preview carries an audible watermark — the clean files arrive after the final delivery.
               </div>
             )}
           </div>
@@ -678,7 +705,7 @@ export default function PublicReviewPage() {
                         <div className="rs-pay-prompt">
                           <span>This round is beyond the included revision budget</span>
                           <button type="button" className="rs-btn approve sm" onClick={() => void payExtraRound()} disabled={paying}>
-                            {paying ? "Opening checkout…" : "💳 Pay for extra round"}
+                            {paying ? "Opening checkout…" : <> <CreditCard size={14} className="mr-1" /> Pay for extra round </>}
                           </button>
                         </div>
                       )}
@@ -788,7 +815,8 @@ export default function PublicReviewPage() {
           {refs && refs.length > 0 && (
             <div className="public-refs">
               <div className="public-refs-head">
-                🎯 References — the engineer's orientation tracks
+                <Target size={14} className="mr-1" />
+                References — the engineer's orientation tracks
                 <span className="public-refs-note">A/B your mix against these</span>
               </div>
               {refs.map((r) => (
@@ -933,7 +961,7 @@ export default function PublicReviewPage() {
                               })()
                             }
                           >
-                            💳 Pay {new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format((co.price_cents ?? 0) / 100)}
+                            <CreditCard size={14} className="mr-1" /> Pay {new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format((co.price_cents ?? 0) / 100)}
                           </button>
                         </div>
                       )}

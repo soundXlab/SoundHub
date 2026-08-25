@@ -3,9 +3,22 @@ import { Link, useParams, useSearchParams } from "react-router-dom";
 import { api } from "../api";
 import ReleaseSection from "../components/ReleaseSection";
 import {
+  FileText,
+  History,
+  GitBranch,
+  Package,
+  Settings2,
+  File,
+  Star,
+  ArrowRightLeft,
+  Download,
+  Link,
+} from "lucide-react";
+import {
   DAW_COLORS,
   humanSize,
   shortDate,
+  type AudioAnalysis,
   type Branch,
   type Commit,
   type DawInfo,
@@ -35,6 +48,9 @@ export default function ProjectPage() {
   const [notice, setNotice] = useState<string | null>(null);
   const [expanded, setExpanded] = useState<string | null>(null);
   const [readme, setReadme] = useState<string | null>(null);
+  const [audioAnalysis, setAudioAnalysis] = useState<AudioAnalysis | null>(null);
+  const [webhookUrl, setWebhookUrl] = useState<string>('');
+  const [showWebhookSetter, setShowWebhookSetter] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null);
 
   const load = useCallback(async () => {
@@ -84,6 +100,34 @@ export default function ProjectPage() {
       .catch(() => setReadme(null));
   }, [tree, pid, branch]);
 
+  // Fetch audio analysis for the current commit
+  useEffect(() => {
+    if (!tree) {
+      setAudioAnalysis(null);
+      return;
+    }
+    const fetchAnalysis = async () => {
+      try {
+        const analysis = await api.getAudioAnalysis(tree.commit_id);
+        setAudioAnalysis(analysis);
+      } catch (err) {
+        console.warn('Failed to fetch audio analysis', err);
+        setAudioAnalysis(null);
+      }
+    };
+    fetchAnalysis();
+  }, [tree]);
+
+  // Load webhook URL from localStorage
+  useEffect(() => {
+    if (pid) {
+      const saved = localStorage.getItem(`project_${pid}_webhook_url`);
+      if (saved) {
+        setWebhookUrl(saved);
+      }
+    }
+  }, [pid]);
+
   const submit = async (e: FormEvent) => {
     e.preventDefault();
     const files = fileInput.current?.files;
@@ -94,12 +138,55 @@ export default function ProjectPage() {
     setUploading(true);
     setNotice(null);
     try {
-      await api.createCommit(pid, message.trim() || "Update project files", files, branch);
+      const newCommit = await api.createCommit(pid, message.trim() || "Update project files", files, branch);
       setMessage("");
       if (fileInput.current) fileInput.current.value = "";
       await loadBranch(branch);
       await load();
-      setNotice("Commit created ✓");
+      let notice = "Commit created ✓";
+      // Trigger audio analysis if any audio-like files were uploaded
+      const audioExtensions = /\.(wav|aiff|flac|mp3|als|alp|cpr|rpp|flp)$/i;
+      const hasAudio = Array.from(files).some(f => audioExtensions.test(f.name));
+      if (hasAudio) {
+        try {
+          const analysis = await api.processAudio(newCommit.id, {
+            analyzeBpm: true,
+            extractKey: true,
+            separateStems: true,
+            generateWaveform: true
+          });
+          const bpm = analysis.bpm ? `♪ ${Math.round(analysis.bpm)} BPM` : '';
+          const key = analysis.key ? `• ${analysis.key}` : '';
+          const stems = analysis.stems_generated && analysis.stem_names.length ? `• ${analysis.stem_names.length} stems` : '';
+          const extra = [bpm, key, stems].filter(Boolean).join(' ');
+          notice = `Commit created ✓ ${extra}`.trim();
+        } catch (analysisErr) {
+          console.warn('Audio analysis failed:', analysisErr);
+          // Keep original notice
+        }
+      }
+      setNotice(notice);
+      // Fire webhook if URL is set
+      if (webhookUrl) {
+        try {
+          await fetch(webhookUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              event: 'commit_created',
+              projectId: pid,
+              commitId: newCommit.id,
+              branch: branch,
+              timestamp: new Date().toISOString(),
+            }),
+          });
+        } catch (webhookErr) {
+          console.warn('Webhook call failed:', webhookErr);
+          // Do not affect notice
+        }
+      }
     } catch (err) {
       setNotice(err instanceof Error ? err.message : "Upload failed");
     } finally {
@@ -135,6 +222,15 @@ export default function ProjectPage() {
             </Link>
             <span className="spacer" />
             <button
+              className="btn ghost sm"
+              onClick={() => setShowWebhookSetter(true)}
+              title="Webhook URL"
+            >
+              <Link size={16} className="mr-2" />
+              Webhook
+            </button>
+            <span className="spacer" />
+            <button
               className="btn danger sm"
               onClick={async () => {
                 if (confirm("Delete this project and all its commits?")) {
@@ -148,21 +244,26 @@ export default function ProjectPage() {
           </div>
           <div className="repo-tabs">
             <button className={`repo-tab ${tab === "code" ? "active" : ""}`} onClick={() => setTab("code")} style={{ background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}>
-              <span>📄</span> Code
+              <FileText size={16} className="mr-2" />
+              Code
             </button>
             <button className={`repo-tab ${tab === "commits" ? "active" : ""}`} onClick={() => setTab("commits")} style={{ background: "none", border: "none", cursor: "pointer", fontFamily: "inherit" }}>
-              <span>🕘</span> Commits
+              <History size={16} className="mr-2" />
+              Commits
               {commits.length > 0 && <span className="muted" style={{ fontSize: 11 }}>({commits.length})</span>}
             </button>
             <Link to={`/projects/${pid}/branches`} className="repo-tab">
-              <span>⎇</span> Branches
+              <GitBranch size={16} className="mr-2" />
+              Branches
               {branches.length > 0 && <span className="muted" style={{ fontSize: 11 }}>({branches.length})</span>}
             </Link>
             <Link to={`/projects/${pid}/features`} className="repo-tab">
-              <span>🧩</span> Features
+              <Package size={16} className="mr-2" />
+              Features
             </Link>
             <span className="repo-tab" style={{ cursor: "default" }}>
-              <span>🎛</span> Release
+              <Settings2 size={16} className="mr-2" />
+              Release
             </span>
           </div>
         </div>
@@ -187,7 +288,8 @@ export default function ProjectPage() {
           <div className="row" style={{ margin: "14px 0" }}>
             <div className="branch-dropdown">
               <button className="branch-selector" onClick={() => setMenuOpen((o) => !o)}>
-                ⎇ {branch}
+                <GitBranch size={14} className="mr-2" />
+                {branch}
                 <span className="muted" style={{ fontSize: 11 }}>
                   {activeBranch ? `${activeBranch.commit_count} commit(s)` : ""}
                 </span>
@@ -203,8 +305,8 @@ export default function ProjectPage() {
                         setMenuOpen(false);
                       }}
                     >
-                      {b.is_default && <span className="default-star">★</span>}
-                      <span>⎇</span> {b.name}
+                      {b.is_default && <span className="default-star"><Star size={14} /></span>}
+                      <GitBranch size={14} /> {b.name}
                       <span className="spacer" />
                       <span className="muted" style={{ fontSize: 11 }}>
                         {b.head_message.slice(0, 40)}
@@ -238,7 +340,7 @@ export default function ProjectPage() {
                 hidden
                 {...(asFolder ? { webkitdirectory: "", directory: "" } : {})}
               />
-              Click to select files{asFolder ? " (folder)" : ""} — .als, .cpr, .rpp, .flp and samples all work.
+              Click to select files{asFolder ? " (folder)" : ""} — .als, .alp, .cpr, .rpp, .flp and samples all work.
             </label>
             <div className="row" style={{ marginTop: 10 }}>
               <label className="muted" style={{ fontSize: 13 }}>
@@ -264,6 +366,13 @@ export default function ProjectPage() {
               <span>
                 {tree ? `${tree.files.length} file(s)` : ""}
               </span>
+              {audioAnalysis && (
+                <span className="muted" style={{ marginLeft: 16 }}>
+                  {audioAnalysis.bpm ? `♪ ${Math.round(audioAnalysis.bpm)} BPM` : ''}
+                  {audioAnalysis.key ? ` • ${audioAnalysis.key}` : ''}
+                  {audioAnalysis.stems_generated && audioAnalysis.stem_names.length ? ` • ${audioAnalysis.stem_names.length} stems` : ''}
+                </span>
+              )}
             </div>
             {!tree ? (
               <div className="file-row muted">No commits yet — upload your project files.</div>
@@ -273,7 +382,7 @@ export default function ProjectPage() {
                 return (
                   <div key={f.path}>
                     <div className="file-row" onClick={() => setExpanded(isOpen ? null : f.path)}>
-                      <span className="file-icon">{f.daw_format ? "🎛" : "📄"}</span>
+                      <span className="file-icon">{f.daw_format ? <Settings2 size={14} /> : <File size={14} />}</span>
                       <span className="file-name">{f.path}</span>
                       {dawBadge(f)}
                       <span className="file-size">{humanSize(f.size)}</span>
@@ -284,7 +393,7 @@ export default function ProjectPage() {
                             title="Diff vs previous commit"
                             onClick={(e) => e.stopPropagation()}
                           >
-                            ⇄
+                            <ArrowRightLeft size={14} />
                           </Link>
                         )}
                         <a
@@ -292,7 +401,7 @@ export default function ProjectPage() {
                           title="Download"
                           onClick={(e) => e.stopPropagation()}
                         >
-                          ⬇
+                          <Download size={14} />
                         </a>
                       </span>
                     </div>
@@ -342,6 +451,31 @@ export default function ProjectPage() {
       )}
     </div>
   );
+  {showWebhookSetter && (
+    <div className="card" style={{ position: 'fixed', top: 20, left: 20, right: 20, maxWidth: 500, margin: 'auto', zIndex: 1000 }}>
+      <h2>Webhook URL</h2>
+      <div className="row" style={{ marginBottom: 10 }}>
+        <input
+          type="text"
+          placeholder="https://your-domain.com/webhook"
+          value={webhookUrl}
+          onChange={(e) => setWebhookUrl(e.target.value)}
+          style={{ flex: 1, minWidth: 200 }}
+        />
+        <button className="btn" onClick={() => {
+          // Save to localStorage
+          localStorage.setItem(`project_${pid}_webhook_url`, webhookUrl);
+          setShowWebhookSetter(false);
+          setNotice('Webhook URL saved');
+        }}>
+          Save
+        </button>
+        <button className="btn ghost" onClick={() => setShowWebhookSetter(false)}>
+          Cancel
+        </button>
+      </div>
+    </div>
+  )}
 }
 
 function DawInfoBox({ info }: { info: DawInfo | null }) {
