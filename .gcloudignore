@@ -1,0 +1,131 @@
+# Ignore files and directories when deploying to Google Cloud
+
+# Local development files
+.env
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw*
+
+# Runtime data
+data
+logs
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage
+.lcov*
+
+# nyc test coverage
+.nyc_output
+
+# Grunt intermediate storage (https://gruntjs.com/creating-plugins#storing-task-files)
+.grunt
+
+# Bower dependency directory (https://bower.io/)
+bower_components
+
+# node-waf configuration
+.lock-wscript
+
+# Compiled binary addons (https://nodejs.org/api/addons.html)
+build/Release
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# TypeScript v1 declaration files
+typings/
+typings_cache/
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Optional stylelint cache
+.stylelintcache
+
+# Microbundle cache
+.microbundle-cache
+
+# Output of the npm pack command
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# Storybook snapshots
+.storybook-preview
+.storybook-production
+
+# Jest test results
+jest-test-results.json
+
+# Temporary files
+*.tmp
+*.temp
+
+# OS-generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Backup files
+*~
+*.bak
+*.tmp
+*.temp
+
+# Git
+.git
+.gitignore
+
+# Docker
+docker-compose.override.yml
+
+# IDE
+*.vim
+*.swp
+
+# Testing
+test/
+tests/
+*/test/*
+*/tests/*
+__tests__
+
+# Documentation
+*.md
+mkdocs.yml
+docs/
+
+# Misc
+.fleet
+.history
+.vessconfig
+.expo/
+.expo-shared/
+.node-repl-history
+
+# Build outputs
+dist/
+build/

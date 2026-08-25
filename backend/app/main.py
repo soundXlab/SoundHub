@@ -4,6 +4,7 @@ from pathlib import Path
 from fastapi import APIRouter, Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 
 from .config import CORS_ORIGINS
@@ -30,6 +31,7 @@ from .routers import (
     kanban,
     metadata,
     notifications_social,
+    notifications as notifications_router,
     packages_gist_sponsors,
     pins,
     portfolio,
@@ -59,6 +61,10 @@ from .routers import (
     search_engine as search_engine_router,
     versions,
     demo,
+    monitoring,
+    compute,
+    api_gateway,
+    iam,
 )
 
 app = FastAPI(
@@ -75,6 +81,7 @@ app.add_middleware(
     allow_headers=["Authorization", "Content-Type"],
 )
 
+# API routes
 app.include_router(auth.router)
 app.include_router(projects.router)
 app.include_router(branch_protection.router)
@@ -125,6 +132,11 @@ app.include_router(search_engine_router.router)
 app.include_router(versions.router)
 app.include_router(storage_router.router)
 app.include_router(jobs_router.router)
+app.include_router(notifications_router.router)
+app.include_router(monitoring.router)
+app.include_router(compute.router)
+app.include_router(api_gateway.router)
+app.include_router(iam.router)
 
 # Register background job handlers
 from .services import job_handlers as _job_handlers  # noqa: F401
@@ -136,29 +148,6 @@ from .graphql.schema import schema as graphql_schema
 graphql_app = GraphQLRouter(graphql_schema)
 app.include_router(graphql_app, prefix="/graphql")
 
-
-@app.on_event("startup")
-def _startup() -> None:
-    init_db()
-    # Initialize FTS5 search index and reindex all entities
-    from .services.search_engine import init_search_index, reindex_all
-    init_search_index()
-    try:
-        result = reindex_all()
-        print(f"🔍 Search index: {result['indexed']} entities indexed")
-    except Exception as e:
-        print(f"⚠️  Search reindex skipped: {e}")
-
-
-@app.get("/api/health")
-def health():
-    return {"status": "ok", "service": "soundhub-api"}
-
-
-_STATIC = Path(__file__).parent / "static"
-
-
-@app.get("/", response_class=HTMLResponse)
-def docs_home():
-    """Serve the polished API documentation landing page."""
-    return (_STATIC / "docs.html").read_text(encoding="utf-8")
+# Serve static files (frontend build) - must come after API routes
+# for SPA fallback to work correctly
+app.mount("/", StaticFiles(directory="app/static", html=True), name="static")

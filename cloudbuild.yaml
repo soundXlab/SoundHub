@@ -1,0 +1,52 @@
+# Cloud Build configuration for SoundHub
+# Builds and deploys the unified backend+frontend to Cloud Run
+
+options:
+  substitution_option: 'ALLOW_LOOSE'
+
+substitutions:
+  _PROJECT_ID: "$PROJECT_ID"
+  _SERVICE: "soundhub"
+  _REGION: "us-central1"
+  _IMAGE: "gcr.io/$PROJECT_ID/soundhub"
+
+steps:
+# Build and deploy the unified application
+- name: 'gcr.io/cloud-builders/docker'
+  id: 'Build Application'
+  args: [
+    'build',
+    '-t', '$_IMAGE',
+    '-f', 'backend/Dockerfile',
+    '.'
+  ]
+  waitFor: ['-']
+
+- name: 'gcr.io/cloud-builders/docker'
+  id: 'Push Application'
+  args: [
+    'push',
+    '$_IMAGE'
+  ]
+  waitFor: ['Build Application']
+
+# Deploy to Cloud Run
+- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  id: 'Deploy Application'
+  entrypoint: 'gcloud'
+  args: [
+    'beta', 'run', 'deploy', '$_SERVICE',
+    '--image', '$_IMAGE',
+    '--platform', 'managed',
+    '--region', '$_REGION',
+    '--allow-unauthenticated',
+    '--set-env-vars', 'SOUNDHUB_STORAGE_PROVIDER=gcs,SOUNDHUB_GCS_BUCKET=soundhub-assets-$PROJECT_ID,SOUNDHUB_ENV=production,SOUNDHUB_SECRET_KEY=${SECRET_KEY},SOUNDHUB_CORS_ORIGINS=*'
+  ]
+  waitFor: ['Push Application']
+  secretEnv: ['SECRET_KEY']
+
+images:
+- '$_IMAGE'
+
+secretEnv:
+- 'SECRET_KEY'

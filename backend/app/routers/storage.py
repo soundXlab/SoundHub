@@ -18,6 +18,9 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Request, UploadFile, status
 from pydantic import BaseModel, Field
 from sqlalchemy import func, select
+import logging
+
+logger = logging.getLogger(__name__)
 from sqlalchemy.orm import Session
 
 from ..config import MAX_UPLOAD_SIZE
@@ -59,6 +62,7 @@ class ObjectMetadataResponse(BaseModel):
     byte_size: int
     kind: str
     status: str
+    storage_tier: int
     project_id: Optional[int] = None
     commit_id: Optional[int] = None
     created_at: datetime
@@ -150,6 +154,33 @@ def create_upload_intent(
         if existing and existing.status not in ("deleted", "failed"):
             # Already stored — return the existing object
             _audit(db, existing, "presign", user.id, request, "dedup-hit")
+
+            # Update storage tier based on current project policy
+            if existing.project_id is not None:
+                from ..models import Project
+                from .policy import StorageTier, determine_storage_tier
+                from datetime import datetime, timezone
+
+                project = db.get(Project, existing.project_id)
+                if project:
+                    current_timestamp = datetime.now(timezone.utc).timestamp()
+                    tier = determine_storage_tier(
+                        created_timestamp=existing.created_at.timestamp(),
+                        current_timestamp=current_timestamp,
+                        hot_days=project.hot_days,
+                        warm_days=project.warm_days,
+                        cold_days=project.cold_days,
+                        enabled=project.storage_enabled
+                    )
+                    if tier.value != existing.storage_tier:
+                        existing.storage_tier = tier.value
+                        try:
+                            storage_backend = get_storage()
+                            storage_backend.set_tier(existing.sha256, tier)
+                        except Exception as e:
+                            # Log the error but don't fail the dedup hit
+                            logger.warning(f"Failed to set storage tier for object {existing.sha256}: {e}")
+
             db.commit()
             storage_key = _content_address_key(existing.sha256)
             return UploadIntentResponse(
@@ -170,7 +201,7 @@ def create_upload_intent(
 
     obj = StorageObject(
         sha256=body.sha256 or "",
-        storage_provider="local" if not hasattr(storage, "bucket") else "s3",
+        storage_provider="local" if not hasattr(storage, "bucket") and not hasattr(storage, "bucket_name") else "s3" if hasattr(storage, "bucket") else "gcs",
         storage_key=storage_key,
         original_filename=body.filename,
         content_type=body.content_type or "application/octet-stream",
@@ -225,6 +256,33 @@ def complete_upload(
 
     obj.status = "uploaded"
     obj.byte_size = obj.byte_size  # could re-verify from storage
+
+    # Set initial storage tier based on project policy and current time
+    if obj.project_id is not None:
+        from ..models import Project
+        from .policy import StorageTier, determine_storage_tier
+        from datetime import datetime, timezone
+
+        project = db.get(Project, obj.project_id)
+        if project:
+            current_timestamp = datetime.now(timezone.utc).timestamp()
+            tier = determine_storage_tier(
+                created_timestamp=obj.created_at.timestamp(),
+                current_timestamp=current_timestamp,
+                hot_days=project.hot_days,
+                warm_days=project.warm_days,
+                cold_days=project.cold_days,
+                enabled=project.storage_enabled
+            )
+            obj.storage_tier = tier.value
+            # Update the storage backend to reflect the tier
+            try:
+                storage_backend = get_storage()
+                storage_backend.set_tier(obj.sha256, tier)
+            except Exception as e:
+                # Log the error but don't fail the upload
+                logger.warning(f"Failed to set storage tier for object {obj.sha256}: {e}")
+
     _audit(db, obj, "complete", user.id, request)
     db.commit()
     return {"id": obj.id, "status": obj.status, "sha256": obj.sha256}
@@ -247,6 +305,7 @@ def get_object_metadata(
         byte_size=obj.byte_size,
         kind=obj.kind,
         status=obj.status,
+        storage_tier=obj.storage_tier,
         project_id=obj.project_id,
         commit_id=obj.commit_id,
         created_at=obj.created_at,
