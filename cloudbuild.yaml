@@ -1,52 +1,45 @@
 # Cloud Build configuration for SoundHub
-# Builds and deploys the unified backend+frontend to Cloud Run
-
-options:
-  substitution_option: 'ALLOW_LOOSE'
-
-substitutions:
-  _PROJECT_ID: "$PROJECT_ID"
-  _SERVICE: "soundhub"
-  _REGION: "us-central1"
-  _IMAGE: "gcr.io/$PROJECT_ID/soundhub"
-
 steps:
-# Build and deploy the unified application
+# Build
 - name: 'gcr.io/cloud-builders/docker'
-  id: 'Build Application'
-  args: [
-    'build',
-    '-t', '$_IMAGE',
-    '-f', 'backend/Dockerfile',
-    '.'
-  ]
+  id: 'Build'
+  args:
+    - 'build'
+    - '-t'
+    - 'us-docker.pkg.dev/$PROJECT_ID/docker/soundhub'
+    - '.'
   waitFor: ['-']
 
+# Push with Artifact Registry auth
 - name: 'gcr.io/cloud-builders/docker'
-  id: 'Push Application'
-  args: [
-    'push',
-    '$_IMAGE'
-  ]
-  waitFor: ['Build Application']
+  id: 'Push'
+  entrypoint: 'bash'
+  args:
+    - '-c'
+    - |
+      # Configure Docker to use gcloud as credential helper
+      gcloud auth configure-docker us-docker.pkg.dev --quiet
+      docker push us-docker.pkg.dev/$PROJECT_ID/docker/soundhub
+  waitFor: ['Build']
 
-# Deploy to Cloud Run
+# Deploy
 - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-  id: 'Deploy Application'
+  id: 'Deploy'
   entrypoint: 'gcloud'
-  args: [
-    'beta', 'run', 'deploy', '$_SERVICE',
-    '--image', '$_IMAGE',
-    '--platform', 'managed',
-    '--region', '$_REGION',
-    '--allow-unauthenticated',
-    '--set-env-vars', 'SOUNDHUB_STORAGE_PROVIDER=gcs,SOUNDHUB_GCS_BUCKET=soundhub-assets-$PROJECT_ID,SOUNDHUB_ENV=production,SOUNDHUB_SECRET_KEY=${SECRET_KEY},SOUNDHUB_CORS_ORIGINS=*'
-  ]
-  waitFor: ['Push Application']
-  secretEnv: ['SECRET_KEY']
+  args:
+    - 'run'
+    - 'deploy'
+    - 'soundhub'
+    - '--image'
+    - 'us-docker.pkg.dev/$PROJECT_ID/docker/soundhub'
+    - '--platform'
+    - 'managed'
+    - '--region'
+    - 'us-central1'
+    - '--allow-unauthenticated'
+    - '--set-env-vars'
+    - 'SOUNDHUB_STORAGE_PROVIDER=gcs,SOUNDHUB_GCS_BUCKET=soundhub-assets-$PROJECT_ID,SOUNDHUB_ENV=production,SOUNDHUB_CORS_ORIGINS=*'
+  waitFor: ['Push']
 
 images:
-- '$_IMAGE'
-
-secretEnv:
-- 'SECRET_KEY'
+- 'us-docker.pkg.dev/$PROJECT_ID/docker/soundhub'

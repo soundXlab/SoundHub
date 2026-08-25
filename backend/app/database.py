@@ -66,6 +66,31 @@ def _migrate() -> None:
         ):
             if col not in packages_cols:
                 conn.execute(text(f"ALTER TABLE packages ADD COLUMN {col} {ddl}"))
+        # Jobs table: new columns for delayed execution, priority, DLQ
+        jobs_cols = {c["name"] for c in inspector.get_columns("jobs")} if inspector.has_table("jobs") else set()
+        for col, ddl in (
+            ("delay_until", "TIMESTAMP"),
+            ("priority", "INTEGER DEFAULT 0"),
+            ("dlq_reason", "TEXT"),
+        ):
+            if col not in jobs_cols:
+                conn.execute(text(f"ALTER TABLE jobs ADD COLUMN {col} {ddl}"))
+        # Projects table: storage lifecycle policy
+        for col, ddl in (
+            ("hot_days", "INTEGER DEFAULT 30"),
+            ("warm_days", "INTEGER DEFAULT 90"),
+            ("cold_days", "INTEGER DEFAULT 365"),
+            ("storage_enabled", "BOOLEAN DEFAULT TRUE"),
+        ):
+            if col not in projects_cols:
+                conn.execute(text(f"ALTER TABLE projects ADD COLUMN {col} {ddl}"))
+        # StorageObject: storage tier
+        storage_cols = {c["name"] for c in inspector.get_columns("storage_objects")} if inspector.has_table("storage_objects") else set()
+        for col, ddl in (
+            ("storage_tier", "INTEGER DEFAULT 0"),
+        ):
+            if col not in storage_cols:
+                conn.execute(text(f"ALTER TABLE storage_objects ADD COLUMN {col} {ddl}"))
         # Deliverable table migrations
         deliverable_cols = {c["name"] for c in inspector.get_columns("release_deliverables")} if inspector.has_table("release_deliverables") else set()
         for col, ddl in (
