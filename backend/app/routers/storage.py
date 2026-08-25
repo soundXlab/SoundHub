@@ -158,7 +158,7 @@ def create_upload_intent(
             # Update storage tier based on current project policy
             if existing.project_id is not None:
                 from ..models import Project
-                from .policy import StorageTier, determine_storage_tier
+                from ..services.storage.policy import StorageTier, determine_storage_tier
                 from datetime import datetime, timezone
 
                 project = db.get(Project, existing.project_id)
@@ -260,7 +260,7 @@ def complete_upload(
     # Set initial storage tier based on project policy and current time
     if obj.project_id is not None:
         from ..models import Project
-        from .policy import StorageTier, determine_storage_tier
+        from ..services.storage.policy import StorageTier, determine_storage_tier
         from datetime import datetime, timezone
 
         project = db.get(Project, obj.project_id)

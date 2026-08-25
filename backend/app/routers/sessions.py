@@ -99,8 +99,14 @@ def _comment_out(c: ReviewComment) -> ReviewCommentOut:
 
 
 def _version_out(db: Session, v: ReviewVersion, with_comments: bool = False) -> ReviewVersionOut:
-    data = storage.read_blob(v.blob_sha)
-    wf = waveform.generate(v.blob_sha, data, v.filename, v.audio_format)
+    # Try to read blob and generate waveform; gracefully handle large files
+    # (e.g. ALP archives) that can't be read into memory.
+    wf = {"duration_s": v.duration_s or 0.0, "peaks": [], "synthetic": True}
+    try:
+        data = storage.read_blob(v.blob_sha)
+        wf = waveform.generate(v.blob_sha, data, v.filename, v.audio_format)
+    except Exception:
+        pass  # Large file or missing blob — return synthetic waveform
     comments = [_comment_out(c) for c in v.comments] if with_comments else []
     session = db.get(ReviewSession, v.session_id)
     watermarked = bool(session and session.watermark_enabled and v.status != "approved")
@@ -656,7 +662,131 @@ def upload_version(session_id: int, message: str = Form(""), file: UploadFile = 
     return _version_out(db, version)
 
 
+class CreateVersionFromStorageRequest(BaseModel):
+    storage_object_id: int = Field(..., description="ID of the uploaded storage object")
+    message: str = Field("", description="Version message")
+    filename: str = Field("", description="Original filename")
+    audio_format: str = Field("alp", description="File format (wav, mp3, alp, etc.)")
+
+
 @router.get("/{session_id}/versions/{version_id}/audio")
+def get_version_audio(
+    session_id: int,
+    version_id: int,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Return a presigned URL for the version audio."""
+    v = get_version_or_404(db, session_id, version_id)
+    if not v.blob_sha:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "No audio available")
+    from ..services.storage import get_storage
+    storage = get_storage()
+    url = storage.presign_get(v.blob_sha)
+    return {"url": url}
+
+
+@router.post("/{session_id}/versions/from-storage", status_code=status.HTTP_201_CREATED)
+def create_version_from_storage(
+    session_id: int,
+    body: CreateVersionFromStorageRequest,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Create a review version from an already-uploaded storage object.
+
+    Use this for large files (>32MB) that were uploaded via the resumable upload endpoint.
+    Flow:
+        1. Upload file to GCS via POST /api/storage/resumable-upload
+        2. Call this endpoint with the storage_object_id to create the version
+    """
+    from ..models import StorageObject
+
+    session = get_session_or_404(db, user, session_id)
+
+    # Get the storage object
+    obj = db.get(StorageObject, body.storage_object_id)
+    if obj is None or obj.status == "deleted":
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Storage object not found")
+    if obj.uploaded_by_id != user.id:
+        raise HTTPException(status.HTTP_403_FORBIDDEN, "Access denied")
+
+    filename = body.filename or obj.original_filename or "upload"
+    ext = body.audio_format or (filename.rsplit(".", 1)[-1].lower() if "." in filename else "bin")
+
+    blob_sha = obj.sha256
+    number = next_version_number(db, session.id)
+    version = ReviewVersion(
+        session_id=session.id,
+        number=number,
+        label=f"v{number}",
+        message=body.message.strip(),
+        filename=filename,
+        blob_sha=blob_sha,
+        size=obj.byte_size,
+        duration_s=0.0,  # Will be computed asynchronously for large files
+        audio_format=ext,
+        round_number=session.round_number,
+    )
+    db.add(version)
+    db.flush()
+
+    # Close any open review requests
+    open_reqs = db.scalars(
+        select(ReviewComment)
+        .join(ReviewVersion, ReviewComment.version_id == ReviewVersion.id)
+        .where(
+            ReviewVersion.session_id == session.id,
+            ReviewComment.status.in_(["open", "acknowledged", "in_progress"]),
+            ReviewComment.fixed_in.is_(None),
+        )
+    ).all()
+    for c in open_reqs:
+        c.status = "fixed"
+        c.fixed_in = version.id
+
+    session.rounds_open = True
+    existing_round = db.scalar(
+        select(ReviewRound).where(
+            ReviewRound.session_id == session.id,
+            ReviewRound.number == session.round_number,
+        )
+    )
+    if existing_round is None:
+        db.add(ReviewRound(
+            session_id=session.id,
+            number=session.round_number,
+            status="open",
+        ))
+
+    session.updated_at = utcnow()
+    ledger.append(db, "version.created", session_id=session.id, actor=user.username, entity_type="version", entity_id=version.id, payload={"label": version.label, "round": version.round_number, "source": "storage_object"})
+    db.commit()
+    db.refresh(version)
+
+    # Return version info directly — don't call _version_out which tries to
+    # read the blob and generate waveform (impossible for large DAW projects).
+    return ReviewVersionOut(
+        id=version.id,
+        session_id=version.session_id,
+        number=version.number,
+        label=version.label,
+        message=version.message,
+        status=version.status,
+        filename=version.filename,
+        size=version.size,
+        duration_s=version.duration_s,
+        audio_format=version.audio_format,
+        created_at=version.created_at,
+        round_number=version.round_number,
+        waveform=[],
+        waveform_synthetic=True,
+        comments=[],
+        watermarked=False,
+        commit_id=version.commit_id,
+    )
+
+
 def download_audio(session_id: int, version_id: int, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     get_session_or_404(db, user, session_id)
     version = get_version_or_404(db, session_id, version_id)
