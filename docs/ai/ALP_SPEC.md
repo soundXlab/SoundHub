@@ -1,230 +1,902 @@
-# SoundHub — Ableton Live Pack (.alp) спецификация
+# SoundHub — Ableton Live Pack (.alp) полная спецификация
 
-## Что такое .alp
+> На основе: Ableton Reference Manual Version 12 (42 главы, ~500 страниц)
+> Дата анализа: 2026-08-26
 
-.alp — это **Ableton Live Pack**, ZIP-архив содержащий полный Ableton Live проект:
-- **Live Set** (.als) — gzip-compressed XML описания проекта
-- **Audio Samples** (.wav, .aiff, .flac, .mp3) — сэмплы, лупы, пресеты
-- **Presets** (.adv, .adg, .alc, .xpl) — пресеты инструментов и эффектов
-- **Max for Live devices** (.amxd) — Max/MSP патчи
-- **MIDI Files** (.mid) — MIDI-данные
-- **Waveform/PNG thumbnails** — превью для UI
+---
 
-## Структура .als XML (что парсим)
+## 1. ЧТО ТАКОЕ .alp
 
-### Уровень 1: Live Set
+.alp — **Ableton Live Pack**, ZIP-архив содержащий полный Ableton Live проект.
+
+### 1.1 Файловая структура архива
+
+```
+PackName.alp (ZIP)
+│
+├── PackName.als                    ← ГЛАВНЫЙ Live Set (gzip-compressed XML)
+│   └── LiveSet/
+│       ├── Tempo                   ← BPM
+│       ├── TimeSignature           ← Размер
+│       ├── Tracks[]                ← Все дорожки
+│       │   ├── AudioTrack          ← Аудио-дорожки
+│       │   ├── MidiTrack           ← MIDI-дорожки
+│       │   ├── GroupTrack          ← Групповые дорожки
+│       │   ├── ReturnTrack         ← Return-дорожки
+│       │   └── MasterTrack         ← Master output
+│       ├── GroovePool              ← Грувы
+│       └── GlobalSnapshots         ← Снимки
+│
+├── Freezey Songs/                  ← Замороженные треки (необязательно)
+├── Samples/                        ← Аудио-сэмплы
+│   ├── Import/                     ← Импортированные сэмплы
+│   └── Processed/                  ← Обработанные сэмплы
+│       ├── Reversed/               ← Реверсированные
+│       ├── Frozen/                 ← Замороженные
+│       └── Flattened/              ← Сведённые
+├── Samples/Presets/                ← Пресеты инструментов
+├── Presets/                        ← Резервные копии пресетов
+│   ├── Instrument/
+│   ├── Drum/
+│   ├── Audio Effect/
+│   ├── MIDI Effect/
+│   └── Max/
+├── Contact/                        ← Контактные данные
+└── [Other project files]
+```
+
+### 1.2 Типы файлов внутри архива
+
+| Расширение | Тип | Описание |
+|-----------|-----|----------|
+| `.als` | Live Set | Описание проекта (gzip XML) |
+| `.wav` | Аудио | PCM аудио (mono/stereo, до 32-bit float) |
+| `.aiff` / `.aif` | Аудио | Apple аудио формат |
+| `.flac` | Аудио | Сжатый lossless |
+| `.mp3` | Аудио | Сжатый lossy (CBR 320 kbps) |
+| `.ogg` | Аудио | Ogg Vorbis |
+| `.aac` | Аудио | Advanced Audio Coding |
+| `.adv` | Preset | Ableton Device Preset (инструмент/эффект) |
+| `.adg` | Preset | Ableton Device Group (Rack пресет) |
+| `.alc` | Live Clip | Ableton Live Clip (с привязкой к сэмплу) |
+| `.xpl` | Preset | Max for Live Preset |
+| `.amxd` | Max Device | Max for Live патч |
+| `.mid` | MIDI | Standard MIDI файл |
+| `.asd` | Analysis | Файл анализа сэмпла (warp markers, tempo) |
+| `.png` / `.jpg` | Изображение | Обложки, thumbnail'ы |
+
+---
+
+## 2. СТРУКТУРА .als XML (детально)
+
+### 2.1 Корневой элемент
+
 ```xml
 <LiveSet MajorVersion="12" MinorVersion="0">
-  <Tempo><Manual Value="128.0"/></Tempo>
-  <TimeSignature><Numerator Value="4"/><Denominator Value="4"/></TimeSignature>
-  <Tracks>...</Tracks>
-  <MasterTrack>...</MasterTrack>
+  <!-- Root attributes -->
 </LiveSet>
 ```
 
-### Уровень 2: Tracks
-Типы треков в Ableton:
-| XML Tag | Тип | Описание |
-|---------|-----|----------|
-| `AudioTrack` | audio | Аудио-дорожка (сэмплы, запись) |
-| `MidiTrack` | midi | MIDI-дорожка (инструменты, ноты) |
-| `GroupTrack` | group | Групповая дорожка (подмена) |
-| `ReturnTrack` | return | Return-дорожка (общие эффекты) |
-| `MasterTrack` | master | Master--output |
+**Версии Live:**
+| Major Version | Live Version |
+|---------------|-------------|
+| 11 | Live 11 |
+| 12 | Live 12 |
 
-### Уровень 3: Devices (цепочка устройств на треке)
+### 2.2 Live Set Properties
+
+```xml
+<LiveSet>
+  <Tempo>
+    <Manual Value="128.0"/>           <!-- BPM -->
+    <AutomationTarget Id="0"/>       <!-- Если автоматизирован -->
+  </Tempo>
+  
+  <TimeSignature>
+    <Numerator Value="4"/>           <!-- Числитель -->
+    <Denominator Value="4"/>         <!-- Знаменатель -->
+  </TimeSignature>
+  
+  <GlobalGrooveAmount Value="100.0"/> <!-- Сила грува (0-100%) -->
+  
+  <UniqueID Value="..."/>           <!-- Уникальный ID проекта -->
+</LiveSet>
 ```
-MIDI Track:
-  [MIDI Effect] → [MIDI Effect] → [Instrument] → [Audio Effect] → [Audio Effect]
 
-Audio Track:
-  [Audio Effect] → [Audio Effect] → [Audio Effect]
+### 2.3 Tracks (дорожки)
 
-Return Track:
-  [Audio Effect] → [Audio Effect]
+Каждый трек содержит:
+
+```xml
+<AudioTrack Id="0">
+  <!-- Имя трека -->
+  <EffectiveName Value="Kick"/>
+  <Name Value="Kick"/>
+  
+  <!-- Цвет (integer → hex) -->
+  <Color Value="86"/>              <!-- Ableton color index -->
+  
+  <!-- Видимость -->
+  <IsFolded Value="false"/>
+  
+  <!-- Mixer -->
+  <Volume>
+    <Manual Value="0.0"/>          <!-- dB (-inf to +6) -->
+    <AutomationTarget Id="0"/>
+  </Volume>
+  <Pan>
+    <Manual Value="0.0"/>          <!-- -50 (left) to +50 (right) -->
+    <AutomationTarget Id="0"/>
+    <PanMode Value="Balanced"/>    <!-- Normal/Balanced -->
+  </Pan>
+  <Sends>
+    <Send>
+      <PostPan Value="false"/>
+      <PostMixer Value="true"/>
+      <Volume>
+        <Manual Value="-inf"/>
+      </Volume>
+    </Send>
+    <!-- Повторить для каждого return -->
+  </Sends>
+  
+  <!-- Mute/Solo -->
+  <Mute Value="false"/>
+  <IsSoloExclusive Value="false"/>
+  <Solo.Value Value="false"/>
+  
+  <!-- Arm (запись) -->
+  <Arm.Value Value="false"/>
+  <Arm.Exclusive Value="false"/>
+  
+  <!-- Monitor -->
+  <MonitorMode Value="Auto"/>      <!-- Auto/In/Off -->
+  
+  <!-- Routing -->
+  <AudioInputRouting>
+    <MidiStatusCode Value="0"/>
+    <ExternalValue.Value Value=""/>
+    <TrackOn Value="true"/>
+    <MidiFrom>                      <!-- MIDI input source -->
+      <MidiFromEffectTrack Value="false"/>
+      <Target.Value Value=""/>
+    </MidiFrom>
+    <AudioFrom>
+      <AudioFromType Value="0"/>   <!-- 0=Ext, 1=Resampling, 2=Track -->
+      <AudioFromChannel.Value Value="post Mixer"/>
+      <Track.Value Value=""/>
+    </AudioFrom>
+  </AudioInputRouting>
+  
+  <AudioOutputRouting>
+    <AudioToType Value="0"/>        <!-- 0=Master, 1=Ext, 2=Track -->
+    <AudioOutputChannelString Value="1/2"/>
+    <TrackOn Value="true"/>
+  </AudioOutputRouting>
+  
+  <!-- Устройства -->
+  <Devices>
+    <AudioEffectBranch>
+      <BranchDevices>
+        <!-- Здесь устройства -->
+      </BranchDevices>
+    </AudioEffectBranch>
+  </Devices>
+  
+  <!-- MIDI clips -->
+  <ArrangementClips>
+    <MidiClip>
+      <Name Value="Pattern 1"/>
+      <Color Value="86"/>
+      <ClipStartTime Value="0.0"/>
+      <ClipEndTime Value="32.0"/>
+      <LoopSettings>
+        <LoopStart Value="0.0"/>
+        <LoopEnd Value="32.0"/>
+        <LoopOn Value="true"/>
+      </LoopSettings>
+      <Notes>
+        <KeyTracks>
+          <KeyTrack>
+            <MidiKey Value="60"/>      <!-- C4 -->
+            <Notes>
+              <MidiNoteEvent>
+                <Time Value="0.0"/>
+                <Duration Value="0.5"/>
+                <Velocity Value="100"/>
+                <Probability Value="1.0"/>
+              </MidiNoteEvent>
+            </Notes>
+          </KeyTrack>
+        </KeyTracks>
+      </Notes>
+    </MidiClip>
+  </ArrangementClips>
+  
+  <!-- Session clips -->
+  <ClipSlots>
+    <ClipSlot>
+      <Clip>
+        <!-- MIDI или Audio clip -->
+      </Clip>
+    </ClipSlot>
+  </ClipSlots>
+  
+  <!-- Automation -->
+  <Envelopes>
+    <AutomationLane>
+      <Target Id="0"/>              <!-- ID параметра -->
+      <Automation>
+        <AutomationEvent>
+          <Time Value="0.0"/>
+          <Value Value="0.75"/>
+        </AutomationEvent>
+      </Automation>
+    </AutomationLane>
+  </Envelopes>
+</AudioTrack>
 ```
 
-### Уровень 4: Plug-Ins
-Типы плагинов в XML:
-| XML Tag | Тип | Описание |
-|---------|-----|----------|
-| `VstPluginInfo` | VST2 | Классический VST |
-| `VstPluginInfo` (VST3) | VST3 | Новый VST3 формат |
-| `AudioUnitPluginInfo` | AU | Audio Unit (macOS) |
-| `ClapPluginInfo` | CLAP | Новый CLAP формат |
+### 2.4 Devices (цепочки устройств)
 
-Данные плагина в XML:
+#### 2.4.1 Порядок устройств на треке
+
+**Audio Track:**
+```
+AudioEffect → AudioEffect → AudioEffect → ... → Mixer
+```
+
+**MIDI Track:**
+```
+MidiEffect → MidiEffect → Instrument → AudioEffect → AudioEffect → ... → Mixer
+```
+
+**Return Track:**
+```
+AudioEffect → AudioEffect → ... → Mixer
+```
+
+#### 2.4.2 Audio Effects (Live 12)
+
+| XML Tag | Device | Описание |
+|---------|--------|----------|
+| `AutoFilter` | Auto Filter | Фильтр с LFO и envelope follower |
+| `AutoPan` | Auto Pan-Tremolo | Авто-панорама/тремоло |
+| `BeatRepeat` | Beat Repeat | Повторы битов |
+| `Chorus-Ensemble` | Chorus-Ensemble | Хорус/ансамбль |
+| `Compressor` | Compressor | Компрессор |
+| `Delay` | Delay | Задержка |
+| `DrumBuss` | Drum Buss | Усиление барабанов |
+| `DynamicTube` | Dynamic Tube | Трубчатая сатурация |
+| `Echo` | Echo | Эхо |
+| `EQEight` | EQ Eight | 8-полосный эквалайзер |
+| `EQThree` | EQ Three | 3-полосный эквалайзер |
+| `Erosion` | Erosion | Эрозия/дисторшн |
+| `FilterDelay` | Filter Delay | Фильтрованная задержка |
+| `Gate` | Gate | Гейт |
+| `GlueCompressor` | Glue Compressor | "Склеивающий" компрессор |
+| `GrainDelay` | Grain Delay | Зернистая задержка |
+| `HybridReverb` | Hybrid Reverb | Гибридная реверберация |
+| `Limiter` | Limiter | Лимитер |
+| `Looper` | Looper | Лупер |
+| `MultibandDynamics` | Multiband Dynamics | Мультимовая динамика |
+| `Overdrive` | Overdrive | Овердрайв |
+| `Pedal` | Pedal | Гитарная педаль |
+| `Phaser-Flanger` | Phaser-Flanger | Фейзер/фленджер |
+| `Redux` | Redux | Бит-крашер |
+| `Resonators` | Resonators | Резонаторы |
+| `Reverb` | Reverb | Реверберация |
+| `Roar` | Roar | Сатурация/дисторшн |
+| `Saturator` | Saturator | Сатурация |
+| `Shifter` | Shifter | Pitch shifter |
+| `SpectralResonator` | Spectral Resonator | Спектральный резонатор |
+| `SpectralTime` | Spectral Time | Спектральная задержка |
+| `Spectrum` | Spectrum | Спектроанализатор |
+| `Tuner` | Tuner | Тюнер |
+| `Utility` | Utility | Утилиты (gain, pan, phase, mono) |
+| `VinylDistortion` | Vinyl Distortion | Виниловая дисторшн |
+| `Vocoder` | Vocoder | Вокодер |
+| `Amp` | Amp | Гитарный усилитель |
+| `Cabinet` | Cabinet | Гитарный кабинет |
+| `ChannelEQ` | Channel EQ | Канальный эквалайзер |
+| `ExternalAudioEffect` | External Audio Effect | Внешний эффект |
+| `AutoShift` | Auto Shift | Авто-тюнер |
+
+#### 2.4.3 MIDI Effects (Live 12)
+
+| XML Tag | Device | Описание |
+|---------|--------|----------|
+| `Arpeggiator` | Arpeggiator | Арпеджиатор |
+| `CCControl` | CC Control | Управление MIDI CC |
+| `Chord` | Chord | Аккорды |
+| `NoteLength` | Note Length | Длина нот |
+| `Pitch` | Pitch | Транспозиция |
+| `Random` | Random | Случайные значения |
+| `Scale` | Scale | Масштабирование нот |
+| `Velocity` | Velocity | Управление velocity |
+
+#### 2.4.4 Instruments (Live 12)
+
+| XML Tag | Device | Описание |
+|---------|--------|----------|
+| `InstrumentBranch` (Analog) | Analog | Аналоговый синтезатор |
+| `InstrumentBranch` (Collision) | Collision | Моделирование ударных |
+| `InstrumentBranch` (Drift) | Drift | Субтрактивный синтезатор |
+| `InstrumentBranch` (DrumSampler) | Drum Sampler | Сэмплер ударных |
+| `InstrumentBranch` (Electric) | Electric | Электрическое пианино |
+| `InstrumentBranch` (Impulse) | Impulse | Сэмплер ударных |
+| `InstrumentBranch` (Meld) | Meld | Вейвтейбл синтезатор |
+| `InstrumentBranch` (Operator) | Operator | FM-синтезатор |
+| `InstrumentBranch` (Sampler) | Sampler | Мультисэмплер |
+| `InstrumentBranch` (Simpler) | Simpler | Простой сэмплер |
+| `InstrumentBranch` (Tension) | Tension | Струнный синтезатор |
+| `InstrumentBranch` (Wavetable) | Wavetable | Вейвтейбл синтезатор |
+
+#### 2.4.5 Plug-Ins (сторонние)
+
 ```xml
 <PluginDevice>
   <VstPluginInfo>
+    <!-- VST2/VST3 -->
     <PlugName Value="Serum"/>
     <PlugUniqueID Value="1769238114"/>
-    <State>... (сериализованное состояние плагина) ...</State>
+    <VstPluginVersion Value="0"/>
+    <State>... (сериализованное состояние) ...</State>
   </VstPluginInfo>
+</PluginDevice>
+
+<PluginDevice>
+  <AudioUnitPluginInfo>
+    <!-- Audio Unit (macOS) -->
+    <PlugName Value="Serum"/>
+    <ComponentType Value="aumu"/>
+    <ComponentSubType Value="sfrm"/>
+    <State>...</State>
+  </AudioUnitPluginInfo>
+</PluginDevice>
+
+<PluginDevice>
+  <ClapPluginInfo>
+    <!-- CLAP формат -->
+    <PlugName Value="..."/>
+    <State>...</State>
+  </ClapPluginInfo>
 </PluginDevice>
 ```
 
-### Уровень 5: Racks (Инструменты/Эффекты)
+**Plug-In битовый идентификатор:**
+- VST2: 4-байтовый код (например `sFPm` = Serum)
+- VST3: CLSID в hex
+- AU: componentType + componentSubType
+- CLAP: unique-id
+
+### 2.5 Racks (Рэки)
+
+#### 2.5.1 Instrument Rack
+
 ```xml
-<InstrumentBranch> <!-- Instrument Rack -->
-  <Branches>
+<InstrumentBranch>
+  <BranchName Value="My Synth Rack"/>
+  <BranchColor Value="86"/>
+  
+  <BranchDevices>
+    <!-- MIDI Effects (до инструмента) -->
+    <Arpeggiator>
+      <Style Value="Up"/>
+      <Rate Value="1/16"/>
+    </Arpeggiator>
+    
+    <!-- Инструмент -->
     <InstrumentBranch>
-      <BranchName Value="Drum Rack"/>
       <BranchDevices>
-        <MidiToAudioDevice>
-          <DrumGroupDevice>
-            <DrumPads>
-              <DrumPad>
-                <SampleRef>...</SampleRef>
-              </DrumPad>
-            </DrumPads>
-          </DrumGroupDevice>
-        </MidiToAudioDevice>
+        <Operator>...</Operator>
       </BranchDevices>
     </InstrumentBranch>
-  </Branches>
+    
+    <!-- Audio Effects (после инструмента) -->
+    <Chorus-Ensemble>...</Chorus-Ensemble>
+    <Reverb>...</Reverb>
+  </BranchDevices>
+  
+  <!-- Macro Controls (до 16) -->
+  <MacroControls>
+    <MacroControl>
+      <MacroName Value="Filter Cutoff"/>
+      <MacroValue Value="0.75"/>
+      <MacroMidiValue Value="64"/>
+    </MacroControl>
+    <!-- ... до 16 макро-контролов -->
+  </MacroControls>
+  
+  <!-- Zones (для Instrument/MIDI Effect Racks) -->
+  <KeyZone>
+    <LValue Value="0"/>        <!-- Минимальная нота -->
+    <HValue Value="127"/>      <!-- Максимальная нота -->
+    <FadeIn Value="0"/>
+    <FadeOut Value="0"/>
+  </KeyZone>
+  <VelocityZone>
+    <LValue Value="1"/>
+    <HValue Value="127"/>
+    <FadeIn Value="0"/>
+    <FadeOut Value="0"/>
+  </VelocityZone>
+  <ChainSelectZone>
+    <LValue Value="0"/>
+    <HValue Value="0"/>
+  </ChainSelectZone>
 </InstrumentBranch>
 ```
 
-## Что SoundHub должен ИЗВЛЕКАТЬ
+#### 2.5.2 Drum Rack
 
-### Приоритет 1: Метаданные для UI (receipt-style просмотр)
-
-| Поле | Источник в XML | Зачем нужно |
-|------|---------------|-------------|
-| **Project Name** | имя .als файла | Заголовок в UI |
-| **BPM** | `LiveSet/Tempo/Manual/@Value` | Отображение темпа |
-| **Time Signature** | `LiveSet/TimeSignature/Numerator/Denominator` | Отображение размера |
-| **Live Version** | `LiveSet/@MajorVersion.@MinorVersion` | Совместимость |
-| **Track Count** | `len(Tracks)` | Общая статистика |
-
-### Приоритет 2: Треки и их устройства
-
-| Поле | Источник | UI |
-|------|----------|-----|
-| **Track Name** | `EffectiveName` или `Name` | Название дорожки |
-| **Track Type** | XML tag name (Audio/Midi/Group/Return) | Иконка типа |
-| **Track Color** | `Color` (integer → hex) | Цветовая полоска |
-| **Track Height** | `TrackHeight` | Визуальный размер |
-| **Mute/Solo/Arm** | `Mute`/`IsSoloExclusive`/`Arm` | Статус |
-| **Volume** | `Volume/Manual/@Value` | Level meter |
-| **Pan** | `Pan/Manual/@Value` | Панорама |
-| **Sends** | `Sends` → `SendEffectChain` | Return-миксы |
-
-### Приоритет 3: Устройства (Devices) на каждом треке
-
-| Поле | Источник | UI |
-|------|----------|-----|
-| **Device Name** | XML tag (EQ Eight, Compressor, etc.) | Название |
-| **Device Type** | category (builtin/VST/AU/CLAP) | Иконка |
-| **Device Enabled** | `IsEnabled` | On/Off |
-| **Plugin Name** | `PlugName` для VST/AU | Название плагина |
-| **Plugin Version** | `State` metadata | Версия |
-| **Plugin State** | `State` (сериализованное) | Для ре-активации |
-
-### Приоритет 4: Сэмплы и аудио-файлы
-
-| Поле | Источник | UI |
-|------|----------|-----|
-| **Sample Path** | `SampleRef/RelativePathElement` | Путь к файлу |
-| **Sample Rate** | `.asd` analysis file или метаданные WAV | Качество |
-| **Bit Depth** | WAV header | Качество |
-| **Duration** | WAV/AIFF header | Длина |
-| **Channels** | WAV header | Mono/Stereo |
-| **Warp Mode** | `WarpMode` в clip | Способ растяжки |
-| **Loop Settings** | `LoopStart/LoopEnd/LoopOn` | Зацикливание |
-| **Clip Gain** | `Gain` в clip | Громкость |
-| **Clip Transpose** | `Transpose` в clip | Транспозиция |
-
-### Приоритет 5: MIDI-клипы
-
-| Поле | Источник | UI |
-|------|----------|-----|
-| **MIDI Notes** | `MidiClip/Notes/Data` | Ноты (для отображения) |
-| **Velocity** | `Note/@Velocity` | Динамика |
-| **Quantization** | `Quantization` | Квантование |
-| **Scale** | `Scale/RootNote/ScaleId` | Тональность |
-| **Groove** | `Groove/` | Грув |
-
-### Приоритет 6: Пресеты и Racks
-
-| Поле | Источник | UI |
-|------|----------|-----|
-| **Rack Name** | `BranchName` | Название рэка |
-| **Chain Count** | `len(Branches)` | Количество цепочек |
-| **Macro Controls** | `MacroControls` | Макро-параметры |
-| **Preset Files** | `.adv/.adg/.xpl` в архиве | Файлы пресетов |
-
-## Что SoundHub должен ОТОБРАЖАТЬ в UI
-
-### Receipt-Style Project View
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│  📦 TheForgebyHecq - Ableton Live Pack v9.1                    │
-│  BPM: 128 | 4/4 | 12 tracks | 247 samples | 34 presets        │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                 │
-│  🎵 Kick             [#FF6F61]                                  │
-│    ├─ Drum Rack → EQ Eight → Compressor → Utility               │
-│    └─ 3 samples (Kick_01.wav, Kick_02.wav, Kick_Noise.wav)     │
-│                                                                 │
-│  🎵 Bass             [#6ECFF6]                                  │
-│    ├─ Serum (VST3) → SSL Comp → ValhallaRoom                   │
-│    └─ MIDI clip: 8 bars, C minor                               │
-│                                                                 │
-│  🎵 Lead             [#A8E6CF]                                  │
-│    ├─ Operator → Auto Filter → Chorus → Reverb                  │
-│    └─ MIDI clip: 16 bars, Am scale                             │
-│                                                                 │
-│  🎵 Pads             [#FFD93D]                                  │
-│    ├─ Wavetable → Echo → Hybrid Reverb                         │
-│    └─ Audio clip: 32 bars, warped, 128 BPM                     │
-│                                                                 │
-│  ... (8 more tracks)                                            │
-│                                                                 │
-├─────────────────────────────────────────────────────────────────┤
-│  📊 Summary                                                     │
-│  ├─ Instruments: Drum Rack, Serum, Operator, Wavetable          │
-│  ├─ Effects: EQ Eight, Compressor, Reverb, Delay, Chorus (×8)  │
-│  ├─ VST Plugins: Serum (x2), FabFilter Pro-Q, ValhallaRoom    │
-│  ├─ Audio: 247 files (1.2GB total)                             │
-│  └─ MIDI Clips: 8                                               │
-└─────────────────────────────────────────────────────────────────┘
+```xml
+<DrumGroupDevice>
+  <BranchName Value="My Drum Kit"/>
+  
+  <DrumPads>
+    <DrumPad>
+      <Receive.Value Value="36"/>        <!-- C1 = Kick -->
+      <Play.Value Value="36"/>
+      <Choke.Value Value="0"/>           <!-- Choke group (0=none) -->
+      <IsEnabled Value="true"/>
+      <Color Value="86"/>
+      
+      <SampleRef>
+        <RelativePathElement>
+          <Dir Value="Samples"/>
+          <Name Value="Kick.wav"/>
+        </RelativePathElement>
+      </SampleRef>
+      
+      <!-- Chain devices -->
+      <BranchDevices>
+        <Simpler>
+          <!-- Сэмплер с параметрами -->
+          <SampleRef>...</SampleRef>
+          <PlaybackMode Value="1"/>       <!-- 0=Classic, 1=One-Shot, 2=Slice -->
+          <Volume Value="0.0"/>
+          <Pan Value="0.0"/>
+          <FilterEnabled Value="true"/>
+          <FilterType Value="1"/>         <!-- LP/HP/BP/Notch -->
+          <FilterFreq Value="0.5"/>
+          <FilterRes Value="0.0"/>
+          <StartValue Value="0.0"/>
+          <EndValue Value="1.0"/>
+          <LoopStart Value="0.0"/>
+          <LoopEnd Value="1.0"/>
+          <LoopOn Value="false"/>
+          <SnapValue Value="true"/>
+        </Simpler>
+        <Compressor>...</Compressor>
+      </BranchDevices>
+    </DrumPad>
+    
+    <!-- Другие пады -->
+    <DrumPad>
+      <Receive.Value Value="38"/>        <!-- D1 = Snare -->
+      ...
+    </DrumPad>
+  </DrumPads>
+  
+  <!-- Return chains (до 6) -->
+  <ReturnChains>
+    <ReturnChain>
+      <BranchName Value="Reverb Send"/>
+      <BranchDevices>
+        <Reverb>...</Reverb>
+      </BranchDevices>
+      <ReturnChainVolume Value="0.0"/>
+    </ReturnChain>
+  </ReturnChains>
+  
+  <!-- Macro Controls -->
+  <MacroControls>...</MacroControls>
+</DrumGroupDevice>
 ```
 
-### Plugin Registry View
+#### 2.5.3 Audio Effect Rack
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│  🔌 Required Plugins                                        │
-├─────────────────────────────────────────────────────────────┤
-│  ✅ Built-in (Live 12)                                      │
-│    EQ Eight, Compressor, Reverb, Chorus, Delay, Utility...  │
-│                                                             │
-│  ⚠️ Third-party VST/AU                                      │
-│    Serum (VST3) — by Xfer Records                           │
-│    FabFilter Pro-Q 3 — by FabFilter                         │
-│    ValhallaRoom — by Valhalla DSP                           │
-│                                                             │
-│  ❓ Unknown                                                  │
-│    (plugins that SoundHub can't identify)                   │
-└─────────────────────────────────────────────────────────────┘
+```xml
+<AudioEffectBranch>
+  <BranchName Value="Parallel Processing"/>
+  
+  <!-- Chain List (параллельные цепочки) -->
+  <Branches>
+    <AudioEffectBranch>
+      <BranchName Value="Clean"/>
+      <ChainVolume Value="0.0"/>
+      <ChainPan Value="0.0"/>
+      <BranchDevices>
+        <EQEight>...</EQEight>
+      </BranchDevices>
+    </AudioEffectBranch>
+    <AudioEffectBranch>
+      <BranchName Value="Dirty"/>
+      <ChainVolume Value="-6.0"/>
+      <BranchDevices>
+        <Overdrive>...</Overdrive>
+        <Compressor>...</Compressor>
+      </BranchDevices>
+    </AudioEffectBranch>
+  </Branches>
+  
+  <MacroControls>...</MacroControls>
+</AudioEffectBranch>
 ```
 
-## Что НЕ нужно парсить (избыточно для маркетплейса)
+### 2.6 Audio Clips
+
+```xml
+<MidiClip>  <!-- или AudioClip -->
+  <Name Value="Loop 1"/>
+  <Color Value="86"/>
+  
+  <!-- Regioны -->
+  <ClipStartTime Value="0.0"/>
+  <ClipEndTime Value="8.0"/>
+  
+  <!-- Loop -->
+  <LoopSettings>
+    <LoopStart Value="0.0"/>
+    <LoopEnd Value="8.0"/>
+    <LoopOn Value="true"/>
+    <HiddenLoopStart Value="0.0"/>
+    <HiddenLoopEnd Value="8.0"/>
+  </LoopSettings>
+  
+  <!-- Warp (для аудио) -->
+  <AudioShapers>
+    <AudioWarper>
+      <WarpMode Value="1"/>              <!-- 0=Beats, 1=Tones, 2=Texture, 3=Re-Pitch, 4=Complex, 5=ComplexPro -->
+      <WarpMarkers>
+        <WarpMarker>
+          <Time Value="0.0"/>
+          <AnchorTime Value="0.0"/>
+        </WarpMarker>
+      </WarpMarkers>
+    </AudioWarper>
+  </AudioShapers>
+  
+  <!-- Gain/Pitch -->
+  <GuGuTransposition Value="0"/>         <!-- Транспозиция в полутонах -->
+  <GuGuVolume Value="100.0"/>            <!-- Громкость (%) -->
+  
+  <!-- Time Signature -->
+  <ClipTimeSignature>
+    <Numerator Value="4"/>
+    <Denominator Value="4"/>
+  </ClipTimeSignature>
+  
+  <!-- Groove -->
+  <GrooveSettings>
+    <GrooveId Value="..."/>              <!-- Ссылка на groove из Groove Pool -->
+  </GrooveSettings>
+  
+  <!-- Follow Action -->
+  <FollowAction>
+    <FollowActionTime>1.0</FollowActionTime>
+    <FollowAction Value="0"/>            <!-- 0=None, 1=Stop, 2=PlayAgain, 3=Next, 4=Previous, 5=Random, 6=Other -->
+    <FollowActionChanceA Value="1.0"/>
+    <FollowActionChanceB Value="0.0"/>
+    <IsLinked Value="false"/>
+    <LinkType Value="0"/>
+  </FollowAction>
+  
+  <!-- Launch -->
+  <Launch>
+    <Velocity Value="100"/>
+    <Quantization Value="4"/>            <!-- Глобальная квантизация -->
+    <IsLaunchable Value="true"/>
+    <LaunchMode Value="0"/>              <!-- 0=Trigger, 1=Gate, 2=Toggle, 3=Repeat -->
+    <Legato Value="false"/>
+  </Launch>
+  
+  <!-- Notes (для MIDI) -->
+  <Notes>
+    <KeyTracks>
+      <KeyTrack>
+        <MidiKey Value="60"/>
+        <Notes>
+          <MidiNoteEvent>
+            <Time Value="0.0"/>
+            <Duration Value="0.5"/>
+            <Velocity Value="100"/>
+            <Probability Value="1.0"/>
+          </MidiNoteEvent>
+        </Notes>
+      </KeyTrack>
+    </KeyTracks>
+    <ControllerChains>
+      <ControllerChain>
+        <MidiCCNo Value="1"/>            <!-- Mod Wheel -->
+        <MidiCCChain>
+          <Events>
+            <MidiCCEvent>
+              <Time Value="0.0"/>
+              <Value Value="64"/>
+            </MidiCCEvent>
+          </Events>
+        </MidiCCChain>
+      </ControllerChain>
+    </ControllerChains>
+  </Notes>
+  
+  <!-- Clip Envelopes -->
+  <Envelopes>
+    <AutomationLane>
+      <Target Id="0"/>
+      <Automation>...</Automation>
+    </AutomationLane>
+  </Envelopes>
+  
+  <!-- Scale -->
+  <ScaleSettings>
+    <IsEnabled Value="false"/>
+    <RootNote Value="0"/>                <!-- C -->
+    <ScaleId Value="0"/>                 <!-- Major -->
+  </ScaleSettings>
+</MidiClip>
+```
+
+### 2.7 Automation
+
+```xml
+<AutomationLane>
+  <Target Id="0"/>                        <!-- ID параметра для автоматизации -->
+  <LomId Value="0"/>
+  <IsEnabled Value="true"/>
+  <Automation>
+    <AutomationEvent>
+      <Time Value="0.0"/>
+      <Value Value="0.75"/>
+    </AutomationEvent>
+    <AutomationEvent>
+      <Time Value="4.0"/>
+      <Value Value="0.50"/>
+    </AutomationEvent>
+  </Automation>
+</AutomationLane>
+```
+
+### 2.8 Groove Pool
+
+```xml
+<GroovePool>
+  <Grooves>
+    <AudioToMidiGroove>
+      <Name Value="Swing 56"/>
+      <FilePath Value="Grooves/Swing 56.agr"/>
+      <Timing Value="100.0"/>             <!-- Сила тайминга -->
+      <Random Value="0.0"/>               <!-- Случайность -->
+      <Velocity Value="0.0"/>             <!-- Влияние на velocity -->
+      <Quantization Value="100.0"/>       <!-- Квантизация -->
+    </AudioToMidiGroove>
+  </Grooves>
+</GroovePool>
+```
+
+### 2.9 Return Tracks
+
+```xml
+<ReturnTrack>
+  <Name Value="Reverb"/>
+  <Volume>
+    <Manual Value="0.0"/>
+  </Volume>
+  <Pan>
+    <Manual Value="0.0"/>
+  </Pan>
+  <Devices>
+    <AudioEffectBranch>
+      <BranchDevices>
+        <Reverb>...</Reverb>
+      </BranchDevices>
+    </AudioEffectBranch>
+  </Devices>
+</ReturnTrack>
+```
+
+### 2.10 Master Track
+
+```xml
+<MasterTrack>
+  <Volume>
+    <Manual Value="0.0"/>
+  </Volume>
+  <Pan>
+    <Manual Value="0.0"/>
+  </Pan>
+  <CrossfaderAssignment Value="0"/>
+  <Sends>
+    <!-- Return sends -->
+  </Sends>
+  <Devices>
+    <!-- Master effects chain -->
+  </Devices>
+</MasterTrack>
+```
+
+---
+
+## 3. ЧТО ИЗВЛЕКАЕМ ДЛЯ UI (приоритизированно)
+
+### 3.1 Приоритет 1: Receipt-View (обзор проекта)
+
+| Что | Как извлекаем | UI отображение |
+|-----|--------------|----------------|
+| **Project Name** | Имя .als файла | Заголовок |
+| **Live Version** | `MajorVersion.MinorVersion` | "Ableton Live 12" |
+| **BPM** | `Tempo/Manual/@Value` | "128 BPM" |
+| **Time Signature** | `TimeSignature/Numerator/Denominator` | "4/4" |
+| **Total Tracks** | `count(Tracks/*)` | "12 tracks" |
+| **Total Samples** | `count(//SampleRef)` | "247 samples" |
+| **Total Presets** | `count(//PresetRef)` + `.adv/.adg/.xpl` files | "34 presets" |
+| **Groove** | `GroovePool/Grooves` | "Swing 56" |
+
+### 3.2 Приоритет 2: Track List
+
+Для каждого трека:
+
+| Что | Как извлекаем | UI |
+|-----|--------------|-----|
+| **Name** | `EffectiveName/@Value` или `Name/@Value` | Название |
+| **Type** | XML tag name | Иконка (audio/midi/group/return) |
+| **Color** | `Color/@Value` → Ableton color palette → hex | Цветная полоска |
+| **Volume** | `Volume/Manual/@Value` | "0.0 dB" |
+| **Pan** | `Pan/Manual/@Value` | "C" / "L15" / "R30" |
+| **Mute** | `Mute/@Value` | 🔇 если muted |
+| **Solo** | `Solo.Value/@Value` | 🔊 если solo |
+| **Arm** | `Arm.Value/@Value` | ⚫ если armed |
+| **Device Chain** | Список устройств (порядок!) | "EQ Eight → Compressor → Reverb" |
+| **Clip Count** | `count(ArrangementClips/*) + count(ClipSlots/*/Clip)` | "3 clips" |
+| **MIDI Clips** | Список MIDI клипов | "Pattern 1 (8 bars)" |
+| **Audio Clips** | Список аудио клипов | "Loop 1 (4 bars, warped)" |
+
+### 3.3 Приоритет 3: Devices & Plugins
+
+Для каждого устройства:
+
+| Что | Как извлекаем | UI |
+|-----|--------------|-----|
+| **Device Name** | XML tag name | "EQ Eight" |
+| **Device Type** | Классификация (builtin/VST/AU/CLAP) | Иконка |
+| **Is Enabled** | `IsEnabled/@Value` | On/Off |
+| **Preset Name** | Если preset loaded | "Preset Name" |
+| **Parameters** | Ключевые параметры (см. ниже) | Значения |
+| **Sidechain** | Если используется sidechain | "Sidechain from Track X" |
+| **Chain Position** | Порядок в цепочке | left-to-right |
+
+**Ключевые параметры по устройствам:**
+
+| Device | Ключевые параметры |
+|--------|-------------------|
+| EQ Eight | Band frequencies, gains, types (8 полос) |
+| Compressor | Threshold, Ratio, Attack, Release, Knee |
+| Reverb | Room Size, Decay, Dry/Wet, Pre-Delay |
+| Delay | Time, Feedback, Dry/Wet, Ping Pong |
+| Auto Filter | Freq, Res, LFO Rate, Envelope Amount |
+| Saturator | Drive, Output, Type |
+| Utility | Gain, Pan, Width, Phase, Mono |
+| Operator | 4 Oscillator levels, Filter, LFO |
+| Wavetable | Position, Filter, Envelopes |
+| Simpler | Sample, Start, End, Filter, Envelope |
+| Drum Rack | Pad assignments (note → sample) |
+| Reverb | Size, Decay, Diffusion, Dry/Wet |
+
+### 3.4 Приоритет 4: Samples
+
+| Что | Как извлекаем | UI |
+|-----|--------------|-----|
+| **File Path** | `SampleRef/RelativePathElement` | "Samples/Kick.wav" |
+| **Format** | Расширение | "WAV" / "AIFF" / "FLAC" |
+| **Sample Rate** | WAV header (или .asd) | "44100 Hz" / "48000 Hz" |
+| **Bit Depth** | WAV header | "16-bit" / "24-bit" / "32-bit float" |
+| **Channels** | WAV header | "Mono" / "Stereo" |
+| **Duration** | WAV header | "3.2s" |
+| **File Size** | ZIP entry size | "1.2 MB" |
+| **Used By** | Ссылки из клипов | "Used in: Kick (MidiTrack 1)" |
+
+### 3.5 Приоритет 5: Plugin Registry
+
+| Что | Как извлекаем | UI |
+|-----|--------------|-----|
+| **Plugin Name** | `PlugName/@Value` | "Serum" |
+| **Plugin Type** | VST2/VST3/AU/CLAP | "VST3" |
+| **Plugin ID** | `PlugUniqueID/@Value` | Для идентификации |
+| **Is Built-in** | Сравнение с known Ableton devices | ✅/⚠️ |
+| **Instances** | Количество использований | "×2" |
+| **Required** | Если нет в Core Library | ⚠️ "Required" |
+
+**Known Ableton Built-in Devices (не требуют установки):**
+
+```python
+LIVE_AUDIO_EFFECTS = {
+    "Amp", "Auto Filter", "Auto Pan-Tremolo", "Auto Shift",
+    "Beat Repeat", "Cabinet", "Channel EQ", "Chorus-Ensemble",
+    "Compressor", "Corpus", "Delay", "Drum Buss", "Dynamic Tube",
+    "Echo", "EQ Eight", "EQ Three", "Erosion",
+    "External Audio Effect", "Filter Delay", "Gate",
+    "Glue Compressor", "Grain Delay", "Hybrid Reverb",
+    "Limiter", "Looper", "Multiband Dynamics",
+    "Overdrive", "Pedal", "Phaser-Flanger",
+    "Redux", "Resonators", "Reverb", "Roar",
+    "Saturator", "Shifter", "Spectral Resonator",
+    "Spectral Time", "Spectrum", "Tuner",
+    "Utility", "Vinyl Distortion", "Vocoder",
+}
+
+LIVE_MIDI_EFFECTS = {
+    "Arpeggiator", "CC Control", "Chord",
+    "Note Length", "Pitch", "Random", "Scale", "Velocity",
+}
+
+LIVE_INSTRUMENTS = {
+    "Analog", "Collision", "Drift", "Drum Sampler",
+    "Electric", "External Instrument", "Impulse",
+    "Meld", "Operator", "Sampler", "Simpler",
+    "Tension", "Wavetable",
+}
+```
+
+### 3.6 Приоритет 6: Drum Rack Pads
+
+| Что | Как извлекаем | UI |
+|-----|--------------|-----|
+| **MIDI Note** | `DrumPad/Receive/@Value` | "C1 (36)" |
+| **GM Drum Name** | Маппинг note → GM | "Kick Drum" |
+| **Sample** | `DrumPad/SampleRef` | "Kick.wav" |
+| **Chain Devices** | Список устройств в цепочке пада | "Simpler → Compressor" |
+| **Choke Group** | `DrumPad/Choke/@Value` | "Choke 1" |
+| **Is Enabled** | `DrumPad/IsEnabled/@Value` | On/Off |
+| **Color** | `DrumPad/Color/@Value` | Цвет пада |
+| **Volume** | `DrumPad/Volume/@Value` | "-3.0 dB" |
+| **Pan** | `DrumPad/Pan/@Value` | "L10" |
+
+### 3.7 Приоритет 7: MIDI Content
+
+| Что | Как извлекаем | UI |
+|-----|--------------|-----|
+| **Note Count** | `count(//MidiNoteEvent)` | "247 notes" |
+| **Note Range** | min/max MidiKey | "C2 - C5" |
+| **Velocity Range** | min/max Velocity | "40 - 127" |
+| **Scale** | `ScaleSettings/RootNote + ScaleId` | "C Minor" |
+| **Quantization** | `Quantization` | "1/16" |
+| **Probability** | `Probability` | "100%" |
+
+### 3.8 Приоритет 8: Audio Clip Details
+
+| Что | Как извлекаем | UI |
+|-----|--------------|-----|
+| **Warp Mode** | `WarpMode` | "Beats" / "Tones" / "Complex" |
+| **Loop Settings** | `LoopOn, LoopStart, LoopEnd` | "Loop: 0.0 - 8.0" |
+| **Transpose** | `GuGuTransposition` | "+2 semitones" |
+| **Gain** | `GuGuVolume` | "-3 dB" |
+| **Fade In/Out** | `FadeInLength/FadeOutLength` | "10ms fade" |
+| **RAM Mode** | `RamMode` | "RAM" / "Disk" |
+
+---
+
+## 4. ЧТО НЕ ПАРСИМ (избыточно)
 
 | Что | Почему не нужно |
 |-----|----------------|
-| Automation breakpoints | Визуальная деталь, не критична для просмотра |
-| Warp markers | Внутренняя настройка, не видна в overview |
-| Clip envelopes | Детали модуляции, не для receipt-view |
-| MIDI Map assignments | Привязка к контроллерам, не для просмотра |
-| Groove pool | Нюансы квантования, не для overview |
-| Return track routing | Техническая деталь |
-| Video tracks | Rare, не для звукового маркетплейса |
+| Automation breakpoints | Визуальная деталь, не для receipt-view |
+| Warp markers | Внутренняя настройка |
+| Clip envelopes (детально) | Модуляция, не для overview |
+| MIDI Map assignments | Привязка к контроллерам |
+| Groove Pool (детально) | Нюансы квантования |
+| Return track routing details | Техническая деталь |
+| Video tracks | Rare |
+| Follow Action settings | Performance detail |
+| Crossfader assignments | DJ-specific |
+| MPE data | Advanced |
+| Scale settings per clip | Minor detail |
+| Default presets | User preference |
 
-## Текущий статус парсера
+---
+
+## 5. ТЕКУЩИЙ СТАТУС ПАРСЕРА
 
 ### Что уже извлекаем (als_parser.py + alp_parser.py)
 - ✅ BPM
@@ -237,65 +909,194 @@ Return Track:
 - ✅ Archive contents (counts)
 
 ### Чего НЕ хватает (нужно добавить)
+
+#### Критично для UI:
 - ❌ Track color (integer → hex conversion)
-- ❌ Track mute/solo/arm status
-- ❌ Volume/pan values
+- ❌ Track volume/pan values
 - ❌ Device chain order (порядок устройств)
 - ❌ Device enabled/disabled status
 - ❌ Plugin type classification (builtin vs VST vs AU)
-- ❌ Rack/chain structure (Drum Rack pads, Instrument Rack chains)
-- ❌ Sample metadata (sample rate, bit depth, duration)
-- ❌ MIDI clip content (ноты, velocity)
-- ❌ Audio clip properties (warp mode, loop settings)
-- ❌ Macro controls on racks
-- ❌ Preset file extraction (.adv/.adg/.xpl)
-- ❌ Streaming parsing (текущий подход загружает всё в память)
+- ❌ Drum Rack pad mapping (note → sample → devices)
+- ❌ Rack structure (chains, macro controls)
+- ❌ Sample metadata (sample rate, bit depth, duration, channels)
 
-## Архитектура потокового C++ Worker
+#### Важно для v2:
+- ❌ MIDI clip content (ноты, velocity, probability)
+- ❌ Audio clip properties (warp mode, loop settings)
+- ❌ Automation lanes
+- ❌ Groove pool
+- ❌ Return track structure
+- ❌ Master track effects
+- ❌ Sidechain routing
+- ❌ Macro control mappings
+
+#### Для C++ worker:
+- ❌ Streaming ZIP parsing (сейчас загружает всё в память)
+- ❌ Incremental SHA-256
+- ❌ Parallel XML parsing
+- ❌ WAV header reading
+
+---
+
+## 6. Архитектура C++ Worker
 
 ```
-Input: ALP blob (any size, streaming from GCS)
+Input: ALP blob (streaming from GCS)
   │
-  ├─ ZIP stream reader (minizip)
+  ├─ ZIP stream reader (minizip/zlib)
   │   │
-  │   ├─ For each entry:
+  │   ├─ For each entry (one at a time):
+  │   │   │
   │   │   ├─ .als → decompress gzip → parse XML (pugixml)
-  │   │   │   └─ Extract: tracks, devices, plugins, samples, metadata
+  │   │   │   ├─ Extract: tracks, devices, plugins, samples
+  │   │   │   ├─ Extract: BPM, time signature, version
+  │   │   │   ├─ Extract: track colors, volumes, pan
+  │   │   │   ├─ Extract: device chain order
+  │   │   │   ├─ Extract: plugin names and types
+  │   │   │   ├─ Extract: Drum Rack pad mappings
+  │   │   │   └─ Extract: sample references with metadata
   │   │   │
   │   │   ├─ .adv/.adg/.xpl → parse preset metadata
+  │   │   │   ├─ Device type
+  │   │   │   ├─ Parameter values (key params only)
+  │   │   │   └─ Parent track reference
   │   │   │
-  │   │   ├─ .wav/.aiff → read header (sample rate, bit depth, duration)
-  │   │   │              → incremental SHA-256 (EVP)
+  │   │   ├─ .wav/.aiff → read header (NOT full file)
+  │   │   │   ├─ Sample rate
+  │   │   │   ├─ Bit depth
+  │   │   │   ├─ Channels
+  │   │   │   ├─ Duration
+  │   │   │   └─ Incremental SHA-256 (EVP)
   │   │   │
-  │   │   └─ other → skip (or catalog)
+  │   │   ├─ .asd → extract warp markers (optional)
+  │   │   │
+  │   │   └─ other → skip
   │   │
   │   └─ Output: JSON with full project metadata
   │
   └─ Output to stdout → Python reads → StorageObject.metadata_json
 ```
 
-## URL-формат для SoundHub
+---
+
+## 7. Receipt-Style UI Mockup
 
 ```
-/p/{username}                    — Portfolio (список проектов)
-/projects/{id}                   — Project view (receipt-style)
-/projects/{id}#track-{name}      — Jump to specific track
-/projects/{id}#plugins           — Plugin registry
+┌─────────────────────────────────────────────────────────────────┐
+│  📦 TheForgebyHecq - Ableton Live Pack v9.1                    │
+│  BPM: 128 | 4/4 | 12 tracks | 247 samples | 34 presets        │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  🎵 Kick             [#FF6F61] ────── Vol: 0.0dB Pan: C        │
+│    ├─ Drum Rack (4 pads)                                        │
+│    │   ├─ C1: Kick.wav → Simpler → Compressor → EQ Eight       │
+│    │   ├─ D1: Snare.wav → Simpler → Drum Buss                  │
+│    │   ├─ F#1: HiHat.wav → Simpler                             │
+│    │   └─ A#1: Cymbal.wav → Simpler → Reverb                   │
+│    └─ Macros: Volume(75%), Filter(50%)                          │
+│                                                                 │
+│  🎵 Bass             [#6ECFF6] ────── Vol: -3dB Pan: C         │
+│    ├─ Serum (VST3) → SSL Compressor → ValhallaRoom             │
+│    ├─ MIDI: "Bass Line" (16 bars, 89 notes, C minor)           │
+│    └─ ⚠️ Requires: Serum (x2), ValhallaRoom                    │
+│                                                                 │
+│  🎵 Lead             [#A8E6CF] ────── Vol: -6dB Pan: L15       │
+│    ├─ Operator → Auto Filter → Chorus → Reverb                  │
+│    ├─ MIDI: "Lead Melody" (8 bars, 127 notes)                   │
+│    └─ Macros: Cutoff(60%), Resonance(40%)                       │
+│                                                                 │
+│  🎵 Pads             [#FFD93D] ────── Vol: -12dB Pan: R20      │
+│    ├─ Wavetable → Echo → Hybrid Reverb                         │
+│    ├─ Audio: "Pad Loop" (32 bars, warped, Complex mode)         │
+│    └─ Loop: 0.0 - 8.0 bars                                     │
+│                                                                 │
+│  🎵 Drums Bus        [Group] ────── 3 tracks                   │
+│    ├─ Kick, Snare, HiHat (nested)                               │
+│    └─ Drum Buss → Glue Compressor                               │
+│                                                                 │
+│  ... (7 more tracks)                                            │
+│                                                                 │
+├─────────────────────────────────────────────────────────────────┤
+│  📊 Summary                                                     │
+│  ├─ Instruments: Operator, Wavetable, Drum Rack, Serum          │
+│  ├─ Effects: EQ Eight(×3), Compressor(×4), Reverb(×3)...      │
+│  ├─ VST Plugins: Serum (×2), FabFilter Pro-Q (×1)              │
+│  ├─ Audio: 247 files (1.2GB total)                             │
+│  ├─ MIDI Clips: 8                                               │
+│  └─ Return Tracks: Reverb, Delay                                │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
-## Итого: Minimum Viable ALP Support
+---
 
-Для MVP нужно:
+## 8. Plugin Registry View
 
+```
+┌─────────────────────────────────────────────────────────────┐
+│  🔌 Required Plugins                                        │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  ✅ Built-in (Live 12) — 38 devices                         │
+│    Amp, Auto Filter, Beat Repeat, Cabinet, Chorus...        │
+│    (полный список в LIVE_AUDIO_EFFECTS)                     │
+│                                                             │
+│  ⚠️ Third-party VST3                                        │
+│    Serum (×2) — by Xfer Records                             │
+│    FabFilter Pro-Q 3 — by FabFilter                         │
+│    ValhallaRoom — by Valhalla DSP                           │
+│                                                             │
+│  ⚠️ Third-party AU (macOS only)                              │
+│    (нет)                                                    │
+│                                                             │
+│  ⚠️ Third-party CLAP                                        │
+│    (нет)                                                    │
+│                                                             │
+│  ℹ️ Max for Live Devices                                     │
+│    (нет)                                                    │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 9. URL-формат для SoundHub
+
+```
+/p/{username}                       — Portfolio (список проектов)
+/projects/{id}                      — Project view (receipt-style)
+/projects/{id}#tracks               — Track list
+/projects/{id}#track-{slug}        — Jump to specific track
+/projects/{id}#plugins             — Plugin registry
+/projects/{id}#samples             — Sample catalog
+/projects/{id}#drum-racks          — Drum Rack overview
+```
+
+---
+
+## 10. Minimum Viable ALP Support (MVP)
+
+### Что нужно для MVP:
 1. **Полный парсинг XML** — все треки, устройства, плагины, сэмплы
-2. **Классификация плагинов** — builtin vs VST3 vs AU vs CLAP
-3. **Receipt-style UI** — дерево треков → устройств → плагинов
-4. **Plugin registry** — список требуемых сторонних плагинов
-5. **Sample catalog** — список сэмплов с метаданными
-6. **Streaming обработка** — для multi-GB ALP файлов
+2. **Track colors** — Ableton color palette → hex
+3. **Device chain order** — порядок устройств
+4. **Plugin classification** — builtin vs VST vs AU
+5. **Drum Rack pads** — note → sample mapping
+6. **Sample metadata** — sample rate, bit depth, duration
+7. **Receipt-style UI** — дерево треков → устройств → плагинов
+8. **Plugin registry** — список требуемых плагинов
+9. **Streaming обработка** — для multi-GB ALP
 
-Для v2:
+### Что для v2:
 - Waveform для сэмплов
 - MIDI clip preview (ноты в Piano Roll)
 - Loudness analysis
 - Sound similarity tags
+- Automation visualization
+- Groove pool
+- Macro control display
+
+### Что для v3:
+- Real-time preview (play samples)
+- Collaboration features
+- Version comparison
+- A/B testing between ALP versions
