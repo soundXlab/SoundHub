@@ -83,6 +83,37 @@ PackName.alp (ZIP)
 | 11 | Live 11 |
 | 12 | Live 12 |
 
+### 2.1.1 Live Clip (.alc)
+
+Live Clip — отдельный файл с одним клипом + его устройствами:
+```xml
+<LiveClip>
+  <OriginalFilename Value="Sample.wav"/>
+  <RelativeFilepath Value="Samples/Import/Sample.wav"/>
+  <ClipSettings>...
+  <DeviceChain>...  <!-- Устройства клипа -->
+</LiveClip>
+```
+
+### 2.1.2 Analysis File (.asd)
+
+Содержит:
+- Warp markers (позиции привязки к таймлайну)
+- Tempo (рассчитанный)
+- Default clip settings (gain, warp state, loop)
+- Transient markers (обнаруженные пики амплитуды)
+
+### 2.1.3 Device Preset (.adv)
+
+XML файл с параметрами устройства:
+```xml
+<PluginDevice Device="EQEight"...>
+  <Parameter Id="Frequency_1" Value="80.0"/>
+  <Parameter Id="Gain_1" Value="-6.0"/>
+  ...
+</PluginDevice>
+```
+
 ### 2.2 Live Set Properties
 
 ```xml
@@ -258,79 +289,85 @@ AudioEffect → AudioEffect → ... → Mixer
 
 #### 2.4.2 Audio Effects (Live 12)
 
-| XML Tag | Device | Описание |
-|---------|--------|----------|
-| `AutoFilter` | Auto Filter | Фильтр с LFO и envelope follower |
-| `AutoPan` | Auto Pan-Tremolo | Авто-панорама/тремоло |
-| `BeatRepeat` | Beat Repeat | Повторы битов |
-| `Chorus-Ensemble` | Chorus-Ensemble | Хорус/ансамбль |
-| `Compressor` | Compressor | Компрессор |
-| `Delay` | Delay | Задержка |
-| `DrumBuss` | Drum Buss | Усиление барабанов |
-| `DynamicTube` | Dynamic Tube | Трубчатая сатурация |
-| `Echo` | Echo | Эхо |
-| `EQEight` | EQ Eight | 8-полосный эквалайзер |
-| `EQThree` | EQ Three | 3-полосный эквалайзер |
-| `Erosion` | Erosion | Эрозия/дисторшн |
-| `FilterDelay` | Filter Delay | Фильтрованная задержка |
-| `Gate` | Gate | Гейт |
-| `GlueCompressor` | Glue Compressor | "Склеивающий" компрессор |
-| `GrainDelay` | Grain Delay | Зернистая задержка |
-| `HybridReverb` | Hybrid Reverb | Гибридная реверберация |
-| `Limiter` | Limiter | Лимитер |
-| `Looper` | Looper | Лупер |
-| `MultibandDynamics` | Multiband Dynamics | Мультимовая динамика |
-| `Overdrive` | Overdrive | Овердрайв |
-| `Pedal` | Pedal | Гитарная педаль |
-| `Phaser-Flanger` | Phaser-Flanger | Фейзер/фленджер |
-| `Redux` | Redux | Бит-крашер |
-| `Resonators` | Resonators | Резонаторы |
-| `Reverb` | Reverb | Реверберация |
-| `Roar` | Roar | Сатурация/дисторшн |
-| `Saturator` | Saturator | Сатурация |
-| `Shifter` | Shifter | Pitch shifter |
-| `SpectralResonator` | Spectral Resonator | Спектральный резонатор |
-| `SpectralTime` | Spectral Time | Спектральная задержка |
-| `Spectrum` | Spectrum | Спектроанализатор |
-| `Tuner` | Tuner | Тюнер |
-| `Utility` | Utility | Утилиты (gain, pan, phase, mono) |
-| `VinylDistortion` | Vinyl Distortion | Виниловая дисторшн |
-| `Vocoder` | Vocoder | Вокодер |
-| `Amp` | Amp | Гитарный усилитель |
-| `Cabinet` | Cabinet | Гитарный кабинет |
-| `ChannelEQ` | Channel EQ | Канальный эквалайзер |
-| `ExternalAudioEffect` | External Audio Effect | Внешний эффект |
-| `AutoShift` | Auto Shift | Авто-тюнер |
+| XML Tag | Device | Ключевые параметры |
+|---------|--------|-------------------|
+| `Amp` | Amp | Gain, Volume, Bass/Mid/Treble, Presence, Model(Clean/Boost/Blues/Rock/Lead/Heavy/Bass) |
+| `AutoFilter` | Auto Filter | Freq, Res, LFO Rate/Wave/Amount, Env Amount, Drive, FilterCircuit(SVF/DFM/MS2/PRD) |
+| `AutoPan` | Auto Pan-Tremolo | Rate, Amount, Phase, Shape(Sine/Tri/Saw/Square/Random), Mode(Panning/Tremolo) |
+| `BeatRepeat` | Beat Repeat | Grid, Interval, Gate, Pitch, Decay, Variation |
+| `Cabinet` | Cabinet | Mic1/Mic2 Model, Filter, Pan |
+| `ChannelEQ` | Channel EQ | Low/Mid/High Gain, HighpassOn |
+| `Chorus-Ensemble` | Chorus-Ensemble | Rate, Width, Amount, Mode(Chorus/Ensemble/Phaser) |
+| `Compressor` | Compressor | Threshold, Ratio, Attack, Release, Knee, MakeupGain, Sidechain |
+| `Delay` | Delay | Time L/R, Feedback, DryWet, PingPong |
+| `DrumBuss` | Drum Buss | Drive, Boom, Transient, Dynamics |
+| `DynamicTube` | Dynamic Tube | Bias, Tone, DryWet |
+| `Echo` | Echo | Time, Feedback, DryWet, Filter, PingPong |
+| `EQEight` | EQ Eight | Band1-8: Freq/Gain/Type(SolidShelf/Bell/Notch/HiShelf/LowShelf/BandPass/HiPass/LowPass) |
+| `EQThree` | EQ Three | GainLo/Mid/Hi, FreqLo/Hi |
+| `Erosion` | Erosion | Amount, Mode(Noise/Sine) |
+| `FilterDelay` | Filter Delay | Delay L/R, FilterFreq/Res, DryWet |
+| `Gate` | Gate | Threshold, Attack, Hold, Release, Sidechain |
+| `GlueCompressor` | Glue Compressor | Threshold, Ratio, Attack, Release, Makeup, DryWet |
+| `GrainDelay` | Grain Delay | Grain/Time/Pitch/Feedback, DryWet |
+| `HybridReverb` | Hybrid Reverb | Convolution/Algo Blend, Size, Decay, DryWet |
+| `Limiter` | Limiter | Threshold, Release |
+| `Looper` | Looper | Length, Overdub, Reverse |
+| `MultibandDynamics` | Multiband Dynamics | Band1-3: Threshold/Ratio/Attack/Release |
+| `Overdrive` | Overdrive | Drive, Tone, DryWet |
+| `Pedal` | Pedal | Gain, Tone, Output, Type(Dist/Fuzz/Overdrive) |
+| `Phaser-Flanger` | Phaser-Flanger | Rate, Amount, Feedback, LFO Wave |
+| `Redux` | Redux | Bit Reduction, Sample Reduction |
+| `Resonators` | Resonators | Pitch1-5, Decay, DryWet |
+| `Reverb` | Reverb | Size, Decay, Diffusion, DryWet, PreDelay |
+| `Roar` | Roar | Mode, Drive, Feedback |
+| `Saturator` | Saturator | Drive, Output, Type(SoftClip/HardClip/Wavefolder/SinFold/TanhFold/AnalogClip) |
+| `Shifter` | Shifter | Coarse/Fine, DryWet |
+| `SpectralResonator` | Spectral Resonator | Frequency, DryWet |
+| `SpectralTime` | Spectral Time | DryWet |
+| `Spectrum` | Spectrum | (анализатор, параметров нет) |
+| `Tuner` | Tuner | Reference Frequency, Tuning (A=440) |
+| `Utility` | Utility | Gain, Pan, Width, Phase (invert), Mono |
+| `VinylDistortion` | Vinyl Distortion | Tracing Model, Drive |
+| `Vocoder` | Vocoder | Carrier, FilterBands, DryWet |
+| `ExternalAudioEffect` | External Audio Effect | (proxy к внешнему эффекту) |
+| `AutoShift` | Auto Shift | Pitch Correction Amount |
 
 #### 2.4.3 MIDI Effects (Live 12)
 
-| XML Tag | Device | Описание |
-|---------|--------|----------|
-| `Arpeggiator` | Arpeggiator | Арпеджиатор |
-| `CCControl` | CC Control | Управление MIDI CC |
-| `Chord` | Chord | Аккорды |
-| `NoteLength` | Note Length | Длина нот |
-| `Pitch` | Pitch | Транспозиция |
-| `Random` | Random | Случайные значения |
-| `Scale` | Scale | Масштабирование нот |
-| `Velocity` | Velocity | Управление velocity |
+| XML Tag | Device | Ключевые параметры |
+|---------|--------|-------------------|
+| `Arpeggiator` | Arpeggiator | Style(Up/Down/Converge/Diverge/Random/Chord...), Rate, Gate, Distance, Steps, Hold |
+| `CCControl` | CC Control | ModWheel, PitchBend, Pressure, CustomA-M (assignable CC) |
+| `Chord` | Chord | Shift1-6 (semitones), Velocity1-6, Chance1-6, Strum, Tension |
+| `NoteLength` | Note Length | Gate, Length, TriggerSource(On/Off), ReleaseVelocity |
+| `Pitch` | Pitch | Pitch (semitones), Step, Lowest, Range, Mode(Block/Fold/Limit) |
+| `Random` | Random | Chance, Choices, Interval, Mode(Random/Alt), Sign(Add/Sub/Bi) |
+| `Scale` | Scale | Base, ScaleName, Transpose, NoteMatrix(13x13) |
+| `Velocity` | Velocity | Mode(Out/Clip), OutHi/Lo, Drive, Compand |
+
+**All MIDI effects support Scale Awareness** (Use Current Scale toggle): transpositions can be in scale degrees instead of semitones.
 
 #### 2.4.4 Instruments (Live 12)
 
-| XML Tag | Device | Описание |
-|---------|--------|----------|
-| `InstrumentBranch` (Analog) | Analog | Аналоговый синтезатор |
-| `InstrumentBranch` (Collision) | Collision | Моделирование ударных |
-| `InstrumentBranch` (Drift) | Drift | Субтрактивный синтезатор |
-| `InstrumentBranch` (DrumSampler) | Drum Sampler | Сэмплер ударных |
-| `InstrumentBranch` (Electric) | Electric | Электрическое пианино |
-| `InstrumentBranch` (Impulse) | Impulse | Сэмплер ударных |
-| `InstrumentBranch` (Meld) | Meld | Вейвтейбл синтезатор |
-| `InstrumentBranch` (Operator) | Operator | FM-синтезатор |
-| `InstrumentBranch` (Sampler) | Sampler | Мультисэмплер |
-| `InstrumentBranch` (Simpler) | Simpler | Простой сэмплер |
-| `InstrumentBranch` (Tension) | Tension | Струнный синтезатор |
-| `InstrumentBranch` (Wavetable) | Wavetable | Вейвтейбл синтезатор |
+| XML Tag | Device | Ключевые параметры |
+|---------|--------|-------------------|
+| `InstrumentBranch` (Analog) | Analog | 2 Osc(Saw/Square/Sine/Noise), 2 Filters(LP/HP/BP/Notch/Formant), 2 Amps, 2 LFOs, ADSR, Sub/OscSync |
+| `InstrumentBranch` (Collision) | Collision | Resonator type, Excitator, Material |
+| `InstrumentBranch` (Drift) | Drift | Oscillators, Filter, Modulation |
+| `InstrumentBranch` (DrumSampler) | Drum Sampler | Sample, Volume, Pan, Filter, Start/End |
+| `InstrumentBranch` (Electric) | Electric | Tines, Damper, Pickup |
+| `InstrumentBranch` (Impulse) | Impulse | 8 Sample slots, Start/Transpose/Filter per slot |
+| `InstrumentBranch` (Meld) | Meld | 2 Osc(Wavetable), Filters, LFOs |
+| `InstrumentBranch` (Operator) | Operator | 4 Osc(A/B/C/D), Algorithms(1-6), Filter, LFO |
+| `InstrumentBranch` (Sampler) | Sampler | Zones(Layer/Key/Velocity), Multi-sample, Filter, Envelopes |
+| `InstrumentBranch` (Simpler) | Simpler | Sample, Start/End, Loop, Filter, Envelope, PlaybackMode(Classic/OneShot/Slice) |
+| `InstrumentBranch` (Tension) | Tension | String physical model, Exciter |
+| `InstrumentBranch` (Wavetable) | Wavetable | 2 Osc(Wavetable position), Filter, LFO, Matrix |
+
+**MIDI tracks:** MIDI Effects → Instrument → Audio Effects
+
+**Note:** Instruments are wrapped in `InstrumentBranch` in the XML. The instrument type is identified by the child element name.
 
 #### 2.4.5 Plug-Ins (сторонние)
 
@@ -370,9 +407,35 @@ AudioEffect → AudioEffect → ... → Mixer
 - AU: componentType + componentSubType
 - CLAP: unique-id
 
-### 2.5 Racks (Рэки)
+### 2.5 Сигнал на треке (Signal Flow)
 
-#### 2.5.1 Instrument Rack
+**Audio Track (по умолчанию):**
+```
+Clip → AudioEffect1 → AudioEffect2 → ... → Mixer (Vol/Pan/Sends) → Output
+```
+
+**MIDI Track (по умолчанию):**
+```
+Clip → MidiEffect1 → MidiEffect2 → Instrument → AudioEffect1 → ... → Mixer → Output
+```
+
+**Return Track:**
+```
+Sends (от клип-треков) → AudioEffect1 → AudioEffect2 → ... → Mixer → Output
+```
+
+**Group Track:**
+```
+[Clip tracks внутри] → Summing → AudioEffect1 → ... → Mixer → Output
+```
+
+**Important:** MIDI трек с инструментом:
+- До инструмента = MIDI сигнал (MIDI Effects)
+- После инструмента = Audio сигнал (Audio Effects)
+
+### 2.6 Racks (Рэки)
+
+#### 2.6.1 Instrument Rack
 
 ```xml
 <InstrumentBranch>
@@ -428,7 +491,7 @@ AudioEffect → AudioEffect → ... → Mixer
 </InstrumentBranch>
 ```
 
-#### 2.5.2 Drum Rack
+#### 2.6.2 Drum Rack
 
 ```xml
 <DrumGroupDevice>
@@ -495,7 +558,7 @@ AudioEffect → AudioEffect → ... → Mixer
 </DrumGroupDevice>
 ```
 
-#### 2.5.3 Audio Effect Rack
+#### 2.6.3 Audio Effect Rack
 
 ```xml
 <AudioEffectBranch>
@@ -525,7 +588,7 @@ AudioEffect → AudioEffect → ... → Mixer
 </AudioEffectBranch>
 ```
 
-### 2.6 Audio Clips
+### 2.7 Audio Clips
 
 ```xml
 <MidiClip>  <!-- или AudioClip -->
@@ -639,7 +702,7 @@ AudioEffect → AudioEffect → ... → Mixer
 </MidiClip>
 ```
 
-### 2.7 Automation
+### 2.8 Automation
 
 ```xml
 <AutomationLane>
@@ -659,7 +722,7 @@ AudioEffect → AudioEffect → ... → Mixer
 </AutomationLane>
 ```
 
-### 2.8 Groove Pool
+### 2.9 Groove Pool
 
 ```xml
 <GroovePool>
@@ -676,7 +739,7 @@ AudioEffect → AudioEffect → ... → Mixer
 </GroovePool>
 ```
 
-### 2.9 Return Tracks
+### 2.10 Return Tracks
 
 ```xml
 <ReturnTrack>
@@ -697,7 +760,7 @@ AudioEffect → AudioEffect → ... → Mixer
 </ReturnTrack>
 ```
 
-### 2.10 Master Track
+### 2.11 Master Track
 
 ```xml
 <MasterTrack>
@@ -715,6 +778,197 @@ AudioEffect → AudioEffect → ... → Mixer
     <!-- Master effects chain -->
   </Devices>
 </MasterTrack>
+```
+
+### 2.12 Warp Modes
+
+| WarpMode Value | Название | Описание |
+|----------------|----------|----------|
+| 0 | Beats | Для ритмических сэмплов (ударные, петли) |
+| 1 | Tones | Для мелодических сэмплов (вокал, гитара) |
+| 2 | Texture | Для текстурных сэмплов (планы, эмбиент) |
+| 3 | Re-Pitch | Аналоговый стиль (pitch + tempo связаны) |
+| 4 | Complex | Для сложных сигналов (миксы, песни) |
+| 5 | Complex Pro | Улучшенный Complex (лучшее качество) |
+
+### 2.13 Clip Launch Modes
+
+| LaunchMode Value | Режим | Поведение |
+|------------------|-------|----------|
+| 0 | Trigger | Down запускает, Up игнорируется |
+| 1 | Gate | Down запускает, Up останавливает |
+| 2 | Toggle | Down запускает, следующий Down останавливает |
+| 3 | Repeat | Повторно запускает пока зажат |
+
+### 2.14 Follow Actions
+
+| FollowAction Value | Действие |
+|--------------------|----------|
+| 0 | No Action |
+| 1 | Stop |
+| 2 | Play Again |
+| 3 | Previous |
+| 4 | Next |
+| 5 | First |
+| 6 | Last |
+| 7 | Any |
+| 8 | Other |
+| 9 | Jump (с Target) |
+
+**Linked/Unlinked:**
+- Linked: Follow Action происходит в конце клипа или после N loop'ов
+- Unlinked: Follow Action происходит через Follow Action Time
+
+### 2.15 Routing и I/O
+
+**Input Types:**
+| AudioFromType | Описание |
+|---------------|----------|
+| 0 | External (Ext. In) — микрофон, инструмент |
+| 1 | Resampling — Main output |
+| 2 | Track — другой трек |
+
+**Output Types:**
+| AudioToType | Описание |
+|------------|----------|
+| 0 | Master — Main output |
+| 1 | External (Ext. Out) — конкретный выход |
+| 2 | Track — другой трек (sidechain) |
+
+**Tap Points (для AudioFrom):**
+- Pre FX — до устройств
+- Post FX — после устройств, до микшера
+- Post Mixer — после микшера
+
+### 2.16 Zones (для Racks)
+
+**Key Zones:**
+- LValue: минимальная нота (0-127)
+- HValue: максимальная нота (0-127)
+- FadeIn/FadeOut:.fade-in/out
+
+**Velocity Zones:**
+- LValue: минимальная velocity (1-127)
+- HValue: максимальная velocity (1-127)
+- FadeIn/FadeOut
+
+**Chain Select Zones:**
+- LValue: минимальное значение (0-127)
+- HValue: максимальное значение (0-127)
+- FadeIn/FadeOut
+
+**Drum Rack:**
+- Receive: MIDI note number (0-127)
+- Play: outgoing note
+- Choke: choke group (0=none, 1-16)
+
+### 2.17 Groove Pool
+
+Грувы — параметры квантования и swing:
+
+```xml
+<GroovePool>
+  <Grooves>
+    <AudioToMidiGroove>
+      <Name Value="Swing 56"/>
+      <FilePath Value="Grooves/Swing 56.agr"/>
+      <Timing Value="100.0"/>      <!-- Сила тайминга (0-100%) -->
+      <Random Value="0.0"/>         <!-- Случайность тайминга -->
+      <Velocity Value="0.0"/>       <!-- Влияние на velocity -->
+      <Quantization Value="100.0"/>  <!-- Квантизация -->
+    </AudioToMidiGroove>
+  </Grooves>
+</GroovePool>
+```
+
+### 2.18 MIDI Clip Properties
+
+```xml
+<MidiClip>
+  <Name Value="Pattern 1"/>
+  <Color Value="86"/>
+  <ClipStartTime Value="0.0"/>
+  <ClipEndTime Value="32.0"/>
+  <LoopSettings>...</LoopSettings>
+  <Notes>
+    <KeyTracks>
+      <KeyTrack>
+        <MidiKey Value="60"/>
+        <Notes>
+          <MidiNoteEvent>
+            <Time Value="0.0"/>
+            <Duration Value="0.5"/>
+            <Velocity Value="100"/>
+            <Probability Value="1.0"/>
+          </MidiNoteEvent>
+        </Notes>
+      </KeyTrack>
+    </KeyTracks>
+    <ControllerChains>
+      <ControllerChain>
+        <MidiCCNo Value="1"/>          <!-- Mod Wheel -->
+        <MidiCCChain>
+          <Events>
+            <MidiCCEvent>
+              <Time Value="0.0"/>
+              <Value Value="64"/>
+            </MidiCCEvent>
+          </Events>
+        </MidiCCChain>
+      </ControllerChain>
+    </ControllerChains>
+  </Notes>
+  <ClipTimeSignature>
+    <Numerator Value="4"/>
+    <Denominator Value="4"/>
+  </ClipTimeSignature>
+  <ScaleSettings>
+    <IsEnabled Value="false"/>
+    <RootNote Value="0"/>
+    <ScaleId Value="0"/>
+  </ScaleSettings>
+  <Launch>
+    <Velocity Value="100"/>
+    <Quantization Value="4"/>
+    <IsLaunchable Value="true"/>
+    <LaunchMode Value="0"/>
+    <Legato Value="false"/>
+  </Launch>
+  <FollowAction>...</FollowAction>
+  <Envelopes>...</Envelopes>
+</MidiClip>
+```
+
+### 2.19 Audio Clip Properties
+
+```xml
+<AudioClip>
+  <Name Value="Loop 1"/>
+  <Color Value="86"/>
+  <ClipStartTime Value="0.0"/>
+  <ClipEndTime Value="8.0"/>
+  <LoopSettings>...</LoopSettings>
+  <AudioShapers>
+    <AudioWarper>
+      <WarpMode Value="1"/>
+      <WarpMarkers>...</WarpMarkers>
+    </AudioWarper>
+  </AudioShapers>
+  <GuGuTransposition Value="0"/>
+  <GuGuVolume Value="100.0"/>
+  <GuGuPan Value="0.0"/>
+  <GuGuPanMode Value="Balanced"/>
+  <FadeInLength Value="0"/>
+  <FadeOutLength Value="0"/>
+  <RamMode Value="false"/>
+  <HighQualityInterpolation Value="false"/>
+  <SampleRef>
+    <RelativePathElement>
+      <Dir Value="Samples"/>
+      <Name Value="Loop.wav"/>
+    </RelativePathElement>
+  </SampleRef>
+</AudioClip>
 ```
 
 ---
