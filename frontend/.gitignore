@@ -1,1 +1,3 @@
 .vercel
+.env*
+frontend/src/components/__tests__/**
