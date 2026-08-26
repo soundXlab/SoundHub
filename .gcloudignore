@@ -146,7 +146,7 @@ buffy-windows/
 .alp/
 .ignore
 .gitignore
-*.py
+/*.py
 api_audit.py
 tmp_audit.py
 debug_test.py

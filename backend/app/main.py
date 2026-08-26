@@ -77,6 +77,11 @@ app = FastAPI(
     version="0.1.0",
 )
 
+# Initialize database tables on startup
+@app.on_event("startup")
+def _startup_db():
+    init_db()
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=CORS_ORIGINS,
@@ -149,4 +154,12 @@ graphql_app = GraphQLRouter(graphql_schema)
 app.include_router(graphql_app, prefix="/graphql")
 
 # Serve static files (frontend build) - must come after API routes
-app.frontend("/", directory="app/static")
+# SPA fallback: serves index.html for unmatched frontend paths (React Router)
+import os as _os
+_static_dir = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "static")
+if _os.path.isdir(_static_dir) and _os.path.isfile(_os.path.join(_static_dir, "index.html")):
+    app.frontend("/", directory=_static_dir, fallback="index.html")
+else:
+    _dev_dist = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "..", "..", "frontend", "dist")
+    if _os.path.isdir(_dev_dist) and _os.path.isfile(_os.path.join(_dev_dist, "index.html")):
+        app.frontend("/", directory=_dev_dist, fallback="index.html")

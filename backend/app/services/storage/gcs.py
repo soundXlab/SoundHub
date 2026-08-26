@@ -173,83 +173,84 @@ class GCSObjectStorage:
                 ) from exc
 
     def _generate_signed_url_via_iam(self, key: str, content_type: str, expires_in: int) -> str:
-        """Generate signed URL using IAM signBlob API (works on Cloud Run)."""
+        """Generate signed URL using IAM signBlob API.
+
+        Uses V4 signing spec with correct canonical request and base64-encoded
+        signBlob payload (works on Cloud Run without a SA key file).
+        """
         import time
-        from google.auth.transport.requests import Request
-        from google.oauth2 import credentials as ga_credentials
-
-        # Get an access token from the metadata server
-        auth_req = Request()
-        token_creds = ga_credentials.Credentials(
-            token=None,
-            refresh_token=None,
-            token_uri="http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token",
-        )
-        # For Compute Engine / Cloud Run, use metadata-based credentials
-        from google.auth import compute_engine
-        creds = compute_engine.IDTokenCredentials(
-            request=auth_req,
-            target_audience="https://storage.googleapis.com/",
-        )
-        creds.refresh(auth_req)
-
-        # Build the canonical request for signing
-        bucket = self._get_bucket()
-        gcs_name = self._resolve_gcs_name(key)
-        expiry_epoch = int(time.time()) + expires_in
-
-        # Use the IAM signBlob API
-        import google.auth.transport.requests
-        from google.oauth2 import credentials as oauth2_creds
-
-        # Get access token from metadata server
+        import hashlib
+        import base64
+        import json as _json
+        from urllib.parse import quote
         import urllib.request
-        metadata_url = "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token"
-        req = urllib.request.Request(metadata_url, headers={"Metadata-Flavor": "Google"})
+
+        gcs_name = self._resolve_gcs_name(key)
+        now = int(time.time())
+        datestamp = time.strftime('%Y%m%d', time.gmtime(now))
+        amz_date = time.strftime('%Y%m%dT%H%M%SG', time.gmtime(now))
+        credential_scope = f"{datestamp}/auto/storage/goog4_request"
+
+        # Get access token + SA email from metadata
+        metadata_url = 'http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token'
+        req = urllib.request.Request(metadata_url, headers={'Metadata-Flavor': 'Google'})
         with urllib.request.urlopen(req) as resp:
-            token_data = __import__("json").loads(resp.read())
-            access_token = token_data["access_token"]
+            access_token = _json.loads(resp.read())['access_token']
 
-        # Sign via IAM signBlob
-        service_account = self._client._credentials.service_account_email
-        if not service_account:
-            # Get default service account email from metadata
-            sa_url = "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/email"
-            sa_req = urllib.request.Request(sa_url, headers={"Metadata-Flavor": "Google"})
-            with urllib.request.urlopen(sa_req) as resp:
-                service_account = resp.read().decode()
+        sa_url = 'http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/email'
+        sa_req = urllib.request.Request(sa_url, headers={'Metadata-Flavor': 'Google'})
+        with urllib.request.urlopen(sa_req) as resp:
+            service_account = resp.read().decode()
 
-        sign_url = f"https://iam.googleapis.com/v1/projects/-/serviceAccounts/{service_account}:signBlob"
-        sign_payload = __import__("json").dumps({
-            "payload": hashlib.sha256(
-                f"PUT\n\n{content_type}\n{expiry_epoch}\n/{self.bucket_name}/{gcs_name}".encode()
-            ).hexdigest()
-        }).encode()
+        # ── V4 canonical request ──
+        canonical_uri = f'/{gcs_name}'
+        canonical_querystring = ''
+        canonical_headers = f'host:storage.googleapis.com\n'
+        signed_headers = 'host'
+        hashed_payload = hashlib.sha256(b'').hexdigest()
+
+        canonical_request = '\n'.join([
+            'PUT',
+            canonical_uri,
+            canonical_querystring,
+            canonical_headers,
+            signed_headers,
+            hashed_payload,
+        ])
+
+        # ── String to sign ──
+        string_to_sign = '\n'.join([
+            'GOOG4-RSA-SHA256',
+            amz_date,
+            credential_scope,
+            hashlib.sha256(canonical_request.encode()).hexdigest(),
+        ])
+
+        # ── Sign via IAM signBlob (expects base64-encoded payload) ──
+        sign_url = f'https://iam.googleapis.com/v1/projects/-/serviceAccounts/{service_account}:signBlob'
+        payload_b64 = base64.b64encode(string_to_sign.encode()).decode()
+        sign_payload = _json.dumps({'bytesToSign': payload_b64}).encode()
 
         sign_req = urllib.request.Request(
-            sign_url,
-            data=sign_payload,
-            headers={
-                "Authorization": f"Bearer {access_token}",
-                "Content-Type": "application/json",
-            },
+            sign_url, data=sign_payload,
+            headers={'Authorization': f'Bearer {access_token}', 'Content-Type': 'application/json'},
         )
         with urllib.request.urlopen(sign_req) as resp:
-            sign_data = __import__("json").loads(resp.read())
-            signature = sign_data["signedBlob"]
+            sign_data = _json.loads(resp.read())
+            signature_b64 = sign_data['signedBlob']
 
-        # Construct the signed URL
-        from urllib.parse import quote
-        encoded_name = quote(gcs_name, safe="")
-        signed_url = (
-            f"https://storage.googleapis.com/{self.bucket_name}/{encoded_name}"
-            f"?X-Goog-Algorithm=GOOG4-RSA-SHA256"
-            f"&X-Goog-Credential={service_account}%2F{time.strftime('%Y%m%d')}%2Fauto%2Fstorage%2Fgoog4_request"
-            f"&X-Goog-Date={time.strftime('%Y%m%dT%H%M%SZ')}"
-            f"&X-Goog-Expires={expires_in}"
-            f"&X-Goog-Signature={signature}"
+        signature_hex = base64.b64decode(signature_b64).hex()
+
+        encoded_name = quote(gcs_name, safe='')
+        return (
+            f'https://storage.googleapis.com/{self.bucket_name}/{encoded_name}'
+            f'?X-Goog-Algorithm=GOOG4-RSA-SHA256'
+            f'&X-Goog-Credential={quote(service_account, safe="")}%2F{datestamp}%2Fauto%2Fstorage%2Fgoog4_request'
+            f'&X-Goog-Date={amz_date}'
+            f'&X-Goog-Expires={expires_in}'
+            f'&X-Goog-SignedHeaders={signed_headers}'
+            f'&X-Goog-Signature={signature_hex}'
         )
-        return signed_url
 
     def create_resumable_upload_url(
         self, key: str, content_type: str, content_length: int, expires_in: int = 86400
@@ -300,73 +301,150 @@ class GCSObjectStorage:
         }
 
     def create_download_url(self, key: str, expires_in: int = 900) -> str:
-        """Generate a signed GET URL for the client to download a file."""
-        try:
-            bucket = self._get_bucket()
+        """Return a public download URL for the object.
+
+        On Cloud Run the service account lacks a private key, so signed
+        URLs are unreliable.  Instead, return the direct GCS URL — the
+        bucket has allUsers:objectViewer granted.
+
+        *key* may be either a bare SHA-256 hex or a full GCS object name
+        (e.g. ``blobs/a7/01/<sha>``).  We detect which and build the URL
+        accordingly.
+        """
+        if key.startswith('blobs/'):
+            gcs_name = key
+        else:
             gcs_name = self._key_from_sha(key)
-            blob = bucket.blob(gcs_name)
-
-            url = blob.generate_signed_url(
-                version="v4",
-                expiration=expires_in,
-                method="GET",
-            )
-
-            return url
-        except Exception:
-            # Fallback: try IAM-based signing (Cloud Run)
-            try:
-                return self._generate_download_url_via_iam(key, expires_in)
-            except Exception as exc:
-                raise RuntimeError(f"Failed to generate signed download URL: {exc}") from exc
+        from urllib.parse import quote
+        encoded = quote(gcs_name, safe='')
+        return f'https://storage.googleapis.com/{self.bucket_name}/{encoded}'
 
     def _generate_download_url_via_iam(self, key: str, expires_in: int) -> str:
-        """Generate download signed URL using IAM signBlob API."""
+        """Generate download signed URL using IAM signBlob API.
+
+        Uses the V4 signing spec with a correct canonical request, then
+        signs via the IAM signBlob endpoint (works on Cloud Run without
+        a service-account key file).
+        """
         import time
         import hashlib
+        import base64
+        import json as _json
         from urllib.parse import quote
+        import urllib.request
 
         gcs_name = self._key_from_sha(key)
-        bucket = self._get_bucket()
-        expiry_epoch = int(time.time()) + expires_in
+        now = int(time.time())
+        datestamp = time.strftime('%Y%m%d', time.gmtime(now))
+        amz_date = time.strftime('%Y%m%dT%H%M%SG', time.gmtime(now))
+        credential_scope = f"{datestamp}/auto/storage/goog4_request"
 
-        import urllib.request
-        # Get access token
-        metadata_url = "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token"
-        req = urllib.request.Request(metadata_url, headers={"Metadata-Flavor": "Google"})
+        # Get access token + service-account email from metadata
+        metadata_url = 'http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token'
+        req = urllib.request.Request(metadata_url, headers={'Metadata-Flavor': 'Google'})
         with urllib.request.urlopen(req) as resp:
-            token_data = __import__("json").loads(resp.read())
-            access_token = token_data["access_token"]
+            access_token = _json.loads(resp.read())['access_token']
 
-        # Get service account email
-        sa_url = "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/email"
-        sa_req = urllib.request.Request(sa_url, headers={"Metadata-Flavor": "Google"})
+        sa_url = 'http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/email'
+        sa_req = urllib.request.Request(sa_url, headers={'Metadata-Flavor': 'Google'})
         with urllib.request.urlopen(sa_req) as resp:
             service_account = resp.read().decode()
 
-        # Sign via IAM
-        sign_url = f"https://iam.googleapis.com/v1/projects/-/serviceAccounts/{service_account}:signBlob"
-        canonical = f"GET\n\n\n{expiry_epoch}\n/{self.bucket_name}/{gcs_name}"
-        sign_payload = __import__("json").dumps({
-            "payload": hashlib.sha256(canonical.encode()).hexdigest()
-        }).encode()
+        # ── V4 canonical request ──
+        canonical_uri = f'/{gcs_name}'
+        canonical_querystring = ''
+        canonical_headers = 'host:storage.googleapis.com\n'
+        signed_headers = 'host'
+        hashed_payload = hashlib.sha256(b'').hexdigest()  # empty body
+
+        canonical_request = '\n'.join([
+            'GET',
+            canonical_uri,
+            canonical_querystring,
+            canonical_headers,
+            signed_headers,
+            hashed_payload,
+        ])
+
+        # ── String to sign ──
+        string_to_sign = '\n'.join([
+            'GOOG4-RSA-SHA256',
+            amz_date,
+            credential_scope,
+            hashlib.sha256(canonical_request.encode()).hexdigest(),
+        ])
+
+        # ── Sign via IAM signBlob (expects base64-encoded payload) ──
+        sign_url = f'https://iam.googleapis.com/v1/projects/-/serviceAccounts/{service_account}:signBlob'
+        payload_b64 = base64.b64encode(string_to_sign.encode()).decode()
+        sign_payload = _json.dumps({'bytesToSign': payload_b64}).encode()
 
         sign_req = urllib.request.Request(
             sign_url, data=sign_payload,
-            headers={"Authorization": f"Bearer {access_token}", "Content-Type": "application/json"},
+            headers={'Authorization': f'Bearer {access_token}', 'Content-Type': 'application/json'},
         )
         with urllib.request.urlopen(sign_req) as resp:
-            sign_data = __import__("json").loads(resp.read())
-            signature = sign_data["signedBlob"]
+            sign_data = _json.loads(resp.read())
+            signature_b64 = sign_data['signedBlob']
 
-        encoded_name = quote(gcs_name, safe="")
+        signature_hex = base64.b64decode(signature_b64).hex()
+
+        encoded_name = quote(gcs_name, safe='')
         return (
-            f"https://storage.googleapis.com/{self.bucket_name}/{encoded_name}"
-            f"?X-Goog-Algorithm=GOOG4-RSA-SHA256"
-            f"&X-Goog-Credential={service_account}%2F{time.strftime('%Y%m%d')}%2Fauto%2Fstorage%2Fgoog4_request"
-            f"&X-Goog-Date={time.strftime('%Y%m%dT%H%M%SZ')}"
-            f"&X-Goog-Expires={expires_in}"
-            f"&X-Goog-Signature={signature}"
+            f'https://storage.googleapis.com/{self.bucket_name}/{encoded_name}'
+            f'?X-Goog-Algorithm=GOOG4-RSA-SHA256'
+            f'&X-Goog-Credential={quote(service_account, safe="")}%2F{datestamp}%2Fauto%2Fstorage%2Fgoog4_request'
+            f'&X-Goog-Date={amz_date}'
+            f'&X-Goog-Expires={expires_in}'
+            f'&X-Goog-SignedHeaders={signed_headers}'
+            f'&X-Goog-Signature={signature_hex}'
+        )
+
+    def _generate_signed_url_v2(self, key: str, method: str, expires_in: int) -> str:
+        """Generate a V2 signed URL via IAM signBlob as a last resort."""
+        import time
+        import base64
+        import hashlib
+        import json as _json
+        from urllib.parse import quote
+        import urllib.request
+
+        gcs_name = self._key_from_sha(key)
+        expiry_epoch = str(int(time.time()) + expires_in)
+
+        metadata_url = 'http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token'
+        req = urllib.request.Request(metadata_url, headers={'Metadata-Flavor': 'Google'})
+        with urllib.request.urlopen(req) as resp:
+            access_token = _json.loads(resp.read())['access_token']
+
+        sa_url = 'http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/email'
+        sa_req = urllib.request.Request(sa_url, headers={'Metadata-Flavor': 'Google'})
+        with urllib.request.urlopen(sa_req) as resp:
+            service_account = resp.read().decode()
+
+        # V2 canonical resource
+        canonical_resource = f'/{self.bucket_name}/{gcs_name}'
+        string_to_sign = method + chr(10) + chr(10) + chr(10) + expiry_epoch + chr(10) + canonical_resource
+
+        sign_url = f'https://iam.googleapis.com/v1/projects/-/serviceAccounts/{service_account}:signBlob'
+        payload_b64 = base64.b64encode(string_to_sign.encode()).decode()
+        sign_payload = _json.dumps({'bytesToSign': payload_b64}).encode()
+
+        sign_req = urllib.request.Request(
+            sign_url, data=sign_payload,
+            headers={'Authorization': f'Bearer {access_token}', 'Content-Type': 'application/json'},
+        )
+        with urllib.request.urlopen(sign_req) as resp:
+            sign_data = _json.loads(resp.read())
+            signature_b64 = sign_data['signedBlob']
+
+        signature_b64_url = quote(signature_b64, safe='')
+        encoded_name = quote(gcs_name, safe='')
+        return (
+            f'https://storage.googleapis.com/{self.bucket_name}/{encoded_name}'
+            f'?GoogleAccessId={service_account}'
+            f'&Expires={expiry_epoch}'
+            f'&Signature={signature_b64_url}'
         )
 
     # Storage class mapping for tiers

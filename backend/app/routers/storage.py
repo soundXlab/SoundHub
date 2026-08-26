@@ -334,6 +334,59 @@ def create_download_url(
     return DownloadUrlResponse(download_url=url, expires_in=expires_in)
 
 
+@router.get("/objects/{object_id}/download")
+def download_object(
+    object_id: int,
+    request: Request,
+    user=Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Proxy download — streams the file from GCS directly to the client.
+
+    Works on Cloud Run where signed URLs are unavailable (no SA key file).
+    """
+    from fastapi.responses import StreamingResponse
+    import io
+
+    obj = _get_object_or_404(object_id, db)
+    _check_project_access(obj, user, db)
+    if obj.status not in ("uploaded", "ready"):
+        raise HTTPException(status.HTTP_409_CONFLICT, f"Object is in '{obj.status}' state")
+
+    storage = get_storage()
+    try:
+        # Stream from GCS in chunks to avoid loading the entire file into memory
+        bucket = storage._get_bucket()
+        gcs_name = storage._key_from_sha(obj.sha256)
+        blob = bucket.blob(gcs_name)
+        if not blob.exists():
+            raise FileNotFoundError(f"Blob {obj.sha256} not found")
+    except Exception as exc:
+        raise HTTPException(status.HTTP_502_BAD_GATEWAY, f"Failed to read from storage: {exc}")
+
+    _audit(db, obj, "download-proxy", user.id, request)
+    db.commit()
+
+    CHUNK_SIZE = 8 * 1024 * 1024  # 8 MB chunks
+
+    def _stream():
+        with blob.open("rb") as f:
+            while True:
+                chunk = f.read(CHUNK_SIZE)
+                if not chunk:
+                    break
+                yield chunk
+
+    return StreamingResponse(
+        _stream(),
+        media_type=obj.content_type or "application/octet-stream",
+        headers={
+            "Content-Disposition": f'attachment; filename="{obj.original_filename}"',
+            "Content-Length": str(obj.byte_size),
+        },
+    )
+
+
 @router.delete("/objects/{object_id}")
 def delete_object(
     object_id: int,
