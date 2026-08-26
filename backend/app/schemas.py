@@ -56,11 +56,23 @@ class WalletLogin(BaseModel):
 class ProjectCreate(BaseModel):
     name: str = Field(min_length=1, max_length=128)
     description: str = Field(default="", max_length=4000)
+    # Storage lifecycle policy
+    hot_days: int = Field(default=30, ge=1, le=365)
+    warm_days: int = Field(default=90, ge=1, le=365)
+    cold_days: int = Field(default=365, ge=1, le=365)
+    storage_enabled: bool = Field(default=True)
 
 
 class ProjectUpdate(BaseModel):
     name: str | None = Field(default=None, min_length=1, max_length=128)
     description: str | None = Field(default=None, max_length=4000)
+
+
+class WorkflowUpdate(BaseModel):
+    name: str | None = None
+    filename: str | None = None
+    yaml_content: str | None = None
+    enabled: bool | None = None
 
 
 class ProjectOut(ORMModel):
@@ -75,6 +87,11 @@ class ProjectOut(ORMModel):
     created_at: datetime
     updated_at: datetime
     owner: UserOut
+    # Storage lifecycle policy
+    hot_days: int = 30
+    warm_days: int = 90
+    cold_days: int = 365
+    storage_enabled: bool = True
 
 
 # ---------- Branches ----------
@@ -104,6 +121,7 @@ class PushOut(BaseModel):
     file_count: int = 0
     uploaded: dict = {}  # {"als": true, "master": true, "stems": 12}
     deduplicated: int = 0
+    alp_extracted: int = 0  # files extracted from ALP archives
     review_url: str | None = None
     version_id: int | None = None
     session_id: int | None = None

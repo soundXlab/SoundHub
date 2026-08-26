@@ -3,6 +3,7 @@
 Provider is selected via SOUNDHUB_STORAGE_PROVIDER env var:
 - ``local`` (default) — content-addressed filesystem in data/blobs/
 - ``s3``             — AWS S3 / MinIO / Cloudflare R2 (requires boto3)
+- ``gcs``            — Google Cloud Storage (requires google-cloud-storage)
 
 All legacy ``from ..services.storage import put_blob`` imports keep working.
 """
@@ -13,7 +14,7 @@ import os
 from .base import ObjectStorage
 from .local import LocalObjectStorage
 
-# ── Singleton provider instance ─────────────────────────────────────────
+# ── Singleton provider instance ───────────────────────────────────────
 
 _provider: ObjectStorage | None = None
 
@@ -29,12 +30,16 @@ def get_storage() -> ObjectStorage:
         from .s3 import S3ObjectStorage
 
         _provider = S3ObjectStorage()
+    elif backend == "gcs":
+        from .gcs import GCSObjectStorage
+
+        _provider = GCSObjectStorage()
     else:
         _provider = LocalObjectStorage()
     return _provider
 
 
-# ── Re-export legacy convenience API ────────────────────────────────────
+# ── Re-export legacy convenience API ─────────────────────────────────
 
 from .local import (  # noqa: E402, F401 — backward-compatible re-exports
     blob_exists,

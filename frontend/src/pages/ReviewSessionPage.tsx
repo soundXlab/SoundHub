@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { api, getToken } from "../api";
 import { fmtClock, WaveformCanvas, CommentComposer, ApprovalPanel, VersionDiffPanel } from "../components/ReviewShared";
-import { Box, Wrench, Check, Folder, ExternalLink, Repeat, DollarSign, Mail, Users, Slash, CreditCard } from "lucide-react";
+import { Box, Wrench, Check, Folder, ExternalLink, Repeat, DollarSign, Mail, Users, Slash, CreditCard, Volume2 } from "lucide-react";
 import ABCompare from "../components/ABCompare";
 import ReferenceCompare from "../components/ReferenceCompare";
 import UsdcPayButton from "../components/UsdcPayButton";

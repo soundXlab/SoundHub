@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 
 from ..database import get_db
 from ..models import SecurityAlert, Workflow, WorkflowRun, Project, User, utcnow
+from ..schemas import WorkflowUpdate
 from ..security import get_current_user
 
 router = APIRouter(tags=["workflows, security, graphql"])
@@ -28,13 +29,14 @@ class WorkflowCreate(BaseModel):
     name: str
     filename: str = ".soundhub/workflow.yml"
     yaml_content: str = ""
+    enabled: bool = True
 
 @router.post("/api/projects/{pid}/workflows", status_code=201)
 def create_workflow(pid: int, payload: WorkflowCreate, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     project = db.get(Project, pid)
     if project is None or project.owner_id != user.id:
         raise HTTPException(404, "Not found")
-    wf = Workflow(project_id=pid, name=payload.name, filename=payload.filename, yaml_content=payload.yaml_content)
+    wf = Workflow(project_id=pid, name=payload.name, filename=payload.filename, yaml_content=payload.yaml_content, enabled=payload.enabled)
     db.add(wf)
     db.commit()
     return {"id": wf.id, "name": wf.name}
@@ -51,8 +53,26 @@ def trigger_workflow(pid: int, wid: int, trigger: str = "manual", user: User = D
     wf = db.get(Workflow, wid)
     if wf is None or wf.project_id != pid:
         raise HTTPException(404, "Workflow not found")
-    run = WorkflowRun(workflow_id=wid, status="pending", trigger=trigger, logs="Workflow triggered\n")
+    run = WorkflowRun(
+        workflow_id=wid,
+        status="queued",
+        trigger=trigger,
+        logs="Workflow triggered and queued for execution\n",
+    )
     db.add(run)
+    db.flush()
+    run_id = run.id
+
+    # Enqueue the workflow execution job
+    from ..services import job_queue
+    job_queue.enqueue_job(
+        "execute_workflow",
+        input_json={"workflow_id": wid, "run_id": run_id},
+        created_by_id=user.id,
+        delay_seconds=None,
+        priority=0,
+    )
+
     db.commit()
     return {"id": run.id, "status": run.status}
 
@@ -69,6 +89,65 @@ def update_run_status(pid: int, wid: int, rid: int, status_val: str = Query(...,
         run.completed_at = utcnow()
     db.commit()
     return {"ok": True, "status": run.status}
+
+
+# ── Workflow Management Endpoints ────────────────────────────────────────────
+
+@router.get("/api/projects/{pid}/workflows/{wid}")
+def get_workflow(pid: int, wid: int, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    wf = db.get(Workflow, wid)
+    if wf is None or wf.project_id != pid:
+        raise HTTPException(404, "Workflow not found")
+    return {"id": wf.id, "name": wf.name, "filename": wf.filename, "yaml_content": wf.yaml_content, "enabled": wf.enabled, "created_at": wf.created_at.isoformat(), "updated_at": wf.updated_at.isoformat()}
+
+
+@router.put("/api/projects/{pid}/workflows/{wid}")
+def update_workflow(pid: int, wid: int, payload: WorkflowUpdate, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    wf = db.get(Workflow, wid)
+    if wf is None or wf.project_id != pid:
+        raise HTTPException(404, "Workflow not found")
+    if payload.name is not None:
+        wf.name = payload.name
+    if payload.filename is not None:
+        wf.filename = payload.filename
+    if payload.yaml_content is not None:
+        wf.yaml_content = payload.yaml_content
+    if payload.enabled is not None:
+        wf.enabled = payload.enabled
+    wf.updated_at = utcnow()
+    db.commit()
+    return {"id": wf.id, "name": wf.name}
+
+
+@router.delete("/api/projects/{pid}/workflows/{wid}")
+def delete_workflow(pid: int, wid: int, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    wf = db.get(Workflow, wid)
+    if wf is None or wf.project_id != pid:
+        raise HTTPException(404, "Workflow not found")
+    db.delete(wf)
+    db.commit()
+    return {"id": wid}
+
+
+@router.post("/api/projects/{pid}/workflows/{wid}/runs/{runId}/cancel")
+def cancel_workflow_run(pid: int, wid: int, runId: int, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    run = db.get(WorkflowRun, runId)
+    if run is None or run.workflow_id != wid:
+        raise HTTPException(404, "Workflow run not found")
+    if run.status in ("success", "failure", "cancelled"):
+        raise HTTPException(400, "Cannot cancel completed workflow run")
+    run.status = "cancelled"
+    run.completed_at = utcnow()
+    db.commit()
+    return {"id": runId, "status": run.status}
+
+
+@router.get("/api/projects/{pid}/workflows/{wid}/runs/{runId}/logs")
+def get_workflow_run_logs(pid: int, wid: int, runId: int, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    run = db.get(WorkflowRun, runId)
+    if run is None or run.workflow_id != wid:
+        raise HTTPException(404, "Workflow run not found")
+    return {"id": run.id, "logs": run.logs}
 
 
 # ── Dependabot / Security Alerts ────────────────────────────────────────────

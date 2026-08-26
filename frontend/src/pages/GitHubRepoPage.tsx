@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { api } from "../api";
 import { shortDate, type GhBranch, type GhCommit } from "../types";
+import { GitBranch, Clock } from "lucide-react";
 
 const REPO_URL = "https://github.com/soundXlab/SoundHub";
 
@@ -52,8 +53,14 @@ export default function GitHubRepoPage() {
           and commits live from the public GitHub API.
         </p>
         <div className="row" style={{ marginTop: 8, gap: 8 }}>
-          <span className="gh-stat">⎇ <b>{branches.length}</b> branches</span>
-          <span className="gh-stat">🕘 <b>{commits.length}</b> commits on {selected ?? "—"}</span>
+          <span className="gh-stat">
+            <GitBranch size={14} className="mr-1" />
+            <b>{branches.length}</b> branches
+          </span>
+          <span className="gh-stat">
+            <Clock size={14} className="mr-1" />
+            <b>{commits.length}</b> commits on {selected ?? "—"}
+          </span>
         </div>
       </div>
 

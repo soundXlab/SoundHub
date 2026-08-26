@@ -143,3 +143,87 @@ class S3ObjectStorage:
             },
             ExpiresIn=expires_in,
         )
+
+    # Storage class mapping for tiers
+    _STORAGE_CLASS_MAP = {
+        StorageTier.HOT: 'STANDARD',          # Immediate access, highest performance
+        StorageTier.WARM: 'STANDARD_IA',      # Infrequent access, lower cost
+        StorageTier.COLD: 'GLACIER',          # Archive access, lowest cost
+        # Optional: could add GLACIER_IR for instant retrieval, DEEP_ARCHIVE for coldest
+    }
+
+    def get_tier(self, key: str) -> StorageTier:
+        """Return the current storage tier for a blob.
+        For S3, we infer tier from the object's StorageClass.
+        """
+        from .policy import StorageTier
+
+        try:
+            client = self._get_client()
+            s3_key = self._key_from_sha(key)
+            response = client.head_object(Bucket=self.bucket, Key=s3_key)
+            storage_class = response.get('StorageClass', 'STANDARD')
+            # Reverse map storage class to tier
+            for tier, sc in self._STORAGE_CLASS_MAP.items():
+                if sc == storage_class:
+                    return tier
+            # Default to HOT if unknown storage class
+            return StorageTier.HOT
+        except Exception:
+            # If we can't get storage class, fallback to metadata tier (legacy)
+            try:
+                client = self._get_client()
+                s3_key = self._key_from_sha(key)
+                response = client.head_object(Bucket=self.bucket, Key=s3_key)
+                metadata = response.get('Metadata', {})
+                tier_str = metadata.get('storage-tier', '0')
+                return StorageTier(int(tier_str))
+            except Exception:
+                return StorageTier.HOT
+
+    def set_tier(self, key: str, tier: StorageTier) -> None:
+        """Move a blob to the specified storage tier.
+        For S3, we change the object's StorageClass.
+        """
+        try:
+            client = self._get_client()
+            s3_key = self._key_from_sha(key)
+
+            target_storage_class = self._STORAGE_CLASS_MAP.get(tier, 'STANDARD')
+
+            # Get current metadata and storage class to preserve metadata
+            response = client.head_object(Bucket=self.bucket, Key=s3_key)
+            metadata = response.get('Metadata', {})
+
+            # Copy object with new storage class, preserving metadata
+            client.copy_object(
+                Bucket=self.bucket,
+                Key=s3_key,
+                CopySource={'Bucket': self.bucket, 'Key': s3_key},
+                Metadata=metadata,
+                MetadataDirective='REPLACE',
+                StorageClass=target_storage_class
+            )
+        except Exception as e:
+            # Fallback to metadata-based tier tracking if storage class change fails
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.warning(
+                f"Failed to change storage class for {key} to {target_storage_class}: {e}. "
+                "Falling back to metadata-based tier tracking."
+            )
+            try:
+                client = self._get_client()
+                s3_key = self._key_from_sha(key)
+                response = client.head_object(Bucket=self.bucket, Key=s3_key)
+                metadata = response.get('Metadata', {})
+                metadata['storage-tier'] = str(tier.value)
+                client.copy_object(
+                    Bucket=self.bucket,
+                    Key=s3_key,
+                    CopySource={'Bucket': self.bucket, 'Key': s3_key},
+                    Metadata=metadata,
+                    MetadataDirective='REPLACE'
+                )
+            except Exception as e2:
+                logger.error(f"Fallback also failed for {key}: {e2}")

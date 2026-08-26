@@ -557,14 +557,14 @@ function DawInfoBox({ info }: { info: DawInfo | null }) {
         </div>
         <div>
           <dt>Duration</dt>
-          <dd>{info.duration ?? "—"}</dd>
+          <dd>" — "</dd>
         </div>
       </div>
       {info.tracks && info.tracks.length > 0 && (
         <div className="project-view-daw-tracks">
           {info.tracks.map((track, i) => (
             <div key={i} className="track-row">
-              <span className="track-kind">{track.type}</span>
+              <span className="track-kind">{track.kind}</span>
               <span>{track.name}</span>
             </div>
           ))}

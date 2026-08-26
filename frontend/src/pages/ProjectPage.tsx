@@ -12,7 +12,7 @@ import {
   Star,
   ArrowRightLeft,
   Download,
-  Link,
+  Link as LinkLucide,
 } from "lucide-react";
 import {
   DAW_COLORS,
@@ -226,7 +226,7 @@ export default function ProjectPage() {
               onClick={() => setShowWebhookSetter(true)}
               title="Webhook URL"
             >
-              <Link size={16} className="mr-2" />
+              <LinkLucide size={16} className="mr-2" />
               Webhook
             </button>
             <span className="spacer" />

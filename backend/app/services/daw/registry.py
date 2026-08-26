@@ -6,6 +6,8 @@ def detect_format(path: str, data: bytes) -> str:
     lower = path.lower()
     if lower.endswith(".als"):
         return "ableton"
+    elif lower.endswith(".alp"):
+        return "ableton_pack"
     elif lower.endswith(".cpr"):
         return "cubase"
     elif lower.endswith(".rpp"):
@@ -20,6 +22,8 @@ def get_daw_info(path: str, data: bytes) -> dict | None:
     fmt = detect_format(path, data)
     if fmt == "ableton":
         return _parse_ableton(data)
+    elif fmt == "ableton_pack":
+        return _parse_alp(data)
     elif fmt == "reaper":
         return _parse_reaper(data)
     elif fmt == "cubase":
@@ -46,6 +50,31 @@ def _parse_ableton(data: bytes) -> dict:
         }
     except Exception:
         return {"format": "ableton", "error": "parse_failed"}
+
+
+def _parse_alp(data: bytes) -> dict:
+    """Parse Ableton Live Pack (.alp) — ZIP archive containing .als + assets."""
+    from .alp_parser import parse_alp
+
+    try:
+        info = parse_alp(data)
+        archive_meta = info.extra.get("archive_contents", {})
+        return {
+            "format": "ableton_pack",
+            "bpm": info.bpm,
+            "time_signature": info.time_signature,
+            "track_count": info.extra.get("track_count", len(info.tracks)),
+            "tracks": [t.name for t in info.tracks[:50]],
+            "plugin_count": len(info.plugins),
+            "plugins": info.plugins[:50],
+            "sample_count": len(info.samples),
+            "preset_count": len(info.extra.get("presets", [])),
+            "als_files": archive_meta.get("als_files", []),
+            "primary_als": archive_meta.get("primary_als", ""),
+            "archive_total_files": archive_meta.get("total_files", 0),
+        }
+    except Exception:
+        return {"format": "ableton_pack", "error": "parse_failed"}
 
 
 def _parse_reaper(data: bytes) -> dict:

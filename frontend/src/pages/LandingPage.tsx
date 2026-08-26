@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import ReviewSession from "../components/ReviewSession";
 
@@ -222,12 +222,8 @@ const COMPARE_ROWS = [
   { feature: "Stems matched by role", soundhub: true, discord: false, drive: false, github: false },
   { feature: "Approvals & rounds", soundhub: true, discord: false, drive: false, github: false },
   { feature: "Final delivery with invoice", soundhub: true, discord: false, drive: false, github: false },
-  { feature: "DAW parsing (.als/.cpr/.rpp/.flp)", soundhub: true, discord: false, drive: false, github: false },
+  { feature: "DAW parsing (.als/.alp/.cpr/.rpp/.flp)", soundhub: true, discord: false, drive: false, github: false },
 ];
-
-// --- hero rotating word -----------------------------------------------------
-
-const HERO_WORDS = ["review", "versions", "approvals"];
 
 const FAQ = [
   {
@@ -354,22 +350,6 @@ function BrowserShot({ src, url, caption, poster }: { src: string; url: string; 
       </video>
       {caption && <div className="cr-shot-cap">{caption}</div>}
     </div>
-  );
-}
-
-// Rotating word in the hero headline (CodeRabbit-style motion).
-function RotatingWord({ words }: { words: string[] }) {
-  const [i, setI] = useState(0);
-
-  useEffect(() => {
-    const t = setInterval(() => setI((x) => (x + 1) % words.length), 2200);
-    return () => clearInterval(t);
-  }, [words.length]);
-
-  return (
-    <span className="cr-rotate" key={i}>
-      {words[i]}
-    </span>
   );
 }
 

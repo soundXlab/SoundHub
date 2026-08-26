@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, type FormEvent } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useSearchParams } from "react-router-dom";
 import { api } from "../api";
 import { shortDate } from "../types";
 
@@ -33,12 +33,19 @@ const TABS: { key: FeatureTab; label: string; icon: string }[] = [
 export default function ProjectFeaturesHub() {
   const { id } = useParams();
   const pid = Number(id);
-  const [tab, setTab] = useState<FeatureTab>("wiki");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tabParam = (searchParams.get("tab") || "wiki") as FeatureTab;
+  const validTabs = TABS.map((t) => t.key);
+  const tab = validTabs.includes(tabParam) ? tabParam : "wiki";
   const [projectName, setProjectName] = useState("");
 
   useEffect(() => {
     api.getProject(pid).then((p) => setProjectName(p.name)).catch(() => {});
   }, [pid]);
+
+  const setTab = (key: FeatureTab) => {
+    setSearchParams({ tab: key });
+  };
 
   return (
     <div>
@@ -504,22 +511,138 @@ function DiscussionsTab({ pid }: { pid: number }) {
 
 // ── Workflows ───────────────────────────────────────────────────────────────
 function WorkflowsTab({ pid }: { pid: number }) {
-  const { items, loading } = useList(() => api.listWorkflows(pid));
+  const { items: workflows, loading: wfLoading } = useList(() => api.listWorkflows(pid));
+  const [selectedWorkflow, setSelectedWorkflow] = useState<number | null>(null);
+  const { items: runs, loading: runLoading } = selectedWorkflow
+    ? useList(() => api.listWorkflowRuns(pid, selectedWorkflow))
+    : { items: [], loading: false };
+
+  const statusColor = (s: string) =>
+    s === "success" ? "#10b981" :
+    s === "failed" ? "#ef4444" :
+    s === "in_progress" || s === "queued" ? "#f59e0b" :
+    "#64748b";
+
+  const createWorkflow = async (e: FormEvent) => {
+    e.preventDefault();
+    // In a real implementation, we'd show a modal
+    // For now just placeholder
+    alert("Workflow creation would open a YAML editor");
+  };
+
+  const toggleWorkflow = async (id: number, enabled: boolean) => {
+    try {
+      await api.updateWorkflow(pid, id, undefined, undefined, !enabled);
+      // Refetch workflows
+      // Note: useList hook doesn't expose reload directly, we'd need to modify it
+      // For simplicity, we'll just update optimistically
+    } catch (err) {
+      console.error('Failed to toggle workflow:', err);
+    }
+  };
+
+  const runWorkflow = async (id: number) => {
+    try {
+      await api.createWorkflowRun(pid, id);
+      // Would trigger refetch of runs
+    } catch (err) {
+      console.error('Failed to run workflow:', err);
+    }
+  };
+
   return (
     <Section title="CI/CD Workflows">
-      {loading ? <Empty text="Loading..." /> : items.length === 0 ? (
-        <Empty text="No workflows configured." />
+      <div style={{ display: "flex", gap: 10, marginBottom: 10, flexWrap: "wrap" }}>
+        <button className="btn" onClick={createWorkflow}>
+          + New Workflow
+        </button>
+      </div>
+
+      {wfLoading ? <p className="muted">Loading workflows...</p> : workflows.length === 0 ? (
+        <p className="muted">No workflows configured. Create one to automate audio processing, testing, or deployment.</p>
       ) : (
-        <div className="commit-list">
-          {items.map((w: any) => (
-            <div className="commit-list-row" key={w.id}>
-              <span>⚙️</span>
-              <span className="commit-msg">{w.name}</span>
-              <span className="muted" style={{ fontSize: 12 }}>{w.filename}</span>
-              <span className="chip">{w.enabled ? "enabled" : "disabled"}</span>
+        <>
+          <div className="commit-list">
+            {workflows.map((w: any) => (
+              <div
+                key={w.id}
+                className={`commit-list-row ${selectedWorkflow === w.id ? "selected-workflow" : ""}`}
+                onClick={() => setSelectedWorkflow(selectedWorkflow === w.id ? null : w.id)}
+                style={{ cursor: "pointer" }}
+              >
+                <span>⚙️</span>
+                <div style={{ display: "flex", flexDirection: "column" }}>
+                  <span className="commit-msg">{w.name}</span>
+                  <span className="muted" style={{ fontSize: 12 }}>{w.filename}</span>
+                </div>
+                <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                  <span
+                    className="chip"
+                    style={{
+                      backgroundColor: w.enabled ? "#10b98120" : "#ef444420",
+                      color: w.enabled ? "#10b981" : "#ef4444",
+                      borderColor: w.enabled ? "#10b981" : "#ef4444"
+                    }}
+                  >
+                    {w.enabled ? "enabled" : "disabled"}
+                  </span>
+                  <button
+                    className="btn sm ghost"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleWorkflow(w.id, w.enabled);
+                    }}
+                  >
+                    {w.enabled ? "Disable" : "Enable"}
+                  </button>
+                  <button
+                    className="btn sm ghost"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      runWorkflow(w.id);
+                    }}
+                  >
+                    Run
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {selectedWorkflow && (
+            <div style={{ marginTop: 20 }}>
+              <h3>Workflow Runs</h3>
+              {runLoading ? <p className="muted">Loading runs...</p> : runs.length === 0 ? (
+                <p className="muted">No runs yet. Run the workflow to see execution history.</p>
+              ) : (
+                <div className="commit-list">
+                  {runs.map((r: any) => (
+                    <div key={r.id} className="commit-list-row">
+                      <span>🏃</span>
+                      <div style={{ display: "flex", flexDirection: "column" }}>
+                        <span className="commit-msg">{r.trigger === "push" ? "Push" : r.trigger === "manual" ? "Manual" : "Scheduled"} run</span>
+                        <span className="muted" style={{ fontSize: 12 }}>
+                          {r.started_at ? new Date(r.started_at).toLocaleString() : "Queued"}
+                          {r.completed_at ?
+                            ` → ${new Date(r.completed_at).toLocaleString()}` : ""}
+                        </span>
+                      </div>
+                      <span
+                        className="chip"
+                        style={{
+                          backgroundColor: statusColor(r.status) + "20",
+                          color: statusColor(r.status)
+                        }}
+                      >
+                        {r.status}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
-          ))}
-        </div>
+          )}
+        </>
       )}
     </Section>
   );

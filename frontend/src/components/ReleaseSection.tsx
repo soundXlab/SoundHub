@@ -10,6 +10,7 @@ import {
   type Deployment,
 } from "../web3/contracts";
 import { setTargetChainId, useWallet } from "../web3/useWallet";
+import { Music, Settings2 } from "lucide-react";
 
 interface Props {
   projectId: number;
@@ -161,7 +162,9 @@ export default function ReleaseSection({
 
   return (
     <div className="card" style={{ marginBottom: 20 }}>
-      <h2>🎵 On-chain release</h2>
+      <h2>
+  <Music size={20} /> On-chain release
+</h2>
       {!deployed ? (
         <p className="muted" style={{ fontSize: 13 }}>
           Contracts not deployed yet. Run <code>npm run deploy:base</code> in{" "}
@@ -172,7 +175,10 @@ export default function ReleaseSection({
           {releaseTokenId && releaseContract ? (
             <div className="daw-box" style={{ borderStyle: "solid" }}>
               <div className="row">
-                <strong>🎛 {releaseName || "Release"}</strong>
+                <strong>
+                  <Settings2 size={16} className="mr-2" />
+                  {releaseName || "Release"}
+                </strong>
                 <span className="badge badge-daw" style={{ background: "#22d3ee" }}>
                   NFT #{releaseTokenId}
                 </span>

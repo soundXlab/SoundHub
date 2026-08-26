@@ -6,17 +6,24 @@ re-pushing the same .als costs nothing. Dedup is automatic.
 Implements the ObjectStorage protocol.
 """
 import hashlib
+import json
+import os
 import re
 import secrets
 import time
 from pathlib import Path
+from typing import Any
 from urllib.parse import quote
 
 from fastapi import UploadFile
 
 from ...config import BLOB_DIR, SECRET_KEY
+from .policy import StorageTier, determine_storage_tier
 
 _SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
+
+# Metadata file extension
+_METADATA_EXT = ".json"
 
 
 def _blob_path(sha: str) -> Path:
@@ -86,6 +93,18 @@ class LocalObjectStorage:
         except ValueError:
             return 0
         return path.stat().st_size if path.exists() else 0
+
+    def get_tier(self, key: str) -> StorageTier:
+        """Return the current storage tier for a blob.
+        For local storage, we don't implement tiering, so we always return HOT.
+        """
+        return StorageTier.HOT
+
+    def set_tier(self, key: str, tier: StorageTier) -> None:
+        """Move a blob to the specified storage tier.
+        For local storage, we do nothing because we don't have tiered storage.
+        """
+        pass
 
 
 # ── Legacy convenience functions (backward-compatible) ──────────────────

@@ -22,6 +22,13 @@ export interface Project {
   created_at: string;
   updated_at: string;
   owner: User;
+  // Storage lifecycle policy
+  storage_policy: {
+    hot_days: number;      // Days to keep in hot storage (fast access)
+    warm_days: number;     // Days to keep in warm storage (slower access)
+    cold_days: number;     // Days to keep in cold storage (archive)
+    enabled: boolean;      // Whether lifecycle policy is enabled
+  };
 }
 
 export interface Branch {
@@ -649,8 +656,40 @@ export interface AudioAnalysis {
   channels: number | null;
   integrated_lufs: number | null;
   true_peak_dbtp: number | null;
+  // New fields for AWS-like analysis
+  bpm: number | null;
+  key: string | null; // e.g., "Cmaj", "Am"
+  key_confidence: number | null; // 0-1
+  loudness_range: number | null; // LU
+  peak_amplitude: number | null; // дБФС
+  zero_crossing_rate: number | null;
+  spectral_centroid: number | null;
+  spectral_rolloff: number | null;
+  // Stem generation status
+  stems_generated: boolean;
+  stem_names: string[]; // ["drums", "bass", "vocals", ...]
   analysis_status: string;
   analysed_at: string | null;
+}
+
+export interface Workflow {
+  id: number;
+  name: string;
+  filename: string; // e.g., "workflows/mix-review.yml"
+  enabled: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface WorkflowRun {
+  id: number;
+  workflow_id: number;
+  status: "queued" | "in_progress" | "success" | "failed" | "cancelled";
+  started_at: string | null;
+  completed_at: string | null;
+  trigger: string; // "push", "manual", "schedule"
+  commit_id: number | null;
+  logs_url: string | null;
 }
 
 export interface StemAsset {
@@ -715,6 +754,7 @@ export function shortDate(iso: string): string {
 
 export const DAW_COLORS: Record<string, string> = {
   als: "#ff8b00",
+  alp: "#ff6b00",
   cpr: "#00b4ff",
   rpp: "#9b5de5",
   flp: "#39d98a",

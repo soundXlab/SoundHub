@@ -2,7 +2,9 @@ import { useCallback, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { api } from "../api";
 import UsdcPayButton from "../components/UsdcPayButton";
+import { Link } from "react-router-dom";
 import { humanSize, shortDate, type DeliveryPage, type Deliverable } from "../types";
+import { Lock, Check, Info, CreditCard, Link as LinkLucide } from "lucide-react";
 
 export default function PublicDeliveryPage() {
   const { token } = useParams<{ token: string }>();
@@ -49,9 +51,9 @@ export default function PublicDeliveryPage() {
       const msg = e instanceof Error ? e.message : "Download failed";
       setDlErr(msg);
       if (msg.toLowerCase().includes("payment")) {
-        setDlErr("💳 Payment required — the engineer has set an outstanding balance on this delivery.");
+        setDlErr("Payment required — the engineer has set an outstanding balance on this delivery.");
       } else if (msg.toLowerCase().includes("deposit")) {
-        setDlErr("💳 Booking deposit required — pay it above to unlock the files.");
+        setDlErr("Booking deposit required — pay it above to unlock the files.");
       }
     } finally {
       setDownloading(null);
@@ -86,7 +88,10 @@ export default function PublicDeliveryPage() {
   if (err) {
     return (
       <div className="session-page">
-        <div className="card error">🔗 {err} — this delivery link doesn't exist.</div>
+        <div className="card error">
+          <LinkLucide size={16} className="mr-1" />
+          {err} — this delivery link doesn't exist.
+        </div>
       </div>
     );
   }
@@ -130,7 +135,10 @@ export default function PublicDeliveryPage() {
               {page.immutable_at ? ` · ${shortDate(page.immutable_at)}` : ""}
             </p>
           </div>
-          {locked && <div className="rs-release-status st-ready">🔒 LOCKED</div>}
+          {locked && <div className="rs-release-status st-ready">
+  <Lock size={14} className="mr-1" />
+  LOCKED
+</div>}
         </div>
 
         {justPaid && page.invoice_status === "paid" && (
@@ -165,7 +173,7 @@ export default function PublicDeliveryPage() {
         {depositDue && (
           <div className="public-delivery-gate">
             <div className="public-delivery-gate-text">
-              💳 Booking deposit due
+              <CreditCard size={14} className="mr-1" />Booking deposit due
               {page.deposit_due_cents ? ` — ${fmtMoney(page.deposit_due_cents, page.currency)}` : ""}
               <span className="public-delivery-gate-sub">
                 The engineer requires a booking deposit before the final files are handed over.
@@ -173,7 +181,14 @@ export default function PublicDeliveryPage() {
             </div>
             <div className="public-delivery-pay-row">
               <button type="button" className="rs-btn approve" onClick={() => void payDeposit()} disabled={paying}>
-                {paying ? "Opening checkout…" : "💳 Pay deposit"}
+                {paying ? (
+                  "Opening checkout…"
+                ) : (
+                  <>
+                    <CreditCard size={14} className="mr-1" />
+                    Pay deposit
+                  </>
+                )}
               </button>
               <UsdcPayButton target={{ deliveryToken: token, kind: "deposit", purposeLabel: "booking deposit" }} />
             </div>
@@ -182,7 +197,7 @@ export default function PublicDeliveryPage() {
         {gate && !depositDue && (
           <div className="public-delivery-gate">
             <div className="public-delivery-gate-text">
-              💳 {page.invoice_status === "balance_due" ? "Outstanding balance" : "Deposit due"}
+              <CreditCard size={14} className="mr-1" /> {page.invoice_status === "balance_due" ? "Outstanding balance" : "Deposit due"}
               {page.amount_due_cents ? ` — ${fmtMoney(page.amount_due_cents, page.currency)}` : ""}
               <span className="public-delivery-gate-sub">
                 Pay to unlock the approved files. Card, Apple Pay and Google Pay accepted.

@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { isLoggedIn } from "./auth";
 import SiteHeader from "./components/SiteHeader";
+import { SidebarLayout } from "./components/SidebarLayout";
 import BranchesPage from "./pages/BranchesPage";
 import CommitPage from "./pages/CommitPage";
 import DiffPage from "./pages/DiffPage";
@@ -15,11 +16,12 @@ import PublicDeliveryPage from "./pages/PublicDeliveryPage";
 import PublicReviewPage from "./pages/PublicReviewPage";
 import MarketplacePage from "./pages/MarketplacePage";
 import ReviewSessionPage from "./pages/ReviewSessionPage";
-import ProjectPage from "./pages/ProjectPage";
 import ProjectsPage from "./pages/ProjectsPage";
 import DawIntegrationPage from "./pages/DawIntegrationPage";
 import DocsPage from "./pages/DocsPage";
 import ProjectFeaturesHub from "./pages/ProjectFeaturesHub";
+import DashboardPage from "./pages/DashboardPage";
+import ProjectViewPage from "./pages/ProjectViewPage";
 
 // Integration pages for individual DAWs — same layout, per-DAW accent color.
 const CUBASE = {
@@ -108,10 +110,23 @@ export default function App() {
 
   const toggleTheme = () => setTheme((t) => (t === "light" ? "dark" : "light"));
 
+  const location = useLocation();
+  const pathname = location.pathname;
+  // Public routes: landing, kettle, docs, login, portfolio, public review, public delivery
+  const isPublic =
+    pathname === "/" ||
+    pathname === "/kettle" ||
+    pathname === "/docs" ||
+    pathname === "/login" ||
+    pathname.startsWith("/p/") ||
+    pathname.startsWith("/r/") ||
+    pathname.startsWith("/d/");
+  const showNav = isPublic;
+
   return (
     <div className="app">
       {/* bandcamp-style global header: logo + search + auth, subnav below */}
-      <SiteHeader theme={theme} onToggleTheme={toggleTheme} />
+      <SiteHeader theme={theme} onToggleTheme={toggleTheme} showNav={showNav} />
       <main className="content">
         <Routes>
           <Route path="/" element={<LandingPage />} />
@@ -132,10 +147,22 @@ export default function App() {
             element={<DawIntegrationPage daw={FL_STUDIO} />}
           />
           <Route
+            path="/dashboard"
+            element={
+              <RequireAuth>
+                <SidebarLayout>
+                  <DashboardPage />
+                </SidebarLayout>
+              </RequireAuth>
+            }
+          />
+          <Route
             path="/projects"
             element={
               <RequireAuth>
-                <ProjectsPage />
+                <SidebarLayout>
+                  <ProjectsPage />
+                </SidebarLayout>
               </RequireAuth>
             }
           />
@@ -143,7 +170,9 @@ export default function App() {
             path="/projects/:id"
             element={
               <RequireAuth>
-                <ProjectPage />
+                <SidebarLayout>
+                  <ProjectViewPage />
+                </SidebarLayout>
               </RequireAuth>
             }
           />
@@ -151,7 +180,9 @@ export default function App() {
             path="/projects/:id/branches"
             element={
               <RequireAuth>
-                <BranchesPage />
+                <SidebarLayout>
+                  <BranchesPage />
+                </SidebarLayout>
               </RequireAuth>
             }
           />
@@ -159,7 +190,9 @@ export default function App() {
             path="/projects/:id/commit/:commitId"
             element={
               <RequireAuth>
-                <CommitPage />
+                <SidebarLayout>
+                  <CommitPage />
+                </SidebarLayout>
               </RequireAuth>
             }
           />
@@ -167,7 +200,9 @@ export default function App() {
             path="/projects/:id/features"
             element={
               <RequireAuth>
-                <ProjectFeaturesHub />
+                <SidebarLayout>
+                  <ProjectFeaturesHub />
+                </SidebarLayout>
               </RequireAuth>
             }
           />
@@ -175,7 +210,9 @@ export default function App() {
             path="/projects/:id/diff"
             element={
               <RequireAuth>
-                <DiffPage />
+                <SidebarLayout>
+                  <DiffPage />
+                </SidebarLayout>
               </RequireAuth>
             }
           />
@@ -183,7 +220,9 @@ export default function App() {
             path="/dao"
             element={
               <RequireAuth>
-                <DAOPage />
+                <SidebarLayout>
+                  <DAOPage />
+                </SidebarLayout>
               </RequireAuth>
             }
           />
@@ -191,7 +230,9 @@ export default function App() {
             path="/market"
             element={
               <RequireAuth>
-                <MarketplacePage />
+                <SidebarLayout>
+                  <MarketplacePage />
+                </SidebarLayout>
               </RequireAuth>
             }
           />
@@ -199,11 +240,12 @@ export default function App() {
             path="/github"
             element={
               <RequireAuth>
-                <GitHubRepoPage />
+                <SidebarLayout>
+                  <GitHubRepoPage />
+                </SidebarLayout>
               </RequireAuth>
             }
           />
-          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
     </div>

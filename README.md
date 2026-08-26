@@ -95,6 +95,7 @@ As an educational hub, SoundHub provides structured learning paths, interactive 
 | **Release Packages** | Assemble deliverables, run QC preflight, lock and deliver securely |
 | **Enterprise Security** | SAST/DAST scanning, encrypted secrets, audit log, IP allowlist, custom roles |
 | **Full Project Management** | Kanban, Tasks, Wiki, Epics, Roadmaps, Milestones, Calendar, Time Tracking |
+| **AWS-like Cloud Features** | Background audio processing, auto-analysis (BPM, key, stems), webhook notifications, workflow automation, intelligent storage policies |
 
 ---
 

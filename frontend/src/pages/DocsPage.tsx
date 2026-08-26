@@ -8,7 +8,7 @@ const CORE_LOOP = [
   {
     n: "1",
     title: "Create — in any DAW",
-    text: "You work in Ableton Live, FL Studio, Cubase or REAPER. SoundHub reads all four project formats (.als, .cpr, .rpp, .flp) so a version isn't a black box.",
+    text: "You work in Ableton Live, FL Studio, Cubase or REAPER. SoundHub reads project formats (.als, .alp, .cpr, .rpp, .flp) so a version isn't a black box.",
   },
   {
     n: "2",

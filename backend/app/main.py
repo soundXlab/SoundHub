@@ -67,6 +67,10 @@ from .routers import (
     iam,
 )
 
+# GraphQL endpoint
+from strawberry.fastapi import GraphQLRouter
+from .graphql.schema import schema as graphql_schema
+
 app = FastAPI(
     title="SoundHub API",
     description="Version control and collaboration for music production projects.",
@@ -141,13 +145,8 @@ app.include_router(iam.router)
 # Register background job handlers
 from .services import job_handlers as _job_handlers  # noqa: F401
 
-# GraphQL endpoint
-from strawberry.fastapi import GraphQLRouter
-from .graphql.schema import schema as graphql_schema
-
 graphql_app = GraphQLRouter(graphql_schema)
 app.include_router(graphql_app, prefix="/graphql")
 
 # Serve static files (frontend build) - must come after API routes
-# for SPA fallback to work correctly
-app.mount("/", StaticFiles(directory="app/static", html=True), name="static")
+app.frontend("/", directory="app/static")

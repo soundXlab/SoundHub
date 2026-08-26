@@ -262,3 +262,104 @@ def make_wav(duration_ms: int = 200) -> bytes:
     header += b"fmt " + struct.pack("<IHHIIHH", 16, 1, 1, rate, rate * 2, 2, 16)
     header += b"data" + struct.pack("<I", len(data))
     return bytes(header) + bytes(data)
+
+
+# ---------------------------------------------------------------------------
+# Ableton Live Pack (.alp) — ZIP archive containing .als + assets
+# ---------------------------------------------------------------------------
+
+
+def make_alp(
+    bpm: float = 128.0,
+    time_sig: tuple[int, int] = (4, 4),
+    tracks: list[tuple[str, str, list[str]]] | None = None,
+    samples: list[str] | None = None,
+    include_samples: bool = True,
+    include_presets: bool = True,
+    include_macos_junk: bool = False,
+) -> bytes:
+    """Create a realistic .alp (ZIP archive) containing .als + assets."""
+    import io
+    import zipfile
+
+    # Create the .als content
+    als_data = make_als(
+        bpm=bpm,
+        time_sig=time_sig,
+        tracks=tracks,
+        samples=samples,
+    )
+
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as zf:
+        # Main project file
+        zf.writestr("MyProject/MyProject.als", als_data)
+
+        # Samples
+        if include_samples:
+            sample_list = samples or ["Kick.wav", "Clap.wav"]
+            for sample in sample_list:
+                zf.writestr(f"MyProject/Samples/{sample}", make_wav(100))
+
+        # Presets
+        if include_presets:
+            zf.writestr("MyProject/Presets/Serum.adv", b"preset data serum")
+            zf.writestr("MyProject/Presets/Reverb.adg", b"preset data reverb")
+            zf.writestr("MyProject/Presets/Delay.alc", b"preset data delay")
+
+        # macOS junk (should be filtered)
+        if include_macos_junk:
+            zf.writestr("__MACOSX/._MyProject.als", b"\x00\x05\x16\x07")
+            zf.writestr("MyProject/.DS_Store", b"\x00\x00\x00\x01Bud1")
+
+    return buf.getvalue()
+
+
+def make_alp_no_als() -> bytes:
+    """Create an ALP archive with no .als files (only samples)."""
+    import io
+    import zipfile
+
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as zf:
+        zf.writestr("Samples/Kick.wav", make_wav(100))
+        zf.writestr("Samples/Bass.wav", make_wav(100))
+        zf.writestr("Presets/Serum.adv", b"preset data")
+
+    return buf.getvalue()
+
+
+def make_alp_large(max_single_file: int = 100 * 1024 * 1024) -> bytes:
+    """Create an ALP with a file larger than the extraction limit."""
+    import io
+    import zipfile
+
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w", zipfile.ZIP_STORED) as zf:
+        zf.writestr("MyProject/MyProject.als", make_als())
+        # Large file (150MB) - should be skipped during extraction
+        zf.writestr("MyProject/Samples/LargeLoop.wav", b"\x00" * (max_single_file + 1))
+
+    return buf.getvalue()
+
+
+def make_alp_empty() -> bytes:
+    """Create an empty ALP archive (no files)."""
+    import io
+    import zipfile
+
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w") as zf:
+        pass  # Empty archive
+
+    return buf.getvalue()
+
+
+def make_alp_corrupt() -> bytes:
+    """Create a corrupt ZIP file."""
+    return b"PK\x03\x04corrupt data here"
+
+
+def make_alp_invalid_signature() -> bytes:
+    """Create a file that is not a valid ALP/ZIP."""
+    return b"Not a ZIP file at all"

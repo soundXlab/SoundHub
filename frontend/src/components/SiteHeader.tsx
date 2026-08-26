@@ -7,6 +7,7 @@ import type { SearchResults } from "../types";
 interface SiteHeaderProps {
   theme: "light" | "dark";
   onToggleTheme: () => void;
+  showNav?: boolean;
 }
 
 /* ---------- tiny inline icons (stroke, currentColor) ---------- */
@@ -168,7 +169,7 @@ function HeaderSearch() {
 
 /* ---------- the two-row bandcamp-style header ---------- */
 
-export default function SiteHeader({ theme, onToggleTheme }: SiteHeaderProps) {
+export default function SiteHeader({ theme, onToggleTheme, showNav }: SiteHeaderProps) {
   const { user, logout } = useAuth();
   const location = useLocation();
   const onLanding = location.pathname === "/" || location.pathname === "/kettle";
@@ -224,29 +225,31 @@ export default function SiteHeader({ theme, onToggleTheme }: SiteHeaderProps) {
         </div>
       </div>
 
-      <nav className="bc-subnav" aria-label="Site">
-        <div className="bc-subnav-inner">
-          {subnav.map((item) =>
-            item.kind === "anchor" ? (
-              <a key={item.key} href={item.to} className="bc-subnav-link">
-                {item.icon}
-                {item.label}
-              </a>
-            ) : (
-              <Link key={item.key} to={item.to} className="bc-subnav-link">
-                {item.icon}
-                {item.label}
+      {showNav && (
+        <nav className="bc-subnav" aria-label="Site">
+          <div className="bc-subnav-inner">
+            {subnav.map((item) =>
+              item.kind === "anchor" ? (
+                <a key={item.key} href={item.to} className="bc-subnav-link">
+                  {item.icon}
+                  {item.label}
+                </a>
+              ) : (
+                <Link key={item.key} to={item.to} className="bc-subnav-link">
+                  {item.icon}
+                  {item.label}
+                </Link>
+              )
+            )}
+            {!user && (
+              <Link to={SAMPLE_REVIEW_URL} className="bc-subnav-link bc-subnav-sample">
+                <Icon d="M8 5v14l11-7z" />
+                Sample review
               </Link>
-            )
-          )}
-          {!user && (
-            <Link to={SAMPLE_REVIEW_URL} className="bc-subnav-link bc-subnav-sample">
-              <Icon d="M8 5v14l11-7z" />
-              Sample review
-            </Link>
-          )}
-        </div>
-      </nav>
+            )}
+          </div>
+        </nav>
+      )}
     </header>
   );
 }

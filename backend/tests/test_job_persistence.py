@@ -237,6 +237,8 @@ class TestJobResultPersistence:
                 output_json={"integrated_lufs": -14.0, "true_peak_dbtp": -0.5},
                 created_at=datetime.now(timezone.utc),
                 finished_at=datetime.now(timezone.utc),
+                delay_until=None,
+                priority=0,
             )
             db.add(job)
             db.flush()

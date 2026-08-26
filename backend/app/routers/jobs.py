@@ -9,6 +9,7 @@ Endpoints:
 """
 from __future__ import annotations
 
+from datetime import datetime, timezone
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -48,6 +49,8 @@ class CreateJobRequest(BaseModel):
     version_id: Optional[int] = None
     session_id: Optional[int] = None
     input_json: Optional[dict] = None
+    delay_seconds: Optional[int] = Field(None, description="Delay job execution by this many seconds")
+    priority: int = Field(0, description="Job priority (0-9, where 0 is highest priority)")
 
 
 class JobResponse(BaseModel):
@@ -55,12 +58,16 @@ class JobResponse(BaseModel):
     type: str
     status: str
     progress: int
+    input_json: Optional[dict] = None
     output_json: Optional[dict] = None
     error_message: str = ""
     attempts: int
     created_at: Optional[str] = None
     started_at: Optional[str] = None
     finished_at: Optional[str] = None
+    delay_until: Optional[str] = None
+    priority: int = 0
+    dlq_reason: Optional[str] = None
 
 
 class JobListResponse(BaseModel):
@@ -94,6 +101,8 @@ def create_job(
             session_id=body.session_id,
             input_json=body.input_json,
             created_by_id=user.id,
+            delay_seconds=body.delay_seconds,
+            priority=body.priority,
         )
     except ValueError as exc:
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, str(exc))
@@ -203,6 +212,97 @@ def retry_job(
         session_id=job.session_id,
         input_json=job.input_json,
         created_by_id=user.id,
+        delay_seconds=job.delay_until and int((job.delay_until - datetime.now(timezone.utc)).total_seconds()) if job.delay_until else None,
+        priority=job.priority,
     )
     new_info = job_queue.get_job_status(new_id)
     return JobResponse(**new_info)
+
+
+# ── Batch Job Endpoint ─────────────────────────────────────────────────
+
+
+class BatchJobSpec(BaseModel):
+    type: str = Field(..., description="Job type (parse_daw, generate_waveform, ...)")
+    storage_object_id: Optional[int] = None
+    project_id: Optional[int] = None
+    commit_id: Optional[int] = None
+    version_id: Optional[int] = None
+    session_id: Optional[int] = None
+    input_json: Optional[dict] = None
+    delay_seconds: Optional[int] = Field(None, description="Delay job execution by this many seconds")
+    priority: int = Field(0, description="Job priority (0-9, where 0 is highest priority)")
+
+
+class BatchJobResponse(BaseModel):
+    job_ids: list[int]
+
+
+@router.post("/batch", response_model=BatchJobResponse, status_code=status.HTTP_202_ACCEPTED)
+def create_jobs_batch(
+    body: list[BatchJobSpec],
+    user=Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Enqueue multiple jobs in a single request for efficiency.
+
+    Returns a list of job IDs in the same order as the input.
+    Maximum 100 jobs per batch.
+    """
+    if len(body) > 100:
+        raise HTTPException(
+            status.HTTP_400_BAD_REQUEST,
+            "Batch size cannot exceed 100 jobs"
+        )
+
+    if len(body) == 0:
+        raise HTTPException(
+            status.HTTP_400_BAD_REQUEST,
+            "Batch must contain at least one job"
+        )
+
+    # Convert Pydantic models to dicts for the service
+    # Rename 'type' field to 'job_type' to match service expectations
+    job_specs = []
+    for job_spec in body:
+        job_dict = job_spec.model_dump(exclude_unset=True)
+        if 'type' in job_dict:
+            job_dict['job_type'] = job_dict.pop('type')
+        job_specs.append(job_dict)
+
+    try:
+        job_ids = job_queue.enqueue_job_batch(job_specs)
+    except ValueError as exc:
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, str(exc))
+
+    return BatchJobResponse(job_ids=job_ids)
+
+
+@router.get("/dlq", response_model=JobListResponse)
+def list_dlq_jobs(
+    project_id: Optional[int] = None,
+    limit: int = 50,
+    user=Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """List jobs in the Dead Letter Queue (DLQ)."""
+    if project_id is not None:
+        from ..models import Project
+        project = db.get(Project, project_id)
+        if project is None or project.owner_id != user.id:
+            raise HTTPException(status.HTTP_403_FORBIDDEN, "Access denied: not project owner")
+    else:
+        # No project filter — show only user's own jobs
+        project_id = None
+
+    jobs = job_queue.list_jobs(
+        project_id=project_id,
+        status="dlq",
+        limit=limit,
+    )
+
+    # When no project_id filter, additionally filter by creator
+    if project_id is None:
+        jobs = [j for j in jobs if j.get("created_by_id") == user.id]
+
+    return {"jobs": jobs, "total": len(jobs)}

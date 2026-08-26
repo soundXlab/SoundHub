@@ -56,8 +56,8 @@ from ..config import MAX_UPLOAD_SIZE
 
 router = APIRouter(prefix="/api/projects", tags=["projects"])
 
-DAW_EXTENSIONS = {"als", "cpr", "rpp", "flp", "logic", "ptx", "band"}
-DAW_MAP = {"als": "Ableton Live", "cpr": "Cubase", "rpp": "REAPER", "flp": "FL Studio", "logic": "Logic Pro", "ptx": "Pro Tools"}
+DAW_EXTENSIONS = {"als", "alp", "cpr", "rpp", "flp", "logic", "ptx", "band"}
+DAW_MAP = {"als": "Ableton Live", "alp": "Ableton Live Pack", "cpr": "Cubase", "rpp": "REAPER", "flp": "FL Studio", "logic": "Logic Pro", "ptx": "Pro Tools"}
 
 
 # ── helpers ──────────────────────────────────────────────────────────────────
@@ -178,7 +178,16 @@ def create_project(payload: ProjectCreate, user: User = Depends(get_current_user
     )
     if existing:
         raise HTTPException(status.HTTP_409_CONFLICT, "A project with this name already exists")
-    project = Project(owner_id=user.id, name=payload.name.strip(), slug=slug, description=payload.description)
+    project = Project(
+        owner_id=user.id,
+        name=payload.name.strip(),
+        slug=slug,
+        description=payload.description,
+        hot_days=payload.hot_days,
+        warm_days=payload.warm_days,
+        cold_days=payload.cold_days,
+        storage_enabled=payload.storage_enabled
+    )
     db.add(project)
     db.flush()
     branch = Branch(project_id=project.id, name="main")
@@ -633,9 +642,12 @@ def push_branch(
             select(StorageObject).where(StorageObject.sha256 == blob_sha).limit(1)
         )
         if existing_obj is None:
+            from app.services.storage import get_storage
+            storage = get_storage()
+            storage_provider = "local" if not hasattr(storage, "bucket") and not hasattr(storage, "bucket_name") else "s3" if hasattr(storage, "bucket") else "gcs"
             so = StorageObject(
                 sha256=blob_sha,
-                storage_provider="local",
+                storage_provider=storage_provider,
                 storage_key=f"blobs/sha256/{blob_sha[:2]}/{blob_sha[2:4]}/{blob_sha}",
                 original_filename=filename,
                 content_type=upload.content_type or "application/octet-stream",
@@ -669,6 +681,24 @@ def push_branch(
             pass  # Best-effort webhook delivery
 
         file_snapshots.append((filename, blob_sha, len(data)))
+
+    # ── Extract ALP archives ──
+    alp_extracted_count = 0
+    for i, (path, blob_sha, size) in enumerate(file_snapshots):
+        if path.lower().endswith(".alp"):
+            try:
+                from ..services.daw.alp_parser import extract_alp_for_storage
+                alp_data = storage.read_blob(blob_sha)
+                # Use the ALP filename (without extension) as prefix for extracted files
+                alp_prefix = path.rsplit(".", 1)[0] if "." in path else path
+                extracted = extract_alp_for_storage(alp_data, prefix=alp_prefix)
+                for extracted_path, extracted_data in extracted:
+                    extracted_sha = storage.put_blob(extracted_data)
+                    file_snapshots.append((extracted_path, extracted_sha, len(extracted_data)))
+                    alp_extracted_count += 1
+            except Exception as e:
+                # ALP extraction is best-effort — don't fail the push
+                logger.warning("Failed to extract ALP %s: %s", path, e)
 
     # ── Validate audio extension before processing ──
     AUDIO_EXTENSIONS = {"wav", "mp3", "flac", "aiff", "aif", "ogg", "m4a", "aac"}
@@ -1132,6 +1162,8 @@ def push_branch(
                         commit_id=commit.id,
                         input_json={"sha256": blob_sha, "filename": path},
                         created_by_id=user.id,
+                        delay_seconds=None,
+                        priority=0,
                     )
             elif ext in {"wav", "mp3", "flac", "aiff", "aif", "ogg", "m4a", "aac"}:
                 # Audio file → waveform, metadata extraction, loudness analysis
@@ -1141,6 +1173,8 @@ def push_branch(
                     commit_id=commit.id,
                     input_json={"sha256": blob_sha, "filename": path},
                     created_by_id=user.id,
+                    delay_seconds=None,
+                    priority=0,
                 )
                 job_queue.enqueue_job(
                     "extract_audio_metadata",
@@ -1148,6 +1182,8 @@ def push_branch(
                     commit_id=commit.id,
                     input_json={"sha256": blob_sha, "filename": path},
                     created_by_id=user.id,
+                    delay_seconds=None,
+                    priority=0,
                 )
                 job_queue.enqueue_job(
                     "analyze_loudness",
@@ -1155,6 +1191,8 @@ def push_branch(
                     commit_id=commit.id,
                     input_json={"sha256": blob_sha, "filename": path},
                     created_by_id=user.id,
+                    delay_seconds=None,
+                    priority=0,
                 )
         except Exception as e:
             # Job enqueueing is best-effort — never block the push response
@@ -1175,6 +1213,7 @@ def push_branch(
         file_count=len(file_snapshots),
         uploaded=uploaded,
         deduplicated=dedup_count,
+        alp_extracted=alp_extracted_count,
         review_url=review_url,
         version_id=version_id,
         session_id=session_id,
@@ -1208,6 +1247,7 @@ def create_commit(
     db.flush()
 
     file_count = 0
+    alp_extracted_count = 0
     for upload in files:
         data = upload.file.read()
         blob_sha = storage.put_blob(data)
@@ -1215,6 +1255,24 @@ def create_commit(
         snap = FileSnapshot(commit_id=commit.id, path=filename, blob_sha=blob_sha, size=len(data))
         db.add(snap)
         file_count += 1
+
+        # Extract ALP archives
+        if filename.lower().endswith(".alp"):
+            try:
+                from ..services.daw.alp_parser import extract_alp_for_storage
+                alp_prefix = filename.rsplit(".", 1)[0] if "." in filename else filename
+                extracted = extract_alp_for_storage(data, prefix=alp_prefix)
+                for extracted_path, extracted_data in extracted:
+                    extracted_sha = storage.put_blob(extracted_data)
+                    db.add(FileSnapshot(
+                        commit_id=commit.id,
+                        path=extracted_path,
+                        blob_sha=extracted_sha,
+                        size=len(extracted_data),
+                    ))
+                    alp_extracted_count += 1
+            except Exception as e:
+                logger.warning("Failed to extract ALP %s: %s", filename, e)
 
     branch.head_commit_id = commit.id
     project.updated_at = utcnow()
@@ -1464,6 +1522,39 @@ def get_diff(
 
     # Fallback: binary diff
     return DiffOut(path=path, format=ext, summary=[], raw="", binary=True, truncated=False)
+
+
+# ── Storage Lifecycle Management ─────────────────────────────────────────────
+
+
+@router.post("/{project_id}/storage-lifecycle", response_model=dict)
+def trigger_storage_lifecycle(
+    project_id: int,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Trigger a storage lifecycle management job for a project.
+
+    This enqueues a background job that will scan all storage objects in the project
+    and move them to appropriate storage tiers based on the project's storage policy.
+    """
+    project = _get_project(db, project_id, user)
+
+    # Enqueue the storage lifecycle management job
+    job_id = job_queue.enqueue_job(
+        "manage_storage_lifecycle",
+        project_id=project.id,
+        input_json={},
+        created_by_id=user.id,
+        delay_seconds=None,
+        priority=0,
+    )
+
+    return {
+        "job_id": job_id,
+        "message": "Storage lifecycle management job enqueued",
+        "project_id": project.id
+    }
 
 
 def _dawinfo_to_dict(info) -> dict | None:

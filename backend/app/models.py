@@ -1,7 +1,7 @@
 """ORM models for SoundHub."""
 from datetime import datetime, timezone
 
-from sqlalchemy import JSON, DateTime, ForeignKey, Integer, String, Text, UniqueConstraint
+from sqlalchemy import JSON, DateTime, ForeignKey, Integer, String, Text, UniqueConstraint, Boolean
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .database import Base
@@ -38,6 +38,11 @@ class Project(Base):
     release_token_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
     release_contract: Mapped[str | None] = mapped_column(String(42), nullable=True)
     release_name: Mapped[str | None] = mapped_column(String(256), nullable=True)
+    # Storage lifecycle policy
+    hot_days: Mapped[int] = mapped_column(Integer, default=30)
+    warm_days: Mapped[int] = mapped_column(Integer, default=90)
+    cold_days: Mapped[int] = mapped_column(Integer, default=365)
+    storage_enabled: Mapped[bool] = mapped_column(Boolean, default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=utcnow, onupdate=utcnow
@@ -1375,7 +1380,7 @@ class WorkflowRun(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     workflow_id: Mapped[int] = mapped_column(ForeignKey("workflows.id"), index=True)
-    status: Mapped[str] = mapped_column(String(32), default="pending")  # pending | running | success | failure | cancelled
+    status: Mapped[str] = mapped_column(String(32), default="queued")  # queued | in_progress | success | failed | cancelled
     trigger: Mapped[str] = mapped_column(String(32), default="push")
     commit_id: Mapped[int | None] = mapped_column(ForeignKey("commits.id"), nullable=True)
     logs: Mapped[str] = mapped_column(Text, default="")
@@ -2275,7 +2280,7 @@ class StorageObject(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     sha256: Mapped[str] = mapped_column(String(64), unique=True, index=True)
-    storage_provider: Mapped[str] = mapped_column(String(32), default="local")  # local | s3
+    storage_provider: Mapped[str] = mapped_column(String(32), default="local")  # local | s3 | gcs
     storage_key: Mapped[str] = mapped_column(String(512), index=True)
     original_filename: Mapped[str] = mapped_column(String(256), default="")
     content_type: Mapped[str] = mapped_column(String(128), default="application/octet-stream")
@@ -2286,6 +2291,7 @@ class StorageObject(Base):
     status: Mapped[str] = mapped_column(
         String(32), default="pending_upload"
     )  # pending_upload | uploaded | processing | ready | failed | deleted
+    storage_tier: Mapped[int] = mapped_column(Integer, default=0)  # 0=hot, 1=warm, 2=cold
     uploaded_by_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
     project_id: Mapped[int | None] = mapped_column(ForeignKey("projects.id"), nullable=True, index=True)
     commit_id: Mapped[int | None] = mapped_column(ForeignKey("commits.id"), nullable=True, index=True)
@@ -2331,6 +2337,8 @@ JOB_TYPES = [
     "build_stem_manifest",
     "run_audio_ci",
     "build_release_package",
+    "manage_storage_lifecycle",
+    "execute_workflow",
 ]
 
 JOB_STATUSES = ["queued", "running", "completed", "failed", "cancelled"]
@@ -2363,9 +2371,387 @@ class Job(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
     started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    # Delayed execution support
+    delay_until: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True, index=True)
+    # Priority support (0-9, where 0 is highest priority)
+    priority: Mapped[int] = mapped_column(Integer, default=0, index=True)
+    # Dead Letter Queue support
+    dlq_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     created_by: Mapped["User | None"] = relationship()
 
     @property
     def is_terminal(self) -> bool:
-        return self.status in ("completed", "failed", "cancelled")
+        return self.status in ("completed", "failed", "cancelled", "dlq")
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# Notification Service — pub/sub messaging (analogous to AWS SNS)
+# ═══════════════════════════════════════════════════════════════════════════
+
+
+class NotificationTopic(Base):
+    """Named topic for publishing/subscribing to events (like SNS topics)."""
+
+    __tablename__ = "notification_topics"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(String(128), unique=True, index=True)
+    display_name: Mapped[str] = mapped_column(String(256), default="")
+    description: Mapped[str] = mapped_column(Text, default="")
+    owner_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, onupdate=utcnow)
+
+    subscriptions: Mapped[list["NotificationSubscription"]] = relationship(back_populates="topic", cascade="all, delete-orphan")
+    owner: Mapped["User | None"] = relationship()
+
+
+class NotificationSubscription(Base):
+    """Subscription to a notification topic (like SNS subscription)."""
+
+    __tablename__ = "notification_subscriptions"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    topic_id: Mapped[int] = mapped_column(ForeignKey("notification_topics.id"), index=True)
+    protocol: Mapped[str] = mapped_column(String(16))  # http | https | email | webhook | websocket
+    endpoint: Mapped[str] = mapped_column(String(512))  # URL, email address, or user_id
+    filter_policy: Mapped[str | None] = mapped_column(JSON, nullable=True)  # JSON filter
+    status: Mapped[str] = mapped_column(String(16), default="active")  # active | pending | failed
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+    topic: Mapped["NotificationTopic"] = relationship(back_populates="subscriptions")
+
+
+class NotificationMessage(Base):
+    """Published message on a topic (like SNS publish)."""
+
+    __tablename__ = "notification_messages"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    topic_id: Mapped[int] = mapped_column(ForeignKey("notification_topics.id"), index=True)
+    subject: Mapped[str] = mapped_column(String(256), default="")
+    body: Mapped[str] = mapped_column(Text, default="")
+    message_type: Mapped[str] = mapped_column(String(32), default="text")  # text | json
+    message_json: Mapped[str | None] = mapped_column(JSON, nullable=True)
+    published_by_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+    topic: Mapped["NotificationTopic"] = relationship()
+    deliveries: Mapped[list["NotificationDelivery"]] = relationship(back_populates="message", cascade="all, delete-orphan")
+
+
+class NotificationDelivery(Base):
+    """Delivery status for each subscription of a message."""
+
+    __tablename__ = "notification_deliveries"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    message_id: Mapped[int] = mapped_column(ForeignKey("notification_messages.id"), index=True)
+    subscription_id: Mapped[int] = mapped_column(ForeignKey("notification_subscriptions.id"), index=True)
+    status: Mapped[str] = mapped_column(String(16), default="pending")  # pending | delivered | failed
+    status_code: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    response_body: Mapped[str] = mapped_column(Text, default="")
+    error: Mapped[str] = mapped_column(Text, default="")
+    attempts: Mapped[int] = mapped_column(Integer, default=0)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    delivered_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+    message: Mapped["NotificationMessage"] = relationship(back_populates="deliveries")
+    subscription: Mapped["NotificationSubscription"] = relationship()
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# Monitoring & Logging — metrics, logs, alarms (analogous to AWS CloudWatch)
+# ═══════════════════════════════════════════════════════════════════════════
+
+
+class MetricNamespace(Base):
+    """Top-level grouping for custom metrics (like CloudWatch namespace)."""
+
+    __tablename__ = "metric_namespaces"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(String(128), unique=True, index=True)
+    description: Mapped[str] = mapped_column(Text, default="")
+    owner_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+
+class MetricDatum(Base):
+    """Individual metric data point (like CloudWatch MetricDatum)."""
+
+    __tablename__ = "metric_data"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    namespace_id: Mapped[int] = mapped_column(ForeignKey("metric_namespaces.id"), index=True)
+    metric_name: Mapped[str] = mapped_column(String(128), index=True)
+    dimensions: Mapped[str | None] = mapped_column(JSON, nullable=True)  # {"ProjectId": "42", ...}
+    value: Mapped[float] = mapped_column(default=0.0)
+    unit: Mapped[str] = mapped_column(String(32), default="None")  # Count|Seconds|Bytes|Percent|...
+    timestamp: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, index=True)
+
+
+class LogGroup(Base):
+    """Log group for storing log streams (like CloudWatch LogGroup)."""
+
+    __tablename__ = "log_groups"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(String(256), unique=True, index=True)
+    retention_days: Mapped[int] = mapped_column(Integer, default=30)
+    description: Mapped[str] = mapped_column(Text, default="")
+    owner_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+    streams: Mapped[list["LogStream"]] = relationship(back_populates="log_group", cascade="all, delete-orphan")
+
+
+class LogStream(Base):
+    """Log stream within a log group (like CloudWatch LogStream)."""
+
+    __tablename__ = "log_streams"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    log_group_id: Mapped[int] = mapped_column(ForeignKey("log_groups.id"), index=True)
+    name: Mapped[str] = mapped_column(String(256), index=True)
+    source: Mapped[str] = mapped_column(String(64), default="api")  # api | job | workflow | user
+    status: Mapped[str] = mapped_column(String(16), default="active")  # active | archived
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+    log_group: Mapped["LogGroup"] = relationship(back_populates="streams")
+    events: Mapped[list["LogEvent"]] = relationship(back_populates="stream", cascade="all, delete-orphan")
+
+
+class LogEvent(Base):
+    """Individual log event within a stream (like CloudWatch LogEvent)."""
+
+    __tablename__ = "log_events"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    stream_id: Mapped[int] = mapped_column(ForeignKey("log_streams.id"), index=True)
+    message: Mapped[str] = mapped_column(Text, default="")
+    level: Mapped[str] = mapped_column(String(16), default="INFO")  # DEBUG|INFO|WARN|ERROR|FATAL
+    source: Mapped[str] = mapped_column(String(64), default="")  # e.g. handler name
+    timestamp: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, index=True)
+    metadata_json: Mapped[str | None] = mapped_column(JSON, nullable=True)
+
+    stream: Mapped["LogStream"] = relationship(back_populates="events")
+
+
+class Alarm(Base):
+    """Alarm for metric thresholds (like CloudWatch Alarm)."""
+
+    __tablename__ = "alarms"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(String(128), unique=True, index=True)
+    namespace_id: Mapped[int] = mapped_column(ForeignKey("metric_namespaces.id"), index=True)
+    metric_name: Mapped[str] = mapped_column(String(128))
+    statistic: Mapped[str] = mapped_column(String(16), default="Average")  # Average|Sum|Minimum|Maximum|SampleCount
+    period_seconds: Mapped[int] = mapped_column(Integer, default=300)
+    evaluation_periods: Mapped[int] = mapped_column(Integer, default=1)
+    comparison_operator: Mapped[str] = mapped_column(String(16))  # >= | <= | > | <
+    threshold: Mapped[float] = mapped_column(default=0.0)
+    alarm_actions: Mapped[str | None] = mapped_column(JSON, nullable=True)  # [{"type": "webhook", "url": "..."}]
+    ok_actions: Mapped[str | None] = mapped_column(JSON, nullable=True)
+    state: Mapped[str] = mapped_column(String(16), default="OK")  # OK | ALARM | INSUFFICIENT_DATA
+    state_reason: Mapped[str] = mapped_column(Text, default="")
+    owner_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, onupdate=utcnow)
+
+    namespace: Mapped["MetricNamespace"] = relationship()
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# Compute Service — serverless functions (analogous to AWS Lambda)
+# ═══════════════════════════════════════════════════════════════════════════
+
+
+class Function(Base):
+    """Serverless function (like AWS Lambda function)."""
+
+    __tablename__ = "functions"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(String(128), unique=True, index=True)
+    description: Mapped[str] = mapped_column(Text, default="")
+    runtime: Mapped[str] = mapped_column(String(32), default="python3.12")  # python3.12 | nodejs20 | wasm
+    handler: Mapped[str] = mapped_column(String(256), default="handler.main")  # module.function
+    code_sha256: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    code_blob: Mapped[str | None] = mapped_column(Text, nullable=True)  # base64 encoded or path
+    timeout_seconds: Mapped[int] = mapped_column(Integer, default=30)
+    memory_mb: Mapped[int] = mapped_column(Integer, default=128)
+    environment_vars: Mapped[str | None] = mapped_column(JSON, nullable=True)
+    max_retries: Mapped[int] = mapped_column(Integer, default=0)
+    status: Mapped[str] = mapped_column(String(16), default="active")  # active | inactive | failed
+    owner_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, onupdate=utcnow)
+
+    invocations: Mapped[list["FunctionInvocation"]] = relationship(back_populates="function", cascade="all, delete-orphan")
+    triggers: Mapped[list["FunctionTrigger"]] = relationship(back_populates="function", cascade="all, delete-orphan")
+    owner: Mapped["User | None"] = relationship()
+
+
+class FunctionTrigger(Base):
+    """Event trigger for a function (like Lambda event source mapping)."""
+
+    __tablename__ = "function_triggers"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    function_id: Mapped[int] = mapped_column(ForeignKey("functions.id"), index=True)
+    event_type: Mapped[str] = mapped_column(String(64))  # job.completed | webhook.received | schedule | api.call
+    filter_pattern: Mapped[str | None] = mapped_column(JSON, nullable=True)
+    enabled: Mapped[bool] = mapped_column(Boolean, default=True)
+    config: Mapped[str | None] = mapped_column(JSON, nullable=True)  # schedule cron, etc.
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+    function: Mapped["Function"] = relationship(back_populates="triggers")
+
+
+class FunctionInvocation(Base):
+    """Execution record for a function (like Lambda invocation log)."""
+
+    __tablename__ = "function_invocations"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    function_id: Mapped[int] = mapped_column(ForeignKey("functions.id"), index=True)
+    status: Mapped[str] = mapped_column(String(16), default="pending")  # pending | running | success | failed | timeout
+    trigger_type: Mapped[str] = mapped_column(String(32), default="manual")  # manual | event | schedule | api
+    request_payload: Mapped[str | None] = mapped_column(JSON, nullable=True)
+    response_payload: Mapped[str | None] = mapped_column(JSON, nullable=True)
+    error_message: Mapped[str] = mapped_column(Text, default="")
+    logs: Mapped[str] = mapped_column(Text, default="")
+    duration_ms: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    billed_duration_ms: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    memory_used_mb: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    invoked_by_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+    function: Mapped["Function"] = relationship(back_populates="invocations")
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# API Gateway — API management, rate limiting, API keys
+# ═══════════════════════════════════════════════════════════════════════════
+
+
+class ApiKey(Base):
+    """API key for external integrations."""
+
+    __tablename__ = "api_keys"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    key_hash: Mapped[str] = mapped_column(String(64), unique=True, index=True)
+    key_prefix: Mapped[str] = mapped_column(String(8))  # first 8 chars for display
+    name: Mapped[str] = mapped_column(String(128))
+    owner_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    scopes: Mapped[str | None] = mapped_column(JSON, nullable=True)  # ["projects:read", "jobs:write", ...]
+    rate_limit_rpm: Mapped[int] = mapped_column(Integer, default=60)  # requests per minute
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    last_used_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+    owner: Mapped["User"] = relationship()
+    usages: Mapped[list["ApiKeyUsage"]] = relationship(back_populates="api_key", cascade="all, delete-orphan")
+
+
+class ApiKeyUsage(Base):
+    """Per-minute usage record for rate limiting."""
+
+    __tablename__ = "api_key_usages"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    api_key_id: Mapped[int] = mapped_column(ForeignKey("api_keys.id"), index=True)
+    window_minute: Mapped[str] = mapped_column(String(16), index=True)  # "2026-08-24T13:40" ISO minute
+    request_count: Mapped[int] = mapped_column(Integer, default=0)
+
+    api_key: Mapped["ApiKey"] = relationship(back_populates="usages")
+
+
+class RateLimitRule(Base):
+    """Global rate limiting rules for endpoints."""
+
+    __tablename__ = "rate_limit_rules"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    path_pattern: Mapped[str] = mapped_column(String(256))  # "/api/projects/*/push" with wildcards
+    method: Mapped[str] = mapped_column(String(8), default="*")  # GET|POST|PUT|DELETE|*
+    requests_per_minute: Mapped[int] = mapped_column(Integer, default=60)
+    requests_per_hour: Mapped[int] = mapped_column(Integer, default=1000)
+    enabled: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# IAM — Identity and Access Management (analogous to AWS IAM)
+# ═══════════════════════════════════════════════════════════════════════════
+
+
+class IamRole(Base):
+    """Custom role with fine-grained permissions."""
+
+    __tablename__ = "iam_roles"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(String(64), unique=True, index=True)
+    description: Mapped[str] = mapped_column(Text, default="")
+    is_system: Mapped[bool] = mapped_column(Boolean, default=False)  # built-in roles
+    owner_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+    policies: Mapped[list["IamPolicy"]] = relationship(back_populates="role", cascade="all, delete-orphan")
+    assignments: Mapped[list["IamRoleAssignment"]] = relationship(back_populates="role", cascade="all, delete-orphan")
+
+
+class IamPolicy(Base):
+    """Permission policy attached to a role (like IAM policy)."""
+
+    __tablename__ = "iam_policies"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    role_id: Mapped[int] = mapped_column(ForeignKey("iam_roles.id"), index=True)
+    effect: Mapped[str] = mapped_column(String(8), default="Allow")  # Allow | Deny
+    service: Mapped[str] = mapped_column(String(32))  # projects | jobs | storage | workflows | notifications | functions | iam
+    actions: Mapped[str] = mapped_column(String(512))  # comma-separated: "read,write,delete"
+    resources: Mapped[str] = mapped_column(String(512), default="*")  # "project:42,project:43" or "*"
+    conditions: Mapped[str | None] = mapped_column(JSON, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+    role: Mapped["IamRole"] = relationship(back_populates="policies")
+
+
+class IamRoleAssignment(Base):
+    """Assigns a role to a user or service account."""
+
+    __tablename__ = "iam_role_assignments"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    role_id: Mapped[int] = mapped_column(ForeignKey("iam_roles.id"), index=True)
+    principal_type: Mapped[str] = mapped_column(String(16))  # user | api_key | service
+    principal_id: Mapped[int] = mapped_column(Integer, index=True)  # user.id or api_key.id
+    scope: Mapped[str] = mapped_column(String(64), default="global")  # global | project:42
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+    role: Mapped["IamRole"] = relationship(back_populates="assignments")
+
+
+class AuditLog(Base):
+    """Immutable audit log for IAM and security events."""
+
+    __tablename__ = "audit_logs"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    event_type: Mapped[str] = mapped_column(String(64), index=True)  # login | role_assigned | policy_changed | api_key_created | ...
+    actor_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
+    actor_type: Mapped[str] = mapped_column(String(16), default="user")  # user | api_key | system
+    target_type: Mapped[str] = mapped_column(String(32), default="")  # user | project | role | api_key
+    target_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    detail: Mapped[str | None] = mapped_column(JSON, nullable=True)
+    ip_address: Mapped[str] = mapped_column(String(45), default="")
+    user_agent: Mapped[str] = mapped_column(String(256), default="")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)

@@ -7,6 +7,7 @@ Implementations:
 from __future__ import annotations
 
 from typing import Protocol, runtime_checkable
+from .policy import StorageTier
 
 
 @runtime_checkable
@@ -39,4 +40,16 @@ class ObjectStorage(Protocol):
 
     def size(self, key: str) -> int:
         """Return blob size in bytes, or 0 if not found."""
+        ...
+
+    def get_tier(self, key: str) -> StorageTier:
+        """Return the current storage tier for a blob."""
+        ...
+
+    def set_tier(self, key: str, tier: StorageTier) -> None:
+        """Move a blob to the specified storage tier."""
+        ...
+
+    def get_object_metadata(self, key: str) -> dict:
+        """Get metadata about an object including its creation time and current tier."""
         ...

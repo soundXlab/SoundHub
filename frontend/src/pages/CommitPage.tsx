@@ -1,6 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { api } from "../api";
+import {
+  Settings2,
+  FileText,
+  Download,
+} from "lucide-react";
 import { DAW_COLORS, humanSize, shortDate, type CommitDetail } from "../types";
 
 export default function CommitPage() {
@@ -42,7 +47,7 @@ export default function CommitPage() {
           const prev = commit.parent_id;
           return (
             <div className="file-row" key={f.path}>
-              <span className="file-icon">{f.daw_format ? "🎛" : "📄"}</span>
+              <span className="file-icon">{f.daw_format ? <Settings2 size={14} /> : <FileText size={14} />}</span>
               <span style={{ flex: 1, fontFamily: "monospace", fontSize: 13 }}>
                 {f.path}
               </span>

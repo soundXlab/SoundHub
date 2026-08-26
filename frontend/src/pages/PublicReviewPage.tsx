@@ -21,6 +21,7 @@ import {
   Settings2,
   Heart,
   Lock,
+  Link as LinkLucide,
 } from "lucide-react";
 import {
   fmtTime,
@@ -352,7 +353,7 @@ export default function PublicReviewPage() {
     return (
       <div className="session-page">
         <div className="card error">
-          <Link size={16} className="mr-1" />
+          <LinkLucide size={16} className="mr-1" />
           {err} — this review link doesn't exist.
         </div>
       </div>

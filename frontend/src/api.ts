@@ -127,10 +127,20 @@ export const api = {
   unbindRelease: (id: number) =>
     request<Project>(`/api/projects/${id}/release`, { method: "DELETE" }),
   listProjects: () => request<Project[]>("/api/projects"),
-  createProject: (name: string, description: string) =>
+  createProject: (name: string, description: string, storagePolicy?: {
+    hot_days: number;
+    warm_days: number;
+    cold_days: number;
+    enabled: boolean;
+  }) =>
     request<Project>("/api/projects", {
       method: "POST",
-      body: JSON.stringify({ name, description }),
+      body: JSON.stringify({ name, description, storage_policy: storagePolicy ?? {
+        hot_days: 30,
+        warm_days: 90,
+        cold_days: 365,
+        enabled: true
+      } }),
     }),
   getProject: (id: number) => request<Project>(`/api/projects/${id}`),
   deleteProject: (id: number) =>
@@ -389,6 +399,16 @@ export const api = {
   // A/B comparison
   getAudioAnalysis: (versionId: number) =>
     request<AudioAnalysis>(`/api/versions/${versionId}/audio-analysis`),
+  processAudio: (versionId: number, opts: {
+    analyzeBpm?: boolean;
+    extractKey?: boolean;
+    separateStems?: boolean;
+    generateWaveform?: boolean;
+  }) =>
+    request<AudioAnalysis>(`/api/versions/${versionId}/process`, {
+      method: "POST",
+      body: JSON.stringify(opts),
+    }),
   createComparison: (opts: {
     baseVersionId: number;
     compareVersionId: number;
@@ -787,6 +807,17 @@ export const api = {
   listWorkflows: (pid: number) => request<any[]>(`/api/projects/${pid}/workflows`),
   createWorkflow: (pid: number, name: string, yamlContent: string) =>
     request<any>(`/api/projects/${pid}/workflows`, { method: 'POST', body: JSON.stringify({ name, yaml_content: yamlContent }) }),
+  getWorkflow: (pid: number, wid: number) => request<any>(`/api/projects/${pid}/workflows/${wid}`),
+  updateWorkflow: (pid: number, wid: number, name?: string, yamlContent?: string, enabled?: boolean) =>
+    request<any>(`/api/projects/${pid}/workflows/${wid}`, { method: 'PUT', body: JSON.stringify({ name, yaml_content: yamlContent, enabled }) }),
+  deleteWorkflow: (pid: number, wid: number) =>
+    request<void>(`/api/projects/${pid}/workflows/${wid}`, { method: 'DELETE' }),
+  listWorkflowRuns: (pid: number, wid: number) => request<any[]>(`/api/projects/${pid}/workflows/${wid}/runs`),
+  createWorkflowRun: (pid: number, wid: number, trigger?: string, commitId?: number) =>
+    request<any>(`/api/projects/${pid}/workflows/${wid}/runs`, { method: 'POST', body: JSON.stringify({ trigger, commit_id: commitId }) }),
+  cancelWorkflowRun: (pid: number, wid: number, runId: number) =>
+    request<any>(`/api/projects/${pid}/workflows/${wid}/runs/${runId}/cancel`, { method: 'POST' }),
+  getWorkflowRunLogs: (pid: number, wid: number, runId: number) => request<any>(`/api/projects/${pid}/workflows/${wid}/runs/${runId}/logs`),
 
   // Incidents
   listIncidents: (pid: number) => request<any[]>(`/api/projects/${pid}/incidents`),
