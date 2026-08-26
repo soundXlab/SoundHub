@@ -12,11 +12,13 @@
 - SPA fallback работает на Cloud Run ✅
 - GCS download работает ✅
 - **ALP спецификация завершена** (1356 строк, 42 главы Ableton Manual)
-- **Спецификация Cubase/Nuendo завершена** (582 строки, Steinberg documentation)
+- **Cubase/Nuendo спецификация завершена** (582 строки, Steinberg documentation)
+- **Ключевой вывод:** Ableton .alp — XML парсится, Cubase .cpr — binary не парсится
 - **Следующий шаг:** C++ streaming ALP worker + Receipt-style UI
 - Buffy занимается шлифовкой существующего кода
 - План: docs/ai/CONVERSATION_2026-08-26.md
 - ALP Spec: docs/ai/ALP_SPEC.md
+- Cubase Spec: docs/ai/CUBASE_SPEC.md
 
 ## Cloud Run
 - **URL:** https://soundhub-xescefoxlq-uc.a.run.app (и https://soundhub-634858473264.us-central1.run.app)
