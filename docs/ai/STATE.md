@@ -9,6 +9,8 @@
 ## Текущий фокус
 - SoundHub задеплоен на Cloud Run ✅
 - Telegram-бот работает ✅
+- SPA fallback работает на Cloud Run ✅
+- GCS download работает ✅
 - Следующий шаг: рефакторинг / новые фичи
 
 ## Cloud Run
@@ -18,7 +20,7 @@
 - **Dockerfile:** multi-stage (frontend build + backend), корневой `Dockerfile`
 - **Env vars:** STORAGE_PROVIDER=gcs, GCS_BUCKET=soundhub-assets-project-e9ee982d-db84-440b-ba1, ENV=production, SECRET_KEY (auto-generated), CORS_ORIGINS=*
 - **Seed:** demo/demo123 при старте контейнера
-- **Ревизия:** soundhub-00008-rdh (2026-08-25)
+- **Ревизия:** soundhub-00035-dps (2026-08-26)
 - **Деплой:** локально `docker build` + `docker push` + `gcloud run deploy` (Cloud Build CI/CD не работает из-за Artifact Registry auth limitation)
 
 ## Auth Inventory (2026-08-25)
@@ -40,7 +42,7 @@
 - `CLAUDE.md` — постоянные правила проекта
 - `docs/ai/STATE.md` — рабочая память сессий
 
-## Исправления今天 (2026-08-25)
+## Исправления (2026-08-25)
 - Dockerfile: multi-stage build, COPY frontend/ (не ../frontend/)
 - Dockerfile: shell-form CMD для env expansion ($PORT)
 - Dockerfile: seed demo data at startup
@@ -48,6 +50,16 @@
 - database.py: добавлены миграции для jobs.delay_until, projects.hot_days, storage_objects.storage_tier
 - TS ошибки: Exchange→ArrowRightLeft, Hook→Link, UpRight→ExternalLink, duplicate ReactNode import
 - tsconfig.json: отключён noUnusedLocals, исключены тесты
+
+## Исправления (2026-08-26)
+- `.gcloudignore`: `*.py` → `/*.py` — исключал все .py файлы из Cloud Build
+- `main.py`: `app.frontend(fallback="index.html")` для SPA маршрутов + `init_db()` на startup
+- `storage.py`: добавлен proxy download `/objects/{id}/download` (стриминг из GCS)
+- `gcs.py`: `create_download_url` возвращает прямой GCS URL (bucket public)
+- `gcs.py`: исправлен IAM signBlob canonical request (V4, `bytesToSign`)
+- Cloud Run IAM: `roles/iam.serviceAccountTokenCreator` на compute SA
+- GCS bucket: `allUsers:objectViewer` для публичных скачиваний
+- **Аккаунт buffy** создан, проект TheForgebyHecq_r29189_v9.0 загружен (871MB)
 
 ## Известные ограничения
 - Cloud Build CI/CD: push в Artifact Registry падает (docker-credential-gcloud не доступен в контейнере)
