@@ -11,7 +11,9 @@
 - Telegram-бот работает ✅
 - SPA fallback работает на Cloud Run ✅
 - GCS download работает ✅
-- Следующий шаг: рефакторинг / новые фичи
+- Следующий шаг: C++/C# модернизация (точечная оптимизация CPU-bound модулей)
+- Buffy занимается шлифовкой существующего кода
+- План: docs/ai/CONVERSATION_2026-08-26.md
 
 ## Cloud Run
 - **URL:** https://soundhub-xescefoxlq-uc.a.run.app (и https://soundhub-634858473264.us-central1.run.app)
