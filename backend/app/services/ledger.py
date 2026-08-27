@@ -13,6 +13,16 @@ from sqlalchemy.orm import Session
 from ..models import LedgerEvent
 
 
+def _as_utc(value: datetime) -> datetime:
+    """Normalize datetime to UTC.
+    If value is naive (no tzinfo), assume UTC.
+    If value is timezone-aware, convert to UTC.
+    """
+    if value.tzinfo is None:
+        return value.replace(tzinfo=timezone.utc)
+    return value.astimezone(timezone.utc)
+
+
 def append(
     db: Session,
     event: str,
@@ -45,6 +55,8 @@ def append(
         if prev:
             prev_hash = prev.event_hash
 
+    # Use a single datetime object for consistency between hash and storage
+    now = _as_utc(datetime.now(timezone.utc))
     # Canonical payload
     canonical = json.dumps(
         {
@@ -53,8 +65,8 @@ def append(
             "entity_type": entity_type,
             "entity_id": entity_id,
             "payload": payload or {},
-            "occurred_at": datetime.now(timezone.utc).isoformat(),
-            "prev_event_hash": prev_hash or "",
+            "occurred_at": now.isoformat(),
+            "prev_event_hash": prev_hash,
         },
         sort_keys=True,
         separators=(",", ":"),
@@ -70,7 +82,7 @@ def append(
         entity_type=entity_type,
         entity_id=entity_id,
         payload=payload or {},
-        occurred_at=datetime.now(timezone.utc),
+        occurred_at=now,  # Use the SAME datetime object as used in hash
         prev_event_hash=prev_hash,
         event_hash=event_hash,
     )
@@ -80,6 +92,9 @@ def append(
 
 def verify_history(db: Session, session_id: int | None = None, package_id: int | None = None) -> dict:
     """Walk the hash chain and report whether any event was tampered with."""
+    import hashlib
+    import json
+
     query = db.query(LedgerEvent).order_by(LedgerEvent.id)
     if session_id:
         query = query.filter(LedgerEvent.session_id == session_id)
@@ -92,8 +107,28 @@ def verify_history(db: Session, session_id: int | None = None, package_id: int |
 
     prev_hash = None
     for e in events:
-        if e.prev_event_hash != prev_hash:
+        # Recompute what the hash should be for this event based on its data
+        occurred_at_utc = _as_utc(e.occurred_at) if e.occurred_at is not None else None
+        canonical = json.dumps(
+            {
+                "event": e.event,
+                "actor": e.actor,
+                "entity_type": e.entity_type,
+                "entity_id": e.entity_id,
+                "payload": e.payload or {},
+                "occurred_at": occurred_at_utc.isoformat() if occurred_at_utc is not None else None,
+                "prev_event_hash": prev_hash,
+            },
+            sort_keys=True,
+            separators=(",", ":"),
+        )
+        expected_hash = hashlib.sha256(canonical.encode()).hexdigest()
+
+        # If the stored hash doesn't match what it should be, the chain is broken
+        if e.event_hash != expected_hash:
             return {"valid": False, "total": len(events), "broken_at": e.id, "broken_event": e.event}
+
+        # Update prev_hash for next iteration
         prev_hash = e.event_hash
 
     return {"valid": True, "total": len(events), "broken_at": None, "head_hash": events[-1].event_hash}
