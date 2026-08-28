@@ -1,5 +1,10 @@
 """DAW format detection and info extraction."""
 
+import hashlib
+import json
+import os
+import subprocess
+
 
 def detect_format(path: str, data: bytes) -> str:
     """Detect the DAW format from file path and content."""
@@ -52,8 +57,77 @@ def _parse_ableton(data: bytes) -> dict:
         return {"format": "ableton", "error": "parse_failed"}
 
 
+def _run_alp_cpp_worker(data: bytes) -> dict | None:
+    """Run ALP analysis using C++ worker subprocess.
+
+    Returns dict with analysis results or None if failed.
+    """
+    CPP_WORKER_PATH = os.path.join(
+        os.path.dirname(__file__),
+        '..',
+        '..',
+        '..',
+        '..',
+        'cpp_worker',
+        'alp_analyzer'
+    )
+    if not (os.path.isfile(CPP_WORKER_PATH) and os.access(CPP_WORKER_PATH, os.X_OK)):
+        return None
+
+    try:
+        proc = subprocess.run(
+            [CPP_WORKER_PATH],
+            input=data,
+            capture_output=True,
+            timeout=30.0  # 30 second timeout for safety
+        )
+
+        if proc.returncode != 0:
+            # C++ worker failed
+            return None
+
+        # Parse JSON output
+        import json
+        output = proc.stdout.decode().strip()
+        result = json.loads(output)
+
+        # Validate required fields
+        required_fields = ["format", "format_key", "bpm", "time_signature", "tracks", "plugins", "samples", "extra"]
+        if not all(field in result for field in required_fields):
+            return None
+
+        # Map to the expected format for registry
+        extra = result.get("extra", {})
+        archive_contents = extra.get("archive_contents", {})
+
+        return {
+            "format": "ableton_pack",
+            "bpm": result.get("bpm"),
+            "time_signature": result.get("time_signature") or None,  # Convert empty string to None
+            "track_count": extra.get("track_count", 0),
+            "tracks": [track.get("name", "") for track in result.get("tracks", [])][:50],
+            "plugin_count": len(result.get("plugins", [])),
+            "plugins": result.get("plugins", [])[:50],
+            "sample_count": len(result.get("samples", [])),
+            "preset_count": len(extra.get("presets", [])),
+            "als_files": archive_contents.get("als_files", []),
+            "primary_als": archive_contents.get("primary_als", ""),
+            "archive_total_files": archive_contents.get("total_files", 0),
+        }
+    except subprocess.TimeoutExpired:
+        return None
+    except Exception:
+        return None
+
+
 def _parse_alp(data: bytes) -> dict:
     """Parse Ableton Live Pack (.alp) — ZIP archive containing .als + assets."""
+    # Try C++ worker first
+    result = _run_alp_cpp_worker(data)
+    if result is not None:
+        return result
+
+    # Fallback to Python parser
     from .alp_parser import parse_alp
 
     try:

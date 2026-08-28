@@ -14,20 +14,38 @@
 - **ALP спецификация завершена** (1356 строк, 42 главы Ableton Manual)
 - **Cubase/Nuendo спецификация завершена** (582 строки, Steinberg documentation)
 - **Ключевой вывод:** Ableton .alp — XML парсится, Cubase .cpr — binary не парсится
-- **Следующий шаг:** C++ streaming ALP worker + Receipt-style UI
-- Buffy занимается шлифовкой существующего кода
-- План: docs/ai/CONVERSATION_2026-08-26.md
+- **UI редизайн:** DaVinci Resolve 21 стиль ✅ (2026-08-28)
+  - Design tokens: оранжевый акцент (#E85D2A), серые фоны (#1B1B1B-#2D2D2D), плотная типографика (11-12px)
+  - Компоненты: AppLayout, TopBar, Button, Card, Sidebar, RightSidebar, Badge, Input, AudioPlayer
+  - Страницы: Dashboard, Projects, Marketplace, Login
+  - Review Session: компактный плеер, плотные комментарии, панель версий
+  - Review Session Page (рабочая): все rs-* CSS классы обновлены (brief, refs, stems, ledger, change orders, preflight, handoff, delivery)
+  - Project Workspace Page: все project-view-* CSS классы обновлены (header, tabs, stats, commit form, file table, README, DAW info)
+  - Лендинг НЕ тронут (остаётся по FIGMA_BRIEF)
+- **Frontend полный** ✅ (2026-08-28): все страницы полноэкранные, единый FullPageLayout
+  - Dashboard: 1350 строк, stats + projects + activity + player + sidebar inspector
+  - Projects: реальные данные из API, create/delete, storage lifecycle
+  - Marketplace: каталог ассетов, фильтры, аудио-плеер
+  - Reviews: список sessions, создание, фильтр, статусы
+  - Upload: drag-n-drop, выбор проекта, реальная загрузка через API
+  - Analytics: реальные данные из API, графики по месяцам, таблицы
+  - Calendar: месячный вид с событиями
+  - Settings: профиль пользователя, безопасность, уведомления, storage, API keys
+  - Sidebar: единый для всех страниц (Dashboard, Projects, Marketplace, Reviews, Upload, Analytics, Calendar, Settings)
+- **systemd:** backend (soundhub-backend.service) и frontend (soundhub-frontend.service) на автозапуске
+- **Следующий шаг:** UI polish (C++ streaming ALP worker завершен)
+- **Figma-макет:** полный бриф — `docs/ai/FIGMA_BRIEF.md`
 - ALP Spec: docs/ai/ALP_SPEC.md
 - Cubase Spec: docs/ai/CUBASE_SPEC.md
 
 ## Cloud Run
-- **URL:** https://soundhub-xescefoxlq-uc.a.run.app (и https://soundhub-634858473264.us-central1.run.app)
+- **URL:** https://soundhub-634858473264.europe-west1.run.app
 - **Проект:** project-e9ee982d-db84-440b-ba1 (Free Trial $300)
 - **Образ:** us-docker.pkg.dev/project-e9ee982d-db84-440b-ba1/docker/soundhub
 - **Dockerfile:** multi-stage (frontend build + backend), корневой `Dockerfile`
 - **Env vars:** STORAGE_PROVIDER=gcs, GCS_BUCKET=soundhub-assets-project-e9ee982d-db84-440b-ba1, ENV=production, SECRET_KEY (auto-generated), CORS_ORIGINS=*
 - **Seed:** demo/demo123 при старте контейнера
-- **Ревизия:** soundhub-00035-dps (2026-08-26)
+- **Ревизия:** soundhub-00003-vdp (2026-08-28)
 - **Деплой:** локально `docker build` + `docker push` + `gcloud run deploy` (Cloud Build CI/CD не работает из-за Artifact Registry auth limitation)
 
 ## Auth Inventory (2026-08-25)
@@ -68,8 +86,34 @@
 - GCS bucket: `allUsers:objectViewer` для публичных скачиваний
 - **Аккаунт buffy** создан, проект TheForgebyHecq_r29189_v9.0 загружен (871MB)
 
+## Исправления (2026-08-28, тесты)
+- `projects.py`: `storage` UnboundLocalError — перенёс `get_storage()` перед циклом
+- `projects.py`: `storage.put_blob()` → `storage.put_bytes()` / добавлены legacy методы в LocalObjectStorage
+- `storage.py`: локальный `from datetime import` затенял модульный → убраны дублирующие импорты
+- `sessions.py`: добавлен эндпоинт `/{id}/submit-feedback` для владельца
+- `release_packages.py`: добавлен `preflight_check` + ledger event `invoice.paid`
+- `test_jobs_after_get.py`: исправлен мок `storage` для фонового потока
+
+## Исправления (2026-08-28, UI)
+- `App.tsx`: `/dashboard` без SiteHeader и SidebarLayout (полноэкранный)
+- `DashboardPage.tsx`: синхронизирован sidebar с FullPageLayout (добавлен Reviews)
+- `ProjectsPage.tsx`: rewrite — больше деталей, create/delete, storage lifecycle
+- `ReviewsPage.tsx`: rewrite — статусы, фильтр, создание
+- `AnalyticsPage.tsx`: rewrite — реальные данные из API, графики
+- `UploadPage.tsx`: rewrite — выбор проекта, drag-n-drop, реальная загрузка через API
+- `SettingsPage.tsx`: реальные данные пользователя, профиль/bio/specialty
+- `FullPageLayout.tsx`: единый layout для всех страниц (sidebar + topbar)
+- Все 12 страниц отвечают 200, TypeScript без ошибок
+
 ## Известные ограничения
 - Cloud Build CI/CD: push в Artifact Registry падает (docker-credential-gcloud не доступен в контейнере)
 - Деплой: только через локальную сборку (`docker build` + `docker push` + `gcloud run deploy`)
 - WSL2: webhook не работает из-за port forwarding
 - FreeTrial $300 — 90 дней, аккаунт vasyl0460@gmail.com
+
+## ALP Upload
+- Uploaded CyclicWaves_r29169_v9.0.alp (256.8 MB, SHA256: 8a5ce401c5856aa6dfcd21378c223a4a2307372818b776ddf47629ad8f7d5656) to project CyclicWaves_r29169_v9.0 (ID 5) via storage API.
+- File is stored in GCS bucket soundhub-assets-project-e9ee982d-db84-440b-ba1 as blobs/8a/5c/8a5ce401c5856aa6dfcd21378c223a4a2307372818b776ddf47629ad8f7d5656
+- Upload timestamp: 2026-08-28T08:08:05Z
+- Project access: https://soundhub-634858473264.europe-west1.run.app/projects/5 (requires login)
+- User's public portfolio: https://soundhub-634858473264.europe-west1.run.app/p/claude
