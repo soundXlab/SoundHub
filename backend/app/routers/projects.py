@@ -612,6 +612,8 @@ def push_branch(
     manifest_stored: bool = False
 
     total_upload_size = 0
+    from app.services.storage import get_storage
+    storage = get_storage()
     for upload in files:
         data = upload.file.read()
         total_upload_size += len(data)

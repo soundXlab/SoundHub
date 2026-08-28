@@ -51,6 +51,14 @@ class LocalObjectStorage:
             path = _blob_path(key)
         except ValueError as exc:
             raise FileNotFoundError(str(exc)) from exc
+
+    def put_blob(self, data: bytes) -> str:
+        """Store bytes, return SHA-256 hash (legacy API)."""
+        return self.put_bytes("unused", data)
+
+    def read_blob(self, sha: str) -> bytes:
+        """Read blob by SHA-256 hash (legacy API)."""
+        return self.get_bytes(sha)
         if not path.exists():
             raise FileNotFoundError(f"Blob {key} not found")
         return path.read_bytes()

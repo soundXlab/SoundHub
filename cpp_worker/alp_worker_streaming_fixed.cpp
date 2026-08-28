@@ -924,7 +924,7 @@ int main(int argc, char* argv[]) {
             std::cout << "\"total_files\":" << (archive_counts["als"] + archive_counts["samples"] + archive_counts["presets"] + archive_counts["images"] + archive_counts["other"]) << ",";
             std::cout << "\"primary_als\":\"\"";
             std::cout << "}";
-            std::cout << "}" << std::endl;
+            std::cout << "}" << "}" << std::endl;
             return 0;
         }
 
