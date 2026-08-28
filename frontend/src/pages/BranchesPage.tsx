@@ -11,7 +11,6 @@ import {
   CardContent,
   Button,
   Input,
-  Select,
 } from "../components/ui";
 
 export default function BranchesPage() {
@@ -68,9 +67,7 @@ export default function BranchesPage() {
         <CardHeader>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Link to={`/projects/${pid}`} variant="outline" size="sm">
-                ← Project
-              </Link>
+              <Button variant="outline" size="sm" onClick={() => window.history.back()}>← Project</Button>
               <CardTitle>Branches</CardTitle>
             </div>
           </div>
@@ -91,14 +88,14 @@ export default function BranchesPage() {
           )}
 
           {error && (
-            <CardDescription style={{ background: 'var(--error-muted)', color: 'var(--error)', padding: '8px', borderRadius: 'var(--radius-sm)' }}>
+            <div style={{ fontSize: '14px', background: 'var(--error-muted)', color: 'var(--error)', padding: '8px', borderRadius: 'var(--radius-sm)' }}>
               {error}
-            </CardDescription>
+            </div>
           )}
           {notice && (
-            <CardDescription style={{ background: 'var(--success-muted)', color: 'var(--success)', padding: '8px', borderRadius: 'var(--radius-sm)' }}>
+            <div style={{ fontSize: '14px', background: 'var(--success-muted)', color: 'var(--success)', padding: '8px', borderRadius: 'var(--radius-sm)' }}>
               {notice}
-            </CardDescription>
+            </div>
           )}
 
           <Card>
@@ -114,17 +111,17 @@ export default function BranchesPage() {
                     onChange={(e) => setName(e.target.value)}
                     style={{ flex: 2 }}
                   />
-                  <Select
+                  <select
                     value={from}
-                    onChange={(e) => setFrom(e.target.value)}
-                    style={{ width: 180 }}
+                    onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFrom(e.target.value)}
+                    style={{ width: 180, padding: '6px 10px', background: 'var(--bg-elevated)', color: 'var(--text-primary)', border: '1px solid var(--border-default)', borderRadius: 'var(--radius-sm)', fontSize: '14px' }}
                   >
                     {branches.map((b) => (
                       <option key={b.name} value={b.name}>
                         from {b.name}
                       </option>
                     ))}
-                  </Select>
+                  </select>
                   <Button variant="primary" size="sm" disabled={!name.trim()}>
                     Create branch
                   </Button>

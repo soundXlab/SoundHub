@@ -494,9 +494,9 @@ export default function MarketplacePage() {
                 </div>
 
                 {catalogErr && (
-                  <CardDescription style={{ color: 'red', marginTop: 10 }}>
+                  <div style={{ fontSize: '14px', color: 'red', marginTop: 10 }}>
                     {catalogErr}
-                  </CardDescription>
+                  </div>
                 )}
 
                 <p className="muted" style={{ margin: "14px 0 10px" }}>
@@ -590,9 +590,9 @@ export default function MarketplacePage() {
                 </div>
 
                 {catalog.length === 0 && !catalogErr && (
-                  <CardDescription className="muted">
+                  <div style={{ fontSize: '14px', color: 'var(--text-muted)', padding: '20px 0', textAlign: 'center' }}>
                     No assets match — try wider filters.
-                  </CardDescription>
+                  </div>
                 )}
               </CardContent>
             </Card>
@@ -622,9 +622,9 @@ export default function MarketplacePage() {
                   </CardHeader>
                   <CardContent>
                     {listings.length === 0 && (
-                      <CardDescription className="muted">
+                      <div style={{ fontSize: '14px', color: 'var(--text-muted)', padding: '20px 0', textAlign: 'center' }}>
                         No assets listed yet. Be the first seller!
-                      </CardDescription>
+                      </div>
                     )}
                     {listings.map((l) => {
                       const isMyListing = wallet.address?.toLowerCase() === l.seller.toLowerCase();
@@ -793,19 +793,19 @@ export default function MarketplacePage() {
                       )}
                     </div>
                     {msg && (
-                      <CardDescription style={{ background: '#4CAF5020', color: '#4CAF50', padding: '8px', borderRadius: 4 }}>
+                      <div style={{ fontSize: '14px', background: '#4CAF5020', color: '#4CAF50', padding: '8px', borderRadius: 4 }}>
                         {msg}
-                      </CardDescription>
+                      </div>
                     )}
                     {err && (
-                      <CardDescription style={{ background: '#F4433620', color: '#F44336', padding: '8px', borderRadius: 4 }}>
+                      <div style={{ fontSize: '14px', background: '#F4433620', color: '#F44336', padding: '8px', borderRadius: 4 }}>
                         {err}
-                      </CardDescription>
+                      </div>
                     )}
                     {receiptErr && (
-                      <CardDescription style={{ background: '#F4433620', color: '#F44336', padding: '8px', borderRadius: 4 }}>
+                      <div style={{ fontSize: '14px', background: '#F4433620', color: '#F44336', padding: '8px', borderRadius: 4 }}>
                         {receiptErr}
-                      </CardDescription>
+                      </div>
                     )}
                     {receipt && <LicenseReceiptCard receipt={receipt} />}
                     <p className="muted" style={{ fontSize: 12, marginBottom: 0 }}>
