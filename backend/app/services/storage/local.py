@@ -51,6 +51,9 @@ class LocalObjectStorage:
             path = _blob_path(key)
         except ValueError as exc:
             raise FileNotFoundError(str(exc)) from exc
+        if not path.exists():
+            raise FileNotFoundError(f"Blob {key} not found")
+        return path.read_bytes()
 
     def put_blob(self, data: bytes) -> str:
         """Store bytes, return SHA-256 hash (legacy API)."""
@@ -59,9 +62,6 @@ class LocalObjectStorage:
     def read_blob(self, sha: str) -> bytes:
         """Read blob by SHA-256 hash (legacy API)."""
         return self.get_bytes(sha)
-        if not path.exists():
-            raise FileNotFoundError(f"Blob {key} not found")
-        return path.read_bytes()
 
     def delete(self, key: str) -> None:
         try:
@@ -107,6 +107,15 @@ class LocalObjectStorage:
         For local storage, we don't implement tiering, so we always return HOT.
         """
         return StorageTier.HOT
+
+    def presign_get(self, sha: str) -> str:
+        """Return a presigned-style URL for downloading the blob.
+        For local storage, returns a file:// URI.
+        """
+        path = _blob_path(sha)
+        if path.exists():
+            return path.as_uri()
+        raise FileNotFoundError(f"Blob {sha} not found")
 
     def set_tier(self, key: str, tier: StorageTier) -> None:
         """Move a blob to the specified storage tier.

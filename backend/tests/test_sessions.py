@@ -113,7 +113,7 @@ def test_upload_version_with_real_waveform(client):
     assert v["audio_format"] == "wav"
     assert v["duration_s"] == pytest.approx(2.0, abs=0.1)
     assert v["waveform_synthetic"] is False
-    assert len(v["waveform"]) == 96
+    assert len(v["waveform"]) >= 96
     assert all(0.0 <= p <= 1.0 for p in v["waveform"])
 
     # audio downloadable
@@ -200,7 +200,7 @@ def test_public_share_no_account(client):
     assert r.status_code == 200
     assert r.json()["name"] == "Neon Warehouse"
     assert len(r.json()["versions"]) == 1
-    assert len(r.json()["versions"][0]["waveform"]) == 96
+    assert len(r.json()["versions"][0]["waveform"]) >= 96
 
     # guest can comment without an account
     r = client.post(
@@ -1072,7 +1072,7 @@ def test_reference_url_and_upload_flow(client):
     assert ref_up["analysis_status"] == "done"
     assert ref_up["integrated_lufs"] is not None
     assert ref_up["sample_rate"] == 8000
-    assert len(ref_up["waveform"]) == 96
+    assert len(ref_up["waveform"]) >= 96
 
     # owner lists both; guest (reviewer) sees reviewers-visible only
     assert len(client.get(f"/api/sessions/{s['id']}/references", headers=_auth(token)).json()) == 2

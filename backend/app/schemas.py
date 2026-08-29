@@ -1,5 +1,6 @@
 """Pydantic schemas for the SoundHub API."""
 from datetime import datetime
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -444,7 +445,7 @@ class ReviewBriefUpdate(BaseModel):
 
 # ---------- Status Updates ----------
 class ReviewStatusUpdate(BaseModel):
-    status: str
+    status: Literal["draft", "open", "needs_changes", "approved", "archived"]
 
 
 class ReviewRequestStatusUpdate(BaseModel):

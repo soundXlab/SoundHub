@@ -481,6 +481,69 @@ def guest_comment(share_token: str, version_id: int, payload: GuestReviewComment
     return _comment_out(comment)
 
 
+@router.post("/public/{share_token}/versions/{version_id}/comments/voice", response_model=ReviewCommentOut, status_code=status.HTTP_201_CREATED)
+def guest_voice_comment(
+    share_token: str, version_id: int,
+    time_s: float = Form(0.0), body: str = Form(""), author_name: str = Form(""),
+    voice_duration_s: float = Form(0.0),
+    voice: UploadFile = File(...),
+    password: str | None = None,
+    db: Session = Depends(get_db),
+):
+    """Guest adds a voice note via the share link."""
+    session = get_public_session(db, share_token)
+    _require_share_permission(session, "comment", author_name, password)
+    if not session.rounds_open:
+        raise HTTPException(status.HTTP_403_FORBIDDEN, "This revision round is closed")
+    version = get_version_or_404(db, session.id, version_id)
+    voice_data = voice.file.read()
+    ext = (voice.filename or "note.webm").rsplit(".", 1)[-1].lower() if voice.filename else "webm"
+    sha = storage.put_blob(voice_data)
+    comment = ReviewComment(
+        version_id=version.id,
+        author_name=author_name.strip()[:128] or "Reviewer",
+        time_s=time_s,
+        body=body.strip(),
+        voice_blob_sha=sha,
+        voice_format=ext,
+        voice_duration_s=voice_duration_s,
+        status="open",
+    )
+    db.add(comment)
+    _log_access(db, session, author_name, "voice_comment", f"{version.label} @ {time_s:.1f}s")
+    ledger.append(db, "feedback.draft_created", session_id=session.id, actor=author_name, entity_type="request", entity_id=comment.id, payload={"version": version.label, "time_s": time_s, "voice": True})
+    session.updated_at = utcnow()
+    db.commit()
+    db.refresh(comment)
+    return _comment_out(comment)
+
+
+@router.get("/{session_id}/versions/{version_id}/comments/{comment_id}/voice")
+def get_voice_comment(session_id: int, version_id: int, comment_id: int, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Owner streams voice comment audio."""
+    get_session_or_404(db, user, session_id)
+    comment = db.get(ReviewComment, comment_id)
+    if comment is None or comment.version_id != version_id:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Comment not found")
+    if not comment.voice_blob_sha:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "No voice audio")
+    data = storage.read_blob(comment.voice_blob_sha)
+    return Response(content=data, media_type=f"audio/{comment.voice_format or 'webm'}")
+
+
+@router.get("/public/{share_token}/versions/{version_id}/comments/{comment_id}/voice")
+def get_public_voice_comment(share_token: str, version_id: int, comment_id: int, db: Session = Depends(get_db)):
+    """Guest streams voice comment audio via share link."""
+    session = get_public_session(db, share_token)
+    comment = db.get(ReviewComment, comment_id)
+    if comment is None or comment.version_id != version_id:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Comment not found")
+    if not comment.voice_blob_sha:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "No voice audio")
+    data = storage.read_blob(comment.voice_blob_sha)
+    return Response(content=data, media_type=f"audio/{comment.voice_format or 'webm'}")
+
+
 @router.post("/public/{share_token}/versions/{version_id}/approvals", response_model=ReviewApprovalOut, status_code=status.HTTP_201_CREATED)
 def guest_approve(share_token: str, version_id: int, payload: ReviewApprovalCreate, password: str | None = None, db: Session = Depends(get_db)):
     session = get_public_session(db, share_token)
@@ -998,6 +1061,47 @@ def add_comment(session_id: int, version_id: int, payload: ReviewCommentCreate, 
     return _comment_out(comment)
 
 
+@router.post("/{session_id}/versions/{version_id}/comments/voice", response_model=ReviewCommentOut, status_code=status.HTTP_201_CREATED)
+def add_voice_comment(
+    session_id: int, version_id: int,
+    time_s: float = Form(0.0), body: str = Form(""), author_name: str = Form(""),
+    voice_duration_s: float = Form(0.0),
+    voice: UploadFile = File(...),
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Owner adds a voice note comment."""
+    get_session_or_404(db, user, session_id)
+    version = get_version_or_404(db, session_id, version_id)
+    voice_data = voice.file.read()
+    ext = (voice.filename or "note.webm").rsplit(".", 1)[-1].lower() if voice.filename else "webm"
+    sha = storage.put_blob(voice_data)
+    comment = ReviewComment(
+        version_id=version.id,
+        author_id=user.id,
+        author_name=user.username,
+        time_s=time_s,
+        body=body.strip(),
+        voice_blob_sha=sha,
+        voice_format=ext,
+        voice_duration_s=voice_duration_s,
+    )
+    db.add(comment)
+    ledger.append(db, "feedback.draft_created", session_id=session_id, actor=user.username, entity_type="request", entity_id=comment.id, payload={"version": version.label, "time_s": time_s, "voice": True})
+    db.commit()
+    db.refresh(comment)
+    return _comment_out(comment)
+
+
+@router.get("/{session_id}/versions/{version_id}/comments/{comment_id}/voice")
+def get_voice_comment(session_id: int, version_id: int, comment_id: int, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Owner streams voice comment audio."""
+    get_session_or_404(db, user, session_id)
+    comment = db.get(ReviewComment, comment_id)
+    if comment is None or comment.version_id != version_id:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Comment not found")
+    if not comment.voice_blob_sha:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "No voice audio")
 @router.patch("/{session_id}/versions/{version_id}/comments/{comment_id}", response_model=ReviewCommentOut)
 def update_comment(session_id: int, version_id: int, comment_id: int, resolved: bool | None = None, body: str | None = None, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     get_session_or_404(db, user, session_id)
@@ -1052,6 +1156,53 @@ def update_version_status(session_id: int, version_id: int, payload: ReviewStatu
         session.updated_at = utcnow()
     db.commit()
     return _version_out(db, version)
+
+
+@router.post("/{session_id}/versions/{version_id}/carry", response_model=ReviewVersionOut, status_code=status.HTTP_201_CREATED)
+def carry_comments(session_id: int, version_id: int, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Carry unresolved comments from the given version to the next newer version."""
+    get_session_or_404(db, user, session_id)
+    source_version = get_version_or_404(db, session_id, version_id)
+    # Find the next (newer) version
+    next_version = db.scalar(
+        select(ReviewVersion).where(
+            ReviewVersion.session_id == session_id,
+            ReviewVersion.number > source_version.number,
+        ).order_by(ReviewVersion.number.asc()).limit(1)
+    )
+    if next_version is None:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "No newer version to carry comments to")
+    if next_version.id == source_version.id:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "Cannot carry comments onto the same version")
+    # Find unresolved comments on the source version
+    unresolved = db.scalars(
+        select(ReviewComment).where(
+            ReviewComment.version_id == source_version.id,
+            ReviewComment.resolved.is_(False),
+        )
+    ).all()
+    carried = []
+    for c in unresolved:
+        new_comment = ReviewComment(
+            version_id=next_version.id,
+            author_id=c.author_id,
+            author_name=f"{c.author_name or 'Reviewer'} (carried)",
+            time_s=c.time_s,
+            body=c.body,
+            parent_id=None,
+            status="open",
+        )
+        db.add(new_comment)
+        carried.append(new_comment)
+    db.flush()
+    for c in carried:
+        db.refresh(c)
+    session = db.get(ReviewSession, session_id)
+    session.updated_at = utcnow()
+    ledger.append(db, "comments.carried", session_id=session_id, actor=user.username, entity_type="version", entity_id=next_version.id, payload={"from_version": source_version.label, "count": len(carried)})
+    db.commit()
+    db.refresh(next_version)
+    return _version_out(db, next_version, with_comments=True)
 
 
 @router.post("/{session_id}/status", response_model=ReviewSessionDetailOut)

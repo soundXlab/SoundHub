@@ -44,8 +44,8 @@ def _extract_wav_peaks(data: bytes) -> tuple[list[float], float]:
             n_samples = n_frames * n_channels
             samples = struct.unpack(f"<{n_samples}h", raw)
 
-            # Downsample to ~2000 peaks
-            target_peaks = 2000
+            # Downsample to ~96 peaks for compact visualization
+            target_peaks = 96
             chunk_size = max(1, len(samples) // target_peaks)
             peaks = []
             for i in range(0, len(samples), chunk_size):

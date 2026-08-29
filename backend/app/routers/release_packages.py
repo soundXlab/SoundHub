@@ -65,6 +65,34 @@ def _extract_wav_metadata(data: bytes) -> dict:
     return {"sample_rate": None, "bit_depth": None, "channels": None}
 
 
+RELEASE_TEMPLATES = [
+    {"id": "final_master", "name": "Final master delivery", "required_deliverables": ["master", "instrumental"]},
+    {"id": "label_sync", "name": "Label / sync delivery", "required_deliverables": ["master", "instrumental", "acapella", "stems"]},
+    {"id": "archive_handoff", "name": "Archive handoff", "required_deliverables": ["master"]},
+    {"id": "stem_handoff", "name": "Stem handoff", "required_deliverables": ["stems"]},
+    {"id": "dj_promo", "name": "DJ promo", "required_deliverables": ["master", "clean_edit"]},
+    {"id": "post_production", "name": "Post-production", "required_deliverables": ["master", "instrumental"]},
+]
+
+
+@router.get("/templates")
+def list_templates():
+    """Return available release templates."""
+    return RELEASE_TEMPLATES
+
+
+def _package_out(package: ReleasePackage) -> ReleasePackageOut:
+    """Convert a ReleasePackage ORM object to ReleasePackageOut."""
+    package_data = {k: v for k, v in package.__dict__.items()
+                    if not k.startswith('_') and k not in ('events', 'delivery_events', 'deliverables')}
+    package_out = ReleasePackageOut.model_validate(package_data)
+    events = [{"event": e.event} for e in package.delivery_events]
+    package_out.events = events
+    deliverables_list = [{"id": d.id, "type": d.type, "filename": d.filename, "size": d.size} for d in package.deliverables]
+    package_out.deliverables = deliverables_list
+    return package_out
+
+
 @router.get("", response_model=list[ReleasePackageOut])
 def list_packages(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     # Get all sessions for the user, then get packages for those sessions
@@ -133,10 +161,19 @@ def create_package(payload: ReleasePackageCreate, user: User = Depends(get_curre
     if version.status != "approved":
         raise HTTPException(status.HTTP_400_BAD_REQUEST, "Version must be approved before packaging")
 
+    # Apply template defaults: if name was not explicitly set (still default), use template name
+    tpl_name = payload.name
+    if payload.template != "custom":
+        for tpl in RELEASE_TEMPLATES:
+            if tpl["id"] == payload.template:
+                # Use template name if the caller didn't provide a custom name
+                if payload.name == "Final delivery":
+                    tpl_name = tpl["name"]
+                break
     package = ReleasePackage(
         session_id=payload.session_id,
         approved_version_id=payload.approved_version_id,
-        name=payload.name,
+        name=tpl_name,
         template=payload.template,
     )
     db.add(package)
@@ -182,26 +219,57 @@ def preflight_check(package_id: int, user: User = Depends(get_current_user), db:
     ]:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Package not found")
     deliverables = db.scalars(select(Deliverable).where(Deliverable.package_id == package_id)).all()
-    issues = []
-    if not deliverables:
-        issues.append("No deliverables attached")
+    checks = []
+    # Check required deliverables from template
+    required = []
+    for tpl in RELEASE_TEMPLATES:
+        if tpl["id"] == package.template:
+            required = tpl.get("required_deliverables", [])
+            break
+    delivered_types = {d.type for d in deliverables}
+    for req in required:
+        if req not in delivered_types:
+            checks.append({"status": "block", "label": "Required deliverable missing", "detail": req})
+    # Check for empty files
+    for d in deliverables:
+        if d.size == 0:
+            checks.append({"status": "block", "label": "Empty file", "detail": d.filename})
+    # Already locked
     if package.status == "ready":
-        issues.append("Package is already locked")
-    passed = len(issues) == 0
-    return {"passed": passed, "issues": issues, "package_id": package_id}
+        checks.append({"status": "block", "label": "Already locked", "detail": ""})
+    blocking = any(c["status"] == "block" for c in checks)
+    passed = not blocking
+    return {"passed": passed, "blocking": blocking, "checks": checks, "package_id": package_id}
 
 
 @router.post("/{package_id}/lock", response_model=ReleasePackageOut)
-def lock_package(package_id: int, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+def lock_package(package_id: int, payload: dict = {}, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     package = db.get(ReleasePackage, package_id)
     if package is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Package not found")
-    # Check if package is already locked (immutable)
     if package.status == "ready":
         raise HTTPException(status.HTTP_400_BAD_REQUEST, "Package is already locked")
-    # Simplified authorization check
+    force = payload.get("force", False)
+    force_reason = payload.get("force_reason", "")
+    if force and not force_reason.strip():
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "force_reason is required when force=True")
+    # Check preflight unless force
+    if not force:
+        deliverables = db.scalars(select(Deliverable).where(Deliverable.package_id == package_id)).all()
+        required = []
+        for tpl in RELEASE_TEMPLATES:
+            if tpl["id"] == package.template:
+                required = tpl.get("required_deliverables", [])
+                break
+        delivered_types = {d.type for d in deliverables}
+        missing = [r for r in required if r not in delivered_types]
+        if missing:
+            raise HTTPException(status.HTTP_400_BAD_REQUEST, f"Preflight failed: missing deliverables: {', '.join(missing)}")
     package.locked_by = user.username
     package.status = "ready"
+    if force:
+        package.force_locked_reason = force_reason
+        package.force_locked_by = user.username
 
     # Generate manifest content based on deliverables
     deliverables = db.scalars(
@@ -238,7 +306,8 @@ def lock_package(package_id: int, user: User = Depends(get_current_user), db: Se
     package.delivery_token = secrets.token_urlsafe(32)
 
     # Add ledger entry for package locked
-    ledger.append(db, "package.locked", session_id=package.session_id, package_id=package.id, actor=user.username, entity_type="package", entity_id=package.id, payload={"scope": "master", "note": "final"})
+    lock_event = "package.lock_forced" if force else "package.locked"
+    ledger.append(db, lock_event, session_id=package.session_id, package_id=package.id, actor=user.username, entity_type="package", entity_id=package.id, payload={"scope": "master", "note": "final" if not force else force_reason})
 
     db.commit()
     db.refresh(package)
@@ -347,6 +416,53 @@ def upload_deliverable(package_id: int, type: str = Form(...), filename: str = F
     db.commit()
     db.refresh(deliverable)
     return DeliverableOut.model_validate(deliverable, from_attributes=True)
+
+
+@router.patch("/{package_id}/handoff", response_model=ReleasePackageOut)
+def handoff_package(package_id: int, payload: dict, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Set handoff metadata on a package."""
+    package = db.get(ReleasePackage, package_id)
+    if package is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Package not found")
+    if "plugin_manifest" in payload:
+        package.plugin_manifest = payload["plugin_manifest"]
+    if "session_manifest" in payload:
+        package.session_manifest = payload["session_manifest"]
+    if "consolidate_audio" in payload:
+        package.consolidate_audio = payload["consolidate_audio"]
+    db.commit()
+    db.refresh(package)
+    return _package_out(package)
+
+
+@router.patch("/{package_id}/archive", response_model=ReleasePackageOut)
+def archive_package(package_id: int, payload: dict, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Update archive status of a package."""
+    package = db.get(ReleasePackage, package_id)
+    if package is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Package not found")
+    if "archive_status" in payload:
+        package.archive_status = payload["archive_status"]
+    if "archive_expires_at" in payload:
+        from datetime import datetime as dt
+        val = payload["archive_expires_at"]
+        if val:
+            package.archive_expires_at = dt.fromisoformat(val.replace("Z", "+00:00"))
+    db.commit()
+    db.refresh(package)
+    return _package_out(package)
+
+
+@router.get("/{package_id}/deliverables/{deliverable_id}/sha256")
+def get_deliverable_sha256(package_id: int, deliverable_id: int, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Get SHA-256 hash of a deliverable."""
+    package = db.get(ReleasePackage, package_id)
+    if package is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Package not found")
+    deliverable = db.get(Deliverable, deliverable_id)
+    if deliverable is None or deliverable.package_id != package_id:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Deliverable not found")
+    return {"sha256": deliverable.sha256}
 
 
 @router.patch("/{package_id}/invoice", response_model=ReleasePackageOut)
