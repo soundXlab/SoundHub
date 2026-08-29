@@ -2,9 +2,9 @@
 
 ## Проект
 - Репозиторий: `/home/scatter/SoundHub`
-- Рабочий агент: `fcc-claude` через `fcc-server`
 - Основная модель: MiMo 2.5
 - Язык отчётов: русский
+- Последний коммит: `3c6fa7c` (fix: improve test_sessions.py — add missing endpoints and fix schemas)
 
 ## Текущий фокус
 - SoundHub задеплоен на Cloud Run ✅
@@ -14,29 +14,107 @@
 - **ALP спецификация завершена** (1356 строк, 42 главы Ableton Manual)
 - **Cubase/Nuendo спецификация завершена** (582 строки, Steinberg documentation)
 - **Ключевой вывод:** Ableton .alp — XML парсится, Cubase .cpr — binary не парсится
-- **UI редизайн:** DaVinci Resolve 21 стиль ✅ (2026-08-28)
-  - Design tokens: оранжевый акцент (#E85D2A), серые фоны (#1B1B1B-#2D2D2D), плотная типографика (11-12px)
-  - Компоненты: AppLayout, TopBar, Button, Card, Sidebar, RightSidebar, Badge, Input, AudioPlayer
-  - Страницы: Dashboard, Projects, Marketplace, Login
-  - Review Session: компактный плеер, плотные комментарии, панель версий
-  - Review Session Page (рабочая): все rs-* CSS классы обновлены (brief, refs, stems, ledger, change orders, preflight, handoff, delivery)
-  - Project Workspace Page: все project-view-* CSS классы обновлены (header, tabs, stats, commit form, file table, README, DAW info)
-  - Лендинг НЕ тронут (остаётся по FIGMA_BRIEF)
-- **Frontend полный** ✅ (2026-08-28): все страницы полноэкранные, единый FullPageLayout
-  - Dashboard: 1350 строк, stats + projects + activity + player + sidebar inspector
-  - Projects: реальные данные из API, create/delete, storage lifecycle
-  - Marketplace: каталог ассетов, фильтры, аудио-плеер
-  - Reviews: список sessions, создание, фильтр, статусы
-  - Upload: drag-n-drop, выбор проекта, реальная загрузка через API
-  - Analytics: реальные данные из API, графики по месяцам, таблицы
-  - Calendar: месячный вид с событиями
-  - Settings: профиль пользователя, безопасность, уведомления, storage, API keys
-  - Sidebar: единый для всех страниц (Dashboard, Projects, Marketplace, Reviews, Upload, Analytics, Calendar, Settings)
-- **systemd:** backend (soundhub-backend.service) и frontend (soundhub-frontend.service) на автозапуске
-- **Следующий шаг:** UI polish (C++ streaming ALP worker завершен)
-- **Figma-макет:** полный бриф — `docs/ai/FIGMA_BRIEF.md`
-- ALP Spec: docs/ai/ALP_SPEC.md
-- Cubase Spec: docs/ai/CUBASE_SPEC.md
+- **C++ streaming ALP worker** ✅ (commit `697b7cb`)
+- **PROJECT-AWARE SOUND LIBRARY** ✅ (vertical slice implementation complete, verified)
+
+## Тесты — статус (2026-08-29)
+
+### Общая статистика
+| Метрика | До сессии | После сессии | Изменение |
+|---------|-----------|-------------|-----------|
+| E2E тест | FAIL | **PASS** | +1 |
+| test_sessions.py | 30F / 5P | **26F / 8P** | +3 pass |
+| Всего failed | 91 | **86** | -5 |
+
+### Коммиты сессии
+- `66d44af` — fix: fix E2E test journey (authenticated approval, ledger, schemas)
+- `3c6fa7c` — fix: improve test_sessions.py (carry, voice notes, templates, archive, force lock)
+
+### Добавленные эндпоинты (сессия 2026-08-29)
+| Эндпоинт | Описание |
+|----------|----------|
+| `POST /{sid}/versions/{vid}/approvals` | Authenticated approval |
+| `POST /{sid}/versions/{vid}/carry` | Carry unresolved comments to next version |
+| `POST /{sid}/versions/{vid}/comments/voice` | Voice note (owner) |
+| `GET /{sid}/versions/{vid}/comments/{cid}/voice` | Stream voice comment audio (owner) |
+| `POST /public/{share}/versions/{vid}/comments/voice` | Voice note (guest) |
+| `GET /public/{share}/versions/{vid}/comments/{cid}/voice` | Stream voice comment audio (guest) |
+| `POST /{pid}/preflight` | QC preflight with template checks |
+| `GET /release-packages/templates` | Template catalog |
+| `PATCH /release-packages/{pid}/archive` | Archive status update |
+| `PATCH /release-packages/{pid}/handoff` | Handoff metadata |
+| `GET /release-packages/{pid}/deliverables/{did}/sha256` | Deliverable SHA-256 |
+| `GET /{sid}/ledger/verify` | Ledger verify (добавлен `ok` field) |
+
+### Исправления в коде
+- **waveform.py** — target_peaks 2000→96 (совпадает с UI)
+- **schemas.py** — `ReviewStatusUpdate` с Literal validation, `ReleasePackageCreate.session_id`, `ReleasePackageOut.events/deliverables`
+- **models.py** — `ReleasePackage.events`→`delivery_events`, добавлен `paid_at`
+- **local.py** — добавлен `presign_get()` метод
+- **release_packages.py** — templates, force lock, preflight с template checks, template name mapping
+
+### Оставшиеся падения (26 тестов)
+Требуют полноценных фич — не баги:
+- reference upload/URL endpoints
+- loudness analysis (pending→done)
+- comparison engine
+- stem comparison
+- change orders flow (courtesy/decline)
+- deposit gate (402 status)
+- watermark preview
+- brief schema compatibility
+- engineer portfolio
+- public version compare
+
+## Frontend — полный редизайн ✅
+
+### Дизайн-система
+- Обновлены дизайн-токены (цвета, отступы, радиусы, тени, типографика, компоненты, layout) для светлой и тёмной темы, вдохновлённые DaVinci Resolve 21.
+- Исправлен ThemeContext.ts для корректной работы с Storybook (использование React.createElement вместо JSX для предотвращения ошибок парсинга).
+- Добавлена поддержка переключения темы через хук useTheme и контекст.
+- Обновлён компонент AssetCard для использования дизайн-токенов и темы, а также добавлены истории в Storybook для состояний Grid, List, Playing.
+- Добавлены типы TypeScript для новых функциональностей (Вики, Спринты, Ретроспективы, Тестовые планы) и обновлены соответствующие эндпоинты в api.ts для уменьшения использования any.
+
+### Архитектура
+- **FullPageLayout** — единый layout для всех авторизованных страниц (sidebar + topbar)
+- **App.tsx** — SiteHeader скрыт для full-page routes, SidebarLayout убан
+- **Sidebar** — единый для всех страниц (Dashboard, Projects, Marketplace, Reviews, Upload, Analytics, Calendar, Settings)
+- **TopBar** — поиск, уведомления, профиль пользователя
+- **Design tokens** — DaVinci Resolve 21 стиль (оранжевый #E85D2A, серые фоны)
+
+### Страницы (11/11 работают, TypeScript 0 ошибок)
+
+| Страница | Роут | Строк | Данные | Описание |
+|----------|------|-------|--------|----------|
+| **Dashboard** | `/dashboard` | ~270 | API | Welcome hero, stats cards (4), projects list, active reviews, quick actions, timeline, system status |
+| **Projects** | `/projects` | ~207 | API | Карточки проектов, create/delete, storage lifecycle, пустое состояние |
+| **Marketplace** | `/market` | ~823 | API | Каталог ассетов, фильтры, аудио-плеер |
+| **Reviews** | `/reviews` | ~215 | API | Список sessions, статусы, фильтр, создание |
+| **Upload** | `/upload` | ~278 | API | Выбор проекта, drag-n-drop, реальная загрузка через `api.createCommit()` |
+| **Analytics** | `/analytics` | ~572 | API | Графики по месяцам, waveform, LUFS, таблицы projects/sessions |
+| **Calendar** | `/calendar` | ~433 | API | Месячный вид, события из sessions/projects, навигация, quick links |
+| **Settings** | `/settings` | ~865 | API | 8 секций: Profile, Appearance, Security, Notifications, Billing, Storage, API Keys, Danger Zone |
+| **Login** | `/login` | ~180 | — | Центрированная карточка, wallet + form auth |
+| **Docs/Kettle** | `/docs`, `/kettle` | ~200 | — | Документация, glossary |
+| **Project View** | `/projects/:id` | ~350 | API | Project overview, assets tab with project-aware sound library, branches, commits |
+
+### UI компоненты (обновлены)
+- **Button** — добавлен вариант `outline`
+- **Badge** — добавлены `style`, `className`, варианты `secondary`/`ghost`
+- **Input** — поддержка `helperText`, `leftIcon`, `rightIcon`
+- **Card** — CardHeader, CardTitle, CardDescription, CardContent, CardFooter
+- **Sidebar** — SidebarNavItem, SidebarSection, SidebarDivider
+
+## Backend
+- FastAPI + SQLAlchemy (Python 3.12)
+- systemd: `soundhub-backend.service` на автозапуске (порт 8000)
+- Seed: demo/demo123
+- ~500+ эндпоинтов
+
+## Frontend Dev Server
+- Vite dev server на порту 5173
+- systemd: `soundhub-frontend.service` на автозапуске
+- Proxy: `/api/*` → `http://127.0.0.1:8000`
 
 ## Cloud Run
 - **URL:** https://soundhub-634858473264.europe-west1.run.app
@@ -45,13 +123,12 @@
 - **Dockerfile:** multi-stage (frontend build + backend), корневой `Dockerfile`
 - **Env vars:** STORAGE_PROVIDER=gcs, GCS_BUCKET=soundhub-assets-project-e9ee982d-db84-440b-ba1, ENV=production, SECRET_KEY (auto-generated), CORS_ORIGINS=*
 - **Seed:** demo/demo123 при старте контейнера
-- **Ревизия:** soundhub-00003-vdp (2026-08-28)
-- **Деплой:** локально `docker build` + `docker push` + `gcloud run deploy` (Cloud Build CI/CD не работает из-за Artifact Registry auth limitation)
+- **Деплой:** локально `docker build` + `docker push` + `gcloud run deploy`
 
-## Auth Inventory (2026-08-25)
-- Всего эндпоинтов: 448 (46 open + 402 protected)
-- Open: auth login/register, demo, public reviews, public sessions, assets, gists, metadata, search, GraphQL
-- Protected: все проектные эндпоинты, jobs, storage, workflows, IAM, monitoring, compute, notifications
+## Auth Inventory (2026-08-29)
+- Всего эндпоинтов: 500+
+- Open: auth login/register, demo, public reviews, public sessions, assets, gists, metadata, search, GraphQL, templates
+- Protected: все проектные эндпоинты, jobs, storage, workflows, IAM, monitoring, compute, notifications, project asset management, project-aware sound library endpoints
 - Детали: `docs/ai/AUTH_INVENTORY.md`
 
 ## Telegram-бот (`/home/scatter/openrouter-bot`)
@@ -60,60 +137,18 @@
 - **CLAUDE.md + STATE.md** загружаются в SystemPrompt
 - **Голос:** транскрипция через Vosk
 - **Vision:** описание картинок через OpenRouter
-- **Баг LANG исправлен**
-- **Коммиты:** `a8e558a`, `09e59c2`
 
-## Проектная память
-- `CLAUDE.md` — постоянные правила проекта
-- `docs/ai/STATE.md` — рабочая память сессий
-
-## Исправления (2026-08-25)
-- Dockerfile: multi-stage build, COPY frontend/ (не ../frontend/)
-- Dockerfile: shell-form CMD для env expansion ($PORT)
-- Dockerfile: seed demo data at startup
-- job_queue.py: убран debug spam, исправлен traceback loop
-- database.py: добавлены миграции для jobs.delay_until, projects.hot_days, storage_objects.storage_tier
-- TS ошибки: Exchange→ArrowRightLeft, Hook→Link, UpRight→ExternalLink, duplicate ReactNode import
-- tsconfig.json: отключён noUnusedLocals, исключены тесты
-
-## Исправления (2026-08-26)
-- `.gcloudignore`: `*.py` → `/*.py` — исключал все .py файлы из Cloud Build
-- `main.py`: `app.frontend(fallback="index.html")` для SPA маршрутов + `init_db()` на startup
-- `storage.py`: добавлен proxy download `/objects/{id}/download` (стриминг из GCS)
-- `gcs.py`: `create_download_url` возвращает прямой GCS URL (bucket public)
-- `gcs.py`: исправлен IAM signBlob canonical request (V4, `bytesToSign`)
-- Cloud Run IAM: `roles/iam.serviceAccountTokenCreator` на compute SA
-- GCS bucket: `allUsers:objectViewer` для публичных скачиваний
-- **Аккаунт buffy** создан, проект TheForgebyHecq_r29189_v9.0 загружен (871MB)
-
-## Исправления (2026-08-28, тесты)
-- `projects.py`: `storage` UnboundLocalError — перенёс `get_storage()` перед циклом
-- `projects.py`: `storage.put_blob()` → `storage.put_bytes()` / добавлены legacy методы в LocalObjectStorage
-- `storage.py`: локальный `from datetime import` затенял модульный → убраны дублирующие импорты
-- `sessions.py`: добавлен эндпоинт `/{id}/submit-feedback` для владельца
-- `release_packages.py`: добавлен `preflight_check` + ledger event `invoice.paid`
-- `test_jobs_after_get.py`: исправлен мок `storage` для фонового потока
-
-## Исправления (2026-08-28, UI)
-- `App.tsx`: `/dashboard` без SiteHeader и SidebarLayout (полноэкранный)
-- `DashboardPage.tsx`: синхронизирован sidebar с FullPageLayout (добавлен Reviews)
-- `ProjectsPage.tsx`: rewrite — больше деталей, create/delete, storage lifecycle
-- `ReviewsPage.tsx`: rewrite — статусы, фильтр, создание
-- `AnalyticsPage.tsx`: rewrite — реальные данные из API, графики
-- `UploadPage.tsx`: rewrite — выбор проекта, drag-n-drop, реальная загрузка через API
-- `SettingsPage.tsx`: реальные данные пользователя, профиль/bio/specialty
-- `FullPageLayout.tsx`: единый layout для всех страниц (sidebar + topbar)
-- Все 12 страниц отвечают 200, TypeScript без ошибок
-
-## Известные ограничения
-- Cloud Build CI/CD: push в Artifact Registry падает (docker-credential-gcloud не доступен в контейнере)
-- Деплой: только через локальную сборку (`docker build` + `docker push` + `gcloud run deploy`)
-- WSL2: webhook не работает из-за port forwarding
-- FreeTrial $300 — 90 дней, аккаунт vasyl0460@gmail.com
+## Telegram-отчёты
+- Все отчёты отправляются в Telegram через `python voice_bot/send_buffy.py`
+- Chat ID: 748628857
+- Записано в CLAUDE.md как постоянная инструкция
 
 ## ALP Upload
-- Uploaded CyclicWaves_r29169_v9.0.alp (256.8 MB, SHA256: 8a5ce401c5856aa6dfcd21378c223a4a2307372818b776ddf47629ad8f7d5656) to project CyclicWaves_r29169_v9.0 (ID 5) via storage API.
-- File is stored in GCS bucket soundhub-assets-project-e9ee982d-db84-440b-ba1 as blobs/8a/5c/8a5ce401c5856aa6dfcd21378c223a4a2307372818b776ddf47629ad8f7d5656
-- Upload timestamp: 2026-08-28T08:08:05Z
-- Project access: https://soundhub-634858473264.europe-west1.run.app/projects/5 (requires login)
-- User's public portfolio: https://soundhub-634858473264.europe-west1.run.app/p/claude
+- Uploaded CyclicWaves_r29169_v9.0.alp (256.8 MB) to project ID 5
+- File stored in GCS bucket
+- Project access: https://soundhub-634858473264.europe-west1.run.app/projects/5
+
+## Следующий шаг
+- Исправить оставшиеся 26 тестов в test_sessions.py (reference, loudness, comparison, change orders)
+- Мониторинг продакшена и сбор обратной связи по PROJECT-AWARE SOUND LIBRARY
+- Подготовка к аудиту безопасности и подготовке к основному релизу
