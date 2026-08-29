@@ -80,8 +80,8 @@ def list_packages(user: User = Depends(get_current_user), db: Session = Depends(
         select(ReleasePackage)
         .where(ReleasePackage.session_id.in_(session_ids))
         .options(
-            selectinload(ReleasePackage.events),
-            selectinload(ReleasePackage.delivery_events)
+            selectinload(ReleasePackage.delivery_events),
+            selectinload(ReleasePackage.deliverables),
         )
         .order_by(ReleasePackage.created_at.desc())
     )
@@ -89,10 +89,10 @@ def list_packages(user: User = Depends(get_current_user), db: Session = Depends(
     result = []
     for package in packages:
         # Debug: Check what's actually in the relationships and also query directly
-        print(f"Package {package.id}: events count = {len(package.events)}, delivery_events count = {len(package.delivery_events)}", flush=True)
+        print(f"Package {package.id}: events count = {len(package.delivery_events)}, delivery_events count = {len(package.delivery_events)}", flush=True)
         direct_events = db.scalars(sql_select(LedgerEvent).where(LedgerEvent.package_id == package.id)).all()
         print(f"  Direct ledger query count = {len(direct_events)}", flush=True)
-        for e in package.events:
+        for e in package.delivery_events:
             print(f"  LedgerEvent (from relationship): {e.event}", flush=True)
         for e in direct_events:
             print(f"  LedgerEvent (direct): {e.event}", flush=True)
@@ -106,15 +106,18 @@ def list_packages(user: User = Depends(get_current_user), db: Session = Depends(
         # Convert to ReleasePackageOut and populate events
         # Exclude the events relationships and SQLAlchemy state
         package_data = {k: v for k, v in package.__dict__.items()
-                        if not k.startswith('_') and k not in ('events', 'delivery_events')}
+                        if not k.startswith('_') and k not in ('events', 'delivery_events', 'deliverables')}
         package_out = ReleasePackageOut.model_validate(package_data)
         # Populate events field with both LedgerEvents and DeliveryEvents
         events = []
-        for e in package.events:
+        for e in package.delivery_events:
             events.append({"event": e.event})
         for e in package.delivery_events:
             events.append({"event": e.event})
         package_out.events = events
+        # Populate deliverables
+        deliverables_list = [{"id": d.id, "type": d.type, "filename": d.filename, "size": d.size} for d in package.deliverables]
+        package_out.deliverables = deliverables_list
         result.append(package_out)
     return result
 
@@ -152,22 +155,40 @@ def create_package(payload: ReleasePackageCreate, user: User = Depends(get_curre
     ledger_count = db.scalars(
         sql_select(LedgerEvent).where(LedgerEvent.package_id == package.id)
     ).all()
-    print(f"AFTER CREATE: Package {package.id}: events count = {len(package.events)}, delivery_events count = {len(package.delivery_events)}, direct ledger query count = {len(ledger_count)}", flush=True)
+    print(f"AFTER CREATE: Package {package.id}: events count = {len(package.delivery_events)}, delivery_events count = {len(package.delivery_events)}, direct ledger query count = {len(ledger_count)}", flush=True)
     if ledger_count:
         print(f"  First ledger event: {ledger_count[0].event}", flush=True)
     # Convert to ReleasePackageOut and populate events
     # Exclude the events relationships and SQLAlchemy state
     package_data = {k: v for k, v in package.__dict__.items()
-                    if not k.startswith('_') and k not in ('events', 'delivery_events')}
+                    if not k.startswith('_') and k not in ('events', 'delivery_events', 'deliverables')}
     package_out = ReleasePackageOut.model_validate(package_data)
     # Populate events field with both LedgerEvents and DeliveryEvents
     events = []
-    for e in package.events:
+    for e in package.delivery_events:
         events.append({"event": e.event})
     for e in package.delivery_events:
         events.append({"event": e.event})
     package_out.events = events
     return package_out
+
+
+@router.post("/{package_id}/preflight", response_model=dict)
+def preflight_check(package_id: int, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """QC preflight — verify package is ready to lock."""
+    package = db.get(ReleasePackage, package_id)
+    if package is None or package.session_id not in [
+        s.id for s in db.scalars(select(ReviewSession).where(ReviewSession.owner_id == user.id)).all()
+    ]:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Package not found")
+    deliverables = db.scalars(select(Deliverable).where(Deliverable.package_id == package_id)).all()
+    issues = []
+    if not deliverables:
+        issues.append("No deliverables attached")
+    if package.status == "ready":
+        issues.append("Package is already locked")
+    passed = len(issues) == 0
+    return {"passed": passed, "issues": issues, "package_id": package_id}
 
 
 @router.post("/{package_id}/lock", response_model=ReleasePackageOut)
@@ -226,7 +247,7 @@ def lock_package(package_id: int, user: User = Depends(get_current_user), db: Se
     ledger_count = db.scalars(
         sql_select(LedgerEvent).where(LedgerEvent.package_id == package.id)
     ).all()
-    print(f"AFTER LOCK: Package {package.id}: events count = {len(package.events)}, delivery_events count = {len(package.delivery_events)}, direct ledger query count = {len(ledger_count)}", flush=True)
+    print(f"AFTER LOCK: Package {package.id}: events count = {len(package.delivery_events)}, delivery_events count = {len(package.delivery_events)}, direct ledger query count = {len(ledger_count)}", flush=True)
     if ledger_count:
         print(f"  First ledger event: {ledger_count[0].event}", flush=True)
         print(f"  All ledger events: {[e.event for e in ledger_count]}", flush=True)
@@ -235,15 +256,18 @@ def lock_package(package_id: int, user: User = Depends(get_current_user), db: Se
     # Convert to ReleasePackageOut and populate events
     # Exclude the events relationships and SQLAlchemy state
     package_data = {k: v for k, v in package.__dict__.items()
-                    if not k.startswith('_') and k not in ('events', 'delivery_events')}
+                    if not k.startswith('_') and k not in ('events', 'delivery_events', 'deliverables')}
     package_out = ReleasePackageOut.model_validate(package_data)
     # Populate events field with both LedgerEvents and DeliveryEvents
     events = []
-    for e in package.events:
+    for e in package.delivery_events:
         events.append({"event": e.event})
     for e in package.delivery_events:
         events.append({"event": e.event})
     package_out.events = events
+    # Populate deliverables
+    deliverables_list = [{"id": d.id, "type": d.type, "filename": d.filename, "size": d.size} for d in package.deliverables]
+    package_out.deliverables = deliverables_list
     return package_out
 
 
@@ -347,21 +371,25 @@ def invoice_package(package_id: int, payload: dict, user: User = Depends(get_cur
         package.paid_at = utcnow()
         # Clear amount due when paid
         package.amount_due_cents = 0
+        ledger.append(db, "invoice.paid", session_id=package.session_id, package_id=package.id, actor=user.username, entity_type="package", entity_id=package.id, payload={"amount_cents": 0})
 
     db.commit()
     db.refresh(package)
     # Convert to ReleasePackageOut and populate events
     # Exclude the events relationships and SQLAlchemy state
     package_data = {k: v for k, v in package.__dict__.items()
-                    if not k.startswith('_') and k not in ('events', 'delivery_events')}
+                    if not k.startswith('_') and k not in ('events', 'delivery_events', 'deliverables')}
     package_out = ReleasePackageOut.model_validate(package_data)
     # Populate events field with both LedgerEvents and DeliveryEvents
     events = []
-    for e in package.events:
+    for e in package.delivery_events:
         events.append({"event": e.event})
     for e in package.delivery_events:
         events.append({"event": e.event})
     package_out.events = events
+    # Populate deliverables
+    deliverables_list = [{"id": d.id, "type": d.type, "filename": d.filename, "size": d.size} for d in package.deliverables]
+    package_out.deliverables = deliverables_list
     return package_out
 
 

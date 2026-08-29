@@ -1014,6 +1014,33 @@ def update_comment(session_id: int, version_id: int, comment_id: int, resolved: 
     return _comment_out(comment)
 
 
+@router.post("/{session_id}/versions/{version_id}/approvals", response_model=ReviewApprovalOut, status_code=status.HTTP_201_CREATED)
+def create_approval(session_id: int, version_id: int, payload: ReviewApprovalCreate, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Authenticated owner creates an approval on a version."""
+    get_session_or_404(db, user, session_id)
+    version = get_version_or_404(db, session_id, version_id)
+    if not payload.approved and not payload.note.strip():
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "A 'needs changes' decision requires a note")
+    approval = ReviewApproval(
+        session_id=session_id,
+        version_id=version.id,
+        scope=payload.scope,
+        approved=payload.approved,
+        note=payload.note.strip(),
+        approver_name=payload.approver_name.strip()[:128] or user.username,
+    )
+    db.add(approval)
+    version.status = "approved" if payload.approved else "needs_changes"
+    session = db.get(ReviewSession, session_id)
+    if session:
+        session.status = version.status
+        session.updated_at = utcnow()
+    ledger.append(db, "approval.created", session_id=session_id, actor=user.username, entity_type="approval", entity_id=approval.id, payload={"version": version.label, "scope": payload.scope, "approved": payload.approved})
+    db.commit()
+    db.refresh(approval)
+    return ReviewApprovalOut.model_validate(approval, from_attributes=True)
+
+
 @router.post("/{session_id}/versions/{version_id}/status", response_model=ReviewVersionOut)
 def update_version_status(session_id: int, version_id: int, payload: ReviewStatusUpdate, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     get_session_or_404(db, user, session_id)
@@ -1064,7 +1091,9 @@ def get_ledger(session_id: int, user: User = Depends(get_current_user), db: Sess
 @router.get("/{session_id}/ledger/verify")
 def verify_ledger(session_id: int, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     get_session_or_404(db, user, session_id)
-    return ledger.verify_history(db, session_id=session_id)
+    result = ledger.verify_history(db, session_id=session_id)
+    result["ok"] = result.get("valid", False)
+    return result
 
 
 # ---------- Stem endpoints (for version-based stem management) ----------

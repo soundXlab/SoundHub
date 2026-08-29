@@ -48,6 +48,7 @@ def client(tmp_path, monkeypatch):
         sessionmaker(bind=test_engine, autoflush=False, autocommit=False),
     )
     Base.metadata.create_all(bind=test_engine)
+    app.dependency_overrides.clear()
     with TestClient(app) as c:
         yield c
 
@@ -110,11 +111,11 @@ def test_full_review_to_paid_delivery_journey(client):
 
     # feedback owner submits the consolidated round
     r = client.post(
-        f"/api/sessions/{sid}/submit-feedback",
+        f"/api/sessions/public/{share}/submit-feedback",
         json={"note": "Consolidated A&R + artist notes"},
         headers=auth,
     )
-    assert r.status_code == 200
+    assert r.status_code == 200, f"submit-feedback failed: {r.status_code} {r.text}"
     assert r.json()["round_number"] == 2
 
     # v2 ships the fix; client approves it

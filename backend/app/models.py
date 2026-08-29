@@ -501,13 +501,14 @@ class ReleasePackage(Base):
     invoice_due_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     force_locked_reason: Mapped[str] = mapped_column(Text, default="")
     force_locked_by: Mapped[str] = mapped_column(String(128), default="")
+    paid_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
     session: Mapped["ReviewSession"] = relationship()
     approved_version: Mapped["ReviewVersion"] = relationship()
     deliverables: Mapped[list["Deliverable"]] = relationship(
         back_populates="package", cascade="all, delete-orphan"
     )
-    events: Mapped[list["DeliveryEvent"]] = relationship(
+    delivery_events: Mapped[list["DeliveryEvent"]] = relationship(
         back_populates="package", cascade="all, delete-orphan"
     )
 
@@ -574,7 +575,7 @@ class DeliveryEvent(Base):
     detail: Mapped[str] = mapped_column(Text, default="")
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
-    package: Mapped["ReleasePackage"] = relationship(back_populates="events")
+    package: Mapped["ReleasePackage"] = relationship(back_populates="delivery_events")
 
 
 # ═══════════════════════════════════════════════════════════════════════════

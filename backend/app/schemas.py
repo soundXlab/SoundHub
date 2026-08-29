@@ -493,9 +493,12 @@ class ReleasePackageOut(ORMModel):
     session_manifest: dict
     consolidate_audio: bool
     archive_status: str
+    events: list[dict] | None = None
+    deliverables: list[dict] | None = None
 
 
 class ReleasePackageCreate(BaseModel):
+    session_id: int
     approved_version_id: int
     name: str = Field(default="Final delivery", max_length=160)
     template: str = Field(default="custom", max_length=32)
