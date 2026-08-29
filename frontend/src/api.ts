@@ -38,6 +38,9 @@ import type {
   StemAsset,
   TokenResponse,
   Tree,
+  WikiPage,
+  WikiRevision,
+  Sprint,
 } from "./types";
 
 const TOKEN_KEY = "soundhub_token";
@@ -82,6 +85,9 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
 }
 
 export const api = {
+  get: <T = any>(path: string) => request<T>(path),
+  post: <T = any>(path: string, body?: any) => request<T>(path, { method: "POST", body: body ? JSON.stringify(body) : undefined, headers: body ? { "Content-Type": "application/json" } : {} }),
+  delete: <T = any>(path: string) => request<T>(path, { method: "DELETE" }),
   login: (username: string, password: string) =>
     request<TokenResponse>("/api/auth/login", {
       method: "POST",
@@ -711,22 +717,22 @@ export const api = {
   // ═══════════════════════════════════════════════════════════════════
 
   // Wiki
-  listWiki: (pid: number) => request<any[]>(`/api/projects/${pid}/wiki`),
-  getWikiPage: (pid: number, slug: string) => request<any>(`/api/projects/${pid}/wiki/${slug}`),
+  listWiki: (pid: number) => request<WikiPage[]>(`/api/projects/${pid}/wiki`),
+  getWikiPage: (pid: number, slug: string) => request<WikiPage>(`/api/projects/${pid}/wiki/${slug}`),
   createWikiPage: (pid: number, slug: string, title: string, content: string) =>
-    request<any>(`/api/projects/${pid}/wiki`, { method: 'POST', body: JSON.stringify({ slug, title, content }) }),
+    request<WikiPage>(`/api/projects/${pid}/wiki`, { method: 'POST', body: JSON.stringify({ slug, title, content }) }),
   updateWikiPage: (pid: number, slug: string, title?: string, content?: string, message?: string) =>
-    request<any>(`/api/projects/${pid}/wiki/${slug}`, { method: 'PUT', body: JSON.stringify({ title, content, message }) }),
+    request<WikiPage>(`/api/projects/${pid}/wiki/${slug}`, { method: 'PUT', body: JSON.stringify({ title, content, message }) }),
   deleteWikiPage: (pid: number, slug: string) =>
     request<void>(`/api/projects/${pid}/wiki/${slug}`, { method: 'DELETE' }),
-  wikiRevisions: (pid: number, slug: string) => request<any[]>(`/api/projects/${pid}/wiki/${slug}/revisions`),
+  wikiRevisions: (pid: number, slug: string) => request<WikiRevision[]>(`/api/projects/${pid}/wiki/${slug}/revisions`),
 
   // Sprints
-  listSprints: (pid: number) => request<any[]>(`/api/projects/${pid}/sprints`),
+  listSprints: (pid: number) => request<Sprint[]>(`/api/projects/${pid}/sprints`),
   createSprint: (pid: number, name: string, goal?: string) =>
-    request<any>(`/api/projects/${pid}/sprints`, { method: 'POST', body: JSON.stringify({ name, goal }) }),
+    request<Sprint>(`/api/projects/${pid}/sprints`, { method: 'POST', body: JSON.stringify({ name, goal }) }),
   updateSprint: (pid: number, sid: number, state: string) =>
-    request<any>(`/api/projects/${pid}/sprints/${sid}`, { method: 'PATCH', body: JSON.stringify({ state }) }),
+    request<Sprint>(`/api/projects/${pid}/sprints/${sid}`, { method: 'PATCH', body: JSON.stringify({ state }) }),
   sprintBacklog: (pid: number, sid: number) => request<any>(`/api/projects/${pid}/sprints/${sid}/backlog`),
   assignStoryPoints: (pid: number, sid: number, taskId: number, points: number) =>
     request<any>(`/api/projects/${pid}/sprints/${sid}/assign`, { method: 'POST', body: JSON.stringify({ task_id: taskId, points }) }),

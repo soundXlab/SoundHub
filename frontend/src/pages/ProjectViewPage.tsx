@@ -1,575 +1,604 @@
-import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
-import { Link, useParams, useSearchParams } from "react-router-dom";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { FullPageLayout } from "../components/FullPageLayout";
 import { api } from "../api";
-import MetadataPanel from "../components/MetadataPanel";
-import VersionHistory from "../components/VersionHistory";
-import ActivityFeed from "../components/ActivityFeed";
-import BatchALPImport from "../components/BatchALPImport";
-import ALPBrowser from "../components/ALPBrowser";
 import {
-  BarChart2,
-  FileText,
-  List,
-  Clock,
-  GitBranch,
-  Package,
-  Settings2,
-  File,
-  Star,
-  ArrowRightLeft,
-  Download,
-  Folder,
-} from "lucide-react";
-import {
-  DAW_COLORS,
-  humanSize,
-  shortDate,
-  type Branch,
-  type Commit,
-  type DawInfo,
-  type Project,
-  type ProjectFile,
-  type Tree,
-} from "../types";
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardFooter,
+  Button,
+  Input,
+  Badge,
+} from "../components/ui";
+import type { CatalogAsset } from "../types";
+import { Folder, GitBranch, Zap, Shield, Truck, List, Grid } from "lucide-react";
+import { useParams } from "react-router-dom";
+import AssetCard from "./AssetCard";
+import FilterPanel from "./FilterPanel";
+import SortBar from "./SortBar";
+import AssetView from "./AssetView";
+import AssetCarousel from "./AssetCarousel";
 
-type Tab = "overview" | "code" | "versions" | "activity";
+interface Project {
+  id: number;
+  name: string;
+  description: string | null;
+  ownerId: number;
+  createdAt: string;
+  updatedAt: string;
+  slug: string;
+}
+
+interface Branch {
+  name: string;
+  isDefault: boolean;
+  headCommitId: number | null;
+  headMessage: string;
+  headSha: string | null;
+  headAuthor: string;
+  headDate: string | null;
+  commitCount: number;
+  createdAt: string;
+}
+
+interface Commit {
+  id: number;
+  message: string;
+  authorId: number;
+  author: {
+    id: number;
+    username: string;
+    walletAddress: string | null;
+  };
+  createdAt: string;
+  stats: {
+    additions: number;
+    deletions: number;
+    files: number;
+  };
+}
+
+interface AssetDependency {
+  assetId: number;
+  packageId: number;
+  name: string;
+  assetUri: string;
+  price: string;
+  license: number;
+  author: string;
+  bpmRange: [number, number];
+  key: string;
+  genres: string[];
+  format: string;
+  plugins: string[];
+  durationSeconds: number;
+  waveform: number[];
+  firstUsedAt: string;
+  lastUsedAt: string;
+  usageCount: number;
+  licenseStatus: string;
+}
+
+interface Recommendation {
+  listingId: number;
+  name: string;
+  assetUri: string;
+  price: string;
+  license: number;
+  active: boolean;
+  seller: string;
+  buyer: string;
+  escrowed: number;
+  released: boolean;
+  author: string;
+  bpmRange: [number, number];
+  key: string;
+  genres: string[];
+  format: string;
+  plugins: string[];
+  durationSeconds: number;
+  waveform: number[];
+  inProject: boolean;
+  reason: string;
+}
+
+interface ProjectStats {
+  totalCommits: number;
+  totalBranches: number;
+  totalAssets: number;
+  storageUsed: string;
+}
+
+function depToCatalog(a: AssetDependency): CatalogAsset {
+  return {
+    listing_id: a.assetId,
+    name: a.name,
+    price_snd: a.price,
+    license: String(a.license),
+    uri: a.assetUri,
+    bpm: a.bpmRange,
+    key: a.key,
+    genres: a.genres,
+    plugins: a.plugins,
+    format: a.format,
+    contents: '',
+    description: '',
+    verified: false,
+    duration_seconds: a.durationSeconds,
+    waveform: a.waveform,
+  };
+}
+
+function recToCatalog(a: Recommendation): CatalogAsset {
+  return {
+    listing_id: a.listingId,
+    name: a.name,
+    price_snd: a.price,
+    license: String(a.license),
+    uri: a.assetUri,
+    bpm: a.bpmRange,
+    key: a.key,
+    genres: a.genres,
+    plugins: a.plugins,
+    format: a.format,
+    contents: '',
+    description: a.reason,
+    verified: false,
+    duration_seconds: a.durationSeconds,
+    waveform: a.waveform,
+  };
+}
 
 export default function ProjectViewPage() {
-  const { id } = useParams();
-  const [searchParams] = useSearchParams();
-  const pid = Number(id);
+  const { projectId } = useParams();
   const [project, setProject] = useState<Project | null>(null);
   const [branches, setBranches] = useState<Branch[]>([]);
-  const [branch, setBranch] = useState<string>(() => searchParams.get("branch") || "main");
-  const [tree, setTree] = useState<Tree | null>(null);
   const [commits, setCommits] = useState<Commit[]>([]);
-  // Initialize tab from searchParams, default to overview
-  const [tab, setTab] = useState<Tab>(() => {
-    const param = searchParams.get("tab");
-    if (param === "overview" || param === "code" || param === "versions" || param === "activity") {
-      return param as Tab;
-    }
-    return "overview";
+  const [assets, setAssets] = useState<AssetDependency[]>([]);
+  const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
+  const [stats, setStats] = useState<ProjectStats>({
+    totalCommits: 0,
+    totalBranches: 0,
+    totalAssets: 0,
+    storageUsed: "0 MB"
   });
+  const [activeTab, setActiveTab] = useState<"overview" | "assets" | "branches" | "commits">("overview");
+  const [filters, setFilters] = useState({
+    q: "",
+    genre: "",
+    key: "",
+    license: "",
+    format: "",
+    plugin: "",
+    bpmMin: "",
+    bpmMax: ""
+  });
+  const [view, setView] = useState<'grid' | 'list'>('grid');
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [playingId, setPlayingId] = useState<number | null>(null);
+  const [progress, setProgress] = useState(0);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  const [message, setMessage] = useState("");
-  const [uploading, setUploading] = useState(false);
-  const [asFolder, setAsFolder] = useState(false);
-  const [notice, setNotice] = useState<string | null>(null);
-  const [expanded, setExpanded] = useState<string | null>(null);
-  const [readme, setReadme] = useState<string | null>(null);
-  const fileInput = useRef<HTMLInputElement>(null);
+  const EMPTY_FILTERS = {
+    q: "",
+    genre: "",
+    key: "",
+    license: "",
+    format: "",
+    plugin: "",
+    bpmMin: "",
+    bpmMax: ""
+  };
 
-  // Keep searchParams in sync with tab state
-  useEffect(() => {
-    // Only update if the tab has changed and the searchParam is different
-    const currentParam = searchParams.get("tab");
-    if (currentParam !== tab) {
-      searchParams.set("tab", tab);
-      // Replace the current URL query string without pushing a new history entry
-      window.history.replaceState(
-        {},
-        "",
-        `${window.location.pathname}?${searchParams.toString()}`
-      );
-    }
-  }, [tab, searchParams]);
+  const loadProjectData = useCallback(async () => {
+    if (!projectId) return;
 
-  const load = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+
     try {
-      const [p, b] = await Promise.all([api.getProject(pid), api.listBranches(pid)]);
-      setProject(p);
-      setBranches(b);
-      const current = b.some((x) => x.name === branch) ? branch : p.default_branch;
-      setBranch(current);
+      // Fetch project data
+      const projectResp = await api.get(`/api/projects/${projectId}`);
+      setProject(projectResp.data);
+
+      // Fetch branches
+      const branchesResp = await api.get(`/api/projects/${projectId}/branches`);
+      setBranches(branchesResp.data);
+
+      // Fetch recent commits
+      const commitsResp = await api.get(`/api/projects/${projectId}/commits?limit=10`);
+      setCommits(commitsResp.data);
+
+      // Fetch project stats
+      const statsResp = await api.get(`/api/projects/${projectId}/stats`);
+      setStats(statsResp.data);
+
+      // Fetch project assets (dependencies)
+      const assetsResp = await api.get(`/api/projects/${projectId}/assets`);
+      setAssets(assetsResp.data);
+
+      // Fetch recommendations
+      const recommendationsResp = await api.get(`/api/projects/${projectId}/sounds/recommend`);
+      setRecommendations(recommendationsResp.data);
+
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load project");
+      setError("Failed to load project data");
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
-  }, [pid, branch]);
-
-  const loadBranch = useCallback(
-    async (name: string) => {
-      try {
-        setError(null);
-        const [t, c] = await Promise.all([api.getTree(pid, { branch: name }), api.listCommits(pid, name)]);
-        setTree(t);
-        setCommits(c);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to load branch");
-      }
-    },
-    [pid]
-  );
+  }, [projectId]);
 
   useEffect(() => {
-    load();
-  }, [load]);
+    loadProjectData();
+  }, [loadProjectData]);
 
-  useEffect(() => {
-    if (project) loadBranch(branch);
-  }, [branch, project?.id]);
+  const handleFilterChange = (key: keyof typeof filters, value: string) => {
+    setFilters(prev => ({ ...prev, [key]: value }));
+  };
 
-  useEffect(() => {
-    setReadme(null);
-    if (!tree) return;
-    const readmeFile = tree.files.find((f) => /^readme\.md$/i.test(f.path.split("/").pop() || ""));
-    if (!readmeFile) return;
-    fetch(api.fileUrl(pid, readmeFile.path, false, branch))
-      .then((r) => r.text())
-      .then((t) => setReadme(t))
-      .catch(() => setReadme(null));
-  }, [tree, pid, branch]);
+  const resetFilters = () => {
+    setFilters(EMPTY_FILTERS);
+  };
 
-  const submit = async (e: FormEvent) => {
-    e.preventDefault();
-    const files = fileInput.current?.files;
-    if (!files || files.length === 0) {
-      setNotice("Select at least one file to commit.");
+  const togglePlay = (asset: CatalogAsset) => {
+    if (playingId === asset.listing_id) {
+      audioRef.current?.pause();
+      setPlayingId(null);
+      setProgress(0);
       return;
     }
-    setUploading(true);
-    setNotice(null);
+    audioRef.current?.pause();
+    const audio = new Audio(asset.uri);
+    audioRef.current = audio;
+    setPlayingId(asset.listing_id);
+    setProgress(0);
+    audio.ontimeupdate = () =>
+      setProgress(audio.duration ? audio.currentTime / audio.duration : 0);
+    audio.onended = () => {
+      setPlayingId(null);
+      setProgress(0);
+    };
+    audio.play().catch(() => {
+      setPlayingId(null);
+      setProgress(0);
+    });
+  };
+
+  const handleAddAsset = async (asset: CatalogAsset) => {
     try {
-      await api.createCommit(pid, message.trim() || "Update project files", files, branch);
-      setMessage("");
-      if (fileInput.current) fileInput.current.value = "";
-      await loadBranch(branch);
-      await load();
-      setNotice("Commit created ✓");
+      await api.post(`/api/projects/${projectId}/assets`, {
+        asset_id: asset.listing_id,
+        commit_message: `Add asset via UI`
+      });
+      // Refresh assets list
+      const assetsResp = await api.get(`/api/projects/${projectId}/assets`);
+      setAssets(assetsResp.data);
     } catch (err) {
-      setNotice(err instanceof Error ? err.message : "Upload failed");
-    } finally {
-      setUploading(false);
+      console.error("Failed to add asset:", err);
+      alert("Failed to add asset to project");
     }
   };
 
-  const dawBadge = (f: ProjectFile) =>
-    f.daw_format && (
-      <span className="badge badge-daw" style={{ background: DAW_COLORS[f.daw_format] ?? "#888" }}>
-        {f.daw_format.toUpperCase()}
-      </span>
-    );
+  const handleRemoveAsset = async (asset: CatalogAsset) => {
+    if (!window.confirm("Are you sure you want to remove this asset from the project?")) {
+      return;
+    }
+    try {
+      await api.delete(`/api/projects/${projectId}/assets/${asset.listing_id}`);
+      // Refresh assets list
+      const assetsResp = await api.get(`/api/projects/${projectId}/assets`);
+      setAssets(assetsResp.data);
+    } catch (err) {
+      console.error("Failed to remove asset:", err);
+      alert("Failed to remove asset from project");
+    }
+  };
 
-  const headCommit = tree ? tree.commit_id : commits[0]?.id;
-  const prevCommit = commits.find((c) => c.id !== headCommit)?.id;
-  const activeBranch = branches.find((b) => b.name === branch);
+  const handleReleasePreflight = async () => {
+    try {
+      const result = await api.post(`/api/projects/${projectId}/release/preflight`);
+      if (result.data.validForRelease) {
+        alert("Project is ready for release! All assets have valid licenses.");
+      } else {
+        let message = "Release blocked due to the following issues:\n\n";
+        result.data.issues.forEach((issue: string) => {
+          message += `• ${issue}\n`;
+        });
+        if (result.data.warnings.length > 0) {
+          message += "\nWarnings:\n";
+          result.data.warnings.forEach((warning: string) => {
+            message += `• ${warning}\n`;
+          });
+        }
+        alert(message);
+      }
+    } catch (err) {
+      console.error("Failed to run preflight check:", err);
+      alert("Failed to run release preflight check");
+    }
+  };
 
-  // Get first DAW info from tree files
-  const firstDawInfo: DawInfo | null = tree?.files.find((f) => f.daw_info)?.daw_info ?? null;
-
-  return (
-    <div className="project-view">
-      {/* Header */}
-      {project && (
-        <div className="project-view-header">
-          <div className="project-view-header-top">
-            <div className="project-view-breadcrumb">
-              <Link to="/projects" className="project-view-back">← Projects</Link>
-              <span className="project-view-sep">/</span>
-              <span className="project-view-owner">{project.owner.username}</span>
-              <span className="project-view-sep">/</span>
-              <span className="project-view-name">{project.name}</span>
-              <span className="project-view-badge">Public</span>
-            </div>
-            <div className="project-view-actions">
-              <button
-                className="project-view-btn project-view-btn-danger"
-                onClick={async () => {
-                  if (confirm("Delete this project and all its commits?")) {
-                    await api.deleteProject(pid);
-                    window.location.href = "/projects";
-                  }
-                }}
-              >
-                Delete
-              </button>
-            </div>
-          </div>
-
-          {project.description && (
-            <p className="project-view-desc">{project.description}</p>
-          )}
-
-          {/* Tabs */}
-          <div className="project-view-tabs">
-            <button
-              className={`project-view-tab ${tab === "overview" ? "active" : ""}`}
-              onClick={() => setTab("overview")}
-            >
-              <BarChart2 className="project-view-tab-icon" size={16} />
-              Overview
-            </button>
-            <button
-              className={`project-view-tab ${tab === "code" ? "active" : ""}`}
-              onClick={() => setTab("code")}
-            >
-              <FileText className="project-view-tab-icon" size={16} />
-              Code
-              {tree && <span className="project-view-tab-count">{tree.files.length}</span>}
-            </button>
-            <button
-              className={`project-view-tab ${tab === "versions" ? "active" : ""}`}
-              onClick={() => setTab("versions")}
-            >
-              <List className="project-view-tab-icon" size={16} />
-              Versions
-              {commits.length > 0 && <span className="project-view-tab-count">{commits.length}</span>}
-            </button>
-            <button
-              className={`project-view-tab ${tab === "activity" ? "active" : ""}`}
-              onClick={() => setTab("activity")}
-            >
-              <Clock className="project-view-tab-icon" size={16} />
-              Activity
-            </button>
-            <Link to={`/projects/${pid}/branches`} className="project-view-tab">
-              <GitBranch className="project-view-tab-icon" size={16} />
-              Branches
-              {branches.length > 0 && <span className="project-view-tab-count">{branches.length}</span>}
-            </Link>
-            <Link to={`/projects/${pid}/features`} className="project-view-tab">
-              <Package className="project-view-tab-icon" size={16} />
-              Features
-            </Link>
-          </div>
-        </div>
-      )}
-
-      {error && <div className="project-view-error">{error}</div>}
-
-      {/* Overview Tab */}
-      {tab === "overview" && project && (
-        <div className="project-view-grid">
-          {/* Main content */}
-          <div className="project-view-main">
-            {/* Quick stats */}
-            <div className="project-view-stats">
-              <div className="project-view-stat">
-                <span className="project-view-stat-label">Branch</span>
-                <span className="project-view-stat-value">⎇ {branch}</span>
-              </div>
-              <div className="project-view-stat">
-                <span className="project-view-stat-label">HEAD</span>
-                <span className="project-view-stat-value">                    {commits.length > 0 ? `#${String(commits[0].id).slice(0, 7)}` : "—"}
-                </span>
-              </div>
-              <div className="project-view-stat">
-                <span className="project-view-stat-label">Files</span>
-                <span className="project-view-stat-value">{tree?.files.length ?? 0}</span>
-              </div>
-              <div className="project-view-stat">
-                <span className="project-view-stat-label">Commits</span>
-                <span className="project-view-stat-value">{commits.length}</span>
-              </div>
-            </div>
-
-            {/* Commit form */}
-            <form className="project-view-commit-form" onSubmit={submit}>
-              <div className="project-view-commit-header">
-                <span className="project-view-commit-title">Push to {branch}</span>
-              </div>
-              <div className="project-view-commit-body">
-                <input
-                  type="text"
-                  placeholder="Commit message, e.g. 'Add synth lead to arrangement'"
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  className="project-view-commit-input"
-                />
-                <label className="project-view-upload-zone">
-                  <input
-                    ref={fileInput}
-                    type="file"
-                    multiple
-                    hidden
-                    {...(asFolder ? { webkitdirectory: "", directory: "" } : {})}
-                  />
-                  <Folder size={14} className="project-view-upload-icon" />
-                  <span className="project-view-upload-text">
-                    Click to select files{asFolder ? " (folder)" : ""} — .als, .alp, .cpr, .rpp, .flp
-                  </span>
-                </label>
-                <div className="project-view-commit-footer">
-                  <label className="project-view-checkbox">
-                    <input
-                      type="checkbox"
-                      checked={asFolder}
-                      onChange={(e) => setAsFolder(e.target.checked)}
-                    />
-                    Upload whole folder
-                  </label>
-                  <button className="project-view-btn project-view-btn-primary" disabled={uploading}>
-                    {uploading ? "Committing…" : "Create commit"}
-                  </button>
-                </div>
-                {notice && (
-                  <div className={`project-view-notice ${notice.includes("✓") ? "success" : "error"}`}>
-                    {notice}
-                  </div>
-                )}
-              </div>
-            </form>
-
-            {/* Batch ALP Import */}
-            <BatchALPImport
-              projectId={pid}
-              branch={branch}
-              onImportComplete={() => {
-                loadBranch(branch);
-                load();
-              }}
-            />
-
-            {/* File table */}
-            <div className="project-view-file-table">
-              <div className="project-view-file-table-header">
-                <span className="project-view-file-table-title">Files on {branch}</span>
-                <span className="project-view-file-table-count">
-                  {tree ? `${tree.files.length} file(s)` : ""}
-                </span>
-              </div>
-              {!tree ? (
-                <div className="project-view-file-empty">No commits yet — upload your project files.</div>
-              ) : (
-                tree.files.map((f) => {
-                  const isOpen = expanded === f.path;
-                  return (
-                    <div key={f.path} className="project-view-file-row-wrapper">
-                      <div
-                        className="project-view-file-row"
-                        onClick={() => setExpanded(isOpen ? null : f.path)}
-                      >
-                        <span className="project-view-file-icon">
-                          {f.daw_format ? <Settings2 size={14} /> : <File size={14} />}
-                        </span>
-                        <span className="project-view-file-name">{f.path}</span>
-                        {dawBadge(f)}
-                        <span className="project-view-file-size">{humanSize(f.size)}</span>
-                        <span className="project-view-file-actions">
-                          {headCommit && prevCommit && (
-                            <Link
-                              to={`/projects/${pid}/diff?path=${encodeURIComponent(f.path)}&from=${prevCommit}&to=${headCommit}`}
-                              className="project-view-file-action"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              ⇄
-                            </Link>
-                          )}
-                          <a
-                            href={api.fileUrl(pid, f.path, true, branch)}
-                            className="project-view-file-action"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            ⬇
-                          </a>
-                        </span>
-                      </div>
-                      {isOpen && f.daw_format === "alp" ? (
-                        <ALPBrowser
-                          projectId={pid}
-                          branch={branch}
-                          filePath={f.path}
-                          fileName={f.path.split("/").pop() || f.path}
-                        />
-                      ) : isOpen ? (
-                        <DawInfoBox info={f.daw_info} />
-                      ) : null}
-                    </div>
-                  );
-                })
-              )}
-            </div>
-
-            {/* README */}
-            {readme && (
-              <div className="project-view-readme">
-                <div className="project-view-readme-header">README.md</div>
-                <div className="project-view-readme-body">
-                  <pre style={{ fontFamily: "inherit", whiteSpace: "pre-wrap", background: "none", border: "none", padding: 0, margin: 0 }}>
-                    {readme}
-                  </pre>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Sidebar */}
-          <div className="project-view-sidebar">
-            <MetadataPanel info={firstDawInfo} compact />
-            <ActivityFeed commits={commits} projectId={pid} maxItems={8} />
-          </div>
-        </div>
-      )}
-
-      {/* Code Tab */}
-      {tab === "code" && (
-        <div className="project-view-code">
-          {/* Branch selector */}
-          <div className="project-view-branch-bar">
-            <div className="branch-dropdown">
-              <button className="branch-selector" onClick={() => setMenuOpen((o) => !o)}>
-                <GitBranch size={14} />
-                <span className="ml-2">{branch}</span>
-                <span className="muted" style={{ fontSize: 11 }}>
-                  {activeBranch ? `${activeBranch.commit_count} commit(s)` : ""}
-                </span>
-              </button>
-              {menuOpen && (
-                <div className="branch-menu">
-                  {branches.map((b) => (
-                    <div
-                      key={b.name}
-                      className={`branch-menu-item ${b.name === branch ? "active" : ""}`}
-                      onClick={() => {
-                        setBranch(b.name);
-                        setMenuOpen(false);
-                      }}
-                    >
-                      {b.is_default && <span className="default-star">★</span>}
-                      <span>⎇</span> {b.name}
-                      <span className="spacer" />
-                      <span className="muted" style={{ fontSize: 11 }}>
-                        {b.head_message.slice(0, 40)}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-            <span className="muted" style={{ fontSize: 12 }}>
-              {tree ? `HEAD · ${tree.commit_message}` : "no commits yet"}
-            </span>
-          </div>
-
-          {/* File table */}
-          <div className="project-view-file-table">
-            <div className="project-view-file-table-header">
-              <span className="project-view-file-table-title">Files on {branch}</span>
-              <span className="project-view-file-table-count">
-                {tree ? `${tree.files.length} file(s)` : ""}
-              </span>
-            </div>
-            {!tree ? (
-              <div className="project-view-file-empty">No commits yet — upload your project files.</div>
-            ) : (
-              tree.files.map((f) => {
-                const isOpen = expanded === f.path;
-                return (
-                  <div key={f.path} className="project-view-file-row-wrapper">
-                    <div
-                      className="project-view-file-row"
-                      onClick={() => setExpanded(isOpen ? null : f.path)}
-                    >
-                      <span className="project-view-file-icon">
-                        {f.daw_format ? <Settings2 size={14} /> : <File size={14} />}
-                      </span>
-                      <span className="project-view-file-name">{f.path}</span>
-                      {dawBadge(f)}
-                      <span className="project-view-file-size">{humanSize(f.size)}</span>
-                      <span className="project-view-file-actions">
-                        {headCommit && prevCommit && (
-                          <Link
-                            to={`/projects/${pid}/diff?path=${encodeURIComponent(f.path)}&from=${prevCommit}&to=${headCommit}`}
-                            className="project-view-file-action"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            ⇄
-                          </Link>
-                        )}
-                        <a
-                          href={api.fileUrl(pid, f.path, true, branch)}
-                          className="project-view-file-action"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          ⬇
-                        </a>
-                      </span>
-                    </div>
-                    {isOpen && f.daw_format === "alp" ? (
-                        <ALPBrowser
-                          projectId={pid}
-                          branch={branch}
-                          filePath={f.path}
-                          fileName={f.path.split("/").pop() || f.path}
-                        />
-                      ) : isOpen ? (
-                        <DawInfoBox info={f.daw_info} />
-                      ) : null}
-                  </div>
-                );
-              })
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Versions Tab */}
-      {tab === "versions" && (
-        <div className="project-view-versions">
-          <VersionHistory
-            commits={commits}
-            projectId={pid}
-            branch={branch}
-            currentCommitId={headCommit != null ? Number(headCommit) : undefined}
-          />
-        </div>
-      )}
-
-      {/* Activity Tab */}
-      {tab === "activity" && (
-        <div className="project-view-activity">
-          <ActivityFeed commits={commits} projectId={pid} maxItems={20} />
-        </div>
-      )}
-    </div>
-  );
-}
-
-function DawInfoBox({ info }: { info: DawInfo | null }) {
-  if (!info) {
+  if (loading) {
     return (
-      <div className="project-view-daw-empty">
-        Not a recognized DAW project file (or too large to analyze).
-      </div>
+      <FullPageLayout activeSection="projects">
+        <div className="project-view-page">
+          <div className="project-view-header">
+            <h1>Loading project...</h1>
+          </div>
+        </div>
+      </FullPageLayout>
     );
   }
+
+  if (error) {
+    return (
+      <FullPageLayout activeSection="projects">
+        <div className="project-view-page">
+          <div className="project-view-header">
+            <h1>Error loading project</h1>
+            <p>{error}</p>
+            <Button variant="outline" onClick={loadProjectData}>
+              Try again
+            </Button>
+          </div>
+        </div>
+      </FullPageLayout>
+    );
+  }
+
+  if (!project) {
+    return (
+      <FullPageLayout activeSection="projects">
+        <div className="project-view-page">
+          <div className="project-view-header">
+            <h1>Project not found</h1>
+            <p>The requested project does not exist or you don't have access to it.</p>
+          </div>
+        </div>
+      </FullPageLayout>
+    );
+  }
+
   return (
-    <div className="project-view-daw-box">
-      <div className="project-view-daw-grid">
-        <div>
-          <dt>DAW</dt>
-          <dd>
-            {info.format} <span className="muted">({info.version})</span>
-          </dd>
+    <FullPageLayout activeSection="projects">
+      <div className="project-view-page">
+        <div className="project-view-header">
+          <h1>{project.name}</h1>
+          <p className="project-description">{project.description || "No description provided"}</p>
+          <div className="project-meta">
+            <span>Owner: #{project.ownerId}</span>
+            <span>•</span>
+            <span>Updated: {new Date(project.updatedAt).toLocaleDateString()}</span>
+          </div>
         </div>
-        <div>
-          <dt>BPM</dt>
-          <dd>{info.bpm ?? "—"}</dd>
-        </div>
-        <div>
-          <dt>Signature</dt>
-          <dd>{info.time_signature ?? "—"}</dd>
-        </div>
-        <div>
-          <dt>Tracks</dt>          <dd>{info.tracks?.length ?? "—"}</dd>
-        </div>
-        <div>
-          <dt>Duration</dt>
-          <dd>" — "</dd>
+
+        <div className="project-view-tabs">
+          <div className="tabs-list" style={{ display: 'flex', gap: '4px', marginBottom: '16px' }}>
+            {(['overview', 'assets', 'branches', 'commits'] as const).map(tab => (
+              <button
+                key={tab}
+                className={`tab-trigger ${activeTab === tab ? 'active' : ''}`}
+                onClick={() => setActiveTab(tab)}
+                style={{ padding: '8px 16px', borderRadius: '6px', border: 'none', cursor: 'pointer', background: activeTab === tab ? 'var(--brand-primary)' : 'var(--bg-secondary)', color: activeTab === tab ? '#fff' : 'var(--text-secondary)' }}
+              >
+                {tab === 'overview' && <Folder size={14} />}
+                {tab === 'assets' && <List size={14} />}
+                {tab === 'branches' && <GitBranch size={14} />}
+                {tab === 'commits' && <Zap size={14} />}
+                {' '}{tab.charAt(0).toUpperCase() + tab.slice(1)}
+              </button>
+            ))}
+          </div>
+
+          {activeTab === 'overview' && (
+              <div className="project-overview">
+                <div className="stats-grid">
+                  <div className="stat-card">
+                    <h3>{stats.totalCommits}</h3>
+                    <p>Commits</p>
+                  </div>
+                  <div className="stat-card">
+                    <h3>{stats.totalBranches}</h3>
+                    <p>Branches</p>
+                  </div>
+                  <div className="stat-card">
+                    <h3>{stats.totalAssets}</h3>
+                    <p>Assets</p>
+                  </div>
+                  <div className="stat-card">
+                    <h3>{stats.storageUsed}</h3>
+                    <p>Storage</p>
+                  </div>
+                </div>
+
+                <div className="project-actions">
+                  <Button onClick={handleReleasePreflight}>
+                    <Shield /> Release Preflight Check
+                  </Button>
+                </div>
+
+                <div className="recent-activity">
+                  <h3>Recent Commits</h3>
+                  {commits.length > 0 ? (
+                    commits.map(commit => (
+                      <div key={commit.id} className="commit-item">
+                        <div className="commit-header">
+                          <span className="commit-sha">#{commit.id}</span>
+                          <span className="commit-author">{commit.author.username}</span>
+                          <span className="commit-date">{new Date(commit.createdAt).toLocaleString()}</span>
+                        </div>
+                        <p className="commit-message">{commit.message}</p>
+                        <div className="commit-stats">
+                          <span>{commit.stats.files} files changed</span>
+                          <span>{commit.stats.additions} additions</span>
+                          <span>{commit.stats.deletions} deletions</span>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p>No commits yet</p>
+                  )}
+                </div>
+              </div>
+            )}
+
+          {activeTab === 'assets' && (
+              <div className="project-assets-view">
+                <div className="assets-toolbar">
+                  <div className="assets-search">
+                    <Input
+                      placeholder="Search assets..."
+                      value={filters.q}
+                      onChange={(e) => handleFilterChange('q', e.target.value)}
+                    />
+                  </div>
+
+                  <div className="assets-actions">
+                    <Button variant="outline" size="sm" onClick={resetFilters}>
+                      Clear filters
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setView(view === 'grid' ? 'list' : 'grid')}
+                    >
+                      {view === 'grid' ? (
+                        <>
+                          <List size={16} />
+                          List view
+                        </>
+                      ) : (
+                        <>
+                          <Grid size={16} />
+                          Grid view
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="assets-filters">
+                  <FilterPanel
+                    filters={filters}
+                    genreOptions={Array.from(new Set((assets as any[]).flatMap((a: any) => a.genres || []))).sort()}
+                    keyOptions={Array.from(new Set(assets.filter(a => a.key).map(a => a.key))).sort()}
+                    licenseOptions={Array.from(new Set(assets.map(a => String(a.license)))).sort()}
+                    formatOptions={Array.from(new Set(assets.filter(a => a.format).map(a => a.format))).sort()}
+                    pluginOptions={Array.from(new Set(assets.flatMap(a => a.plugins))).sort()}
+                    onFilterChange={handleFilterChange}
+                    onResetFilters={resetFilters}
+                  />
+                </div>
+
+                <div className="assets-main">
+                  <AssetView
+                    view={view}
+                    catalog={assets.map(depToCatalog)}
+                    catalogLoading={false}
+                    catalogErr={null}
+                    playingId={playingId}
+                    onViewToggle={() => setView(view === 'grid' ? 'list' : 'grid')}
+                    onTogglePlay={togglePlay}
+                    onAssetDetail={(asset) => {
+                      window.location.href = `/market`;
+                    }}
+                  />
+
+                  {recommendations.length > 0 && (
+                    <div className="recommendations-aside">
+                      <h3>Recommended for your project</h3>
+                      <AssetCarousel
+                        assets={recommendations.map(recToCatalog)}
+                        onTogglePlay={togglePlay}
+                        onAssetDetail={(asset) => {
+                          window.location.href = `/market`;
+                        }}
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+          {activeTab === 'branches' && (
+              <div className="project-branches-view">
+                <div className="branches-toolbar">
+                  <Button onClick={() => {
+                    // TODO: Implement branch creation modal
+                    alert("Branch creation modal would go here");
+                  }}>
+                    <GitBranch size={16} /> New Branch
+                  </Button>
+                </div>
+
+                <div className="branches-list">
+                  {branches.length > 0 ? (
+                    branches.map(branch => (
+                      <div key={branch.name} className="branch-item">
+                        <div className="branch-header">
+                          <h4>
+                            {branch.name}
+                            {branch.isDefault && (
+                              <span className="branch-default">(default)</span>
+                            )}
+                          </h4>
+                          <div className="branch-meta">
+                            <span>{branch.commitCount} commits</span>
+                            <span>•</span>
+                            <span>{branch.headAuthor}</span>
+                            <span>•</span>
+                            <span>{branch.headDate ? new Date(branch.headDate).toLocaleString() : '—'}</span>
+                          </div>
+                        </div>
+                        <p className="branch-message">{branch.headMessage}</p>
+                      </div>
+                    ))
+                  ) : (
+                    <p>No branches found</p>
+                  )}
+                </div>
+              </div>
+            )}
+
+          {activeTab === 'commits' && (
+              <div className="project-commits-view">
+                <div className="commits-toolbar">
+                  <Button onClick={() => {
+                    // TODO: Implement commit creation
+                    alert("Commit creation would go here");
+                  }}>
+                    <Zap size={16} /> New Commit
+                  </Button>
+                </div>
+
+                <div className="commits-list">
+                  {commits.length > 0 ? (
+                    commits.map(commit => (
+                      <div key={commit.id} className="commit-item">
+                        <div className="commit-header">
+                          <span className="commit-sha">#{commit.id}</span>
+                          <span className="commit-author">{commit.author.username}</span>
+                          <span className="commit-date">{new Date(commit.createdAt).toLocaleString()}</span>
+                        </div>
+                        <p className="commit-message">{commit.message}</p>
+                        <div className="commit-stats">
+                          <span>{commit.stats.files} files changed</span>
+                          <span>{commit.stats.additions} +</span>
+                          <span>{commit.stats.deletions} -</span>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p>No commits found</p>
+                  )}
+                </div>
+              </div>
+            )}
         </div>
       </div>
-      {info.tracks && info.tracks.length > 0 && (
-        <div className="project-view-daw-tracks">
-          {info.tracks.map((track, i) => (
-            <div key={i} className="track-row">
-              <span className="track-kind">{track.kind}</span>
-              <span>{track.name}</span>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
+    </FullPageLayout>
   );
 }
