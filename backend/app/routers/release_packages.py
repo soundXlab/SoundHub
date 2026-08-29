@@ -88,7 +88,7 @@ def _package_out(package: ReleasePackage) -> ReleasePackageOut:
     package_out = ReleasePackageOut.model_validate(package_data)
     events = [{"event": e.event} for e in package.delivery_events]
     package_out.events = events
-    deliverables_list = [{"id": d.id, "type": d.type, "filename": d.filename, "size": d.size} for d in package.deliverables]
+    deliverables_list = [{"id": d.id, "type": d.type, "filename": d.filename, "size": d.size, "sha256": d.sha256} for d in package.deliverables]
     package_out.deliverables = deliverables_list
     return package_out
 
@@ -144,7 +144,7 @@ def list_packages(user: User = Depends(get_current_user), db: Session = Depends(
             events.append({"event": e.event})
         package_out.events = events
         # Populate deliverables
-        deliverables_list = [{"id": d.id, "type": d.type, "filename": d.filename, "size": d.size} for d in package.deliverables]
+        deliverables_list = [{"id": d.id, "type": d.type, "filename": d.filename, "size": d.size, "sha256": d.sha256} for d in package.deliverables]
         package_out.deliverables = deliverables_list
         result.append(package_out)
     return result
@@ -335,7 +335,7 @@ def lock_package(package_id: int, payload: dict = {}, user: User = Depends(get_c
         events.append({"event": e.event})
     package_out.events = events
     # Populate deliverables
-    deliverables_list = [{"id": d.id, "type": d.type, "filename": d.filename, "size": d.size} for d in package.deliverables]
+    deliverables_list = [{"id": d.id, "type": d.type, "filename": d.filename, "size": d.size, "sha256": d.sha256} for d in package.deliverables]
     package_out.deliverables = deliverables_list
     return package_out
 
@@ -504,7 +504,7 @@ def invoice_package(package_id: int, payload: dict, user: User = Depends(get_cur
         events.append({"event": e.event})
     package_out.events = events
     # Populate deliverables
-    deliverables_list = [{"id": d.id, "type": d.type, "filename": d.filename, "size": d.size} for d in package.deliverables]
+    deliverables_list = [{"id": d.id, "type": d.type, "filename": d.filename, "size": d.size, "sha256": d.sha256} for d in package.deliverables]
     package_out.deliverables = deliverables_list
     return package_out
 

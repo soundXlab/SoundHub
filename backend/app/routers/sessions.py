@@ -13,6 +13,7 @@ from ..config import MAX_UPLOAD_SIZE
 from ..database import get_db
 from ..models import (
     LedgerEvent,
+    ReferenceComparison,
     ReviewApproval,
     ReviewComment,
     ReviewRound,
@@ -542,6 +543,74 @@ def get_public_voice_comment(share_token: str, version_id: int, comment_id: int,
         raise HTTPException(status.HTTP_404_NOT_FOUND, "No voice audio")
     data = storage.read_blob(comment.voice_blob_sha)
     return Response(content=data, media_type=f"audio/{comment.voice_format or 'webm'}")
+
+
+# ---------- Public reference endpoints ----------
+
+@router.get("/public/{share_token}/references")
+def public_list_references(share_token: str, db: Session = Depends(get_db)):
+    """List references visible to guests (reviewers only)."""
+    from ..models import ReferenceTrack
+    session = get_public_session(db, share_token)
+    refs = db.scalars(
+        select(ReferenceTrack).where(
+            ReferenceTrack.session_id == session.id,
+            ReferenceTrack.visibility.in_(["reviewers", "public"]),
+        )
+    ).all()
+    from ..schemas import ReferenceTrackOut
+    return [ReferenceTrackOut.model_validate(r, from_attributes=True) for r in refs]
+
+
+@router.get("/public/{share_token}/references/{reference_id}/audio")
+def public_reference_audio(share_token: str, reference_id: int, db: Session = Depends(get_db)):
+    """Stream reference audio for guests (reviewers-visible only)."""
+    from ..models import ReferenceTrack
+    session = get_public_session(db, share_token)
+    ref = db.get(ReferenceTrack, reference_id)
+    if ref is None or ref.session_id != session.id:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Reference not found")
+    if ref.visibility not in ("reviewers", "public"):
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Reference not visible")
+    if not ref.blob_sha:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "No audio")
+    data = storage.read_blob(ref.blob_sha)
+    return Response(content=data, media_type=f"audio/{ref.audio_format or 'wav'}")
+
+
+@router.post("/public/{share_token}/references/compare", status_code=status.HTTP_201_CREATED)
+def public_compare_reference(share_token: str, payload: dict, db: Session = Depends(get_db)):
+    """Guest compares a version against a reference."""
+    from ..models import ReferenceTrack, ReferenceComparison, ReviewVersion
+    session = get_public_session(db, share_token)
+    version_id = payload.get("version_id")
+    reference_id = payload.get("reference_id")
+    start_ms = payload.get("start_ms", 0)
+    end_ms = payload.get("end_ms", 0)
+    version = db.get(ReviewVersion, version_id)
+    if version is None or version.session_id != session.id:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Version not found")
+    ref = db.get(ReferenceTrack, reference_id)
+    if ref is None or ref.session_id != session.id:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Reference not found")
+    if ref.source_type == "external_url":
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "Cannot compare external URL references")
+    comp = ReferenceComparison(
+        session_id=session.id, version_id=version_id, reference_id=reference_id,
+        start_ms=start_ms, end_ms=end_ms,
+        level_match="short_term_lufs", mix_gain_db=0.0, ref_gain_db=0.0,
+    )
+    db.add(comp)
+    db.commit()
+    db.refresh(comp)
+    return {
+        "id": comp.id, "version_id": version_id, "reference_id": reference_id,
+        "level_match": "short_term_lufs", "mix_gain_db": 0.0, "ref_gain_db": 0.0,
+        "reference_label": ref.title,
+        "mix_audio_url": f"/api/sessions/public/{share_token}/versions/{version_id}/audio",
+        "ref_audio_url": f"/api/sessions/public/{share_token}/references/{reference_id}/audio",
+        "start_ms": start_ms, "end_ms": end_ms,
+    }
 
 
 @router.post("/public/{share_token}/versions/{version_id}/approvals", response_model=ReviewApprovalOut, status_code=status.HTTP_201_CREATED)

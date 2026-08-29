@@ -777,6 +777,7 @@ class ReferenceTrackOut(ORMModel):
     sample_rate: int | None = None
     channels: int | None = None
     analysis_status: str
+    waveform: list[float] | None = None
 
 
 # ---------- Roles ----------
