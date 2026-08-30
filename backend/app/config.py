@@ -39,11 +39,19 @@ def _secret_key() -> str:
 
 SECRET_KEY = _secret_key()
 ALGORITHM = "HS256"
+
+# Access token: short-lived (60 minutes default)
 ACCESS_TOKEN_EXPIRE_MINUTES = int(
-    os.environ.get("SOUNDHUB_TOKEN_EXPIRE_MINUTES", "10080")
-)  # 7 days
+    os.environ.get("SOUNDHUB_TOKEN_EXPIRE_MINUTES", "60")
+)
+
+# Refresh token: long-lived (7 days default)
+REFRESH_TOKEN_EXPIRE_DAYS = int(
+    os.environ.get("SOUNDHUB_REFRESH_TOKEN_EXPIRE_DAYS", "7")
+)
 
 MAX_UPLOAD_SIZE = int(os.environ.get("SOUNDHUB_MAX_UPLOAD_SIZE", str(2 * 1024**3)))  # 2 GiB
+MAX_VOICE_NOTE_SIZE = int(os.environ.get("SOUNDHUB_MAX_VOICE_NOTE_SIZE", str(25 * 1024 * 1024)))  # 25 MiB
 
 # Stripe
 STRIPE_SECRET_KEY = os.environ.get("STRIPE_SECRET_KEY", "")
@@ -61,13 +69,17 @@ BASE_RPC_URL = os.environ.get("SOUNDHUB_BASE_RPC_URL", "")
 USDC_FALLBACK_PAYEE = os.environ.get("SOUNDHUB_USDC_FALLBACK_PAYEE", "")
 
 # CORS — comma-separated list of allowed browser origins.
-CORS_ORIGINS = [
-    o.strip()
-    for o in os.environ.get(
-        "SOUNDHUB_CORS_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173"
-    ).split(",")
-    if o.strip()
-]
+# WARNING: Never use '*' in production — it allows any site to make authenticated requests.
+_cors_raw = os.environ.get(
+    "SOUNDHUB_CORS_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173"
+)
+CORS_ORIGINS = [o.strip() for o in _cors_raw.split(",") if o.strip()]
+if IS_PRODUCTION and "*" in CORS_ORIGINS:
+    raise RuntimeError(
+        "CORS_ORIGINS='*' is not allowed in production! "
+        "Set SOUNDHUB_CORS_ORIGINS to your actual domain(s). "
+        "Example: SOUNDHUB_CORS_ORIGINS=https://soundhub.app,https://www.soundhub.app"
+    )
 
 # Email / Reminders
 FRONTEND_URL = os.environ.get("SOUNDHUB_FRONTEND_URL", "http://localhost:5173")

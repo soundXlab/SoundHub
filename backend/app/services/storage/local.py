@@ -144,11 +144,23 @@ def blob_exists(sha: str) -> bool:
 
 
 def put_upload_file(upload: UploadFile, max_size: int) -> bytes:
-    """Read an UploadFile into memory, enforcing a size limit."""
-    data = upload.file.read()
-    if len(data) > max_size:
-        raise ValueError(f"File exceeds maximum size of {max_size} bytes")
-    return data
+    """Read an UploadFile into memory with chunked reading to avoid OOM on large files.
+    
+    Reads in 1 MiB chunks and checks total size against max_size.
+    Returns the complete file bytes once validated.
+    """
+    CHUNK_SIZE = 1024 * 1024  # 1 MiB
+    chunks: list[bytes] = []
+    total_size = 0
+    while True:
+        chunk = upload.file.read(CHUNK_SIZE)
+        if not chunk:
+            break
+        total_size += len(chunk)
+        if total_size > max_size:
+            raise ValueError(f"File exceeds maximum size of {max_size} bytes")
+        chunks.append(chunk)
+    return b"".join(chunks)
 
 
 def blob_size(sha: str) -> int:

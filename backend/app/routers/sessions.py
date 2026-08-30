@@ -496,12 +496,18 @@ def guest_voice_comment(
     db: Session = Depends(get_db),
 ):
     """Guest adds a voice note via the share link."""
+    from ..config import MAX_VOICE_NOTE_SIZE
     session = get_public_session(db, share_token)
     _require_share_permission(session, "comment", author_name, password)
     if not session.rounds_open:
         raise HTTPException(status.HTTP_403_FORBIDDEN, "This revision round is closed")
     version = get_version_or_404(db, session.id, version_id)
+    # Check file size before reading into memory
+    if voice.size and voice.size > MAX_VOICE_NOTE_SIZE:
+        raise HTTPException(status.HTTP_413_REQUEST_ENTITY_TOO_LARGE, f"Voice note too large (max {MAX_VOICE_NOTE_SIZE // 1024 // 1024} MiB)")
     voice_data = voice.file.read()
+    if len(voice_data) > MAX_VOICE_NOTE_SIZE:
+        raise HTTPException(status.HTTP_413_REQUEST_ENTITY_TOO_LARGE, f"Voice note too large (max {MAX_VOICE_NOTE_SIZE // 1024 // 1024} MiB)")
     ext = (voice.filename or "note.webm").rsplit(".", 1)[-1].lower() if voice.filename else "webm"
     sha = storage.put_blob(voice_data)
     comment = ReviewComment(
@@ -1285,9 +1291,15 @@ def add_voice_comment(
     db: Session = Depends(get_db),
 ):
     """Owner adds a voice note comment."""
+    from ..config import MAX_VOICE_NOTE_SIZE
     get_session_or_404(db, user, session_id)
     version = get_version_or_404(db, session_id, version_id)
+    # Check file size before reading into memory
+    if voice.size and voice.size > MAX_VOICE_NOTE_SIZE:
+        raise HTTPException(status.HTTP_413_REQUEST_ENTITY_TOO_LARGE, f"Voice note too large (max {MAX_VOICE_NOTE_SIZE // 1024 // 1024} MiB)")
     voice_data = voice.file.read()
+    if len(voice_data) > MAX_VOICE_NOTE_SIZE:
+        raise HTTPException(status.HTTP_413_REQUEST_ENTITY_TOO_LARGE, f"Voice note too large (max {MAX_VOICE_NOTE_SIZE // 1024 // 1024} MiB)")
     ext = (voice.filename or "note.webm").rsplit(".", 1)[-1].lower() if voice.filename else "webm"
     sha = storage.put_blob(voice_data)
     comment = ReviewComment(

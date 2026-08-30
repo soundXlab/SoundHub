@@ -9,3 +9,4 @@ in its log-only transport during tests.
 import os
 
 os.environ.setdefault("SMTP_HOST", "")
+os.environ.setdefault("SOUNDHUB_ENV", "test")

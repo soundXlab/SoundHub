@@ -7,8 +7,9 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 
-from .config import CORS_ORIGINS
+from .config import CORS_ORIGINS, IS_PRODUCTION
 from .database import get_db, init_db
+from .middleware_rate_limit import RateLimitMiddleware
 from .routers import (
     activity,
     ai_mix,
@@ -89,6 +90,15 @@ app.add_middleware(
     allow_methods=["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["Authorization", "Content-Type"],
 )
+
+# Rate limiting middleware — 60 req/min per IP in production, 200 in dev
+# Disabled in test mode (SOUNDHUB_ENV=test)
+import os as _os_runtime
+if _os_runtime.environ.get("SOUNDHUB_ENV", "").lower() not in ("test", "testing"):
+    if IS_PRODUCTION:
+        app.add_middleware(RateLimitMiddleware, max_requests=60, window_seconds=60)
+    else:
+        app.add_middleware(RateLimitMiddleware, max_requests=200, window_seconds=60)
 
 # API routes
 app.include_router(auth.router)
