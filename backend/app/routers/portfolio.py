@@ -1,4 +1,6 @@
 """Public portfolio and engineer profiles."""
+import logging
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import Response
 from sqlalchemy import select
@@ -9,6 +11,8 @@ from ..models import ReleasePackage, ReviewSession, User, ReviewVersion
 from ..schemas import UserOut
 from ..security import get_current_user
 from ..services import catalog, reputation, storage, watermark
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/portfolio", tags=["portfolio"])
 
@@ -79,7 +83,8 @@ def get_portfolio(username: str, db: Session = Depends(get_db)):
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.exception("Error in get_portfolio for user %s", username)
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 
 @router.get("/{username}/preview/{version_id}")

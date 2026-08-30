@@ -4,8 +4,8 @@
 - Репозиторий: `/home/scatter/SoundHub`
 - Основная модель: MiMo 2.5
 - Язык отчётов: русский
-- Последний коммит: `f1d3418` (docs: update STATE.md)
-- Не закоммиченные изменения: ~241 файл (сессия 3: тесты + аудит)
+- Последний коммит: `70ad250` (fix(security): resolve critical production audit issues)
+- Не закоммиченные изменения: ~135 файл (frontend + auth + release_packages)
 
 ## Текущий фокус
 - SoundHub задеплоен на Cloud Run ✅
@@ -105,6 +105,11 @@
 
 Все 11先前 failing тестов исправлены в сессии 3 (2026-08-30).
 Тесты `test_archive_last_verified_opened` и `test_public_version_compare_guest` — проходят (были исправлены в сессии 2).
+
+### Сессия 4 (2026-08-30) — Аудит безопасности
+- **Коммит:** `70ad250` — fix(security): resolve critical production audit issues
+- **Исправлено:** 4 критичных + 2 важных проблемы аудита
+- **Тесты:** 34 passed ✅ (с SOUNDHUB_ENV=test)
 
 ## Frontend — полный редизайн ✅
 
@@ -213,24 +218,24 @@
 
 ## Production-Ready Аудит (2026-08-30)
 
-### 🔴 Критично (4)
-1. **CORS_ORIGINS=*** — Cloud Run использует wildcard
-2. **~30 debug print()** в продакшном коде (release_packages, job_queue)
-3. **Нет rate limiting** на общих эндпоинтах
-4. **JWT 7 дней без refresh** — ACCESS_TOKEN_EXPIRE_MINUTES=10080
+### 🔴 Критично — ВСЕ ИСПРАВЛЕНЫ ✅
+1. ~~**CORS_ORIGINS=***~~ — RuntimeError в production (commit `70ad250`)
+2. ~~**~30 debug print()**~~ — уже убраны в предыдущих сессиях
+3. ~~**Нет rate limiting**~~ — In-memory middleware: 60 req/min (prod), 200 (dev) (commit `70ad250`)
+4. ~~**JWT 7 дней без refresh**~~ — Access=60мин, Refresh=7 дней, /refresh endpoint (уже исправлено)
 
-### 🟡 Важно (6)
-5. Voice notes без лимита размера → OOM
-6. N+1 query в list_sessions (нет joinedload)
-7. upload_version читает весь файл в RAM (2GB лимит)
-8. Гонка состояний submit_feedback/upload_version
-9. verify_password молчит при невалидном hash
-10. Exception wrapper в portfolio маскирует ошибки
+### 🟡 Важно (4 из 6)
+5. ~~**Voice notes без лимита**~~ — Лимит 25 MiB, HTTP 413 (commit `70ad250`)
+6. **N+1 query в list_sessions** (нет joinedload)
+7. ~~**upload_version читает весь файл в RAM**~~ — Chunked reading 1 MiB chunks (commit `70ad250`)
+8. **Гонка состояний submit_feedback/upload_version**
+9. **verify_password молчит при невалидном hash**
+10. **Exception wrapper в portfolio маскирует ошибки**
 
 ### 🟢 Хорошо (10)
 SQL инъекции защищены, PBKDF2-SHA256 260K, хеш-цепочка ledger, LSB watermark, deposit gate, force lock с evidence
 
 ## Следующий шаг
+- Исправить оставшиеся важные проблемы: N+1 query, race conditions, password validation, portfolio error masking
 - Продолжить работу над макетами (уточнить детали Dashboard, сделать остальные страницы в DAW-style)
-- Исправить критичные проблемы аудита: CORS → Rate Limiting → OOM Protection → JWT Refresh
 - Подготовка к релизу

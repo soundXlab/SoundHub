@@ -791,10 +791,42 @@ def guest_approve(share_token: str, version_id: int, payload: ReviewApprovalCrea
 
 @router.get("", response_model=list[ReviewSessionOut])
 def list_sessions(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    # Optimized: single query with version counts instead of N+1
+    from sqlalchemy import func, case
+    
+    # Subquery for version counts and latest status per session
+    version_stats = db.scalars(
+        select(
+            ReviewVersion.session_id,
+            func.count(ReviewVersion.id).label('version_count'),
+            func.max(ReviewVersion.status).label('latest_status'),
+        )
+        .group_by(ReviewVersion.session_id)
+    ).all()
+    
+    # Create lookup dict
+    stats_map = {s.session_id: {'count': s.version_count, 'status': s.latest_status} for s in version_stats}
+    
     sessions = db.scalars(
         select(ReviewSession).where(ReviewSession.owner_id == user.id).order_by(ReviewSession.updated_at.desc())
     ).all()
-    return [_session_out(db, s) for s in sessions]
+    
+    result = []
+    for s in sessions:
+        stats = stats_map.get(s.id, {'count': 0, 'status': ''})
+        result.append(ReviewSessionOut(
+            id=s.id,
+            project_id=s.project_id,
+            name=s.name,
+            status=s.status,
+            share_token=s.share_token,
+            created_at=s.created_at,
+            updated_at=s.updated_at,
+            owner_username=s.owner.username if s.owner else "",
+            version_count=stats['count'],
+            latest_status=stats['status'],
+        ))
+    return result
 
 
 @router.post("", response_model=ReviewSessionOut, status_code=status.HTTP_201_CREATED)
@@ -878,7 +910,12 @@ def update_brief(session_id: int, payload: ReviewBriefUpdate, user: User = Depen
 
 @router.post("/{session_id}/versions", response_model=ReviewVersionOut, status_code=status.HTTP_201_CREATED)
 def upload_version(session_id: int, message: str = Form(""), file: UploadFile = File(...), background: BackgroundTasks = BackgroundTasks(), user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    session = get_session_or_404(db, user, session_id)
+    # Lock session row to prevent race condition with submit_feedback
+    session = db.scalars(
+        select(ReviewSession).where(ReviewSession.id == session_id).with_for_update()
+    ).first()
+    if session is None or session.owner_id != user.id:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Session not found")
     filename = PurePosixPath((file.filename or "audio.wav").replace("\\", "/")).name
     ext = filename.rsplit(".", 1)[-1].lower() if "." in filename else ""
     if ext not in ALLOWED_AUDIO:
@@ -1681,7 +1718,9 @@ def submit_feedback(
     - No round is auto-created: the owner must start the round first.
     - Calling submit-feedback on an already-closed round returns 409.
     """
+    # Lock session row to prevent race condition with upload_version
     session = get_public_session(db, share_token)
+    db.execute(select(ReviewSession).where(ReviewSession.id == session.id).with_for_update())
     _require_share_permission(session, "comment", actor, password)
 
     # If a feedback_owner is set, only they can submit feedback
