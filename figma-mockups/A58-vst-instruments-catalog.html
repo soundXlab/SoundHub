@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <title>SoundHub — VST Instruments</title>
+  <link rel="stylesheet" href="design-system/shared.css">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Inter',-apple-system,sans-serif; background:var(--bg-primary); color:var(--text-primary); overflow:hidden; height:100vh; }
+
+    /* ── Transport Bar ── */
+    .transport-bar { height:40px; background:var(--bg-panel); border-bottom:1px solid var(--border-default); display:flex; align-items:center; padding:0 12px; gap:16px; font-size:11px; user-select:none; }
+    .transport-logo { font-weight:800; font-size:13px; color:var(--brand-accent); letter-spacing:-0.5px; }
+    .transport-logo span { color:var(--text-primary); }
+    .transport-divider { width:1px; height:20px; background:var(--border-default); }
+    .transport-group { display:flex; align-items:center; gap:6px; }
+    .transport-label { color:var(--text-muted); font-size:10px; text-transform:uppercase; letter-spacing:0.5px; }
+    .transport-value { background:var(--bg-primary); border:1px solid var(--border-default); border-radius:4px; padding:2px 8px; font-family:var(--font-mono); font-size:12px; font-weight:600; min-width:50px; text-align:center; }
+    .transport-spacer { flex:1; }
+
+    /* ── Layout ── */
+    .app-body { display:flex; height:calc(100vh - 40px); }
+    .sidebar { width:var(--sidebar-width); background:var(--bg-panel); border-right:1px solid var(--border-default); display:flex; flex-direction:column; }
+    .sidebar-search { padding:8px; border-bottom:1px solid var(--border-default); }
+    .sidebar-search input { width:100%; background:var(--bg-input); border:1px solid var(--border-default); border-radius:var(--radius-sm); padding:6px 8px 6px 28px; font-size:11px; color:var(--text-primary); outline:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2352525b' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:8px center; }
+    .sidebar-nav { flex:1; overflow-y:auto; padding:4px 0; }
+    .sidebar-section { padding:8px 12px 4px; font-size:9px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; font-weight:700; }
+    .sidebar-item { padding:6px 12px; font-size:11px; font-weight:500; color:var(--text-secondary); cursor:pointer; display:flex; align-items:center; gap:8px; border-left:2px solid transparent; transition:all 0.1s; }
+    .sidebar-item:hover { color:var(--text-primary); }
+    .sidebar-item.active { color:var(--brand-accent); background:rgba(234,88,8,0.08); border-left-color:var(--brand-accent); }
+    .sidebar-item .icon { width:16px; text-align:center; }
+    .sidebar-badge { margin-left:auto; background:var(--brand-accent); color:#fff; font-size:9px; padding:1px 5px; border-radius:8px; font-weight:700; }
+
+    /* ── Content ── */
+    .content { flex:1; display:flex; flex-direction:column; min-width:0; overflow:hidden; }
+    .page-header { padding:16px 24px; border-bottom:1px solid var(--border-default); display:flex; align-items:center; justify-content:space-between; }
+    .page-title { font-size:18px; font-weight:700; }
+    .page-scroll { flex:1; overflow-y:auto; padding:20px 24px; }
+
+    /* ── Filter Bar ── */
+    .filter-bar { display:flex; gap:8px; align-items:center; padding:10px 14px; background:var(--bg-surface); border:1px solid var(--border-default); border-radius:var(--radius-md); margin-bottom:16px; flex-wrap:wrap; }
+    .filter-chip { padding:5px 10px; border-radius:4px; font-size:10px; font-weight:600; cursor:pointer; border:1px solid var(--border-default); background:transparent; color:var(--text-muted); transition:all 0.1s; white-space:nowrap; }
+    .filter-chip:hover { color:var(--text-primary); border-color:var(--border-hover); }
+    .filter-chip.active { background:var(--brand-accent); color:#fff; border-color:var(--brand-accent); }
+    .filter-search { flex:1; min-width:180px; background:var(--bg-input); border:1px solid var(--border-default); border-radius:var(--radius-sm); padding:5px 10px 5px 28px; font-size:11px; color:var(--text-primary); outline:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2352525b' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:8px center; }
+    .filter-search::placeholder { color:var(--text-muted); }
+    .filter-divider { width:1px; height:20px; background:var(--border-default); }
+
+    /* ── Category Tabs ── */
+    .category-tabs { display:flex; gap:4px; margin-bottom:16px; }
+    .cat-tab { padding:7px 14px; border-radius:var(--radius-sm); font-size:11px; font-weight:600; cursor:pointer; border:1px solid var(--border-default); background:transparent; color:var(--text-muted); transition:all 0.15s; display:flex; align-items:center; gap:6px; }
+    .cat-tab:hover { color:var(--text-primary); border-color:var(--border-hover); }
+    .cat-tab.active { background:rgba(234,88,8,0.1); color:var(--brand-accent); border-color:var(--brand-accent); }
+    .cat-count { font-size:9px; padding:1px 5px; border-radius:8px; background:var(--bg-elevated); color:var(--text-muted); font-family:var(--font-mono); }
+
+    /* ── VST Grid ── */
+    .vst-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:14px; }
+    .vst-card {
+      background:var(--bg-surface); border:1px solid var(--border-default); border-radius:var(--radius-md);
+      overflow:hidden; cursor:pointer; transition:all 0.2s; position:relative;
+    }
+    .vst-card:hover { border-color:var(--border-hover); transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,0.3); }
+    .vst-card-visual {
+      height:120px; position:relative; overflow:hidden;
+      display:flex; align-items:center; justify-content:center;
+    }
+    .vst-card-visual .vst-icon { font-size:48px; opacity:0.9; z-index:1; position:relative; }
+    .vst-card-visual .vst-bg { position:absolute; inset:0; opacity:0.15; }
+    .vst-card-wave {
+      position:absolute; bottom:0; left:0; right:0; height:32px;
+      display:flex; align-items:flex-end; gap:1px; padding:0 12px 8px;
+    }
+    .vst-wave-bar { flex:1; border-radius:1px; opacity:0.5; }
+    .vst-card:hover .vst-wave-bar { opacity:0.8; }
+    .vst-card-badge {
+      position:absolute; top:8px; right:8px; padding:2px 7px;
+      border-radius:4px; font-size:9px; font-weight:600; z-index:2;
+    }
+    .vst-card-body { padding:14px; }
+    .vst-card-name { font-size:13px; font-weight:700; color:var(--text-primary); margin-bottom:2px; }
+    .vst-card-maker { font-size:10px; color:var(--text-muted); margin-bottom:8px; }
+    .vst-card-desc { font-size:11px; color:var(--text-secondary); line-height:1.4; margin-bottom:10px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+    .vst-card-tags { display:flex; gap:4px; flex-wrap:wrap; margin-bottom:10px; }
+    .vst-tag { padding:2px 6px; background:var(--bg-elevated); border-radius:3px; font-size:9px; color:var(--text-muted); }
+    .vst-card-footer { display:flex; align-items:center; justify-content:space-between; padding-top:10px; border-top:1px solid rgba(39,39,42,0.5); }
+    .vst-price { font-size:14px; font-weight:700; font-family:var(--font-mono); }
+    .vst-price.free { color:var(--color-success); }
+    .vst-card-meta { display:flex; gap:10px; font-size:10px; color:var(--text-muted); }
+    .vst-card-meta span { display:flex; align-items:center; gap:3px; }
+
+    /* ── Sort ── */
+    .sort-bar { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+    .sort-bar-left { font-size:12px; color:var(--text-muted); }
+    .sort-bar-right { display:flex; gap:4px; }
+    .sort-btn { padding:4px 8px; border-radius:4px; font-size:10px; color:var(--text-muted); cursor:pointer; border:1px solid transparent; transition:all 0.1s; }
+    .sort-btn:hover { color:var(--text-primary); }
+    .sort-btn.active { color:var(--text-primary); border-color:var(--border-default); background:var(--bg-surface); }
+
+    /* ── Device Chain ── */
+    .device-chain { height:56px; background:var(--bg-panel); border-top:1px solid var(--border-default); display:flex; align-items:center; padding:0 16px; gap:8px; }
+    .device { padding:5px 10px; background:var(--bg-primary); border:1px solid var(--border-default); border-radius:4px; font-size:10px; color:var(--text-secondary); display:flex; align-items:center; gap:6px; cursor:pointer; transition:all 0.1s; }
+    .device:hover { border-color:var(--border-hover); color:var(--text-primary); }
+    .device.active { border-color:var(--brand-accent); color:var(--brand-accent); background:rgba(234,88,8,0.05); }
+    .device .led { width:6px; height:6px; border-radius:50%; background:var(--border-default); }
+    .device.active .led { background:var(--color-success); box-shadow:0 0 6px rgba(34,197,94,0.5); }
+    .device-chain-spacer { flex:1; }
+    .device-chain-label { font-size:9px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; font-weight:700; }
+  </style>
+</head>
+<body>
+  <!-- Transport Bar -->
+  <div class="transport-bar">
+    <div class="transport-logo">Sound<span>Hub</span></div>
+    <div class="transport-divider"></div>
+    <div class="transport-group"><span class="transport-label">Instruments</span><div class="transport-value" style="color:var(--brand-accent)">48</div></div>
+    <div class="transport-group"><span class="transport-label">Presets</span><div class="transport-value">1,247</div></div>
+    <div class="transport-group"><span class="transport-label">Free</span><div class="transport-value" style="color:var(--color-success)">12</div></div>
+    <div class="transport-spacer"></div>
+    <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted)">VST INSTRUMENTS</div>
+  </div>
+
+  <div class="app-body">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-search"><input type="text" placeholder="Search instruments..."></div>
+      <div class="sidebar-nav">
+        <div class="sidebar-section">Main</div>
+        <div class="sidebar-item"><span class="icon">📊</span> Dashboard</div>
+        <div class="sidebar-item"><span class="icon">📁</span> Projects</div>
+        <div class="sidebar-item"><span class="icon">🛒</span> Marketplace</div>
+        <div class="sidebar-item"><span class="icon">⬆️</span> Upload</div>
+        <div class="sidebar-section">Instruments</div>
+        <div class="sidebar-item active"><span class="icon">🎹</span> VST Instruments <span class="sidebar-badge">48</span></div>
+        <div class="sidebar-item"><span class="icon">🎛️</span> Effects</div>
+        <div class="sidebar-item"><span class="icon">📦</span> Sample Packs</div>
+        <div class="sidebar-item"><span class="icon">🎚️</span> Presets</div>
+        <div class="sidebar-section">Workspace</div>
+        <div class="sidebar-item"><span class="icon">💬</span> Reviews</div>
+        <div class="sidebar-item"><span class="icon">📋</span> Sessions</div>
+        <div class="sidebar-section">Account</div>
+        <div class="sidebar-item"><span class="icon">⚙️</span> Settings</div>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+      <div class="page-header">
+        <div class="page-title">VST Instruments</div>
+        <div style="display:flex;gap:8px">
+          <button style="padding:6px 14px;background:var(--bg-surface);color:var(--text-primary);border:1px solid var(--border-default);border-radius:var(--radius-sm);font-size:11px;font-weight:600;cursor:pointer">📥 My Library</button>
+          <button style="padding:6px 14px;background:var(--brand-accent);color:#fff;border:none;border-radius:var(--radius-sm);font-size:11px;font-weight:600;cursor:pointer">+ Publish Instrument</button>
+        </div>
+      </div>
+      <div class="page-scroll">
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+          <input class="filter-search" type="text" placeholder="Search 48 instruments...">
+          <div class="filter-divider"></div>
+          <div class="filter-chip active">All</div>
+          <div class="filter-chip">Synth</div>
+          <div class="filter-chip">Sampler</div>
+          <div class="filter-chip">Drum Machine</div>
+          <div class="filter-chip">Organ</div>
+          <div class="filter-chip">Piano</div>
+          <div class="filter-chip">Bass</div>
+          <div style="flex:1"></div>
+          <div class="filter-chip" style="border-style:dashed">+ Tag</div>
+        </div>
+
+        <!-- Category Tabs -->
+        <div class="category-tabs">
+          <div class="cat-tab active">🎛️ All Instruments <span class="cat-count">48</span></div>
+          <div class="cat-tab">🌊 Wavetable <span class="cat-count">14</span></div>
+          <div class="cat-tab">🎹 Keys <span class="cat-count">8</span></div>
+          <div class="cat-tab">🥁 Drums <span class="cat-count">10</span></div>
+          <div class="cat-tab">🎸 Bass <span class="cat-count">6</span></div>
+          <div class="cat-tab">☁️ Pads & Atmos <span class="cat-count">10</span></div>
+        </div>
+
+        <!-- Sort Bar -->
+        <div class="sort-bar">
+          <div class="sort-bar-left">Showing 48 instruments</div>
+          <div class="sort-bar-right">
+            <div class="sort-btn active">Popular</div>
+            <div class="sort-btn">Newest</div>
+            <div class="sort-btn">Price ↑</div>
+            <div class="sort-btn">Rating</div>
+          </div>
+        </div>
+
+        <!-- VST Grid -->
+        <div class="vst-grid">
+          <!-- Serum -->
+          <div class="vst-card">
+            <div class="vst-card-visual" style="background:linear-gradient(135deg,rgba(234,88,8,0.15),rgba(234,179,8,0.1))">
+              <div class="vst-bg" style="background:linear-gradient(135deg,#ea5808,#eab308)"></div>
+              <div class="vst-icon">🌊</div>
+              <div class="vst-card-badge" style="background:rgba(234,88,8,0.2);color:#ea5808">WAVETABLE</div>
+              <div class="vst-card-wave">
+                <div class="vst-wave-bar" style="height:40%;background:#ea5808"></div>
+                <div class="vst-wave-bar" style="height:70%;background:#ea5808"></div>
+                <div class="vst-wave-bar" style="height:55%;background:#ea5808"></div>
+                <div class="vst-wave-bar" style="height:85%;background:#ea5808"></div>
+                <div class="vst-wave-bar" style="height:60%;background:#ea5808"></div>
+                <div class="vst-wave-bar" style="height:45%;background:#ea5808"></div>
+                <div class="vst-wave-bar" style="height:75%;background:#ea5808"></div>
+                <div class="vst-wave-bar" style="height:90%;background:#ea5808"></div>
+                <div class="vst-wave-bar" style="height:50%;background:#ea5808"></div>
+                <div class="vst-wave-bar" style="height:65%;background:#ea5808"></div>
+              </div>
+            </div>
+            <div class="vst-card-body">
+              <div class="vst-card-name">Serum</div>
+              <div class="vst-card-maker">by Xfer Records</div>
+              <div class="vst-card-desc">Advanced wavetable synthesizer with custom wavetable creation, extensive modulation, and built-in effects.</div>
+              <div class="vst-card-tags">
+                <span class="vst-tag">wavetable</span>
+                <span class="vst-tag">synth</span>
+                <span class="vst-tag">modulation</span>
+                <span class="vst-tag">effects</span>
+              </div>
+              <div class="vst-card-footer">
+                <div class="vst-price">$189</div>
+                <div class="vst-card-meta"><span>★ 4.9</span><span>342 presets</span><span>VST3/AU</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Vital -->
+          <div class="vst-card">
+            <div class="vst-card-visual" style="background:linear-gradient(135deg,rgba(139,92,246,0.15),rgba(6,182,212,0.1))">
+              <div class="vst-bg" style="background:linear-gradient(135deg,#8b5cf6,#06b6d4)"></div>
+              <div class="vst-icon">🔮</div>
+              <div class="vst-card-badge" style="background:rgba(34,197,94,0.15);color:var(--color-success)">FREE</div>
+              <div class="vst-card-wave">
+                <div class="vst-wave-bar" style="height:30%;background:#8b5cf6"></div>
+                <div class="vst-wave-bar" style="height:55%;background:#8b5cf6"></div>
+                <div class="vst-wave-bar" style="height:45%;background:#8b5cf6"></div>
+                <div class="vst-wave-bar" style="height:70%;background:#8b5cf6"></div>
+                <div class="vst-wave-bar" style="height:50%;background:#8b5cf6"></div>
+                <div class="vst-wave-bar" style="height:40%;background:#8b5cf6"></div>
+                <div class="vst-wave-bar" style="height:60%;background:#8b5cf6"></div>
+                <div class="vst-wave-bar" style="height:75%;background:#8b5cf6"></div>
+                <div class="vst-wave-bar" style="height:55%;background:#8b5cf6"></div>
+                <div class="vst-wave-bar" style="height:65%;background:#8b5cf6"></div>
+              </div>
+            </div>
+            <div class="vst-card-body">
+              <div class="vst-card-name">Vital</div>
+              <div class="vst-card-maker">by Matt Tytel</div>
+              <div class="vst-card-desc">Spectral wavetable synthesizer with a modern UI, unlimited wavetable generation, and cross-platform support.</div>
+              <div class="vst-card-tags">
+                <span class="vst-tag">wavetable</span>
+                <span class="vst-tag">free</span>
+                <span class="vst-tag">cross-platform</span>
+              </div>
+              <div class="vst-card-footer">
+                <div class="vst-price free">Free</div>
+                <div class="vst-card-meta"><span>★ 4.8</span><span>128 presets</span><span>VST3/AU</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Massive X -->
+          <div class="vst-card">
+            <div class="vst-card-visual" style="background:linear-gradient(135deg,rgba(59,130,246,0.15),rgba(139,92,246,0.1))">
+              <div class="vst-bg" style="background:linear-gradient(135deg,#3b82f6,#8b5cf6)"></div>
+              <div class="vst-icon">⚡</div>
+              <div class="vst-card-badge" style="background:rgba(59,130,246,0.15);color:var(--color-info)">WAVETABLE</div>
+              <div class="vst-card-wave">
+                <div class="vst-wave-bar" style="height:50%;background:#3b82f6"></div>
+                <div class="vst-wave-bar" style="height:75%;background:#3b82f6"></div>
+                <div class="vst-wave-bar" style="height:60%;background:#3b82f6"></div>
+                <div class="vst-wave-bar" style="height:85%;background:#3b82f6"></div>
+                <div class="vst-wave-bar" style="height:70%;background:#3b82f6"></div>
+                <div class="vst-wave-bar" style="height:55%;background:#3b82f6"></div>
+                <div class="vst-wave-bar" style="height:80%;background:#3b82f6"></div>
+                <div class="vst-wave-bar" style="height:90%;background:#3b82f6"></div>
+                <div class="vst-wave-bar" style="height:65%;background:#3b82f6"></div>
+                <div class="vst-wave-bar" style="height:75%;background:#3b82f6"></div>
+              </div>
+            </div>
+            <div class="vst-card-body">
+              <div class="vst-card-name">Massive X</div>
+              <div class="vst-card-maker">by Native Instruments</div>
+              <div class="vst-card-desc">Next-generation wavetable synth with innovative oscillator and routing system for complex sound design.</div>
+              <div class="vst-card-tags">
+                <span class="vst-tag">wavetable</span>
+                <span class="vst-tag">synth</span>
+                <span class="vst-tag">sound-design</span>
+              </div>
+              <div class="vst-card-footer">
+                <div class="vst-price">$149</div>
+                <div class="vst-card-meta"><span>★ 4.7</span><span>256 presets</span><span>VST3/AU</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Diva -->
+          <div class="vst-card">
+            <div class="vst-card-visual" style="background:linear-gradient(135deg,rgba(234,179,8,0.15),rgba(239,68,68,0.1))">
+              <div class="vst-bg" style="background:linear-gradient(135deg,#eab308,#ef4444)"></div>
+              <div class="vst-icon">🎹</div>
+              <div class="vst-card-badge" style="background:rgba(234,179,8,0.15);color:var(--color-warning)">ANALOG</div>
+              <div class="vst-card-wave">
+                <div class="vst-wave-bar" style="height:45%;background:#eab308"></div>
+                <div class="vst-wave-bar" style="height:65%;background:#eab308"></div>
+                <div class="vst-wave-bar" style="height:55%;background:#eab308"></div>
+                <div class="vst-wave-bar" style="height:80%;background:#eab308"></div>
+                <div class="vst-wave-bar" style="height:60%;background:#eab308"></div>
+                <div class="vst-wave-bar" style="height:50%;background:#eab308"></div>
+                <div class="vst-wave-bar" style="height:70%;background:#eab308"></div>
+                <div class="vst-wave-bar" style="height:85%;background:#eab308"></div>
+                <div class="vst-wave-bar" style="height:55%;background:#eab308"></div>
+                <div class="vst-wave-bar" style="height:75%;background:#eab308"></div>
+              </div>
+            </div>
+            <div class="vst-card-body">
+              <div class="vst-card-name">Diva</div>
+              <div class="vst-card-maker">by u-he</div>
+              <div class="vst-card-desc">Virtual analog synthesizer that captures the soul of vintage hardware with Component Modeling technology.</div>
+              <div class="vst-card-tags">
+                <span class="vst-tag">analog</span>
+                <span class="vst-tag">vintage</span>
+                <span class="vst-tag">warm</span>
+              </div>
+              <div class="vst-card-footer">
+                <div class="vst-price">$179</div>
+                <div class="vst-card-meta"><span>★ 4.8</span><span>180 presets</span><span>VST3/AU</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pigments -->
+          <div class="vst-card">
+            <div class="vst-card-visual" style="background:linear-gradient(135deg,rgba(16,185,129,0.15),rgba(6,182,212,0.1))">
+              <div class="vst-bg" style="background:linear-gradient(135deg,#10b981,#06b6d4)"></div>
+              <div class="vst-icon">🎨</div>
+              <div class="vst-card-badge" style="background:rgba(16,185,129,0.15);color:#10b981">POLY</div>
+              <div class="vst-card-wave">
+                <div class="vst-wave-bar" style="height:35%;background:#10b981"></div>
+                <div class="vst-wave-bar" style="height:60%;background:#10b981"></div>
+                <div class="vst-wave-bar" style="height:50%;background:#10b981"></div>
+                <div class="vst-wave-bar" style="height:75%;background:#10b981"></div>
+                <div class="vst-wave-bar" style="height:55%;background:#10b981"></div>
+                <div class="vst-wave-bar" style="height:45%;background:#10b981"></div>
+                <div class="vst-wave-bar" style="height:65%;background:#10b981"></div>
+                <div class="vst-wave-bar" style="height:80%;background:#10b981"></div>
+                <div class="vst-wave-bar" style="height:50%;background:#10b981"></div>
+                <div class="vst-wave-bar" style="height:70%;background:#10b981"></div>
+              </div>
+            </div>
+            <div class="vst-card-body">
+              <div class="vst-card-name">Pigments 5</div>
+              <div class="vst-card-maker">by Arturia</div>
+              <div class="vst-card-desc">Multi-engine synthesizer combining wavetable, virtual analog, granular, and harmonic synthesis in one UI.</div>
+              <div class="vst-card-tags">
+                <span class="vst-tag">multi-engine</span>
+                <span class="vst-tag">granular</span>
+                <span class="vst-tag">wavetable</span>
+              </div>
+              <div class="vst-card-footer">
+                <div class="vst-price">$199</div>
+                <div class="vst-card-meta"><span>★ 4.7</span><span>1,100 presets</span><span>VST3/AU</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Omnisphere -->
+          <div class="vst-card">
+            <div class="vst-card-visual" style="background:linear-gradient(135deg,rgba(236,72,153,0.15),rgba(139,92,246,0.1))">
+              <div class="vst-bg" style="background:linear-gradient(135deg,#ec4899,#8b5cf6)"></div>
+              <div class="vst-icon">🌌</div>
+              <div class="vst-card-badge" style="background:rgba(236,72,153,0.15);color:#ec4899">FLAGSHIP</div>
+              <div class="vst-card-wave">
+                <div class="vst-wave-bar" style="height:55%;background:#ec4899"></div>
+                <div class="vst-wave-bar" style="height:80%;background:#ec4899"></div>
+                <div class="vst-wave-bar" style="height:65%;background:#ec4899"></div>
+                <div class="vst-wave-bar" style="height:90%;background:#ec4899"></div>
+                <div class="vst-wave-bar" style="height:75%;background:#ec4899"></div>
+                <div class="vst-wave-bar" style="height:60%;background:#ec4899"></div>
+                <div class="vst-wave-bar" style="height:85%;background:#ec4899"></div>
+                <div class="vst-wave-bar" style="height:95%;background:#ec4899"></div>
+                <div class="vst-wave-bar" style="height:70%;background:#ec4899"></div>
+                <div class="vst-wave-bar" style="height:80%;background:#ec4899"></div>
+              </div>
+            </div>
+            <div class="vst-card-body">
+              <div class="vst-card-name">Omnisphere</div>
+              <div class="vst-card-maker">by Spectrasonics</div>
+              <div class="vst-card-desc">Flagship power synth with 14,000+ sounds, deep editing, hardware synth integration, and creative FX.</div>
+              <div class="vst-card-tags">
+                <span class="vst-tag">flagship</span>
+                <span class="vst-tag">hybrid</span>
+                <span class="vst-tag">14k sounds</span>
+              </div>
+              <div class="vst-card-footer">
+                <div class="vst-price">$499</div>
+                <div class="vst-card-meta"><span>★ 4.9</span><span>14,000+ presets</span><span>VST/AU</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Kontakt -->
+          <div class="vst-card">
+            <div class="vst-card-visual" style="background:linear-gradient(135deg,rgba(239,68,68,0.15),rgba(234,88,8,0.1))">
+              <div class="vst-bg" style="background:linear-gradient(135deg,#ef4444,#ea5808)"></div>
+              <div class="vst-icon">🎻</div>
+              <div class="vst-card-badge" style="background:rgba(239,68,68,0.15);color:var(--color-error)">SAMPLER</div>
+              <div class="vst-card-wave">
+                <div class="vst-wave-bar" style="height:40%;background:#ef4444"></div>
+                <div class="vst-wave-bar" style="height:60%;background:#ef4444"></div>
+                <div class="vst-wave-bar" style="height:50%;background:#ef4444"></div>
+                <div class="vst-wave-bar" style="height:75%;background:#ef4444"></div>
+                <div class="vst-wave-bar" style="height:55%;background:#ef4444"></div>
+                <div class="vst-wave-bar" style="height:45%;background:#ef4444"></div>
+                <div class="vst-wave-bar" style="height:65%;background:#ef4444"></div>
+                <div class="vst-wave-bar" style="height:80%;background:#ef4444"></div>
+                <div class="vst-wave-bar" style="height:50%;background:#ef4444"></div>
+                <div class="vst-wave-bar" style="height:70%;background:#ef4444"></div>
+              </div>
+            </div>
+            <div class="vst-card-body">
+              <div class="vst-card-name">Kontakt 8</div>
+              <div class="vst-card-maker">by Native Instruments</div>
+              <div class="vst-card-desc">Industry-standard sampler platform with thousands of libraries for orchestral, cinematic, and world instruments.</div>
+              <div class="vst-card-tags">
+                <span class="vst-tag">sampler</span>
+                <span class="vst-tag">orchestral</span>
+                <span class="vst-tag">libraries</span>
+              </div>
+              <div class="vst-card-footer">
+                <div class="vst-price">$399</div>
+                <div class="vst-card-meta"><span>★ 4.8</span><span>2,000+ libs</span><span>VST3/AU</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Spire -->
+          <div class="vst-card">
+            <div class="vst-card-visual" style="background:linear-gradient(135deg,rgba(6,182,212,0.15),rgba(16,185,129,0.1))">
+              <div class="vst-bg" style="background:linear-gradient(135deg,#06b6d4,#10b981)"></div>
+              <div class="vst-icon">🌀</div>
+              <div class="vst-card-badge" style="background:rgba(6,182,212,0.15);color:#06b6d4">WAVETABLE</div>
+              <div class="vst-card-wave">
+                <div class="vst-wave-bar" style="height:35%;background:#06b6d4"></div>
+                <div class="vst-wave-bar" style="height:55%;background:#06b6d4"></div>
+                <div class="vst-wave-bar" style="height:45%;background:#06b6d4"></div>
+                <div class="vst-wave-bar" style="height:70%;background:#06b6d4"></div>
+                <div class="vst-wave-bar" style="height:50%;background:#06b6d4"></div>
+                <div class="vst-wave-bar" style="height:40%;background:#06b6d4"></div>
+                <div class="vst-wave-bar" style="height:60%;background:#06b6d4"></div>
+                <div class="vst-wave-bar" style="height:75%;background:#06b6d4"></div>
+                <div class="vst-wave-bar" style="height:50%;background:#06b6d4"></div>
+                <div class="vst-wave-bar" style="height:65%;background:#06b6d4"></div>
+              </div>
+            </div>
+            <div class="vst-card-body">
+              <div class="vst-card-name">Spire</div>
+              <div class="vst-card-maker">by Reveal Sound</div>
+              <div class="vst-card-desc">Polyphonic synth combining wavetable, FM, AM, and noise engines with a flexible modulation matrix.</div>
+              <div class="vst-card-tags">
+                <span class="vst-tag">wavetable</span>
+                <span class="vst-tag">FM</span>
+                <span class="vst-tag">trance</span>
+              </div>
+              <div class="vst-card-footer">
+                <div class="vst-price">$189</div>
+                <div class="vst-card-meta"><span>★ 4.6</span><span>800 presets</span><span>VST/AU</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Phase Plant -->
+          <div class="vst-card">
+            <div class="vst-card-visual" style="background:linear-gradient(135deg,rgba(168,85,247,0.15),rgba(236,72,153,0.1))">
+              <div class="vst-bg" style="background:linear-gradient(135deg,#a855f7,#ec4899)"></div>
+              <div class="vst-icon">🔬</div>
+              <div class="vst-card-badge" style="background:rgba(168,85,247,0.15);color:#a855f7">MODULAR</div>
+              <div class="vst-card-wave">
+                <div class="vst-wave-bar" style="height:30%;background:#a855f7"></div>
+                <div class="vst-wave-bar" style="height:50%;background:#a855f7"></div>
+                <div class="vst-wave-bar" style="height:40%;background:#a855f7"></div>
+                <div class="vst-wave-bar" style="height:65%;background:#a855f7"></div>
+                <div class="vst-wave-bar" style="height:50%;background:#a855f7"></div>
+                <div class="vst-wave-bar" style="height:35%;background:#a855f7"></div>
+                <div class="vst-wave-bar" style="height:55%;background:#a855f7"></div>
+                <div class="vst-wave-bar" style="height:70%;background:#a855f7"></div>
+                <div class="vst-wave-bar" style="height:45%;background:#a855f7"></div>
+                <div class="vst-wave-bar" style="height:60%;background:#a855f7"></div>
+              </div>
+            </div>
+            <div class="vst-card-body">
+              <div class="vst-card-name">Phase Plant</div>
+              <div class="vst-card-maker">by Kilohearts</div>
+              <div class="vst-card-desc">Modular synthesizer environment where you build your own synth from snapin modules and effects.</div>
+              <div class="vst-card-tags">
+                <span class="vst-tag">modular</span>
+                <span class="vst-tag">snapin</span>
+                <span class="vst-tag">custom</span>
+              </div>
+              <div class="vst-card-footer">
+                <div class="vst-price">$199</div>
+                <div class="vst-card-meta"><span>★ 4.7</span><span>350 presets</span><span>VST3/AU</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Device Chain -->
+      <div class="device-chain">
+        <span class="device-chain-label">Categories:</span>
+        <div class="device active"><div class="led"></div> All</div>
+        <div class="device"><div class="led"></div> Synth</div>
+        <div class="device"><div class="led"></div> Keys</div>
+        <div class="device"><div class="led"></div> Drums</div>
+        <div class="device"><div class="led"></div> Bass</div>
+        <div class="device"><div class="led"></div> Pads</div>
+        <div class="device-chain-spacer"></div>
+        <span class="device-chain-label">View:</span>
+        <div class="device active"><div class="led"></div> Grid</div>
+        <div class="device"><div class="led"></div> List</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

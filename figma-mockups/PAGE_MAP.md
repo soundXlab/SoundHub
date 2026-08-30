@@ -138,6 +138,7 @@
 |---|----------|--------|----------|
 | A56 | DAW Plugin Config | ✅ | Max4Live, REAPER настройки — `A56-daw-plugin-config.html` |
 | A57 | CLI Reference | ✅ | snd команды — `A57-cli-reference.html` |
+| A58 | VST Instruments Catalog | ✅ | Каталог VST-инструментов — `A58-vst-instruments-catalog.html` |
 
 ## Admin (если нужен)
 
@@ -188,6 +189,6 @@
 | Admin | 5 | 5 | 0 |
 | Mobile | 8 | 8 | 0 |
 | Special States | 6 | 6 | 0 |
-| **TOTAL** | **85** | **85** | **0** |
+| **TOTAL** | **86** | **86** | **0** |
 
 Все страницы покрыты макетами ✅
