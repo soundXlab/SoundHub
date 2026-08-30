@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <title>SoundHub — Payouts (DAW Style)</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',-apple-system,sans-serif;background:#0d0d0d;color:#e4e4e7;overflow:hidden;height:100vh}
+    .transport-bar{height:40px;background:#111113;border-bottom:1px solid #27272a;display:flex;align-items:center;padding:0 12px;gap:16px;font-size:11px;user-select:none}
+    .transport-logo{font-weight:800;font-size:13px;color:#ea5808;letter-spacing:-.5px}.transport-logo span{color:#e4e4e7}
+    .transport-divider{width:1px;height:20px;background:#27272a}
+    .transport-group{display:flex;align-items:center;gap:6px}
+    .transport-label{color:#71717a;font-size:10px;text-transform:uppercase;letter-spacing:.5px}
+    .transport-value{background:#0d0d0d;border:1px solid #27272a;border-radius:4px;padding:2px 8px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#22c55e;font-weight:600;min-width:60px;text-align:center}
+    .transport-spacer{flex:1}
+    .transport-time{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:#e4e4e7;letter-spacing:1px}
+    .app-body{display:flex;height:calc(100vh - 40px)}
+    .sidebar{width:240px;background:#111113;border-right:1px solid #27272a;display:flex;flex-direction:column;user-select:none}
+    .sidebar-search{padding:8px;border-bottom:1px solid #27272a}
+    .sidebar-search input{width:100%;background:#0d0d0d;border:1px solid #27272a;border-radius:4px;padding:6px 8px 6px 28px;font-size:11px;color:#e4e4e7;outline:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:8px center}
+    .sidebar-search input::placeholder{color:#52525b}
+    .sidebar-nav{flex:1;overflow-y:auto;padding:4px 0}
+    .sidebar-section{padding:8px 12px 4px;font-size:9px;color:#52525b;text-transform:uppercase;letter-spacing:1px;font-weight:700}
+    .sidebar-item{padding:6px 12px;font-size:11px;font-weight:500;color:#a1a1aa;cursor:pointer;display:flex;align-items:center;gap:8px;border-left:2px solid transparent;transition:all .1s}
+    .sidebar-item:hover{color:#e4e4e7}
+    .sidebar-item.active{color:#ea5808;background:rgba(234,88,8,.08);border-left-color:#ea5808}
+    .sidebar-item .icon{width:16px;text-align:center}
+    .content{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+    .page-header{padding:16px 24px;border-bottom:1px solid #27272a;display:flex;align-items:center;justify-content:space-between}
+    .page-title{font-size:18px;font-weight:700;color:#e4e4e7}
+    .btn{padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid #27272a;transition:all .15s}
+    .btn-primary{background:#ea5808;color:#fff;border-color:#ea5808}
+    .btn-secondary{background:#1a1a1a;color:#e4e4e7}
+    .btn-ghost{background:transparent;color:#71717a;border-color:transparent}
+    .dashboard-container{flex:1;overflow-y:auto;padding:24px}
+    .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+    .stat-card{background:#111113;border:1px solid #27272a;border-radius:8px;padding:16px}
+    .stat-card-title{font-size:11px;color:#71717a;margin-bottom:8px}
+    .stat-card-value{font-size:24px;font-weight:700;font-family:'JetBrains Mono',monospace;margin-bottom:4px}
+    .stat-card-change{font-size:10px}
+    .change-positive{color:#22c55e}
+    .transactions-table{width:100%;border-collapse:collapse}
+    .transactions-table th{padding:10px 12px;text-align:left;font-size:10px;color:#52525b;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid #27272a}
+    .transactions-table td{padding:12px;font-size:12px;color:#a1a1aa;border-bottom:1px solid #1a1a1a}
+    .tx-status{padding:3px 8px;border-radius:4px;font-size:9px;font-weight:600}
+    .tx-completed{background:rgba(34,197,94,.12);color:#22c55e}
+    .tx-pending{background:rgba(234,179,8,.12);color:#eab308}
+    .device-chain{height:60px;background:#111113;border-top:1px solid #27272a;display:flex;align-items:center;padding:0 16px;gap:8px}
+    .device{padding:6px 12px;background:#0d0d0d;border:1px solid #27272a;border-radius:4px;font-size:10px;color:#a1a1aa;display:flex;align-items:center;gap:6px}
+    .device .led{width:6px;height:6px;border-radius:50%;background:#27272a}
+    .device.active .led{background:#22c55e;box-shadow:0 0 6px rgba(34,197,94,.5)}
+    .device-chain-spacer{flex:1}
+    .device-chain-label{font-size:9px;color:#52525b;text-transform:uppercase;letter-spacing:.5px;font-weight:700}
+  </style>
+</head>
+<body>
+  <div class="transport-bar">
+    <div class="transport-logo">Sound<span>Hub</span></div>
+    <div class="transport-divider"></div>
+    <div class="transport-group"><span class="transport-label">Balance</span><div class="transport-value">$312.50</div></div>
+    <div class="transport-group"><span class="transport-label">Pending</span><div class="transport-value" style="color:#eab308">$89.00</div></div>
+    <div class="transport-group"><span class="transport-label">Total Paid</span><div class="transport-value">$1,247</div></div>
+    <div class="transport-spacer"></div>
+    <div class="transport-time">PAYOUTS</div>
+    <div class="transport-divider"></div>
+    <div class="transport-group"><span class="transport-label">Next</span><div class="transport-value">Sep 1</div></div>
+  </div>
+  <div class="app-body">
+    <div class="sidebar">
+      <div class="sidebar-search"><input type="text" placeholder="Search..."></div>
+      <div class="sidebar-nav">
+        <div class="sidebar-section">Main</div>
+        <div class="sidebar-item"><span class="icon">📊</span> Dashboard</div>
+        <div class="sidebar-item"><span class="icon">📁</span> Projects</div>
+        <div class="sidebar-item active"><span class="icon">🛒</span> Marketplace</div>
+        <div class="sidebar-section">Workspace</div>
+        <div class="sidebar-item"><span class="icon">💬</span> Reviews</div>
+        <div class="sidebar-item"><span class="icon">📋</span> Sessions</div>
+        <div class="sidebar-section">Account</div>
+        <div class="sidebar-item"><span class="icon">⚙️</span> Settings</div>
+      </div>
+    </div>
+    <div class="content">
+      <div class="page-header"><div class="page-title">Payouts</div><div><button class="btn btn-primary">💸 Request Payout</button></div></div>
+      <div class="dashboard-container">
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-card-title">Available Balance</div><div class="stat-card-value" style="color:#22c55e">$312.50</div><div class="stat-card-change change-positive">Ready to withdraw</div></div>
+          <div class="stat-card"><div class="stat-card-title">Pending Payout</div><div class="stat-card-value" style="color:#eab308">$89.00</div><div class="stat-card-change" style="color:#71717a">Processing since Aug 28</div></div>
+          <div class="stat-card"><div class="stat-card-title">Total Earned</div><div class="stat-card-value" style="color:#ea5808">$1,247</div><div class="stat-card-change change-positive">↑ 12% this month</div></div>
+          <div class="stat-card"><div class="stat-card-title">Next Payout</div><div class="stat-card-value" style="color:#3b82f6">Sep 1</div><div class="stat-card-change" style="color:#71717a">Auto-payout (min $50)</div></div>
+        </div>
+
+        <div style="background:#111113;border:1px solid #27272a;border-radius:8px;overflow:hidden">
+          <div style="padding:16px 20px;border-bottom:1px solid #27272a;font-size:14px;font-weight:700;color:#e4e4e7">Payout History</div>
+          <table class="transactions-table">
+            <thead><tr><th>Date</th><th>Amount</th><th>Method</th><th>Status</th><th>TX Hash</th></tr></thead>
+            <tbody>
+              <tr><td style="font-weight:600;color:#e4e4e7">Aug 15, 2026</td><td style="font-family:'JetBrains Mono',monospace;color:#22c55e">$312.50</td><td>USDC (Base)</td><td><span class="tx-status tx-completed">Completed</span></td><td style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#52525b">0x1a2b...3c4d</td></tr>
+              <tr><td style="font-weight:600;color:#e4e4e7">Jul 15, 2026</td><td style="font-family:'JetBrains Mono',monospace;color:#22c55e">$287.00</td><td>USDC (Base)</td><td><span class="tx-status tx-completed">Completed</span></td><td style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#52525b">0x5e6f...7a8b</td></tr>
+              <tr><td style="font-weight:600;color:#e4e4e7">Jun 15, 2026</td><td style="font-family:'JetBrains Mono',monospace;color:#22c55e">$198.00</td><td>USDC (Base)</td><td><span class="tx-status tx-completed">Completed</span></td><td style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#52525b">0x9c0d...1e2f</td></tr>
+              <tr><td style="font-weight:600;color:#e4e4e7">May 15, 2026</td><td style="font-family:'JetBrains Mono',monospace;color:#22c55e">$145.00</td><td>USDC (Base)</td><td><span class="tx-status tx-completed">Completed</span></td><td style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#52525b">0x3a4b...5c6d</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="device-chain">
+        <span class="device-chain-label">Payouts:</span>
+        <div class="device active"><div class="led"></div> $312.50 Available</div>
+        <div class="device"><div class="led"></div> $89.00 Pending</div>
+        <div class="device-chain-spacer"></div>
+        <span class="device-chain-label">Method:</span>
+        <div class="device"><div class="led"></div> USDC (Base)</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

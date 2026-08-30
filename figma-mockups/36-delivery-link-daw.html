@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <title>SoundHub — Delivery Link (DAW Style)</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', -apple-system, sans-serif; background: #0d0d0d; color: #e4e4e7; overflow: hidden; height: 100vh; }
+
+    /* ── Transport Bar ── */
+    .transport-bar {
+      height: 40px; background: #111113; border-bottom: 1px solid #27272a;
+      display: flex; align-items: center; padding: 0 12px; gap: 16px;
+      font-size: 11px; user-select: none;
+    }
+    .transport-logo { font-weight: 800; font-size: 13px; color: #ea5808; letter-spacing: -0.5px; }
+    .transport-logo span { color: #e4e4e7; }
+    .transport-divider { width: 1px; height: 20px; background: #27272a; }
+    .transport-group { display: flex; align-items: center; gap: 6px; }
+    .transport-label { color: #71717a; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .transport-value {
+      background: #0d0d0d; border: 1px solid #27272a; border-radius: 4px;
+      padding: 2px 8px; font-family: 'JetBrains Mono', monospace; font-size: 12px;
+      color: #22c55e; font-weight: 600; min-width: 60px; text-align: center;
+    }
+    .transport-spacer { flex: 1; }
+    .transport-time {
+      font-family: 'JetBrains Mono', monospace; font-size: 18px; font-weight: 700;
+      color: #e4e4e7; letter-spacing: 1px;
+    }
+
+    /* ── Main Layout ── */
+    .app-body { display: flex; height: calc(100vh - 40px); }
+
+    /* ── Content Area ── */
+    .content {
+      flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden;
+      max-width: 1200px; margin: 0 auto;
+    }
+
+    /* ── Header ── */
+    .page-header {
+      padding: 24px 32px; border-bottom: 1px solid #27272a;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .page-title { font-size: 18px; font-weight: 700; color: #e4e4e7; }
+    .header-actions { display: flex; gap: 8px; }
+    .btn {
+      padding: 8px 16px; border-radius: 6px; font-size: 12px; font-weight: 600;
+      cursor: pointer; border: 1px solid #27272a; transition: all 0.15s;
+    }
+    .btn-primary { background: #ea5808; color: #fff; border-color: #ea5808; }
+    .btn-primary:hover { background: #c2410c; }
+    .btn-secondary { background: #1a1a1a; color: #e4e4e7; }
+    .btn-secondary:hover { background: #27272a; }
+    .btn-ghost { background: transparent; color: #71717a; border-color: transparent; }
+    .btn-ghost:hover { color: #e4e4e7; background: #1a1a1a; }
+    .btn-success { background: #22c55e; color: #fff; border-color: #22c55e; }
+    .btn-success:hover { background: #16a34a; }
+
+    /* ── Delivery Layout ── */
+    .delivery-layout {
+      flex: 1; display: flex; overflow: hidden;
+    }
+
+    /* ── Main Content ── */
+    .delivery-main {
+      flex: 1; overflow-y: auto; padding: 32px;
+    }
+
+    /* ── Project Info Card ── */
+    .project-card {
+      background: #111113; border: 1px solid #27272a; border-radius: 8px;
+      padding: 24px; margin-bottom: 24px;
+    }
+    .project-card-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .project-card-title { font-size: 20px; font-weight: 700; color: #e4e4e7; }
+    .project-card-badge {
+      padding: 4px 12px; border-radius: 4px; font-size: 11px;
+      font-weight: 600; text-transform: uppercase;
+    }
+    .badge-ready { background: rgba(34,197,94,0.12); color: #22c55e; }
+    .project-card-meta {
+      display: flex; gap: 24px; font-size: 12px; color: #71717a;
+      margin-bottom: 16px;
+    }
+    .project-card-meta-item {
+      display: flex; align-items: center; gap: 6px;
+    }
+    .project-card-description {
+      font-size: 13px; color: #a1a1aa; line-height: 1.6;
+      margin-bottom: 16px;
+    }
+    .project-card-tags {
+      display: flex; gap: 8px;
+    }
+    .tag {
+      padding: 4px 10px; background: #0d0d0d; border: 1px solid #27272a;
+      border-radius: 4px; font-size: 10px; color: #a1a1aa;
+    }
+
+    /* ── Waveform Player ── */
+    .waveform-player {
+      background: #111113; border: 1px solid #27272a; border-radius: 8px;
+      padding: 20px; margin-bottom: 24px;
+    }
+    .waveform-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .waveform-title { font-size: 16px; font-weight: 700; color: #e4e4e7; }
+    .waveform-meta { font-size: 12px; color: #71717a; }
+    .waveform-bars {
+      display: flex; align-items: flex-end; gap: 2px; height: 100px;
+    }
+    .wave-bar { flex: 1; border-radius: 1px; }
+    .waveform-controls {
+      display: flex; align-items: center; gap: 16px; margin-top: 16px;
+    }
+    .play-btn {
+      width: 44px; height: 44px; background: #ea5808; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 18px; cursor: pointer;
+      box-shadow: 0 2px 8px rgba(234,88,8,0.4);
+    }
+    .waveform-progress {
+      flex: 1; height: 8px; background: #27272a; border-radius: 4px;
+      position: relative; cursor: pointer;
+    }
+    .waveform-progress-fill {
+      position: absolute; left: 0; top: 0; height: 100%;
+      width: 0%; background: #ea5808; border-radius: 4px;
+    }
+    .waveform-time {
+      font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #71717a;
+    }
+
+    /* ── Files List ── */
+    .files-section {
+      background: #111113; border: 1px solid #27272a; border-radius: 8px;
+      margin-bottom: 24px;
+    }
+    .files-header {
+      padding: 16px 20px; border-bottom: 1px solid #27272a;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .files-title { font-size: 14px; font-weight: 700; color: #e4e4e7; }
+    .files-count { font-size: 11px; color: #71717a; }
+    .file-list { padding: 8px; }
+    .file-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px; border-radius: 6px; transition: background 0.1s;
+      cursor: pointer;
+    }
+    .file-item:hover { background: #0d0d0d; }
+    .file-icon {
+      width: 36px; height: 36px; background: #0d0d0d; border: 1px solid #27272a;
+      border-radius: 6px; display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+    }
+    .file-info { flex: 1; min-width: 0; }
+    .file-name { font-size: 12px; font-weight: 600; color: #e4e4e7; }
+    .file-meta { font-size: 10px; color: #71717a; margin-top: 2px; }
+    .file-hash {
+      font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #52525b;
+      max-width: 120px; overflow: hidden; text-overflow: ellipsis;
+    }
+    .file-actions { display: flex; gap: 6px; }
+    .file-action-btn {
+      padding: 4px 8px; background: #0d0d0d; border: 1px solid #27272a;
+      border-radius: 4px; font-size: 10px; color: #71717a; cursor: pointer;
+    }
+    .file-action-btn:hover { border-color: #3f3f46; color: #e4e4e7; }
+
+    /* ── QC Report ── */
+    .qc-section {
+      background: #111113; border: 1px solid #27272a; border-radius: 8px;
+      margin-bottom: 24px;
+    }
+    .qc-header {
+      padding: 16px 20px; border-bottom: 1px solid #27272a;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .qc-title { font-size: 14px; font-weight: 700; color: #e4e4e7; }
+    .qc-body { padding: 20px; }
+    .qc-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+    }
+    .qc-card {
+      background: #0d0d0d; border: 1px solid #27272a; border-radius: 6px;
+      padding: 16px; text-align: center;
+    }
+    .qc-card-value {
+      font-size: 20px; font-weight: 700; font-family: 'JetBrains Mono', monospace;
+      margin-bottom: 4px;
+    }
+    .qc-card-label { font-size: 10px; color: #71717a; text-transform: uppercase; }
+    .qc-pass { color: #22c55e; }
+    .qc-warn { color: #eab308; }
+    .qc-fail { color: #ef4444; }
+
+    /* ── Right Panel ── */
+    .right-panel {
+      width: 320px; background: #111113; border-left: 1px solid #27272a;
+      display: flex; flex-direction: column; user-select: none; overflow-y: auto;
+    }
+    .panel-section { padding: 16px; border-bottom: 1px solid #27272a; }
+    .panel-section-title {
+      font-size: 9px; color: #52525b; text-transform: uppercase;
+      letter-spacing: 1px; font-weight: 700; margin-bottom: 10px;
+    }
+    .panel-stat {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 6px 0; font-size: 12px;
+    }
+    .panel-stat-label { color: #71717a; }
+    .panel-stat-value { color: #e4e4e7; font-family: 'JetBrains Mono', monospace; font-weight: 600; }
+
+    /* ── Download Button ── */
+    .download-btn {
+      width: 100%; padding: 12px; background: #ea5808; border: none;
+      border-radius: 6px; font-size: 14px; font-weight: 700; color: #fff;
+      cursor: pointer; transition: background 0.15s; margin-bottom: 12px;
+    }
+    .download-btn:hover { background: #c2410c; }
+    .download-all-btn {
+      width: 100%; padding: 10px; background: transparent; border: 1px solid #27272a;
+      border-radius: 6px; font-size: 12px; font-weight: 600; color: #e4e4e7;
+      cursor: pointer; transition: all 0.15s;
+    }
+    .download-all-btn:hover { background: #1a1a1a; }
+
+    /* ── Ledger Hash ── */
+    .ledger-hash {
+      font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #52525b;
+      word-break: break-all; padding: 8px; background: #0d0d0d;
+      border: 1px solid #27272a; border-radius: 4px;
+    }
+
+    /* ── Device Chain (Bottom) ── */
+    .device-chain {
+      height: 60px; background: #111113; border-top: 1px solid #27272a;
+      display: flex; align-items: center; padding: 0 16px; gap: 8px;
+    }
+    .device {
+      padding: 6px 12px; background: #0d0d0d; border: 1px solid #27272a;
+      border-radius: 4px; font-size: 10px; color: #a1a1aa;
+      display: flex; align-items: center; gap: 6px; cursor: pointer;
+      transition: all 0.1s;
+    }
+    .device:hover { border-color: #3f3f46; color: #e4e4e7; }
+    .device.active { border-color: #ea5808; color: #ea5808; background: rgba(234,88,8,0.08); }
+    .device .led { width: 6px; height: 6px; border-radius: 50%; background: #27272a; }
+    .device.active .led { background: #22c55e; box-shadow: 0 0 6px rgba(34,197,94,0.5); }
+    .device-chain-spacer { flex: 1; }
+    .device-chain-label {
+      font-size: 9px; color: #52525b; text-transform: uppercase;
+      letter-spacing: 0.5px; font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <!-- Transport Bar -->
+  <div class="transport-bar">
+    <div class="transport-logo">Sound<span>Hub</span></div>
+    <div class="transport-divider"></div>
+    <div class="transport-group">
+      <span class="transport-label">Package</span>
+      <div class="transport-value" style="color:#22c55e">Ready</div>
+    </div>
+    <div class="transport-group">
+      <span class="transport-label">Files</span>
+      <div class="transport-value">3</div>
+    </div>
+    <div class="transport-group">
+      <span class="transport-label">Total Size</span>
+      <div class="transport-value">12.4 GB</div>
+    </div>
+    <div class="transport-spacer"></div>
+    <div class="transport-time">DELIVERY</div>
+    <div class="transport-divider"></div>
+    <div class="transport-group">
+      <span class="transport-label">Expires</span>
+      <div class="transport-value" style="color:#eab308">6d 12h</div>
+    </div>
+  </div>
+
+  <div class="app-body">
+    <!-- Content -->
+    <div class="content">
+      <!-- Page Header -->
+      <div class="page-header">
+        <div class="page-title">Delivery Package — Neon Warehouse Master</div>
+        <div class="header-actions">
+          <button class="btn btn-ghost">📋 Copy Link</button>
+          <button class="btn btn-secondary">📤 Share</button>
+          <button class="btn btn-success">⬇ Download All</button>
+        </div>
+      </div>
+
+      <!-- Delivery Layout -->
+      <div class="delivery-layout">
+        <!-- Main Content -->
+        <div class="delivery-main">
+          <!-- Project Info Card -->
+          <div class="project-card">
+            <div class="project-card-header">
+              <div class="project-card-title">Neon Warehouse — Master Delivery</div>
+              <div class="project-card-badge badge-ready">Ready for Download</div>
+            </div>
+            <div class="project-card-meta">
+              <div class="project-card-meta-item">📁 Project: Neon Album</div>
+              <div class="project-card-meta-item">👤 Engineer: @mixmaster</div>
+              <div class="project-card-meta-item">📅 Delivered: Aug 30, 2026</div>
+              <div class="project-card-meta-item">🔗 Share: neon-warehouse-master</div>
+            </div>
+            <div class="project-card-description">
+              Master version of Neon Warehouse for release. All stems mixed down to stereo WAV. 
+              Loudness normalized to -14 LUFS. Ready for distribution.
+            </div>
+            <div class="project-card-tags">
+              <div class="tag">Master</div>
+              <div class="tag">WAV 24bit</div>
+              <div class="tag">48 kHz</div>
+              <div class="tag">Stereo</div>
+              <div class="tag">-14 LUFS</div>
+            </div>
+          </div>
+
+          <!-- Waveform Player -->
+          <div class="waveform-player">
+            <div class="waveform-header">
+              <div>
+                <div class="waveform-title">Neon Warehouse — Master Final</div>
+                <div class="waveform-meta">WAV 24bit · 48 kHz · 4.1 GB · 4:02</div>
+              </div>
+            </div>
+            <div class="waveform-bars">
+              <div class="wave-bar" style="height:30%;background:#ea5808"></div>
+              <div class="wave-bar" style="height:50%;background:#ea5808"></div>
+              <div class="wave-bar" style="height:70%;background:#ea5808"></div>
+              <div class="wave-bar" style="height:45%;background:#ea5808"></div>
+              <div class="wave-bar" style="height:85%;background:#ea5808"></div>
+              <div class="wave-bar" style="height:60%;background:#ea5808"></div>
+              <div class="wave-bar" style="height:75%;background:#ea5808"></div>
+              <div class="wave-bar" style="height:40%;background:#ea5808"></div>
+              <div class="wave-bar" style="height:65%;background:#ea5808"></div>
+              <div class="wave-bar" style="height:55%;background:#ea5808"></div>
+              <div class="wave-bar" style="height:80%;background:#ea5808"></div>
+              <div class="wave-bar" style="height:50%;background:#ea5808"></div>
+              <div class="wave-bar" style="height:70%;background:#ea5808"></div>
+              <div class="wave-bar" style="height:60%;background:#ea5808"></div>
+              <div class="wave-bar" style="height:45%;background:#ea5808"></div>
+              <div class="wave-bar" style="height:75%;background:#ea5808"></div>
+              <div class="wave-bar" style="height:55%;background:#ea5808"></div>
+              <div class="wave-bar" style="height:65%;background:#ea5808"></div>
+              <div class="wave-bar" style="height:80%;background:#ea5808"></div>
+              <div class="wave-bar" style="height:50%;background:#ea5808"></div>
+            </div>
+            <div class="waveform-controls">
+              <div class="play-btn">▶</div>
+              <div class="waveform-progress">
+                <div class="waveform-progress-fill"></div>
+              </div>
+              <div class="waveform-time">0:00 / 4:02</div>
+            </div>
+          </div>
+
+          <!-- Files List -->
+          <div class="files-section">
+            <div class="files-header">
+              <div class="files-title">Package Files</div>
+              <div class="files-count">3 files · 12.4 GB</div>
+            </div>
+            <div class="file-list">
+              <div class="file-item">
+                <div class="file-icon">🎵</div>
+                <div class="file-info">
+                  <div class="file-name">Neon_Warehouse_Master_Final.wav</div>
+                  <div class="file-meta">WAV 24bit · 48 kHz · Stereo · 4:02</div>
+                </div>
+                <div class="file-hash">a3f8c2d1e5b7...</div>
+                <div class="file-actions">
+                  <div class="file-action-btn">⬇ Download</div>
+                  <div class="file-action-btn">🔍 Verify</div>
+                </div>
+              </div>
+              <div class="file-item">
+                <div class="file-icon">📦</div>
+                <div class="file-info">
+                  <div class="file-name">Neon_Warehouse_Stems.zip</div>
+                  <div class="file-meta">ZIP · 8.2 GB · 6 stems</div>
+                </div>
+                <div class="file-hash">b7d4e9f2a1c3...</div>
+                <div class="file-actions">
+                  <div class="file-action-btn">⬇ Download</div>
+                  <div class="file-action-btn">🔍 Verify</div>
+                </div>
+              </div>
+              <div class="file-item">
+                <div class="file-icon">📄</div>
+                <div class="file-info">
+                  <div class="file-name">Neon_Warehouse_Credits.txt</div>
+                  <div class="file-meta">TXT · 2 KB</div>
+                </div>
+                <div class="file-hash">c1a5b8d2e4f6...</div>
+                <div class="file-actions">
+                  <div class="file-action-btn">⬇ Download</div>
+                  <div class="file-action-btn">🔍 Verify</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- QC Report -->
+          <div class="qc-section">
+            <div class="qc-header">
+              <div class="qc-title">QC Report</div>
+              <div style="font-size:11px;color:#22c55e;font-weight:600">✓ All Checks Passed</div>
+            </div>
+            <div class="qc-body">
+              <div class="qc-grid">
+                <div class="qc-card">
+                  <div class="qc-card-value qc-pass">-14.2</div>
+                  <div class="qc-card-label">Loudness (LUFS)</div>
+                </div>
+                <div class="qc-card">
+                  <div class="qc-card-value qc-pass">-1.2</div>
+                  <div class="qc-card-label">True Peak (dBTP)</div>
+                </div>
+                <div class="qc-card">
+                  <div class="qc-card-value qc-pass">8.1</div>
+                  <div class="qc-card-label">Dynamic Range (LU)</div>
+                </div>
+                <div class="qc-card">
+                  <div class="qc-card-value qc-pass">42</div>
+                  <div class="qc-card-label">SNR (dB)</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Panel -->
+        <div class="right-panel">
+          <!-- Download Actions -->
+          <div class="panel-section">
+            <button class="download-btn">⬇ Download All (12.4 GB)</button>
+            <button class="download-all-btn">📋 Copy Download Link</button>
+          </div>
+
+          <!-- Package Info -->
+          <div class="panel-section">
+            <div class="panel-section-title">Package Info</div>
+            <div class="panel-stat">
+              <span class="panel-stat-label">Package ID</span>
+              <span class="panel-stat-value">#42</span>
+            </div>
+            <div class="panel-stat">
+              <span class="panel-stat-label">Version</span>
+              <span class="panel-stat-value">v3.2</span>
+            </div>
+            <div class="panel-stat">
+              <span class="panel-stat-label">Created</span>
+              <span class="panel-stat-value">Aug 30, 2026</span>
+            </div>
+            <div class="panel-stat">
+              <span class="panel-stat-label">Expires</span>
+              <span class="panel-stat-value" style="color:#eab308">Sep 6, 2026</span>
+            </div>
+            <div class="panel-stat">
+              <span class="panel-stat-label">Downloads</span>
+              <span class="panel-stat-value">2 / 5</span>
+            </div>
+          </div>
+
+          <!-- Engineer Info -->
+          <div class="panel-section">
+            <div class="panel-section-title">Engineer</div>
+            <div style="display:flex;align-items:center;gap:12px">
+              <div style="width:40px;height:40px;border-radius:50%;background:#3b82f6;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff">M</div>
+              <div>
+                <div style="font-size:13px;font-weight:600;color:#e4e4e7">@mixmaster</div>
+                <div style="font-size:11px;color:#71717a">Mastering Engineer</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Ledger Verification -->
+          <div class="panel-section">
+            <div class="panel-section-title">Ledger Verification</div>
+            <div class="panel-stat">
+              <span class="panel-stat-label">Status</span>
+              <span class="panel-stat-value" style="color:#22c55e">✓ Verified</span>
+            </div>
+            <div class="panel-stat">
+              <span class="panel-stat-label">Chain</span>
+              <span class="panel-stat-value">3 events</span>
+            </div>
+            <div class="ledger-hash">
+              Hash: a3f8c2d1e5b74f9a8c6d3e2f1a0b9c8d7e6f5a4b3c2d1e0f9a8b7c6d5e4f3a2
+            </div>
+          </div>
+
+          <!-- Activity -->
+          <div class="panel-section">
+            <div class="panel-section-title">Activity</div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <div style="display:flex;gap:10px;font-size:11px;color:#a1a1aa">
+                <div style="width:8px;height:8px;border-radius:50%;background:#22c55e;margin-top:4px;flex-shrink:0"></div>
+                <div>
+                  <div>Package created</div>
+                  <div style="font-size:10px;color:#52525b">2h ago</div>
+                </div>
+              </div>
+              <div style="display:flex;gap:10px;font-size:11px;color:#a1a1aa">
+                <div style="width:8px;height:8px;border-radius:50%;background:#ea5808;margin-top:4px;flex-shrink:0"></div>
+                <div>
+                  <div>Downloaded by @client</div>
+                  <div style="font-size:10px;color:#52525b">1h ago</div>
+                </div>
+              </div>
+              <div style="display:flex;gap:10px;font-size:11px;color:#a1a1aa">
+                <div style="width:8px;height:8px;border-radius:50%;background:#3b82f6;margin-top:4px;flex-shrink:0"></div>
+                <div>
+                  <div>QC checks passed</div>
+                  <div style="font-size:10px;color:#52525b">2h ago</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Device Chain -->
+      <div class="device-chain">
+        <span class="device-chain-label">Package:</span>
+        <div class="device active"><div class="led"></div> ▶ Preview</div>
+        <div class="device"><div class="led"></div> Spectrogram</div>
+        <div class="device"><div class="led"></div> Loudness</div>
+        <div class="device-chain-spacer"></div>
+        <span class="device-chain-label">Format:</span>
+        <div class="device"><div class="led"></div> WAV 24bit</div>
+        <div class="device"><div class="led"></div> 48 kHz</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

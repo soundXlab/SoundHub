@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <title>SoundHub — API Keys (DAW Style)</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', -apple-system, sans-serif; background: #0d0d0d; color: #e4e4e7; overflow: hidden; height: 100vh; }
+    .transport-bar { height: 40px; background: #111113; border-bottom: 1px solid #27272a; display: flex; align-items: center; padding: 0 12px; gap: 16px; font-size: 11px; user-select: none; }
+    .transport-logo { font-weight: 800; font-size: 13px; color: #ea5808; letter-spacing: -0.5px; }
+    .transport-logo span { color: #e4e4e7; }
+    .transport-divider { width: 1px; height: 20px; background: #27272a; }
+    .transport-group { display: flex; align-items: center; gap: 6px; }
+    .transport-label { color: #71717a; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .transport-value { background: #0d0d0d; border: 1px solid #27272a; border-radius: 4px; padding: 2px 8px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #22c55e; font-weight: 600; min-width: 60px; text-align: center; }
+    .transport-spacer { flex: 1; }
+    .transport-time { font-family: 'JetBrains Mono', monospace; font-size: 18px; font-weight: 700; color: #e4e4e7; letter-spacing: 1px; }
+    .app-body { display: flex; height: calc(100vh - 40px); }
+    .sidebar { width: 240px; background: #111113; border-right: 1px solid #27272a; display: flex; flex-direction: column; user-select: none; }
+    .sidebar-search { padding: 8px; border-bottom: 1px solid #27272a; }
+    .sidebar-search input { width: 100%; background: #0d0d0d; border: 1px solid #27272a; border-radius: 4px; padding: 6px 8px 6px 28px; font-size: 11px; color: #e4e4e7; outline: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: 8px center; }
+    .sidebar-search input::placeholder { color: #52525b; }
+    .sidebar-nav { flex: 1; overflow-y: auto; padding: 4px 0; }
+    .sidebar-section { padding: 8px 12px 4px; font-size: 9px; color: #52525b; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+    .sidebar-item { padding: 6px 12px; font-size: 11px; font-weight: 500; color: #a1a1aa; cursor: pointer; display: flex; align-items: center; gap: 8px; border-left: 2px solid transparent; transition: all 0.1s; }
+    .sidebar-item:hover { color: #e4e4e7; }
+    .sidebar-item.active { color: #ea5808; background: rgba(234,88,8,0.08); border-left-color: #ea5808; }
+    .sidebar-item .icon { width: 16px; text-align: center; }
+    .content { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
+    .page-header { padding: 16px 24px; border-bottom: 1px solid #27272a; display: flex; align-items: center; justify-content: space-between; }
+    .page-title { font-size: 18px; font-weight: 700; color: #e4e4e7; }
+    .btn { padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; border: 1px solid #27272a; transition: all 0.15s; }
+    .btn-primary { background: #ea5808; color: #fff; border-color: #ea5808; }
+    .btn-primary:hover { background: #c2410c; }
+    .btn-secondary { background: #1a1a1a; color: #e4e4e7; }
+    .btn-secondary:hover { background: #27272a; }
+    .btn-ghost { background: transparent; color: #71717a; border-color: transparent; }
+    .btn-ghost:hover { color: #e4e4e7; background: #1a1a1a; }
+    .btn-danger { background: transparent; color: #ef4444; border-color: #ef4444; }
+    .btn-danger:hover { background: rgba(239,68,68,0.1); }
+    .settings-layout { display: flex; flex: 1; overflow: hidden; }
+    .settings-nav { width: 200px; background: #111113; border-right: 1px solid #27272a; padding: 16px 0; overflow-y: auto; flex-shrink: 0; }
+    .settings-nav-title { padding: 0 16px; font-size: 9px; color: #52525b; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin-bottom: 8px; }
+    .settings-nav-item { padding: 8px 16px; font-size: 12px; font-weight: 500; color: #a1a1aa; cursor: pointer; display: flex; align-items: center; gap: 8px; border-left: 2px solid transparent; transition: all 0.1s; }
+    .settings-nav-item:hover { color: #e4e4e7; background: rgba(255,255,255,0.02); }
+    .settings-nav-item.active { color: #ea5808; background: rgba(234,88,8,0.08); border-left-color: #ea5808; }
+    .settings-nav-item .icon { width: 16px; text-align: center; font-size: 13px; }
+    .settings-content { flex: 1; overflow-y: auto; padding: 24px 32px; }
+    .settings-section { margin-bottom: 32px; padding-bottom: 32px; border-bottom: 1px solid #27272a; }
+    .settings-section:last-child { border-bottom: none; }
+    .settings-section-title { font-size: 16px; font-weight: 700; color: #e4e4e7; margin-bottom: 4px; }
+    .settings-section-desc { font-size: 12px; color: #71717a; margin-bottom: 16px; }
+
+    /* ── API Key Card ── */
+    .api-key-card {
+      background: #111113; border: 1px solid #27272a; border-radius: 8px;
+      padding: 16px; margin-bottom: 12px;
+    }
+    .api-key-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .api-key-name { font-size: 14px; font-weight: 700; color: #e4e4e7; }
+    .api-key-badge {
+      padding: 3px 8px; border-radius: 4px; font-size: 9px; font-weight: 600;
+    }
+    .badge-active { background: rgba(34,197,94,0.12); color: #22c55e; }
+    .badge-expired { background: rgba(239,68,68,0.12); color: #ef4444; }
+    .api-key-value {
+      display: flex; align-items: center; gap: 8px;
+      background: #0d0d0d; border: 1px solid #27272a; border-radius: 6px;
+      padding: 10px 12px; margin-bottom: 12px;
+    }
+    .api-key-text {
+      flex: 1; font-family: 'JetBrains Mono', monospace; font-size: 12px;
+      color: #a1a1aa; overflow: hidden; text-overflow: ellipsis;
+    }
+    .api-key-meta {
+      display: flex; gap: 24px; font-size: 11px; color: #71717a;
+    }
+    .api-key-meta-item { display: flex; align-items: center; gap: 6px; }
+    .api-key-actions { display: flex; gap: 8px; margin-top: 12px; }
+
+    /* ── Rate Limit Meter ── */
+    .rate-meter {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px; background: #0d0d0d; border: 1px solid #27272a; border-radius: 6px;
+      margin-top: 12px;
+    }
+    .rate-meter-label { font-size: 11px; color: #71717a; min-width: 100px; }
+    .rate-meter-bar { flex: 1; height: 8px; background: #27272a; border-radius: 4px; overflow: hidden; }
+    .rate-meter-fill { height: 100%; border-radius: 4px; }
+    .rate-meter-value { font-size: 11px; font-family: 'JetBrains Mono', monospace; font-weight: 600; min-width: 80px; text-align: right; }
+
+    /* ── Usage Chart ── */
+    .usage-chart {
+      background: #111113; border: 1px solid #27272a; border-radius: 8px;
+      padding: 16px; margin-bottom: 16px;
+    }
+    .chart-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .chart-title { font-size: 12px; font-weight: 600; color: #e4e4e7; }
+    .chart-bars {
+      display: flex; align-items: flex-end; gap: 4px; height: 60px;
+    }
+    .chart-bar {
+      flex: 1; background: #ea5808; border-radius: 2px; opacity: 0.7;
+      transition: opacity 0.1s;
+    }
+    .chart-bar:hover { opacity: 1; }
+    .chart-labels {
+      display: flex; justify-content: space-between; margin-top: 8px;
+      font-size: 9px; color: #52525b;
+    }
+
+    .device-chain { height: 60px; background: #111113; border-top: 1px solid #27272a; display: flex; align-items: center; padding: 0 16px; gap: 8px; }
+    .device { padding: 6px 12px; background: #0d0d0d; border: 1px solid #27272a; border-radius: 4px; font-size: 10px; color: #a1a1aa; display: flex; align-items: center; gap: 6px; cursor: pointer; transition: all 0.1s; }
+    .device:hover { border-color: #3f3f46; color: #e4e4e7; }
+    .device.active { border-color: #ea5808; color: #ea5808; background: rgba(234,88,8,0.08); }
+    .device .led { width: 6px; height: 6px; border-radius: 50%; background: #27272a; }
+    .device.active .led { background: #22c55e; box-shadow: 0 0 6px rgba(34,197,94,0.5); }
+    .device-chain-spacer { flex: 1; }
+    .device-chain-label { font-size: 9px; color: #52525b; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; }
+  </style>
+</head>
+<body>
+  <div class="transport-bar">
+    <div class="transport-logo">Sound<span>Hub</span></div>
+    <div class="transport-divider"></div>
+    <div class="transport-group">
+      <span class="transport-label">Keys</span>
+      <div class="transport-value">3</div>
+    </div>
+    <div class="transport-group">
+      <span class="transport-label">Active</span>
+      <div class="transport-value" style="color:#22c55e">2</div>
+    </div>
+    <div class="transport-group">
+      <span class="transport-label">Rate</span>
+      <div class="transport-value">1K/min</div>
+    </div>
+    <div class="transport-spacer"></div>
+    <div class="transport-time">API KEYS</div>
+    <div class="transport-divider"></div>
+    <div class="transport-group">
+      <span class="transport-label">Calls Today</span>
+      <div class="transport-value">2.4K</div>
+    </div>
+  </div>
+
+  <div class="app-body">
+    <div class="sidebar">
+      <div class="sidebar-search"><input type="text" placeholder="Search..."></div>
+      <div class="sidebar-nav">
+        <div class="sidebar-section">Main</div>
+        <div class="sidebar-item"><span class="icon">📊</span> Dashboard</div>
+        <div class="sidebar-item"><span class="icon">📁</span> Projects</div>
+        <div class="sidebar-item"><span class="icon">🛒</span> Marketplace</div>
+        <div class="sidebar-section">Workspace</div>
+        <div class="sidebar-item"><span class="icon">💬</span> Reviews</div>
+        <div class="sidebar-item"><span class="icon">📋</span> Sessions</div>
+        <div class="sidebar-section">Account</div>
+        <div class="sidebar-item active"><span class="icon">⚙️</span> Settings</div>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="page-header">
+        <div class="page-title">API Keys</div>
+        <div class="header-actions">
+          <button class="btn btn-secondary">📖 API Docs</button>
+          <button class="btn btn-primary">+ Generate New Key</button>
+        </div>
+      </div>
+
+      <div class="settings-layout">
+        <div class="settings-nav">
+          <div class="settings-nav-title">Account</div>
+          <div class="settings-nav-item"><span class="icon">👤</span> Profile</div>
+          <div class="settings-nav-item"><span class="icon">🔐</span> Security</div>
+          <div class="settings-nav-item"><span class="icon">🔔</span> Notifications</div>
+          <div class="settings-nav-title">Workspace</div>
+          <div class="settings-nav-item"><span class="icon">🎨</span> Appearance</div>
+          <div class="settings-nav-item"><span class="icon">💾</span> Storage</div>
+          <div class="settings-nav-item active"><span class="icon">🔌</span> API Keys</div>
+          <div class="settings-nav-title">Billing</div>
+          <div class="settings-nav-item"><span class="icon">💳</span> Subscription</div>
+        </div>
+
+        <div class="settings-content">
+          <!-- Usage Overview -->
+          <div class="settings-section">
+            <div class="settings-section-title">API Usage</div>
+            <div class="settings-section-desc">Monitor your API consumption across all keys.</div>
+
+            <div class="usage-chart">
+              <div class="chart-header">
+                <div class="chart-title">Requests (Last 24 Hours)</div>
+                <div style="font-size:11px;color:#ea5808;font-family:'JetBrains Mono',monospace;font-weight:600">2,412 calls</div>
+              </div>
+              <div class="chart-bars">
+                <div class="chart-bar" style="height:30%"></div>
+                <div class="chart-bar" style="height:45%"></div>
+                <div class="chart-bar" style="height:60%"></div>
+                <div class="chart-bar" style="height:35%"></div>
+                <div class="chart-bar" style="height:80%"></div>
+                <div class="chart-bar" style="height:55%"></div>
+                <div class="chart-bar" style="height:70%"></div>
+                <div class="chart-bar" style="height:40%"></div>
+                <div class="chart-bar" style="height:65%"></div>
+                <div class="chart-bar" style="height:50%"></div>
+                <div class="chart-bar" style="height:75%"></div>
+                <div class="chart-bar" style="height:45%"></div>
+                <div class="chart-bar" style="height:85%"></div>
+                <div class="chart-bar" style="height:60%"></div>
+                <div class="chart-bar" style="height:50%"></div>
+                <div class="chart-bar" style="height:70%"></div>
+                <div class="chart-bar" style="height:40%"></div>
+                <div class="chart-bar" style="height:55%"></div>
+                <div class="chart-bar" style="height:65%"></div>
+                <div class="chart-bar" style="height:45%"></div>
+                <div class="chart-bar" style="height:75%"></div>
+                <div class="chart-bar" style="height:55%"></div>
+                <div class="chart-bar" style="height:65%"></div>
+                <div class="chart-bar" style="height:40%"></div>
+              </div>
+              <div class="chart-labels">
+                <span>00:00</span>
+                <span>06:00</span>
+                <span>12:00</span>
+                <span>18:00</span>
+                <span>Now</span>
+              </div>
+            </div>
+
+            <div class="rate-meter">
+              <div class="rate-meter-label">Rate Limit</div>
+              <div class="rate-meter-bar">
+                <div class="rate-meter-fill" style="width:24%;background:#22c55e"></div>
+              </div>
+              <div class="rate-meter-value" style="color:#22c55e">240 / 1,000 rpm</div>
+            </div>
+          </div>
+
+          <!-- API Keys -->
+          <div class="settings-section">
+            <div class="settings-section-title">Your API Keys</div>
+            <div class="settings-section-desc">Manage API keys for programmatic access to SoundHub.</div>
+
+            <!-- Key 1 -->
+            <div class="api-key-card">
+              <div class="api-key-header">
+                <div class="api-key-name">Production Key</div>
+                <div class="api-key-badge badge-active">Active</div>
+              </div>
+              <div class="api-key-value">
+                <div class="api-key-text">sk_live_a3f8c2d1e5b74f9a8c6d3e2f...masked</div>
+                <button class="btn btn-ghost" style="font-size:10px">👁 Show</button>
+                <button class="btn btn-ghost" style="font-size:10px">📋 Copy</button>
+              </div>
+              <div class="api-key-meta">
+                <div class="api-key-meta-item">🔑 Scopes: read, write, admin</div>
+                <div class="api-key-meta-item">⏱ Rate: 1,000 req/min</div>
+                <div class="api-key-meta-item">📅 Created: Aug 15, 2026</div>
+                <div class="api-key-meta-item">🔄 Last used: 2h ago</div>
+              </div>
+              <div class="api-key-actions">
+                <button class="btn btn-ghost" style="font-size:11px">✏️ Edit</button>
+                <button class="btn btn-ghost" style="font-size:11px">🔄 Regenerate</button>
+                <button class="btn btn-ghost" style="font-size:11px;color:#ef4444">🗑 Revoke</button>
+              </div>
+            </div>
+
+            <!-- Key 2 -->
+            <div class="api-key-card">
+              <div class="api-key-header">
+                <div class="api-key-name">Development Key</div>
+                <div class="api-key-badge badge-active">Active</div>
+              </div>
+              <div class="api-key-value">
+                <div class="api-key-text">sk_dev_b7d4e9f2a1c35g0h9i7j4k2l...masked</div>
+                <button class="btn btn-ghost" style="font-size:10px">👁 Show</button>
+                <button class="btn btn-ghost" style="font-size:10px">📋 Copy</button>
+              </div>
+              <div class="api-key-meta">
+                <div class="api-key-meta-item">🔑 Scopes: read, write</div>
+                <div class="api-key-meta-item">⏱ Rate: 100 req/min</div>
+                <div class="api-key-meta-item">📅 Created: Aug 20, 2026</div>
+                <div class="api-key-meta-item">🔄 Last used: 5h ago</div>
+              </div>
+              <div class="api-key-actions">
+                <button class="btn btn-ghost" style="font-size:11px">✏️ Edit</button>
+                <button class="btn btn-ghost" style="font-size:11px">🔄 Regenerate</button>
+                <button class="btn btn-ghost" style="font-size:11px;color:#ef4444">🗑 Revoke</button>
+              </div>
+            </div>
+
+            <!-- Key 3 (Expired) -->
+            <div class="api-key-card" style="opacity:0.6">
+              <div class="api-key-header">
+                <div class="api-key-name">Old CI Key</div>
+                <div class="api-key-badge badge-expired">Expired</div>
+              </div>
+              <div class="api-key-value">
+                <div class="api-key-text">sk_old_c1a5b8d2e4f67i3j0k8l5m3n...masked</div>
+                <button class="btn btn-ghost" style="font-size:10px">👁 Show</button>
+                <button class="btn btn-ghost" style="font-size:10px">📋 Copy</button>
+              </div>
+              <div class="api-key-meta">
+                <div class="api-key-meta-item">🔑 Scopes: read</div>
+                <div class="api-key-meta-item">⏱ Rate: 50 req/min</div>
+                <div class="api-key-meta-item">📅 Created: Jul 10, 2026</div>
+                <div class="api-key-meta-item">❌ Expired: Aug 10, 2026</div>
+              </div>
+              <div class="api-key-actions">
+                <button class="btn btn-ghost" style="font-size:11px">🔄 Renew</button>
+                <button class="btn btn-ghost" style="font-size:11px;color:#ef4444">🗑 Delete</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Start -->
+          <div class="settings-section">
+            <div class="settings-section-title">Quick Start</div>
+            <div class="settings-section-desc">Get started with the SoundHub API.</div>
+
+            <div style="background:#0d0d0d;border:1px solid #27272a;border-radius:8px;padding:16px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#a1a1aa;line-height:1.8">
+              <div style="color:#52525b"># Install the CLI</div>
+              <div><span style="color:#22c55e">npm</span> install -g @soundhub/cli</div>
+              <br>
+              <div style="color:#52525b"># Authenticate</div>
+              <div><span style="color:#22c55e">snd</span> auth login --key <span style="color:#ea5808">sk_live_...</span></div>
+              <br>
+              <div style="color:#52525b"># Push a project</div>
+              <div><span style="color:#22c55e">snd</span> push --project my-album</div>
+              <br>
+              <div style="color:#52525b"># Or use cURL</div>
+              <div><span style="color:#22c55e">curl</span> -H "Authorization: Bearer <span style="color:#ea5808">sk_live_...</span>" \</div>
+              <div>  https://api.soundhub.app/v1/projects</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="device-chain">
+        <span class="device-chain-label">API:</span>
+        <div class="device active"><div class="led"></div> 2 Keys Active</div>
+        <div class="device"><div class="led"></div> 2.4K calls today</div>
+        <div class="device-chain-spacer"></div>
+        <span class="device-chain-label">Rate:</span>
+        <div class="device"><div class="led"></div> 24% used</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

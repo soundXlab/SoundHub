@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <title>SoundHub — Security (DAW Style)</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',-apple-system,sans-serif;background:#0d0d0d;color:#e4e4e7;overflow:hidden;height:100vh}
+    .transport-bar{height:40px;background:#111113;border-bottom:1px solid #27272a;display:flex;align-items:center;padding:0 12px;gap:16px;font-size:11px;user-select:none}
+    .transport-logo{font-weight:800;font-size:13px;color:#ea5808;letter-spacing:-.5px}.transport-logo span{color:#e4e4e7}
+    .transport-divider{width:1px;height:20px;background:#27272a}
+    .transport-group{display:flex;align-items:center;gap:6px}
+    .transport-label{color:#71717a;font-size:10px;text-transform:uppercase;letter-spacing:.5px}
+    .transport-value{background:#0d0d0d;border:1px solid #27272a;border-radius:4px;padding:2px 8px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#22c55e;font-weight:600;min-width:60px;text-align:center}
+    .transport-spacer{flex:1}
+    .transport-time{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:#e4e4e7;letter-spacing:1px}
+    .app-body{display:flex;height:calc(100vh - 40px)}
+    .sidebar{width:240px;background:#111113;border-right:1px solid #27272a;display:flex;flex-direction:column;user-select:none}
+    .sidebar-search{padding:8px;border-bottom:1px solid #27272a}
+    .sidebar-search input{width:100%;background:#0d0d0d;border:1px solid #27272a;border-radius:4px;padding:6px 8px 6px 28px;font-size:11px;color:#e4e4e7;outline:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:8px center}
+    .sidebar-search input::placeholder{color:#52525b}
+    .sidebar-nav{flex:1;overflow-y:auto;padding:4px 0}
+    .sidebar-section{padding:8px 12px 4px;font-size:9px;color:#52525b;text-transform:uppercase;letter-spacing:1px;font-weight:700}
+    .sidebar-item{padding:6px 12px;font-size:11px;font-weight:500;color:#a1a1aa;cursor:pointer;display:flex;align-items:center;gap:8px;border-left:2px solid transparent;transition:all .1s}
+    .sidebar-item:hover{color:#e4e4e7}
+    .sidebar-item.active{color:#ea5808;background:rgba(234,88,8,.08);border-left-color:#ea5808}
+    .sidebar-item .icon{width:16px;text-align:center}
+    .content{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+    .page-header{padding:16px 24px;border-bottom:1px solid #27272a;display:flex;align-items:center;justify-content:space-between}
+    .page-title{font-size:18px;font-weight:700;color:#e4e4e7}
+    .btn{padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid #27272a;transition:all .15s}
+    .btn-primary{background:#ea5808;color:#fff;border-color:#ea5808}.btn-primary:hover{background:#c2410c}
+    .btn-secondary{background:#1a1a1a;color:#e4e4e7}.btn-secondary:hover{background:#27272a}
+    .btn-ghost{background:transparent;color:#71717a;border-color:transparent}.btn-ghost:hover{color:#e4e4e7;background:#1a1a1a}
+    .btn-danger{background:transparent;color:#ef4444;border-color:#ef4444}
+    .settings-layout{display:flex;flex:1;overflow:hidden}
+    .settings-nav{width:200px;background:#111113;border-right:1px solid #27272a;padding:16px 0;overflow-y:auto;flex-shrink:0}
+    .settings-nav-title{padding:0 16px;font-size:9px;color:#52525b;text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-bottom:8px}
+    .settings-nav-item{padding:8px 16px;font-size:12px;font-weight:500;color:#a1a1aa;cursor:pointer;display:flex;align-items:center;gap:8px;border-left:2px solid transparent;transition:all .1s}
+    .settings-nav-item:hover{color:#e4e4e7;background:rgba(255,255,255,.02)}
+    .settings-nav-item.active{color:#ea5808;background:rgba(234,88,8,.08);border-left-color:#ea5808}
+    .settings-nav-item .icon{width:16px;text-align:center;font-size:13px}
+    .settings-content{flex:1;overflow-y:auto;padding:24px 32px}
+    .settings-section{margin-bottom:32px;padding-bottom:32px;border-bottom:1px solid #27272a}
+    .settings-section:last-child{border-bottom:none}
+    .settings-section-title{font-size:16px;font-weight:700;color:#e4e4e7;margin-bottom:4px}
+    .settings-section-desc{font-size:12px;color:#71717a;margin-bottom:16px}
+    .settings-row{display:flex;align-items:flex-start;gap:16px;margin-bottom:16px}
+    .settings-label{width:180px;flex-shrink:0}
+    .settings-label-title{font-size:12px;font-weight:600;color:#e4e4e7}
+    .settings-label-desc{font-size:11px;color:#52525b;margin-top:2px}
+    .settings-field{flex:1;max-width:480px}
+    .input{width:100%;background:#0d0d0d;border:1px solid #27272a;border-radius:6px;padding:8px 12px;font-size:12px;color:#e4e4e7;outline:none;transition:border-color .15s}
+    .input:focus{border-color:#ea5808}
+    .input::placeholder{color:#52525b}
+    .toggle-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid #1a1a1a}
+    .toggle-row:last-child{border-bottom:none}
+    .toggle-info{flex:1}
+    .toggle-title{font-size:12px;font-weight:500;color:#e4e4e7}
+    .toggle-desc{font-size:11px;color:#52525b;margin-top:2px}
+    .toggle{width:36px;height:20px;background:#27272a;border-radius:10px;position:relative;cursor:pointer;transition:background .2s;flex-shrink:0}
+    .toggle.on{background:#ea5808}
+    .toggle::after{content:'';position:absolute;width:16px;height:16px;background:#fff;border-radius:50%;top:2px;left:2px;transition:transform .2s}
+    .toggle.on::after{transform:translateX(16px)}
+    .session-card{padding:12px;background:#0d0d0d;border:1px solid #27272a;border-radius:6px;margin-bottom:8px}
+    .session-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+    .session-name{font-size:12px;font-weight:600;color:#e4e4e7}
+    .session-badge{padding:3px 8px;border-radius:4px;font-size:9px;font-weight:600}
+    .badge-active{background:rgba(34,197,94,.12);color:#22c55e}
+    .badge-current{background:rgba(234,88,8,.12);color:#ea5808}
+    .session-meta{font-size:10px;color:#71717a;display:flex;gap:16px}
+    .device-chain{height:60px;background:#111113;border-top:1px solid #27272a;display:flex;align-items:center;padding:0 16px;gap:8px}
+    .device{padding:6px 12px;background:#0d0d0d;border:1px solid #27272a;border-radius:4px;font-size:10px;color:#a1a1aa;display:flex;align-items:center;gap:6px;cursor:pointer;transition:all .1s}
+    .device:hover{border-color:#3f3f46;color:#e4e4e7}
+    .device.active{border-color:#ea5808;color:#ea5808;background:rgba(234,88,8,.08)}
+    .device .led{width:6px;height:6px;border-radius:50%;background:#27272a}
+    .device.active .led{background:#22c55e;box-shadow:0 0 6px rgba(34,197,94,.5)}
+    .device-chain-spacer{flex:1}
+    .device-chain-label{font-size:9px;color:#52525b;text-transform:uppercase;letter-spacing:.5px;font-weight:700}
+  </style>
+</head>
+<body>
+  <div class="transport-bar">
+    <div class="transport-logo">Sound<span>Hub</span></div>
+    <div class="transport-divider"></div>
+    <div class="transport-group"><span class="transport-label">2FA</span><div class="transport-value" style="color:#22c55e">Enabled</div></div>
+    <div class="transport-group"><span class="transport-label">Sessions</span><div class="transport-value">3</div></div>
+    <div class="transport-group"><span class="transport-label">Password</span><div class="transport-value" style="color:#22c55e">Strong</div></div>
+    <div class="transport-spacer"></div>
+    <div class="transport-time">SECURITY</div>
+    <div class="transport-divider"></div>
+    <div class="transport-group"><span class="transport-label">Last login</span><div class="transport-value">2h ago</div></div>
+  </div>
+  <div class="app-body">
+    <div class="sidebar">
+      <div class="sidebar-search"><input type="text" placeholder="Search..."></div>
+      <div class="sidebar-nav">
+        <div class="sidebar-section">Main</div>
+        <div class="sidebar-item"><span class="icon">📊</span> Dashboard</div>
+        <div class="sidebar-item"><span class="icon">📁</span> Projects</div>
+        <div class="sidebar-item"><span class="icon">🛒</span> Marketplace</div>
+        <div class="sidebar-section">Workspace</div>
+        <div class="sidebar-item"><span class="icon">💬</span> Reviews</div>
+        <div class="sidebar-item"><span class="icon">📋</span> Sessions</div>
+        <div class="sidebar-section">Account</div>
+        <div class="sidebar-item active"><span class="icon">⚙️</span> Settings</div>
+      </div>
+    </div>
+    <div class="content">
+      <div class="page-header"><div class="page-title">Security</div><div class="header-actions"><button class="btn btn-primary">Save Changes</button></div></div>
+      <div class="settings-layout">
+        <div class="settings-nav">
+          <div class="settings-nav-title">Account</div>
+          <div class="settings-nav-item"><span class="icon">👤</span> Profile</div>
+          <div class="settings-nav-item active"><span class="icon">🔐</span> Security</div>
+          <div class="settings-nav-item"><span class="icon">🔔</span> Notifications</div>
+          <div class="settings-nav-title">Workspace</div>
+          <div class="settings-nav-item"><span class="icon">🎨</span> Appearance</div>
+          <div class="settings-nav-item"><span class="icon">💾</span> Storage</div>
+          <div class="settings-nav-item"><span class="icon">🔌</span> API Keys</div>
+          <div class="settings-nav-title">Billing</div>
+          <div class="settings-nav-item"><span class="icon">💳</span> Subscription</div>
+        </div>
+        <div class="settings-content">
+          <!-- Password -->
+          <div class="settings-section">
+            <div class="settings-section-title">Password</div>
+            <div class="settings-section-desc">Last changed 45 days ago.</div>
+            <div class="settings-row">
+              <div class="settings-label"><div class="settings-label-title">Current Password</div></div>
+              <div class="settings-field"><input class="input" type="password" placeholder="••••••••"></div>
+            </div>
+            <div class="settings-row">
+              <div class="settings-label"><div class="settings-label-title">New Password</div></div>
+              <div class="settings-field"><input class="input" type="password" placeholder="Min 12 characters"></div>
+            </div>
+            <div class="settings-row">
+              <div class="settings-label"><div class="settings-label-title">Confirm Password</div></div>
+              <div class="settings-field"><input class="input" type="password" placeholder="Repeat new password"></div>
+            </div>
+          </div>
+
+          <!-- 2FA -->
+          <div class="settings-section">
+            <div class="settings-section-title">Two-Factor Authentication</div>
+            <div class="settings-section-desc">Add an extra layer of security to your account.</div>
+            <div style="background:#0d0d0d;border:1px solid #27272a;border-radius:8px;padding:16px">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+                <div>
+                  <div style="font-size:12px;font-weight:600;color:#22c55e">✓ 2FA is enabled</div>
+                  <div style="font-size:11px;color:#71717a;margin-top:2px">Using authenticator app (Google Authenticator)</div>
+                </div>
+                <button class="btn btn-secondary" style="font-size:11px">Disable</button>
+              </div>
+              <div style="padding:8px 12px;background:#111113;border-radius:4px;font-size:11px;color:#71717a">
+                Backup codes: <span style="color:#e4e4e7;font-family:'JetBrains Mono',monospace">8 remaining</span>
+                <button class="btn btn-ghost" style="font-size:10px;margin-left:8px">Regenerate</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Active Sessions -->
+          <div class="settings-section">
+            <div class="settings-section-title">Active Sessions</div>
+            <div class="settings-section-desc">Manage devices logged into your account.</div>
+
+            <div class="session-card" style="border-color:#ea5808">
+              <div class="session-header">
+                <div class="session-name">💻 MacBook Pro — Chrome</div>
+                <div class="session-badge badge-current">Current</div>
+              </div>
+              <div class="session-meta">
+                <span>📍 Berlin, Germany</span>
+                <span>🕐 Last active: now</span>
+                <span>🌐 192.168.1.100</span>
+              </div>
+            </div>
+
+            <div class="session-card">
+              <div class="session-header">
+                <div class="session-name">📱 iPhone 15 — Safari</div>
+                <div class="session-badge badge-active">Active</div>
+              </div>
+              <div class="session-meta">
+                <span>📍 Berlin, Germany</span>
+                <span>🕐 Last active: 3h ago</span>
+                <span>🌐 10.0.0.50</span>
+              </div>
+            </div>
+
+            <div class="session-card">
+              <div class="session-header">
+                <div class="session-name">🖥️ Windows Desktop — Firefox</div>
+                <div class="session-badge badge-active">Active</div>
+              </div>
+              <div class="session-meta">
+                <span>📍 Munich, Germany</span>
+                <span>🕐 Last active: 2d ago</span>
+                <span>🌐 172.16.0.1</span>
+              </div>
+            </div>
+
+            <button class="btn btn-danger" style="font-size:11px;margin-top:8px">Revoke All Other Sessions</button>
+          </div>
+
+          <!-- Login History -->
+          <div class="settings-section">
+            <div class="settings-section-title">Recent Login Activity</div>
+            <div class="settings-section-desc">Monitor login attempts to your account.</div>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <div style="display:flex;align-items:center;gap:12px;padding:8px 12px;background:#111113;border-radius:4px;font-size:11px">
+                <span style="color:#22c55e">✓</span>
+                <span style="color:#71717a;min-width:140px">Aug 30, 14:23</span>
+                <span style="flex:1;color:#a1a1aa">Login successful — Chrome, Berlin</span>
+                <span style="color:#52525b">192.168.1.100</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px;padding:8px 12px;background:#111113;border-radius:4px;font-size:11px">
+                <span style="color:#22c55e">✓</span>
+                <span style="color:#71717a;min-width:140px">Aug 30, 11:05</span>
+                <span style="flex:1;color:#a1a1aa">Login successful — Safari, Berlin</span>
+                <span style="color:#52525b">10.0.0.50</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px;padding:8px 12px;background:rgba(239,68,68,.05);border:1px solid rgba(239,68,68,.2);border-radius:4px;font-size:11px">
+                <span style="color:#ef4444">✕</span>
+                <span style="color:#71717a;min-width:140px">Aug 29, 22:41</span>
+                <span style="flex:1;color:#ef4444">Failed login — unknown device</span>
+                <span style="color:#52525b">45.33.12.8</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px;padding:8px 12px;background:#111113;border-radius:4px;font-size:11px">
+                <span style="color:#22c55e">✓</span>
+                <span style="color:#71717a;min-width:140px">Aug 29, 09:12</span>
+                <span style="flex:1;color:#a1a1aa">Login successful — Firefox, Munich</span>
+                <span style="color:#52525b">172.16.0.1</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="device-chain">
+        <span class="device-chain-label">Security:</span>
+        <div class="device active"><div class="led"></div> 2FA Enabled</div>
+        <div class="device"><div class="led"></div> 3 Sessions</div>
+        <div class="device-chain-spacer"></div>
+        <span class="device-chain-label">Last scan:</span>
+        <div class="device"><div class="led"></div> No threats</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <title>SoundHub — Loading (DAW Style)</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',-apple-system,sans-serif;background:#0d0d0d;color:#e4e4e7;overflow:hidden;height:100vh}
+    .transport-bar{height:40px;background:#111113;border-bottom:1px solid #27272a;display:flex;align-items:center;padding:0 12px;gap:16px;font-size:11px}
+    .transport-logo{font-weight:800;font-size:13px;color:#ea5808;letter-spacing:-.5px}.transport-logo span{color:#e4e4e7}
+    .transport-divider{width:1px;height:20px;background:#27272a}
+    .transport-group{display:flex;align-items:center;gap:6px}
+    .transport-label{color:#71717a;font-size:10px;text-transform:uppercase;letter-spacing:.5px}
+    .transport-value{background:#0d0d0d;border:1px solid #27272a;border-radius:4px;padding:2px 8px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#52525b;font-weight:600;min-width:60px;text-align:center}
+    .transport-spacer{flex:1}
+    .transport-time{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:#e4e4e7;letter-spacing:1px}
+    .app-body{display:flex;height:calc(100vh - 40px)}
+    .sidebar{width:240px;background:#111113;border-right:1px solid #27272a;display:flex;flex-direction:column}
+    .sidebar-nav{flex:1;padding:4px 0}
+    .sidebar-section{padding:8px 12px 4px;font-size:9px;color:#52525b;text-transform:uppercase;letter-spacing:1px;font-weight:700}
+    .sidebar-item{padding:6px 12px;font-size:11px;font-weight:500;color:#52525b;display:flex;align-items:center;gap:8px}
+    .content{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+    .page-header{padding:16px 24px;border-bottom:1px solid #27272a;display:flex;align-items:center;justify-content:space-between}
+    .page-title{font-size:18px;font-weight:700;color:#52525b}
+    
+    @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+    .skeleton{background:linear-gradient(90deg,#1a1a1a 25%,#27272a 50%,#1a1a1a 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:4px}
+    .skeleton-text{height:12px;margin-bottom:8px}
+    .skeleton-title{height:20px;margin-bottom:12px;width:60%}
+    .skeleton-block{height:100px;margin-bottom:16px}
+    .skeleton-card{background:#111113;border:1px solid #27272a;border-radius:8px;padding:16px;margin-bottom:12px}
+    .skeleton-circle{width:32px;height:32px;border-radius:50%}
+    
+    .loading-spinner{width:24px;height:24px;border:3px solid #27272a;border-top-color:#ea5808;border-radius:50%;animation:spin 1s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    
+    .device-chain{height:60px;background:#111113;border-top:1px solid #27272a;display:flex;align-items:center;padding:0 16px;gap:8px}
+    .device{padding:6px 12px;background:#0d0d0d;border:1px solid #27272a;border-radius:4px;font-size:10px;color:#52525b;display:flex;align-items:center;gap:6px}
+    .device .led{width:6px;height:6px;border-radius:50%;background:#27272a;animation:pulse 2s infinite}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+    .device-chain-spacer{flex:1}
+    .device-chain-label{font-size:9px;color:#52525b;text-transform:uppercase;letter-spacing:.5px;font-weight:700}
+  </style>
+</head>
+<body>
+  <div class="transport-bar">
+    <div class="transport-logo">Sound<span>Hub</span></div>
+    <div class="transport-divider"></div>
+    <div class="transport-group"><span class="transport-label">Status</span><div class="transport-value">Loading...</div></div>
+    <div class="transport-spacer"></div>
+    <div class="transport-time">LOADING</div>
+    <div class="transport-divider"></div>
+    <div class="transport-group"><div class="loading-spinner"></div></div>
+  </div>
+  <div class="app-body">
+    <div class="sidebar">
+      <div class="sidebar-nav">
+        <div class="sidebar-section">Main</div>
+        <div class="sidebar-item"><div class="skeleton skeleton-text" style="width:80px"></div></div>
+        <div class="sidebar-item"><div class="skeleton skeleton-text" style="width:90px"></div></div>
+        <div class="sidebar-item"><div class="skeleton skeleton-text" style="width:70px"></div></div>
+        <div class="sidebar-section">Workspace</div>
+        <div class="sidebar-item"><div class="skeleton skeleton-text" style="width:85px"></div></div>
+        <div class="sidebar-item"><div class="skeleton skeleton-text" style="width:75px"></div></div>
+        <div class="sidebar-section">Account</div>
+        <div class="sidebar-item"><div class="skeleton skeleton-text" style="width:80px"></div></div>
+      </div>
+    </div>
+    <div class="content">
+      <div class="page-header"><div class="skeleton skeleton-title"></div><div class="skeleton" style="width:120px;height:32px;border-radius:6px"></div></div>
+      <div style="flex:1;overflow-y:auto;padding:24px">
+        <!-- Stats skeleton -->
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px">
+          <div class="skeleton-card"><div class="skeleton skeleton-text" style="width:60%"></div><div class="skeleton skeleton-title"></div><div class="skeleton skeleton-text" style="width:40%"></div></div>
+          <div class="skeleton-card"><div class="skeleton skeleton-text" style="width:60%"></div><div class="skeleton skeleton-title"></div><div class="skeleton skeleton-text" style="width:40%"></div></div>
+          <div class="skeleton-card"><div class="skeleton skeleton-text" style="width:60%"></div><div class="skeleton skeleton-title"></div><div class="skeleton skeleton-text" style="width:40%"></div></div>
+          <div class="skeleton-card"><div class="skeleton skeleton-text" style="width:60%"></div><div class="skeleton skeleton-title"></div><div class="skeleton skeleton-text" style="width:40%"></div></div>
+        </div>
+        <!-- Content skeleton -->
+        <div class="skeleton-card"><div class="skeleton skeleton-title"></div><div class="skeleton skeleton-block"></div></div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+          <div class="skeleton-card"><div class="skeleton skeleton-block" style="height:80px"></div><div class="skeleton skeleton-text"></div><div class="skeleton skeleton-text" style="width:60%"></div></div>
+          <div class="skeleton-card"><div class="skeleton skeleton-block" style="height:80px"></div><div class="skeleton skeleton-text"></div><div class="skeleton skeleton-text" style="width:60%"></div></div>
+          <div class="skeleton-card"><div class="skeleton skeleton-block" style="height:80px"></div><div class="skeleton skeleton-text"></div><div class="skeleton skeleton-text" style="width:60%"></div></div>
+        </div>
+      </div>
+      <div class="device-chain">
+        <span class="device-chain-label">Loading:</span>
+        <div class="device"><div class="led"></div> Fetching data...</div>
+        <div class="device-chain-spacer"></div>
+        <div class="loading-spinner"></div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <title>SoundHub — Connected Accounts (DAW Style)</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',-apple-system,sans-serif;background:#0d0d0d;color:#e4e4e7;overflow:hidden;height:100vh}
+    .transport-bar{height:40px;background:#111113;border-bottom:1px solid #27272a;display:flex;align-items:center;padding:0 12px;gap:16px;font-size:11px;user-select:none}
+    .transport-logo{font-weight:800;font-size:13px;color:#ea5808;letter-spacing:-.5px}.transport-logo span{color:#e4e4e7}
+    .transport-divider{width:1px;height:20px;background:#27272a}
+    .transport-group{display:flex;align-items:center;gap:6px}
+    .transport-label{color:#71717a;font-size:10px;text-transform:uppercase;letter-spacing:.5px}
+    .transport-value{background:#0d0d0d;border:1px solid #27272a;border-radius:4px;padding:2px 8px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#22c55e;font-weight:600;min-width:60px;text-align:center}
+    .transport-spacer{flex:1}
+    .transport-time{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:#e4e4e7;letter-spacing:1px}
+    .app-body{display:flex;height:calc(100vh - 40px)}
+    .sidebar{width:240px;background:#111113;border-right:1px solid #27272a;display:flex;flex-direction:column;user-select:none}
+    .sidebar-search{padding:8px;border-bottom:1px solid #27272a}
+    .sidebar-search input{width:100%;background:#0d0d0d;border:1px solid #27272a;border-radius:4px;padding:6px 8px 6px 28px;font-size:11px;color:#e4e4e7;outline:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:8px center}
+    .sidebar-search input::placeholder{color:#52525b}
+    .sidebar-nav{flex:1;overflow-y:auto;padding:4px 0}
+    .sidebar-section{padding:8px 12px 4px;font-size:9px;color:#52525b;text-transform:uppercase;letter-spacing:1px;font-weight:700}
+    .sidebar-item{padding:6px 12px;font-size:11px;font-weight:500;color:#a1a1aa;cursor:pointer;display:flex;align-items:center;gap:8px;border-left:2px solid transparent;transition:all .1s}
+    .sidebar-item:hover{color:#e4e4e7}
+    .sidebar-item.active{color:#ea5808;background:rgba(234,88,8,.08);border-left-color:#ea5808}
+    .sidebar-item .icon{width:16px;text-align:center}
+    .content{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+    .page-header{padding:16px 24px;border-bottom:1px solid #27272a;display:flex;align-items:center;justify-content:space-between}
+    .page-title{font-size:18px;font-weight:700;color:#e4e4e7}
+    .settings-layout{display:flex;flex:1;overflow:hidden}
+    .settings-nav{width:200px;background:#111113;border-right:1px solid #27272a;padding:16px 0;overflow-y:auto;flex-shrink:0}
+    .settings-nav-title{padding:0 16px;font-size:9px;color:#52525b;text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-bottom:8px}
+    .settings-nav-item{padding:8px 16px;font-size:12px;font-weight:500;color:#a1a1aa;cursor:pointer;display:flex;align-items:center;gap:8px;border-left:2px solid transparent;transition:all .1s}
+    .settings-nav-item:hover{color:#e4e4e7;background:rgba(255,255,255,.02)}
+    .settings-nav-item.active{color:#ea5808;background:rgba(234,88,8,.08);border-left-color:#ea5808}
+    .settings-nav-item .icon{width:16px;text-align:center;font-size:13px}
+    .settings-content{flex:1;overflow-y:auto;padding:24px 32px}
+    .settings-section{margin-bottom:32px;padding-bottom:32px;border-bottom:1px solid #27272a}
+    .settings-section:last-child{border-bottom:none}
+    .settings-section-title{font-size:16px;font-weight:700;color:#e4e4e7;margin-bottom:4px}
+    .settings-section-desc{font-size:12px;color:#71717a;margin-bottom:16px}
+    .account-card{background:#111113;border:1px solid #27272a;border-radius:8px;padding:16px;margin-bottom:12px}
+    .account-header{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+    .account-icon{width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px}
+    .account-name{font-size:13px;font-weight:600;color:#e4e4e7}
+    .account-email{font-size:11px;color:#71717a}
+    .account-badge{margin-left:auto;padding:3px 8px;border-radius:4px;font-size:9px;font-weight:600}
+    .badge-connected{background:rgba(34,197,94,.12);color:#22c55e}
+    .badge-available{background:rgba(113,113,122,.12);color:#71717a}
+    .btn{padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid #27272a;transition:all .15s}
+    .btn-primary{background:#ea5808;color:#fff;border-color:#ea5808}.btn-primary:hover{background:#c2410c}
+    .btn-secondary{background:#1a1a1a;color:#e4e4e7}
+    .btn-ghost{background:transparent;color:#71717a;border-color:transparent}.btn-ghost:hover{color:#e4e4e7;background:#1a1a1a}
+    .btn-danger{background:transparent;color:#ef4444;border-color:#ef4444}
+    .device-chain{height:60px;background:#111113;border-top:1px solid #27272a;display:flex;align-items:center;padding:0 16px;gap:8px}
+    .device{padding:6px 12px;background:#0d0d0d;border:1px solid #27272a;border-radius:4px;font-size:10px;color:#a1a1aa;display:flex;align-items:center;gap:6px;cursor:pointer;transition:all .1s}
+    .device:hover{border-color:#3f3f46;color:#e4e4e7}
+    .device.active{border-color:#ea5808;color:#ea5808;background:rgba(234,88,8,.08)}
+    .device .led{width:6px;height:6px;border-radius:50%;background:#27272a}
+    .device.active .led{background:#22c55e;box-shadow:0 0 6px rgba(34,197,94,.5)}
+    .device-chain-spacer{flex:1}
+    .device-chain-label{font-size:9px;color:#52525b;text-transform:uppercase;letter-spacing:.5px;font-weight:700}
+  </style>
+</head>
+<body>
+  <div class="transport-bar">
+    <div class="transport-logo">Sound<span>Hub</span></div>
+    <div class="transport-divider"></div>
+    <div class="transport-group"><span class="transport-label">Connected</span><div class="transport-value">3</div></div>
+    <div class="transport-group"><span class="transport-label">Wallet</span><div class="transport-value" style="color:#22c55e">0x1a2b...3c4d</div></div>
+    <div class="transport-spacer"></div>
+    <div class="transport-time">ACCOUNTS</div>
+    <div class="transport-divider"></div>
+    <div class="transport-group"><span class="transport-label">Status</span><div class="transport-value" style="color:#22c55e">All OK</div></div>
+  </div>
+  <div class="app-body">
+    <div class="sidebar">
+      <div class="sidebar-search"><input type="text" placeholder="Search..."></div>
+      <div class="sidebar-nav">
+        <div class="sidebar-section">Main</div>
+        <div class="sidebar-item"><span class="icon">📊</span> Dashboard</div>
+        <div class="sidebar-item"><span class="icon">📁</span> Projects</div>
+        <div class="sidebar-item"><span class="icon">🛒</span> Marketplace</div>
+        <div class="sidebar-section">Workspace</div>
+        <div class="sidebar-item"><span class="icon">💬</span> Reviews</div>
+        <div class="sidebar-item"><span class="icon">📋</span> Sessions</div>
+        <div class="sidebar-section">Account</div>
+        <div class="sidebar-item active"><span class="icon">⚙️</span> Settings</div>
+      </div>
+    </div>
+    <div class="content">
+      <div class="page-header"><div class="page-title">Connected Accounts</div></div>
+      <div class="settings-layout">
+        <div class="settings-nav">
+          <div class="settings-nav-title">Account</div>
+          <div class="settings-nav-item"><span class="icon">👤</span> Profile</div>
+          <div class="settings-nav-item"><span class="icon">🔐</span> Security</div>
+          <div class="settings-nav-item"><span class="icon">🔗</span> Connected Accounts</div>
+          <div class="settings-nav-title">Workspace</div>
+          <div class="settings-nav-item"><span class="icon">🎨</span> Appearance</div>
+          <div class="settings-nav-item"><span class="icon">💾</span> Storage</div>
+          <div class="settings-nav-item"><span class="icon">🔌</span> API Keys</div>
+        </div>
+        <div class="settings-content">
+          <!-- Wallet -->
+          <div class="settings-section">
+            <div class="settings-section-title">Crypto Wallet</div>
+            <div class="settings-section-desc">Connect your wallet for USDC payments on Base network.</div>
+            <div class="account-card" style="border-color:rgba(34,197,94,.3)">
+              <div class="account-header">
+                <div class="account-icon" style="background:linear-gradient(135deg,#627eea,#3b5998)">🦊</div>
+                <div>
+                  <div class="account-name">MetaMask</div>
+                  <div class="account-email">0x1a2b3c4d5e6f7890abcdef1234567890abcdef3c4d</div>
+                </div>
+                <div class="account-badge badge-connected">Connected</div>
+              </div>
+              <div style="display:flex;gap:16px;font-size:11px;color:#71717a;margin-bottom:12px">
+                <span>Network: <span style="color:#e4e4e7">Base (8453)</span></span>
+                <span>Balance: <span style="color:#22c55e;font-family:'JetBrains Mono',monospace">$142.50 USDC</span></span>
+                <span>Connected: Aug 15, 2026</span>
+              </div>
+              <div style="display:flex;gap:8px">
+                <button class="btn btn-ghost" style="font-size:11px">Verify</button>
+                <button class="btn btn-ghost" style="font-size:11px;color:#ef4444">Disconnect</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Discord -->
+          <div class="settings-section">
+            <div class="settings-section-title">Discord</div>
+            <div class="settings-section-desc">Link your Discord for community features and notifications.</div>
+            <div class="account-card">
+              <div class="account-header">
+                <div class="account-icon" style="background:#5865F2">💬</div>
+                <div>
+                  <div class="account-name">Discord</div>
+                  <div class="account-email">scatter#1234</div>
+                </div>
+                <div class="account-badge badge-connected">Connected</div>
+              </div>
+              <div style="display:flex;gap:16px;font-size:11px;color:#71717a;margin-bottom:12px">
+                <span>Server: <span style="color:#e4e4e7">SoundHub Community</span></span>
+                <span>Role: <span style="color:#ea5808">Verified Creator</span></span>
+                <span>Connected: Aug 20, 2026</span>
+              </div>
+              <div style="display:flex;gap:8px">
+                <button class="btn btn-ghost" style="font-size:11px">Manage Roles</button>
+                <button class="btn btn-ghost" style="font-size:11px;color:#ef4444">Disconnect</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Google -->
+          <div class="settings-section">
+            <div class="settings-section-title">Google</div>
+            <div class="settings-section-desc">Sign in with Google for quick access.</div>
+            <div class="account-card">
+              <div class="account-header">
+                <div class="account-icon" style="background:linear-gradient(135deg,#4285f4,#34a853)">G</div>
+                <div>
+                  <div class="account-name">Google</div>
+                  <div class="account-email">scatter.sound@gmail.com</div>
+                </div>
+                <div class="account-badge badge-connected">Connected</div>
+              </div>
+              <div style="display:flex;gap:16px;font-size:11px;color:#71717a;margin-bottom:12px">
+                <span>Connected: Aug 10, 2026</span>
+              </div>
+              <div style="display:flex;gap:8px">
+                <button class="btn btn-ghost" style="font-size:11px;color:#ef4444">Disconnect</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Available -->
+          <div class="settings-section">
+            <div class="settings-section-title">Available Integrations</div>
+            <div class="settings-section-desc">Connect more services to enhance your workflow.</div>
+
+            <div class="account-card" style="border-style:dashed">
+              <div class="account-header">
+                <div class="account-icon" style="background:#1DB954">🎵</div>
+                <div><div class="account-name">Spotify</div><div class="account-email">Sync your releases</div></div>
+                <button class="btn btn-primary" style="font-size:11px">Connect</button>
+              </div>
+            </div>
+
+            <div class="account-card" style="border-style:dashed">
+              <div class="account-header">
+                <div class="account-icon" style="background:#FF0000">▶</div>
+                <div><div class="account-name">YouTube</div><div class="account-email">Link your channel</div></div>
+                <button class="btn btn-primary" style="font-size:11px">Connect</button>
+              </div>
+            </div>
+
+            <div class="account-card" style="border-style:dashed">
+              <div class="account-header">
+                <div class="account-icon" style="background:#1DA1F2">🐦</div>
+                <div><div class="account-name">Twitter / X</div><div class="account-email">Share your work</div></div>
+                <button class="btn btn-primary" style="font-size:11px">Connect</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="device-chain">
+        <span class="device-chain-label">Accounts:</span>
+        <div class="device active"><div class="led"></div> MetaMask</div>
+        <div class="device active"><div class="led"></div> Discord</div>
+        <div class="device active"><div class="led"></div> Google</div>
+        <div class="device-chain-spacer"></div>
+        <span class="device-chain-label">3 connected</span>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

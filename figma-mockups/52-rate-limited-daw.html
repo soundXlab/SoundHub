@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <title>SoundHub — Rate Limited (DAW Style)</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',-apple-system,sans-serif;background:#0d0d0d;color:#e4e4e7;overflow:hidden;height:100vh;display:flex;align-items:center;justify-content:center}
+    .rate-container{text-align:center;max-width:500px}
+    .rate-icon{font-size:72px;margin-bottom:24px}
+    .rate-code{font-size:48px;font-weight:800;font-family:'JetBrains Mono',monospace;color:#eab308;margin-bottom:8px}
+    .rate-title{font-size:20px;font-weight:700;color:#e4e4e7;margin-bottom:8px}
+    .rate-desc{font-size:13px;color:#71717a;line-height:1.6;margin-bottom:32px}
+    .rate-timer{display:inline-flex;align-items:center;gap:12px;padding:16px 24px;background:#111113;border:1px solid #27272a;border-radius:8px;margin-bottom:32px}
+    .timer-label{font-size:11px;color:#71717a}
+    .timer-value{font-size:24px;font-weight:700;font-family:'JetBrains Mono',monospace;color:#eab308}
+    .timer-seconds{font-size:14px;color:#71717a}
+    .tips{background:#111113;border:1px solid #27272a;border-radius:8px;padding:16px;text-align:left;margin-bottom:24px}
+    .tips-title{font-size:12px;font-weight:600;color:#e4e4e7;margin-bottom:12px}
+    .tip-item{display:flex;align-items:flex-start;gap:8px;padding:6px 0;font-size:11px;color:#a1a1aa;line-height:1.5}
+    .tip-icon{color:#ea5808;flex-shrink:0}
+    .btn{padding:10px 24px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid #27272a;transition:all .15s}
+    .btn-primary{background:#ea5808;color:#fff;border-color:#ea5808}
+    .btn-secondary{background:#1a1a1a;color:#e4e4e7}
+    .waveform-deco{display:flex;align-items:flex-end;justify-content:center;gap:3px;height:40px;margin-bottom:24px;opacity:.3}
+    .wave-bar{width:4px;background:#eab308;border-radius:2px}
+    @keyframes wave{0%,100%{height:10px}50%{height:30px}}
+  </style>
+</head>
+<body>
+  <div class="rate-container">
+    <div class="waveform-deco">
+      <div class="wave-bar" style="height:15px;animation:wave 1s ease-in-out 0s infinite"></div>
+      <div class="wave-bar" style="height:25px;animation:wave 1s ease-in-out 0.1s infinite"></div>
+      <div class="wave-bar" style="height:10px;animation:wave 1s ease-in-out 0.2s infinite"></div>
+      <div class="wave-bar" style="height:30px;animation:wave 1s ease-in-out 0.3s infinite"></div>
+      <div class="wave-bar" style="height:20px;animation:wave 1s ease-in-out 0.4s infinite"></div>
+      <div class="wave-bar" style="height:35px;animation:wave 1s ease-in-out 0.5s infinite"></div>
+      <div class="wave-bar" style="height:15px;animation:wave 1s ease-in-out 0.6s infinite"></div>
+      <div class="wave-bar" style="height:25px;animation:wave 1s ease-in-out 0.7s infinite"></div>
+      <div class="wave-bar" style="height:10px;animation:wave 1s ease-in-out 0.8s infinite"></div>
+      <div class="wave-bar" style="height:20px;animation:wave 1s ease-in-out 0.9s infinite"></div>
+    </div>
+    <div class="rate-icon">🚦</div>
+    <div class="rate-code">429</div>
+    <div class="rate-title">Too Many Requests</div>
+    <div class="rate-desc">You've hit the rate limit. Take a breather and try again in a moment.</div>
+    
+    <div class="rate-timer">
+      <div>
+        <div class="timer-label">Retry in</div>
+        <div style="display:flex;align-items:baseline;gap:4px">
+          <span class="timer-value">00</span>
+          <span class="timer-seconds">:</span>
+          <span class="timer-value">47</span>
+          <span class="timer-seconds">sec</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="tips">
+      <div class="tips-title">💡 Tips</div>
+      <div class="tip-item"><span class="tip-icon">→</span> You've made 60 requests in the last minute. The limit is 60 req/min.</div>
+      <div class="tip-item"><span class="tip-icon">→</span> Use pagination or filters to reduce the number of API calls.</div>
+      <div class="tip-item"><span class="tip-icon">→</span> Consider caching frequently accessed data locally.</div>
+      <div class="tip-item"><span class="tip-icon">→</span> Upgrade to Pro for higher rate limits (1K req/min).</div>
+    </div>
+
+    <div style="display:flex;justify-content:center;gap:12px">
+      <button class="btn btn-secondary" onclick="history.back()">← Go Back</button>
+      <button class="btn btn-primary">Retry Now</button>
+    </div>
+  </div>
+</body>
+</html>

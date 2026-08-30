@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <title>SoundHub — Wishlist (DAW Style)</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',-apple-system,sans-serif;background:#0d0d0d;color:#e4e4e7;overflow:hidden;height:100vh}
+    .transport-bar{height:40px;background:#111113;border-bottom:1px solid #27272a;display:flex;align-items:center;padding:0 12px;gap:16px;font-size:11px;user-select:none}
+    .transport-logo{font-weight:800;font-size:13px;color:#ea5808;letter-spacing:-.5px}.transport-logo span{color:#e4e4e7}
+    .transport-divider{width:1px;height:20px;background:#27272a}
+    .transport-group{display:flex;align-items:center;gap:6px}
+    .transport-label{color:#71717a;font-size:10px;text-transform:uppercase;letter-spacing:.5px}
+    .transport-value{background:#0d0d0d;border:1px solid #27272a;border-radius:4px;padding:2px 8px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#22c55e;font-weight:600;min-width:60px;text-align:center}
+    .transport-spacer{flex:1}
+    .transport-time{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:#e4e4e7;letter-spacing:1px}
+    .app-body{display:flex;height:calc(100vh - 40px)}
+    .sidebar{width:240px;background:#111113;border-right:1px solid #27272a;display:flex;flex-direction:column;user-select:none}
+    .sidebar-search{padding:8px;border-bottom:1px solid #27272a}
+    .sidebar-search input{width:100%;background:#0d0d0d;border:1px solid #27272a;border-radius:4px;padding:6px 8px 6px 28px;font-size:11px;color:#e4e4e7;outline:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:8px center}
+    .sidebar-search input::placeholder{color:#52525b}
+    .sidebar-nav{flex:1;overflow-y:auto;padding:4px 0}
+    .sidebar-section{padding:8px 12px 4px;font-size:9px;color:#52525b;text-transform:uppercase;letter-spacing:1px;font-weight:700}
+    .sidebar-item{padding:6px 12px;font-size:11px;font-weight:500;color:#a1a1aa;cursor:pointer;display:flex;align-items:center;gap:8px;border-left:2px solid transparent;transition:all .1s}
+    .sidebar-item:hover{color:#e4e4e7}
+    .sidebar-item.active{color:#ea5808;background:rgba(234,88,8,.08);border-left-color:#ea5808}
+    .sidebar-item .icon{width:16px;text-align:center}
+    .content{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+    .page-header{padding:16px 24px;border-bottom:1px solid #27272a;display:flex;align-items:center;justify-content:space-between}
+    .page-title{font-size:18px;font-weight:700;color:#e4e4e7}
+    .btn{padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid #27272a;transition:all .15s}
+    .btn-primary{background:#ea5808;color:#fff;border-color:#ea5808}
+    .btn-secondary{background:#1a1a1a;color:#e4e4e7}
+    .btn-ghost{background:transparent;color:#71717a;border-color:transparent}
+    .asset-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;padding:24px;overflow-y:auto;flex:1}
+    .asset-card{background:#111113;border:1px solid #27272a;border-radius:8px;overflow:hidden;cursor:pointer;transition:all .15s;position:relative}
+    .asset-card:hover{border-color:#3f3f46;transform:translateY(-2px)}
+    .wishlist-btn{position:absolute;top:8px;right:8px;width:28px;height:28px;background:rgba(239,68,68,.9);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;z-index:1;cursor:pointer}
+    .waveform-area{height:80px;display:flex;align-items:flex-end;padding:0 12px 12px;gap:2px}
+    .wave-bar{flex:1;border-radius:1px}
+    .card-body{padding:12px}
+    .card-title{font-size:12px;font-weight:600;color:#e4e4e7;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .card-meta{font-size:10px;color:#71717a;margin-top:4px;display:flex;align-items:center;gap:6px}
+    .card-price{font-size:14px;font-weight:700;color:#22c55e;font-family:'JetBrains Mono',monospace}
+    .card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:8px;padding-top:8px;border-top:1px solid #27272a}
+    .device-chain{height:60px;background:#111113;border-top:1px solid #27272a;display:flex;align-items:center;padding:0 16px;gap:8px}
+    .device{padding:6px 12px;background:#0d0d0d;border:1px solid #27272a;border-radius:4px;font-size:10px;color:#a1a1aa;display:flex;align-items:center;gap:6px}
+    .device .led{width:6px;height:6px;border-radius:50%;background:#27272a}
+    .device-chain-spacer{flex:1}
+    .device-chain-label{font-size:9px;color:#52525b;text-transform:uppercase;letter-spacing:.5px;font-weight:700}
+  </style>
+</head>
+<body>
+  <div class="transport-bar">
+    <div class="transport-logo">Sound<span>Hub</span></div>
+    <div class="transport-divider"></div>
+    <div class="transport-group"><span class="transport-label">Saved</span><div class="transport-value">8</div></div>
+    <div class="transport-group"><span class="transport-label">Total Value</span><div class="transport-value">$87.92</div></div>
+    <div class="transport-spacer"></div>
+    <div class="transport-time">WISHLIST</div>
+    <div class="transport-divider"></div>
+    <div class="transport-group"><span class="transport-label">Cart</span><div class="transport-value">3</div></div>
+  </div>
+  <div class="app-body">
+    <div class="sidebar">
+      <div class="sidebar-search"><input type="text" placeholder="Search..."></div>
+      <div class="sidebar-nav">
+        <div class="sidebar-section">Main</div>
+        <div class="sidebar-item"><span class="icon">📊</span> Dashboard</div>
+        <div class="sidebar-item"><span class="icon">📁</span> Projects</div>
+        <div class="sidebar-item active"><span class="icon">🛒</span> Marketplace</div>
+        <div class="sidebar-section">Workspace</div>
+        <div class="sidebar-item"><span class="icon">💬</span> Reviews</div>
+        <div class="sidebar-section">Account</div>
+        <div class="sidebar-item"><span class="icon">⚙️</span> Settings</div>
+      </div>
+    </div>
+    <div class="content">
+      <div class="page-header">
+        <div class="page-title">Wishlist <span style="color:#71717a;font-weight:400;font-size:14px;margin-left:8px">8 items · $87.92 total</span></div>
+        <div><button class="btn btn-primary">🛒 Buy All ($87.92)</button></div>
+      </div>
+      <div class="asset-grid">
+        <div class="asset-card">
+          <div class="wishlist-btn">❤️</div>
+          <div class="waveform-area" style="background:linear-gradient(135deg,rgba(239,68,68,.15),rgba(234,179,8,.1))">
+            <div class="wave-bar" style="height:90%;background:#ef4444"></div><div class="wave-bar" style="height:95%;background:#ef4444"></div><div class="wave-bar" style="height:85%;background:#ef4444"></div><div class="wave-bar" style="height:100%;background:#ef4444"></div><div class="wave-bar" style="height:80%;background:#ef4444"></div><div class="wave-bar" style="height:95%;background:#ef4444"></div><div class="wave-bar" style="height:90%;background:#ef4444"></div><div class="wave-bar" style="height:100%;background:#ef4444"></div>
+          </div>
+          <div class="card-body"><div class="card-title">808 Bass Kit Pro</div><div class="card-meta"><span>by @beatmaker</span></div><div class="card-footer"><div class="card-price">$9.99</div><button class="btn btn-primary" style="font-size:10px;padding:4px 10px">Add to Cart</button></div></div>
+        </div>
+        <div class="asset-card">
+          <div class="wishlist-btn">❤️</div>
+          <div class="waveform-area" style="background:linear-gradient(135deg,rgba(236,72,153,.15),rgba(234,88,8,.1))">
+            <div class="wave-bar" style="height:55%;background:#ec4899"></div><div class="wave-bar" style="height:75%;background:#ec4899"></div><div class="wave-bar" style="height:45%;background:#ec4899"></div><div class="wave-bar" style="height:85%;background:#ec4899"></div><div class="wave-bar" style="height:65%;background:#ec4899"></div><div class="wave-bar" style="height:70%;background:#ec4899"></div><div class="wave-bar" style="height:50%;background:#ec4899"></div><div class="wave-bar" style="height:80%;background:#ec4899"></div>
+          </div>
+          <div class="card-body"><div class="card-title">Synthwave Dreams Vol.2</div><div class="card-meta"><span>by @neonbeats</span></div><div class="card-footer"><div class="card-price">$14.99</div><button class="btn btn-primary" style="font-size:10px;padding:4px 10px">Add to Cart</button></div></div>
+        </div>
+        <div class="asset-card">
+          <div class="wishlist-btn">❤️</div>
+          <div class="waveform-area" style="background:linear-gradient(135deg,rgba(168,85,247,.15),rgba(234,88,8,.1))">
+            <div class="wave-bar" style="height:70%;background:#a855f7"></div><div class="wave-bar" style="height:85%;background:#a855f7"></div><div class="wave-bar" style="height:60%;background:#a855f7"></div><div class="wave-bar" style="height:95%;background:#a855f7"></div><div class="wave-bar" style="height:75%;background:#a855f7"></div><div class="wave-bar" style="height:80%;background:#a855f7"></div><div class="wave-bar" style="height:65%;background:#a855f7"></div><div class="wave-bar" style="height:90%;background:#a855f7"></div>
+          </div>
+          <div class="card-body"><div class="card-title">Orchestral Strings Pro</div><div class="card-meta"><span>by @in-house</span></div><div class="card-footer"><div class="card-price">$19.99</div><button class="btn btn-primary" style="font-size:10px;padding:4px 10px">Add to Cart</button></div></div>
+        </div>
+        <div class="asset-card">
+          <div class="wishlist-btn">❤️</div>
+          <div class="waveform-area" style="background:linear-gradient(135deg,rgba(34,197,94,.15),rgba(6,182,212,.1))">
+            <div class="wave-bar" style="height:40%;background:#22c55e"></div><div class="wave-bar" style="height:55%;background:#22c55e"></div><div class="wave-bar" style="height:65%;background:#22c55e"></div><div class="wave-bar" style="height:50%;background:#22c55e"></div><div class="wave-bar" style="height:75%;background:#22c55e"></div><div class="wave-bar" style="height:60%;background:#22c55e"></div><div class="wave-bar" style="height:45%;background:#22c55e"></div><div class="wave-bar" style="height:70%;background:#22c55e"></div>
+          </div>
+          <div class="card-body"><div class="card-title">Organic Percussion</div><div class="card-meta"><span>by @worldsounds</span></div><div class="card-footer"><div class="card-price">$7.99</div><button class="btn btn-primary" style="font-size:10px;padding:4px 10px">Add to Cart</button></div></div>
+        </div>
+      </div>
+      <div class="device-chain">
+        <span class="device-chain-label">Wishlist:</span>
+        <div class="device active"><div class="led"></div> 8 Items</div>
+        <div class="device"><div class="led"></div> $87.92 Total</div>
+        <div class="device-chain-spacer"></div>
+        <span class="device-chain-label">Cart:</span>
+        <div class="device"><div class="led"></div> 3 Items</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

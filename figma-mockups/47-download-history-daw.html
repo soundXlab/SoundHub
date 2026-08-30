@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <title>SoundHub — Download History (DAW Style)</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',-apple-system,sans-serif;background:#0d0d0d;color:#e4e4e7;overflow:hidden;height:100vh}
+    .transport-bar{height:40px;background:#111113;border-bottom:1px solid #27272a;display:flex;align-items:center;padding:0 12px;gap:16px;font-size:11px;user-select:none}
+    .transport-logo{font-weight:800;font-size:13px;color:#ea5808;letter-spacing:-.5px}.transport-logo span{color:#e4e4e7}
+    .transport-divider{width:1px;height:20px;background:#27272a}
+    .transport-group{display:flex;align-items:center;gap:6px}
+    .transport-label{color:#71717a;font-size:10px;text-transform:uppercase;letter-spacing:.5px}
+    .transport-value{background:#0d0d0d;border:1px solid #27272a;border-radius:4px;padding:2px 8px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#22c55e;font-weight:600;min-width:60px;text-align:center}
+    .transport-spacer{flex:1}
+    .transport-time{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:#e4e4e7;letter-spacing:1px}
+    .app-body{display:flex;height:calc(100vh - 40px)}
+    .sidebar{width:240px;background:#111113;border-right:1px solid #27272a;display:flex;flex-direction:column;user-select:none}
+    .sidebar-search{padding:8px;border-bottom:1px solid #27272a}
+    .sidebar-search input{width:100%;background:#0d0d0d;border:1px solid #27272a;border-radius:4px;padding:6px 8px 6px 28px;font-size:11px;color:#e4e4e7;outline:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:8px center}
+    .sidebar-search input::placeholder{color:#52525b}
+    .sidebar-nav{flex:1;overflow-y:auto;padding:4px 0}
+    .sidebar-section{padding:8px 12px 4px;font-size:9px;color:#52525b;text-transform:uppercase;letter-spacing:1px;font-weight:700}
+    .sidebar-item{padding:6px 12px;font-size:11px;font-weight:500;color:#a1a1aa;cursor:pointer;display:flex;align-items:center;gap:8px;border-left:2px solid transparent;transition:all .1s}
+    .sidebar-item:hover{color:#e4e4e7}
+    .sidebar-item.active{color:#ea5808;background:rgba(234,88,8,.08);border-left-color:#ea5808}
+    .sidebar-item .icon{width:16px;text-align:center}
+    .content{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+    .page-header{padding:16px 24px;border-bottom:1px solid #27272a;display:flex;align-items:center;justify-content:space-between}
+    .page-title{font-size:18px;font-weight:700;color:#e4e4e7}
+    .btn{padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid #27272a;transition:all .15s}
+    .btn-secondary{background:#1a1a1a;color:#e4e4e7}
+    .btn-ghost{background:transparent;color:#71717a;border-color:transparent}
+    .filter-tabs{display:flex;gap:0;border-bottom:1px solid #27272a;padding:0 24px;background:#111113}
+    .filter-tab{padding:10px 16px;font-size:12px;font-weight:500;color:#71717a;cursor:pointer;border-bottom:2px solid transparent;transition:all .1s}
+    .filter-tab:hover{color:#e4e4e7}
+    .filter-tab.active{color:#ea5808;border-bottom-color:#ea5808}
+    .dashboard-container{flex:1;overflow-y:auto;padding:24px}
+    .transactions-table{width:100%;border-collapse:collapse}
+    .transactions-table th{padding:10px 12px;text-align:left;font-size:10px;color:#52525b;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid #27272a}
+    .transactions-table td{padding:12px;font-size:12px;color:#a1a1aa;border-bottom:1px solid #1a1a1a}
+    .transactions-table tr:hover td{background:rgba(255,255,255,.02)}
+    .file-name{display:flex;align-items:center;gap:10px}
+    .file-icon{width:32px;height:32px;background:#0d0d0d;border:1px solid #27272a;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px}
+    .type-badge{padding:3px 8px;border-radius:4px;font-size:9px;font-weight:600;text-transform:uppercase}
+    .type-wav{background:rgba(234,88,8,.12);color:#ea5808}
+    .type-flac{background:rgba(34,197,94,.12);color:#22c55e}
+    .type-mp3{background:rgba(59,130,246,.12);color:#3b82f6}
+    .device-chain{height:60px;background:#111113;border-top:1px solid #27272a;display:flex;align-items:center;padding:0 16px;gap:8px}
+    .device{padding:6px 12px;background:#0d0d0d;border:1px solid #27272a;border-radius:4px;font-size:10px;color:#a1a1aa;display:flex;align-items:center;gap:6px}
+    .device .led{width:6px;height:6px;border-radius:50%;background:#27272a}
+    .device-chain-spacer{flex:1}
+    .device-chain-label{font-size:9px;color:#52525b;text-transform:uppercase;letter-spacing:.5px;font-weight:700}
+  </style>
+</head>
+<body>
+  <div class="transport-bar">
+    <div class="transport-logo">Sound<span>Hub</span></div>
+    <div class="transport-divider"></div>
+    <div class="transport-group"><span class="transport-label">Downloads</span><div class="transport-value">47</div></div>
+    <div class="transport-group"><span class="transport-label">Size</span><div class="transport-value">2.4 GB</div></div>
+    <div class="transport-spacer"></div>
+    <div class="transport-time">DOWNLOADS</div>
+    <div class="transport-divider"></div>
+    <div class="transport-group"><span class="transport-label">This Month</span><div class="transport-value">12</div></div>
+  </div>
+  <div class="app-body">
+    <div class="sidebar">
+      <div class="sidebar-search"><input type="text" placeholder="Search..."></div>
+      <div class="sidebar-nav">
+        <div class="sidebar-section">Main</div>
+        <div class="sidebar-item"><span class="icon">📊</span> Dashboard</div>
+        <div class="sidebar-item"><span class="icon">📁</span> Projects</div>
+        <div class="sidebar-item active"><span class="icon">🛒</span> Marketplace</div>
+        <div class="sidebar-section">Workspace</div>
+        <div class="sidebar-item"><span class="icon">💬</span> Reviews</div>
+        <div class="sidebar-section">Account</div>
+        <div class="sidebar-item"><span class="icon">⚙️</span> Settings</div>
+      </div>
+    </div>
+    <div class="content">
+      <div class="page-header"><div class="page-title">Download History</div><div><button class="btn btn-secondary">📦 Export List</button></div></div>
+      <div class="filter-tabs">
+        <div class="filter-tab active">All (47)</div>
+        <div class="filter-tab">Purchased (18)</div>
+        <div class="filter-tab">Free (29)</div>
+        <div class="filter-tab">This Month (12)</div>
+      </div>
+      <div class="dashboard-container">
+        <table class="transactions-table">
+          <thead><tr><th>Asset</th><th>Type</th><th>Size</th><th>Price</th><th>Date</th><th></th></tr></thead>
+          <tbody>
+            <tr>
+              <td><div class="file-name"><div class="file-icon">🎵</div><div><div style="color:#e4e4e7;font-weight:600">808 Bass Kit</div><div style="font-size:10px;color:#52525b">by @beatmaker</div></div></div></td>
+              <td><span class="type-badge type-wav">WAV</span></td>
+              <td style="font-family:'JetBrains Mono',monospace">120 MB</td>
+              <td style="font-family:'JetBrains Mono',monospace;color:#22c55e">$9.99</td>
+              <td>Aug 30, 2026</td>
+              <td><button class="btn btn-ghost" style="font-size:10px">⬇ Re-download</button></td>
+            </tr>
+            <tr>
+              <td><div class="file-name"><div class="file-icon">🎹</div><div><div style="color:#e4e4e7;font-weight:600">Synthwave Dreams</div><div style="font-size:10px;color:#52525b">by @neonbeats</div></div></div></td>
+              <td><span class="type-badge type-wav">WAV</span></td>
+              <td style="font-family:'JetBrains Mono',monospace">85 MB</td>
+              <td style="font-family:'JetBrains Mono',monospace;color:#22c55e">$14.99</td>
+              <td>Aug 28, 2026</td>
+              <td><button class="btn btn-ghost" style="font-size:10px">⬇ Re-download</button></td>
+            </tr>
+            <tr>
+              <td><div class="file-name"><div class="file-icon">🎻</div><div><div style="color:#e4e4e7;font-weight:600">Orchestral Strings</div><div style="font-size:10px;color:#52525b">by @in-house</div></div></div></td>
+              <td><span class="type-badge type-wav">WAV</span></td>
+              <td style="font-family:'JetBrains Mono',monospace">320 MB</td>
+              <td style="font-family:'JetBrains Mono',monospace;color:#22c55e">$19.99</td>
+              <td>Aug 25, 2026</td>
+              <td><button class="btn btn-ghost" style="font-size:10px">⬇ Re-download</button></td>
+            </tr>
+            <tr>
+              <td><div class="file-name"><div class="file-icon">🎧</div><div><div style="color:#e4e4e7;font-weight:600">Chillhop Beats Vol.3</div><div style="font-size:10px;color:#52525b">by @lofimaster</div></div></div></td>
+              <td><span class="type-badge type-wav">WAV</span></td>
+              <td style="font-family:'JetBrains Mono',monospace">65 MB</td>
+              <td style="font-family:'JetBrains Mono',monospace;color:#3b82f6">Free</td>
+              <td>Aug 22, 2026</td>
+              <td><button class="btn btn-ghost" style="font-size:10px">⬇ Re-download</button></td>
+            </tr>
+            <tr>
+              <td><div class="file-name"><div class="file-icon">🎸</div><div><div style="color:#e4e4e7;font-weight:600">Organic Percussion</div><div style="font-size:10px;color:#52525b">by @worldsounds</div></div></div></td>
+              <td><span class="type-badge type-flac">FLAC</span></td>
+              <td style="font-family:'JetBrains Mono',monospace">180 MB</td>
+              <td style="font-family:'JetBrains Mono',monospace;color:#22c55e">$7.99</td>
+              <td>Aug 20, 2026</td>
+              <td><button class="btn btn-ghost" style="font-size:10px">⬇ Re-download</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="device-chain">
+        <span class="device-chain-label">Downloads:</span>
+        <div class="device active"><div class="led"></div> 47 Total</div>
+        <div class="device"><div class="led"></div> 2.4 GB</div>
+        <div class="device-chain-spacer"></div>
+        <span class="device-chain-label">Last:</span>
+        <div class="device"><div class="led"></div> 808 Bass Kit</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

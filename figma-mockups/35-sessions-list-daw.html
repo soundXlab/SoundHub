@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <title>SoundHub — Sessions List (DAW Style)</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', -apple-system, sans-serif; background: #0d0d0d; color: #e4e4e7; overflow: hidden; height: 100vh; }
+
+    /* ── Transport Bar ── */
+    .transport-bar {
+      height: 40px; background: #111113; border-bottom: 1px solid #27272a;
+      display: flex; align-items: center; padding: 0 12px; gap: 16px;
+      font-size: 11px; user-select: none;
+    }
+    .transport-logo { font-weight: 800; font-size: 13px; color: #ea5808; letter-spacing: -0.5px; }
+    .transport-logo span { color: #e4e4e7; }
+    .transport-divider { width: 1px; height: 20px; background: #27272a; }
+    .transport-group { display: flex; align-items: center; gap: 6px; }
+    .transport-label { color: #71717a; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .transport-value {
+      background: #0d0d0d; border: 1px solid #27272a; border-radius: 4px;
+      padding: 2px 8px; font-family: 'JetBrains Mono', monospace; font-size: 12px;
+      color: #22c55e; font-weight: 600; min-width: 60px; text-align: center;
+    }
+    .transport-spacer { flex: 1; }
+    .transport-time {
+      font-family: 'JetBrains Mono', monospace; font-size: 18px; font-weight: 700;
+      color: #e4e4e7; letter-spacing: 1px;
+    }
+
+    /* ── Main Layout ── */
+    .app-body { display: flex; height: calc(100vh - 40px); }
+
+    /* ── Left Sidebar ── */
+    .sidebar {
+      width: 240px; background: #111113; border-right: 1px solid #27272a;
+      display: flex; flex-direction: column; user-select: none;
+    }
+    .sidebar-search { padding: 8px; border-bottom: 1px solid #27272a; }
+    .sidebar-search input {
+      width: 100%; background: #0d0d0d; border: 1px solid #27272a; border-radius: 4px;
+      padding: 6px 8px 6px 28px; font-size: 11px; color: #e4e4e7; outline: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: 8px center;
+    }
+    .sidebar-search input::placeholder { color: #52525b; }
+    .sidebar-nav { flex: 1; overflow-y: auto; padding: 4px 0; }
+    .sidebar-section { padding: 8px 12px 4px; font-size: 9px; color: #52525b; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+    .sidebar-item {
+      padding: 6px 12px; font-size: 11px; font-weight: 500; color: #a1a1aa;
+      cursor: pointer; display: flex; align-items: center; gap: 8px;
+      border-left: 2px solid transparent; transition: all 0.1s;
+    }
+    .sidebar-item:hover { color: #e4e4e7; }
+    .sidebar-item.active { color: #ea5808; background: rgba(234,88,8,0.08); border-left-color: #ea5808; }
+    .sidebar-item .icon { width: 16px; text-align: center; }
+    .sidebar-badge {
+      margin-left: auto; background: #ea5808; color: #fff;
+      font-size: 9px; padding: 1px 5px; border-radius: 8px;
+    }
+
+    /* ── Content Area ── */
+    .content { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
+
+    /* ── Header ── */
+    .page-header {
+      padding: 16px 24px; border-bottom: 1px solid #27272a;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .page-title { font-size: 18px; font-weight: 700; color: #e4e4e7; }
+    .header-actions { display: flex; gap: 8px; }
+    .btn {
+      padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 600;
+      cursor: pointer; border: 1px solid #27272a; transition: all 0.15s;
+    }
+    .btn-primary { background: #ea5808; color: #fff; border-color: #ea5808; }
+    .btn-primary:hover { background: #c2410c; }
+    .btn-secondary { background: #1a1a1a; color: #e4e4e7; }
+    .btn-secondary:hover { background: #27272a; }
+    .btn-ghost { background: transparent; color: #71717a; border-color: transparent; }
+    .btn-ghost:hover { color: #e4e4e7; background: #1a1a1a; }
+
+    /* ── Filter Bar ── */
+    .filter-bar {
+      padding: 12px 24px; border-bottom: 1px solid #27272a;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .filter-group { display: flex; gap: 4px; }
+    .filter-btn {
+      padding: 5px 10px; border-radius: 4px; font-size: 11px; font-weight: 500;
+      cursor: pointer; border: 1px solid #27272a; background: transparent;
+      color: #71717a; transition: all 0.1s;
+    }
+    .filter-btn:hover { color: #e4e4e7; border-color: #3f3f46; }
+    .filter-btn.active { background: #ea5808; color: #fff; border-color: #ea5808; }
+    .filter-search {
+      flex: 1; background: #0d0d0d; border: 1px solid #27272a; border-radius: 4px;
+      padding: 5px 10px; font-size: 11px; color: #e4e4e7; outline: none;
+      max-width: 200px;
+    }
+    .filter-search::placeholder { color: #52525b; }
+    .filter-divider { width: 1px; height: 20px; background: #27272a; }
+
+    /* ── Sessions Grid ── */
+    .sessions-container {
+      flex: 1; overflow-y: auto; padding: 24px;
+    }
+    .sessions-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 16px;
+    }
+
+    /* ── Session Card ── */
+    .session-card {
+      background: #111113; border: 1px solid #27272a; border-radius: 8px;
+      overflow: hidden; cursor: pointer; transition: all 0.15s;
+    }
+    .session-card:hover { border-color: #3f3f46; transform: translateY(-1px); }
+    .session-card-header {
+      padding: 12px 14px; border-bottom: 1px solid #27272a;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .session-card-title { font-size: 13px; font-weight: 700; color: #e4e4e7; }
+    .session-card-badge {
+      padding: 2px 8px; border-radius: 4px; font-size: 9px;
+      font-weight: 600; text-transform: uppercase;
+    }
+    .badge-active { background: rgba(234,88,8,0.12); color: #ea5808; }
+    .badge-review { background: rgba(234,179,8,0.12); color: #eab308; }
+    .badge-complete { background: rgba(34,197,94,0.12); color: #22c55e; }
+    .badge-draft { background: rgba(113,113,122,0.12); color: #71717a; }
+    .session-card-body { padding: 12px 14px; }
+    .session-card-meta {
+      display: flex; align-items: center; gap: 12px; font-size: 11px; color: #71717a;
+      margin-bottom: 10px;
+    }
+    .session-card-meta-item {
+      display: flex; align-items: center; gap: 4px;
+    }
+    .session-card-waveform {
+      display: flex; align-items: flex-end; gap: 1px; height: 32px;
+      margin-bottom: 10px;
+    }
+    .session-wave-bar { flex: 1; background: #ea5808; border-radius: 1px; opacity: 0.6; }
+    .session-card-footer {
+      padding: 10px 14px; border-top: 1px solid #27272a;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .session-card-participants {
+      display: flex; align-items: center;
+    }
+    .session-card-avatar {
+      width: 22px; height: 22px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 9px; font-weight: 700; color: #fff;
+      border: 2px solid #111113; margin-left: -6px;
+    }
+    .session-card-avatar:first-child { margin-left: 0; }
+    .session-card-time { font-size: 10px; color: #52525b; }
+
+    /* ── Device Chain (Bottom) ── */
+    .device-chain {
+      height: 60px; background: #111113; border-top: 1px solid #27272a;
+      display: flex; align-items: center; padding: 0 16px; gap: 8px;
+    }
+    .device {
+      padding: 6px 12px; background: #0d0d0d; border: 1px solid #27272a;
+      border-radius: 4px; font-size: 10px; color: #a1a1aa;
+      display: flex; align-items: center; gap: 6px; cursor: pointer;
+      transition: all 0.1s;
+    }
+    .device:hover { border-color: #3f3f46; color: #e4e4e7; }
+    .device.active { border-color: #ea5808; color: #ea5808; background: rgba(234,88,8,0.08); }
+    .device .led { width: 6px; height: 6px; border-radius: 50%; background: #27272a; }
+    .device.active .led { background: #22c55e; box-shadow: 0 0 6px rgba(34,197,94,0.5); }
+    .device-chain-spacer { flex: 1; }
+    .device-chain-label {
+      font-size: 9px; color: #52525b; text-transform: uppercase;
+      letter-spacing: 0.5px; font-weight: 700;
+    }
+
+    /* ── Stats Bar ── */
+    .stats-bar {
+      padding: 8px 24px; border-bottom: 1px solid #27272a;
+      display: flex; gap: 24px; font-size: 11px; color: #71717a;
+    }
+    .stats-item { display: flex; align-items: center; gap: 6px; }
+    .stats-value { font-weight: 600; color: #e4e4e7; font-family: 'JetBrains Mono', monospace; }
+  </style>
+</head>
+<body>
+  <!-- Transport Bar -->
+  <div class="transport-bar">
+    <div class="transport-logo">Sound<span>Hub</span></div>
+    <div class="transport-divider"></div>
+    <div class="transport-group">
+      <span class="transport-label">Sessions</span>
+      <div class="transport-value">12</div>
+    </div>
+    <div class="transport-group">
+      <span class="transport-label">Active</span>
+      <div class="transport-value" style="color:#ea5808">4</div>
+    </div>
+    <div class="transport-group">
+      <span class="transport-label">In Review</span>
+      <div class="transport-value" style="color:#eab308">3</div>
+    </div>
+    <div class="transport-spacer"></div>
+    <div class="transport-time">SESSIONS</div>
+    <div class="transport-divider"></div>
+    <div class="transport-group">
+      <span class="transport-label">Budget</span>
+      <div class="transport-value">8/12</div>
+    </div>
+  </div>
+
+  <div class="app-body">
+    <!-- Left Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-search">
+        <input type="text" placeholder="Search sessions...">
+      </div>
+      <div class="sidebar-nav">
+        <div class="sidebar-section">Main</div>
+        <div class="sidebar-item"><span class="icon">📊</span> Dashboard</div>
+        <div class="sidebar-item"><span class="icon">📁</span> Projects</div>
+        <div class="sidebar-item"><span class="icon">🛒</span> Marketplace</div>
+        <div class="sidebar-section">Workspace</div>
+        <div class="sidebar-item"><span class="icon">💬</span> Reviews</div>
+        <div class="sidebar-item active"><span class="icon">📋</span> Sessions <span class="sidebar-badge">12</span></div>
+        <div class="sidebar-section">Account</div>
+        <div class="sidebar-item"><span class="icon">⚙️</span> Settings</div>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+      <!-- Page Header -->
+      <div class="page-header">
+        <div class="page-title">Sessions</div>
+        <div class="header-actions">
+          <button class="btn btn-secondary">📤 Export All</button>
+          <button class="btn btn-primary">+ New Session</button>
+        </div>
+      </div>
+
+      <!-- Filter Bar -->
+      <div class="filter-bar">
+        <div class="filter-group">
+          <div class="filter-btn active">All (12)</div>
+          <div class="filter-btn">Active (4)</div>
+          <div class="filter-btn">In Review (3)</div>
+          <div class="filter-btn">Complete (5)</div>
+        </div>
+        <div class="filter-divider"></div>
+        <input class="filter-search" type="text" placeholder="Filter sessions...">
+      </div>
+
+      <!-- Stats Bar -->
+      <div class="stats-bar">
+        <div class="stats-item">
+          <span>Total Rounds:</span>
+          <span class="stats-value">24</span>
+        </div>
+        <div class="stats-item">
+          <span>Avg. Duration:</span>
+          <span class="stats-value">3:42</span>
+        </div>
+        <div class="stats-item">
+          <span>Completion Rate:</span>
+          <span class="stats-value" style="color:#22c55e">83%</span>
+        </div>
+        <div class="stats-item">
+          <span>Avg. Comments:</span>
+          <span class="stats-value">12</span>
+        </div>
+      </div>
+
+      <!-- Sessions Grid -->
+      <div class="sessions-container">
+        <div class="sessions-grid">
+          <!-- Session 1 -->
+          <div class="session-card">
+            <div class="session-card-header">
+              <div class="session-card-title">Neon Warehouse — Master</div>
+              <div class="session-card-badge badge-active">Active</div>
+            </div>
+            <div class="session-card-body">
+              <div class="session-card-meta">
+                <div class="session-card-meta-item">📁 Project: Neon Album</div>
+                <div class="session-card-meta-item">🔄 Round 2/3</div>
+                <div class="session-card-meta-item">💬 8 comments</div>
+              </div>
+              <div class="session-card-waveform">
+                <div class="session-wave-bar" style="height:40%"></div>
+                <div class="session-wave-bar" style="height:60%"></div>
+                <div class="session-wave-bar" style="height:80%"></div>
+                <div class="session-wave-bar" style="height:50%"></div>
+                <div class="session-wave-bar" style="height:90%"></div>
+                <div class="session-wave-bar" style="height:70%"></div>
+                <div class="session-wave-bar" style="height:45%"></div>
+                <div class="session-wave-bar" style="height:65%"></div>
+                <div class="session-wave-bar" style="height:55%"></div>
+                <div class="session-wave-bar" style="height:75%"></div>
+              </div>
+            </div>
+            <div class="session-card-footer">
+              <div class="session-card-participants">
+                <div class="session-card-avatar" style="background:#ea5808">P</div>
+                <div class="session-card-avatar" style="background:#22c55e">R</div>
+                <div class="session-card-avatar" style="background:#eab308">A</div>
+              </div>
+              <div class="session-card-time">Updated 2h ago</div>
+            </div>
+          </div>
+
+          <!-- Session 2 -->
+          <div class="session-card">
+            <div class="session-card-header">
+              <div class="session-card-title">Midnight Drive — Mix Review</div>
+              <div class="session-card-badge badge-review">In Review</div>
+            </div>
+            <div class="session-card-body">
+              <div class="session-card-meta">
+                <div class="session-card-meta-item">📁 Project: Midnight EP</div>
+                <div class="session-card-meta-item">🔄 Round 1/2</div>
+                <div class="session-card-meta-item">💬 3 comments</div>
+              </div>
+              <div class="session-card-waveform">
+                <div class="session-wave-bar" style="height:30%"></div>
+                <div class="session-wave-bar" style="height:50%"></div>
+                <div class="session-wave-bar" style="height:70%"></div>
+                <div class="session-wave-bar" style="height:40%"></div>
+                <div class="session-wave-bar" style="height:85%"></div>
+                <div class="session-wave-bar" style="height:60%"></div>
+                <div class="session-wave-bar" style="height:35%"></div>
+                <div class="session-wave-bar" style="height:55%"></div>
+                <div class="session-wave-bar" style="height:45%"></div>
+                <div class="session-wave-bar" style="height:65%"></div>
+              </div>
+            </div>
+            <div class="session-card-footer">
+              <div class="session-card-participants">
+                <div class="session-card-avatar" style="background:#3b82f6">M</div>
+                <div class="session-card-avatar" style="background:#8b5cf6">J</div>
+              </div>
+              <div class="session-card-time">Updated 5h ago</div>
+            </div>
+          </div>
+
+          <!-- Session 3 -->
+          <div class="session-card">
+            <div class="session-card-header">
+              <div class="session-card-title">Summer Vibes — Stem Check</div>
+              <div class="session-card-badge badge-complete">Complete</div>
+            </div>
+            <div class="session-card-body">
+              <div class="session-card-meta">
+                <div class="session-card-meta-item">📁 Project: Summer Album</div>
+                <div class="session-card-meta-item">✅ Approved</div>
+                <div class="session-card-meta-item">💬 15 comments</div>
+              </div>
+              <div class="session-card-waveform">
+                <div class="session-wave-bar" style="height:50%"></div>
+                <div class="session-wave-bar" style="height:70%"></div>
+                <div class="session-wave-bar" style="height:90%"></div>
+                <div class="session-wave-bar" style="height:60%"></div>
+                <div class="session-wave-bar" style="height:80%"></div>
+                <div class="session-wave-bar" style="height:45%"></div>
+                <div class="session-wave-bar" style="height:65%"></div>
+                <div class="session-wave-bar" style="height:55%"></div>
+                <div class="session-wave-bar" style="height:75%"></div>
+                <div class="session-wave-bar" style="height:40%"></div>
+              </div>
+            </div>
+            <div class="session-card-footer">
+              <div class="session-card-participants">
+                <div class="session-card-avatar" style="background:#ea5808">P</div>
+                <div class="session-card-avatar" style="background:#22c55e">R</div>
+              </div>
+              <div class="session-card-time">Completed 1d ago</div>
+            </div>
+          </div>
+
+          <!-- Session 4 -->
+          <div class="session-card">
+            <div class="session-card-header">
+              <div class="session-card-title">Deep House — Final Master</div>
+              <div class="session-card-badge badge-draft">Draft</div>
+            </div>
+            <div class="session-card-body">
+              <div class="session-card-meta">
+                <div class="session-card-meta-item">📁 Project: Deep Collection</div>
+                <div class="session-card-meta-item">🔄 Round 0/2</div>
+                <div class="session-card-meta-item">💬 0 comments</div>
+              </div>
+              <div class="session-card-waveform">
+                <div class="session-wave-bar" style="height:25%"></div>
+                <div class="session-wave-bar" style="height:45%"></div>
+                <div class="session-wave-bar" style="height:65%"></div>
+                <div class="session-wave-bar" style="height:35%"></div>
+                <div class="session-wave-bar" style="height:80%"></div>
+                <div class="session-wave-bar" style="height:55%"></div>
+                <div class="session-wave-bar" style="height:30%"></div>
+                <div class="session-wave-bar" style="height:50%"></div>
+                <div class="session-wave-bar" style="height:40%"></div>
+                <div class="session-wave-bar" style="height:60%"></div>
+              </div>
+            </div>
+            <div class="session-card-footer">
+              <div class="session-card-participants">
+                <div class="session-card-avatar" style="background:#ea5808">P</div>
+              </div>
+              <div class="session-card-time">Created 3d ago</div>
+            </div>
+          </div>
+
+          <!-- Session 5 -->
+          <div class="session-card">
+            <div class="session-card-header">
+              <div class="session-card-title">Acoustic Session — Live Mix</div>
+              <div class="session-card-badge badge-active">Active</div>
+            </div>
+            <div class="session-card-body">
+              <div class="session-card-meta">
+                <div class="session-card-meta-item">📁 Project: Acoustic EP</div>
+                <div class="session-card-meta-item">🔄 Round 1/3</div>
+                <div class="session-card-meta-item">💬 5 comments</div>
+              </div>
+              <div class="session-card-waveform">
+                <div class="session-wave-bar" style="height:35%"></div>
+                <div class="session-wave-bar" style="height:55%"></div>
+                <div class="session-wave-bar" style="height:75%"></div>
+                <div class="session-wave-bar" style="height:45%"></div>
+                <div class="session-wave-bar" style="height:85%"></div>
+                <div class="session-wave-bar" style="height:65%"></div>
+                <div class="session-wave-bar" style="height:40%"></div>
+                <div class="session-wave-bar" style="height:60%"></div>
+                <div class="session-wave-bar" style="height:50%"></div>
+                <div class="session-wave-bar" style="height:70%"></div>
+              </div>
+            </div>
+            <div class="session-card-footer">
+              <div class="session-card-participants">
+                <div class="session-card-avatar" style="background:#3b82f6">M</div>
+                <div class="session-card-avatar" style="background:#eab308">A</div>
+                <div class="session-card-avatar" style="background:#8b5cf6">J</div>
+              </div>
+              <div class="session-card-time">Updated 30m ago</div>
+            </div>
+          </div>
+
+          <!-- Session 6 -->
+          <div class="session-card">
+            <div class="session-card-header">
+              <div class="session-card-title">Techno Project — Stem Review</div>
+              <div class="session-card-badge badge-review">In Review</div>
+            </div>
+            <div class="session-card-body">
+              <div class="session-card-meta">
+                <div class="session-card-meta-item">📁 Project: Techno 2024</div>
+                <div class="session-card-meta-item">🔄 Round 2/3</div>
+                <div class="session-card-meta-item">💬 12 comments</div>
+              </div>
+              <div class="session-card-waveform">
+                <div class="session-wave-bar" style="height:45%"></div>
+                <div class="session-wave-bar" style="height:65%"></div>
+                <div class="session-wave-bar" style="height:85%"></div>
+                <div class="session-wave-bar" style="height:55%"></div>
+                <div class="session-wave-bar" style="height:95%"></div>
+                <div class="session-wave-bar" style="height:75%"></div>
+                <div class="session-wave-bar" style="height:50%"></div>
+                <div class="session-wave-bar" style="height:70%"></div>
+                <div class="session-wave-bar" style="height:60%"></div>
+                <div class="session-wave-bar" style="height:80%"></div>
+              </div>
+            </div>
+            <div class="session-card-footer">
+              <div class="session-card-participants">
+                <div class="session-card-avatar" style="background:#ea5808">P</div>
+                <div class="session-card-avatar" style="background:#22c55e">R</div>
+              </div>
+              <div class="session-card-time">Updated 1h ago</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Device Chain -->
+      <div class="device-chain">
+        <span class="device-chain-label">Quick Actions:</span>
+        <div class="device active"><div class="led"></div> + New Session</div>
+        <div class="device"><div class="led"></div> Filter</div>
+        <div class="device"><div class="led"></div> Sort</div>
+        <div class="device-chain-spacer"></div>
+        <span class="device-chain-label">View:</span>
+        <div class="device active"><div class="led"></div> Grid</div>
+        <div class="device"><div class="led"></div> List</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <title>SoundHub — Storage Management (DAW Style)</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', -apple-system, sans-serif; background: #0d0d0d; color: #e4e4e7; overflow: hidden; height: 100vh; }
+    .transport-bar { height: 40px; background: #111113; border-bottom: 1px solid #27272a; display: flex; align-items: center; padding: 0 12px; gap: 16px; font-size: 11px; user-select: none; }
+    .transport-logo { font-weight: 800; font-size: 13px; color: #ea5808; letter-spacing: -0.5px; }
+    .transport-logo span { color: #e4e4e7; }
+    .transport-divider { width: 1px; height: 20px; background: #27272a; }
+    .transport-group { display: flex; align-items: center; gap: 6px; }
+    .transport-label { color: #71717a; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .transport-value { background: #0d0d0d; border: 1px solid #27272a; border-radius: 4px; padding: 2px 8px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #22c55e; font-weight: 600; min-width: 60px; text-align: center; }
+    .transport-spacer { flex: 1; }
+    .transport-time { font-family: 'JetBrains Mono', monospace; font-size: 18px; font-weight: 700; color: #e4e4e7; letter-spacing: 1px; }
+    .app-body { display: flex; height: calc(100vh - 40px); }
+    .sidebar { width: 240px; background: #111113; border-right: 1px solid #27272a; display: flex; flex-direction: column; user-select: none; }
+    .sidebar-search { padding: 8px; border-bottom: 1px solid #27272a; }
+    .sidebar-search input { width: 100%; background: #0d0d0d; border: 1px solid #27272a; border-radius: 4px; padding: 6px 8px 6px 28px; font-size: 11px; color: #e4e4e7; outline: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: 8px center; }
+    .sidebar-search input::placeholder { color: #52525b; }
+    .sidebar-nav { flex: 1; overflow-y: auto; padding: 4px 0; }
+    .sidebar-section { padding: 8px 12px 4px; font-size: 9px; color: #52525b; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+    .sidebar-item { padding: 6px 12px; font-size: 11px; font-weight: 500; color: #a1a1aa; cursor: pointer; display: flex; align-items: center; gap: 8px; border-left: 2px solid transparent; transition: all 0.1s; }
+    .sidebar-item:hover { color: #e4e4e7; }
+    .sidebar-item.active { color: #ea5808; background: rgba(234,88,8,0.08); border-left-color: #ea5808; }
+    .sidebar-item .icon { width: 16px; text-align: center; }
+    .content { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
+    .page-header { padding: 16px 24px; border-bottom: 1px solid #27272a; display: flex; align-items: center; justify-content: space-between; }
+    .page-title { font-size: 18px; font-weight: 700; color: #e4e4e7; }
+    .btn { padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; border: 1px solid #27272a; transition: all 0.15s; }
+    .btn-primary { background: #ea5808; color: #fff; border-color: #ea5808; }
+    .btn-primary:hover { background: #c2410c; }
+    .btn-secondary { background: #1a1a1a; color: #e4e4e7; }
+    .btn-secondary:hover { background: #27272a; }
+    .btn-ghost { background: transparent; color: #71717a; border-color: transparent; }
+    .btn-ghost:hover { color: #e4e4e7; background: #1a1a1a; }
+    .btn-danger { background: transparent; color: #ef4444; border-color: #ef4444; }
+    .btn-danger:hover { background: rgba(239,68,68,0.1); }
+    .settings-layout { display: flex; flex: 1; overflow: hidden; }
+    .settings-nav { width: 200px; background: #111113; border-right: 1px solid #27272a; padding: 16px 0; overflow-y: auto; flex-shrink: 0; }
+    .settings-nav-title { padding: 0 16px; font-size: 9px; color: #52525b; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin-bottom: 8px; }
+    .settings-nav-item { padding: 8px 16px; font-size: 12px; font-weight: 500; color: #a1a1aa; cursor: pointer; display: flex; align-items: center; gap: 8px; border-left: 2px solid transparent; transition: all 0.1s; }
+    .settings-nav-item:hover { color: #e4e4e7; background: rgba(255,255,255,0.02); }
+    .settings-nav-item.active { color: #ea5808; background: rgba(234,88,8,0.08); border-left-color: #ea5808; }
+    .settings-nav-item .icon { width: 16px; text-align: center; font-size: 13px; }
+    .settings-content { flex: 1; overflow-y: auto; padding: 24px 32px; }
+    .settings-section { margin-bottom: 32px; padding-bottom: 32px; border-bottom: 1px solid #27272a; }
+    .settings-section:last-child { border-bottom: none; }
+    .settings-section-title { font-size: 16px; font-weight: 700; color: #e4e4e7; margin-bottom: 4px; }
+    .settings-section-desc { font-size: 12px; color: #71717a; margin-bottom: 16px; }
+
+    /* ── Storage Visual ── */
+    .storage-visual {
+      background: #111113; border: 1px solid #27272a; border-radius: 8px;
+      padding: 24px; margin-bottom: 24px;
+    }
+    .storage-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .storage-title { font-size: 14px; font-weight: 700; color: #e4e4e7; }
+    .storage-amount { font-size: 24px; font-weight: 800; font-family: 'JetBrains Mono', monospace; }
+    .storage-bar { height: 16px; background: #27272a; border-radius: 8px; overflow: hidden; margin-bottom: 16px; }
+    .storage-fill { height: 100%; border-radius: 8px; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; font-size: 9px; font-weight: 700; color: #fff; }
+    .storage-legend { display: flex; gap: 24px; flex-wrap: wrap; }
+    .storage-legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #a1a1aa; }
+    .storage-legend-dot { width: 10px; height: 10px; border-radius: 3px; }
+
+    /* ── Category Cards ── */
+    .category-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
+    .category-card {
+      background: #111113; border: 1px solid #27272a; border-radius: 8px;
+      padding: 16px; cursor: pointer; transition: all 0.15s;
+    }
+    .category-card:hover { border-color: #3f3f46; }
+    .category-card-icon { font-size: 24px; margin-bottom: 8px; }
+    .category-card-name { font-size: 12px; font-weight: 600; color: #e4e4e7; margin-bottom: 4px; }
+    .category-card-size { font-size: 18px; font-weight: 700; font-family: 'JetBrains Mono', monospace; margin-bottom: 4px; }
+    .category-card-count { font-size: 10px; color: #52525b; }
+
+    /* ── Files Table ── */
+    .files-table { width: 100%; border-collapse: collapse; }
+    .files-table th {
+      padding: 10px 12px; text-align: left; font-size: 10px; color: #52525b;
+      text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #27272a;
+    }
+    .files-table td {
+      padding: 12px; font-size: 12px; color: #a1a1aa; border-bottom: 1px solid #1a1a1a;
+    }
+    .files-table tr:hover td { background: rgba(255,255,255,0.02); }
+    .file-name-cell { display: flex; align-items: center; gap: 10px; }
+    .file-icon { width: 32px; height: 32px; background: #0d0d0d; border: 1px solid #27272a; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+    .file-type { padding: 3px 8px; border-radius: 4px; font-size: 9px; font-weight: 600; text-transform: uppercase; }
+    .type-wav { background: rgba(234,88,8,0.12); color: #ea5808; }
+    .type-flac { background: rgba(34,197,94,0.12); color: #22c55e; }
+    .type-mp3 { background: rgba(59,130,246,0.12); color: #3b82f6; }
+    .type-zip { background: rgba(168,85,247,0.12); color: #a855f7; }
+
+    .device-chain { height: 60px; background: #111113; border-top: 1px solid #27272a; display: flex; align-items: center; padding: 0 16px; gap: 8px; }
+    .device { padding: 6px 12px; background: #0d0d0d; border: 1px solid #27272a; border-radius: 4px; font-size: 10px; color: #a1a1aa; display: flex; align-items: center; gap: 6px; cursor: pointer; transition: all 0.1s; }
+    .device:hover { border-color: #3f3f46; color: #e4e4e7; }
+    .device.active { border-color: #ea5808; color: #ea5808; background: rgba(234,88,8,0.08); }
+    .device .led { width: 6px; height: 6px; border-radius: 50%; background: #27272a; }
+    .device.active .led { background: #22c55e; box-shadow: 0 0 6px rgba(34,197,94,0.5); }
+    .device-chain-spacer { flex: 1; }
+    .device-chain-label { font-size: 9px; color: #52525b; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; }
+  </style>
+</head>
+<body>
+  <div class="transport-bar">
+    <div class="transport-logo">Sound<span>Hub</span></div>
+    <div class="transport-divider"></div>
+    <div class="transport-group">
+      <span class="transport-label">Used</span>
+      <div class="transport-value">2.3 GB</div>
+    </div>
+    <div class="transport-group">
+      <span class="transport-label">Free</span>
+      <div class="transport-value" style="color:#22c55e">97.7 GB</div>
+    </div>
+    <div class="transport-group">
+      <span class="transport-label">Plan</span>
+      <div class="transport-value" style="color:#ea5808">100 GB</div>
+    </div>
+    <div class="transport-spacer"></div>
+    <div class="transport-time">STORAGE</div>
+    <div class="transport-divider"></div>
+    <div class="transport-group">
+      <span class="transport-label">Usage</span>
+      <div class="transport-value">2.3%</div>
+    </div>
+  </div>
+
+  <div class="app-body">
+    <div class="sidebar">
+      <div class="sidebar-search"><input type="text" placeholder="Search..."></div>
+      <div class="sidebar-nav">
+        <div class="sidebar-section">Main</div>
+        <div class="sidebar-item"><span class="icon">📊</span> Dashboard</div>
+        <div class="sidebar-item"><span class="icon">📁</span> Projects</div>
+        <div class="sidebar-item"><span class="icon">🛒</span> Marketplace</div>
+        <div class="sidebar-section">Workspace</div>
+        <div class="sidebar-item"><span class="icon">💬</span> Reviews</div>
+        <div class="sidebar-item"><span class="icon">📋</span> Sessions</div>
+        <div class="sidebar-section">Account</div>
+        <div class="sidebar-item active"><span class="icon">⚙️</span> Settings</div>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="page-header">
+        <div class="page-title">Storage Management</div>
+        <div class="header-actions">
+          <button class="btn btn-secondary">🔄 Refresh</button>
+          <button class="btn btn-primary">⬆ Upload Files</button>
+        </div>
+      </div>
+
+      <div class="settings-layout">
+        <div class="settings-nav">
+          <div class="settings-nav-title">Account</div>
+          <div class="settings-nav-item"><span class="icon">👤</span> Profile</div>
+          <div class="settings-nav-item"><span class="icon">🔐</span> Security</div>
+          <div class="settings-nav-item"><span class="icon">🔔</span> Notifications</div>
+          <div class="settings-nav-title">Workspace</div>
+          <div class="settings-nav-item"><span class="icon">🎨</span> Appearance</div>
+          <div class="settings-nav-item active"><span class="icon">💾</span> Storage</div>
+          <div class="settings-nav-item"><span class="icon">🔌</span> API Keys</div>
+          <div class="settings-nav-title">Billing</div>
+          <div class="settings-nav-item"><span class="icon">💳</span> Subscription</div>
+        </div>
+
+        <div class="settings-content">
+          <!-- Storage Visual -->
+          <div class="storage-visual">
+            <div class="storage-header">
+              <div class="storage-title">Storage Overview</div>
+              <div class="storage-amount"><span style="color:#ea5808">2.3 GB</span> <span style="color:#71717a;font-size:14px;font-weight:400">/ 100 GB</span></div>
+            </div>
+            <div class="storage-bar">
+              <div class="storage-fill" style="width:2.3%;background:#ea5808">2.3%</div>
+            </div>
+            <div class="storage-legend">
+              <div class="storage-legend-item">
+                <div class="storage-legend-dot" style="background:#ea5808"></div>
+                Audio Files (1.8 GB)
+              </div>
+              <div class="storage-legend-item">
+                <div class="storage-legend-dot" style="background:#3b82f6"></div>
+                Projects (0.3 GB)
+              </div>
+              <div class="storage-legend-item">
+                <div class="storage-legend-dot" style="background:#22c55e"></div>
+                Stems (0.15 GB)
+              </div>
+              <div class="storage-legend-item">
+                <div class="storage-legend-dot" style="background:#eab308"></div>
+                Other (0.05 GB)
+              </div>
+            </div>
+          </div>
+
+          <!-- Category Cards -->
+          <div class="settings-section">
+            <div class="settings-section-title">By Category</div>
+            <div class="settings-section-desc">Breakdown of your storage usage.</div>
+
+            <div class="category-grid">
+              <div class="category-card">
+                <div class="category-card-icon">🎵</div>
+                <div class="category-card-name">Audio Files</div>
+                <div class="category-card-size" style="color:#ea5808">1.8 GB</div>
+                <div class="category-card-count">24 files</div>
+              </div>
+              <div class="category-card">
+                <div class="category-card-icon">📁</div>
+                <div class="category-card-name">Projects</div>
+                <div class="category-card-size" style="color:#3b82f6">0.3 GB</div>
+                <div class="category-card-count">12 projects</div>
+              </div>
+              <div class="category-card">
+                <div class="category-card-icon">🎸</div>
+                <div class="category-card-name">Stems</div>
+                <div class="category-card-size" style="color:#22c55e">0.15 GB</div>
+                <div class="category-card-count">8 stems</div>
+              </div>
+              <div class="category-card">
+                <div class="category-card-icon">📦</div>
+                <div class="category-card-name">Other</div>
+                <div class="category-card-size" style="color:#eab308">0.05 GB</div>
+                <div class="category-card-count">6 files</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Largest Files -->
+          <div class="settings-section">
+            <div class="settings-section-title">Largest Files</div>
+            <div class="settings-section-desc">Files consuming the most storage.</div>
+
+            <table class="files-table">
+              <thead>
+                <tr>
+                  <th>File</th>
+                  <th>Type</th>
+                  <th>Size</th>
+                  <th>Modified</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <div class="file-name-cell">
+                      <div class="file-icon">🎵</div>
+                      <div>
+                        <div style="color:#e4e4e7;font-weight:600">Neon_Warehouse_Master.wav</div>
+                        <div style="font-size:10px;color:#52525b">Projects / Neon Album</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td><span class="file-type type-wav">WAV</span></td>
+                  <td style="font-family:'JetBrains Mono',monospace;font-weight:600">4.1 GB</td>
+                  <td>Aug 30, 2026</td>
+                  <td><button class="btn btn-ghost" style="font-size:10px">🗑</button></td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="file-name-cell">
+                      <div class="file-icon">🎸</div>
+                      <div>
+                        <div style="color:#e4e4e7;font-weight:600">Stems_Bundle.zip</div>
+                        <div style="font-size:10px;color:#52525b">Projects / Neon Album</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td><span class="file-type type-zip">ZIP</span></td>
+                  <td style="font-family:'JetBrains Mono',monospace;font-weight:600">8.2 GB</td>
+                  <td>Aug 29, 2026</td>
+                  <td><button class="btn btn-ghost" style="font-size:10px">🗑</button></td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="file-name-cell">
+                      <div class="file-icon">🎵</div>
+                      <div>
+                        <div style="color:#e4e4e7;font-weight:600">Midnight_Drive_Mix.flac</div>
+                        <div style="font-size:10px;color:#52525b">Projects / Midnight EP</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td><span class="file-type type-flac">FLAC</span></td>
+                  <td style="font-family:'JetBrains Mono',monospace;font-weight:600">2.8 GB</td>
+                  <td>Aug 28, 2026</td>
+                  <td><button class="btn btn-ghost" style="font-size:10px">🗑</button></td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="file-name-cell">
+                      <div class="file-icon">🎵</div>
+                      <div>
+                        <div style="color:#e4e4e7;font-weight:600">Summer_Vibes_Master.mp3</div>
+                        <div style="font-size:10px;color:#52525b">Projects / Summer Album</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td><span class="file-type type-mp3">MP3</span></td>
+                  <td style="font-family:'JetBrains Mono',monospace;font-weight:600">12.4 MB</td>
+                  <td>Aug 27, 2026</td>
+                  <td><button class="btn btn-ghost" style="font-size:10px">🗑</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Cleanup -->
+          <div class="settings-section">
+            <div class="settings-section-title">Cleanup</div>
+            <div class="settings-section-desc">Free up storage space.</div>
+
+            <div style="display:flex;gap:12px">
+              <div style="flex:1;padding:16px;background:#111113;border:1px solid #27272a;border-radius:8px">
+                <div style="font-size:12px;font-weight:600;color:#e4e4e7;margin-bottom:4px">Delete Old Versions</div>
+                <div style="font-size:11px;color:#71717a;margin-bottom:12px">Remove previous versions of files (keeps latest)</div>
+                <div style="display:flex;align-items:center;justify-content:space-between">
+                  <div style="font-size:11px;color:#22c55e;font-family:'JetBrains Mono',monospace">~0.8 GB recoverable</div>
+                  <button class="btn btn-secondary" style="font-size:11px">Clean Up</button>
+                </div>
+              </div>
+              <div style="flex:1;padding:16px;background:#111113;border:1px solid #27272a;border-radius:8px">
+                <div style="font-size:12px;font-weight:600;color:#e4e4e7;margin-bottom:4px">Empty Trash</div>
+                <div style="font-size:11px;color:#71717a;margin-bottom:12px">Permanently delete trashed files</div>
+                <div style="display:flex;align-items:center;justify-content:space-between">
+                  <div style="font-size:11px;color:#eab308;font-family:'JetBrains Mono',monospace">3 files in trash</div>
+                  <button class="btn btn-danger" style="font-size:11px">Empty</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="device-chain">
+        <span class="device-chain-label">Storage:</span>
+        <div class="device active"><div class="led"></div> 2.3 GB Used</div>
+        <div class="device"><div class="led"></div> 97.7 GB Free</div>
+        <div class="device-chain-spacer"></div>
+        <span class="device-chain-label">Provider:</span>
+        <div class="device"><div class="led"></div> GCS (Cloud)</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

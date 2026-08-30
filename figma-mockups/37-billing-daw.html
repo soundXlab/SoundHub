@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <title>SoundHub — Billing & Plans (DAW Style)</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', -apple-system, sans-serif; background: #0d0d0d; color: #e4e4e7; overflow: hidden; height: 100vh; }
+    .transport-bar { height: 40px; background: #111113; border-bottom: 1px solid #27272a; display: flex; align-items: center; padding: 0 12px; gap: 16px; font-size: 11px; user-select: none; }
+    .transport-logo { font-weight: 800; font-size: 13px; color: #ea5808; letter-spacing: -0.5px; }
+    .transport-logo span { color: #e4e4e7; }
+    .transport-divider { width: 1px; height: 20px; background: #27272a; }
+    .transport-group { display: flex; align-items: center; gap: 6px; }
+    .transport-label { color: #71717a; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .transport-value { background: #0d0d0d; border: 1px solid #27272a; border-radius: 4px; padding: 2px 8px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #22c55e; font-weight: 600; min-width: 60px; text-align: center; }
+    .transport-spacer { flex: 1; }
+    .transport-time { font-family: 'JetBrains Mono', monospace; font-size: 18px; font-weight: 700; color: #e4e4e7; letter-spacing: 1px; }
+    .app-body { display: flex; height: calc(100vh - 40px); }
+    .sidebar { width: 240px; background: #111113; border-right: 1px solid #27272a; display: flex; flex-direction: column; user-select: none; }
+    .sidebar-search { padding: 8px; border-bottom: 1px solid #27272a; }
+    .sidebar-search input { width: 100%; background: #0d0d0d; border: 1px solid #27272a; border-radius: 4px; padding: 6px 8px 6px 28px; font-size: 11px; color: #e4e4e7; outline: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: 8px center; }
+    .sidebar-search input::placeholder { color: #52525b; }
+    .sidebar-nav { flex: 1; overflow-y: auto; padding: 4px 0; }
+    .sidebar-section { padding: 8px 12px 4px; font-size: 9px; color: #52525b; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+    .sidebar-item { padding: 6px 12px; font-size: 11px; font-weight: 500; color: #a1a1aa; cursor: pointer; display: flex; align-items: center; gap: 8px; border-left: 2px solid transparent; transition: all 0.1s; }
+    .sidebar-item:hover { color: #e4e4e7; }
+    .sidebar-item.active { color: #ea5808; background: rgba(234,88,8,0.08); border-left-color: #ea5808; }
+    .sidebar-item .icon { width: 16px; text-align: center; }
+    .content { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
+    .page-header { padding: 16px 24px; border-bottom: 1px solid #27272a; display: flex; align-items: center; justify-content: space-between; }
+    .page-title { font-size: 18px; font-weight: 700; color: #e4e4e7; }
+    .btn { padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; border: 1px solid #27272a; transition: all 0.15s; }
+    .btn-primary { background: #ea5808; color: #fff; border-color: #ea5808; }
+    .btn-primary:hover { background: #c2410c; }
+    .btn-secondary { background: #1a1a1a; color: #e4e4e7; }
+    .btn-secondary:hover { background: #27272a; }
+    .btn-ghost { background: transparent; color: #71717a; border-color: transparent; }
+    .btn-ghost:hover { color: #e4e4e7; background: #1a1a1a; }
+    .settings-layout { display: flex; flex: 1; overflow: hidden; }
+    .settings-nav { width: 200px; background: #111113; border-right: 1px solid #27272a; padding: 16px 0; overflow-y: auto; flex-shrink: 0; }
+    .settings-nav-title { padding: 0 16px; font-size: 9px; color: #52525b; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin-bottom: 8px; }
+    .settings-nav-item { padding: 8px 16px; font-size: 12px; font-weight: 500; color: #a1a1aa; cursor: pointer; display: flex; align-items: center; gap: 8px; border-left: 2px solid transparent; transition: all 0.1s; }
+    .settings-nav-item:hover { color: #e4e4e7; background: rgba(255,255,255,0.02); }
+    .settings-nav-item.active { color: #ea5808; background: rgba(234,88,8,0.08); border-left-color: #ea5808; }
+    .settings-nav-item .icon { width: 16px; text-align: center; font-size: 13px; }
+    .settings-content { flex: 1; overflow-y: auto; padding: 24px 32px; }
+    .settings-section { margin-bottom: 32px; padding-bottom: 32px; border-bottom: 1px solid #27272a; }
+    .settings-section:last-child { border-bottom: none; }
+    .settings-section-title { font-size: 16px; font-weight: 700; color: #e4e4e7; margin-bottom: 4px; }
+    .settings-section-desc { font-size: 12px; color: #71717a; margin-bottom: 16px; }
+
+    /* ── Pricing Cards ── */
+    .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+    .pricing-card {
+      background: #111113; border: 1px solid #27272a; border-radius: 8px;
+      padding: 24px; position: relative; transition: all 0.15s;
+    }
+    .pricing-card:hover { border-color: #3f3f46; }
+    .pricing-card.current { border-color: #ea5808; background: rgba(234,88,8,0.04); }
+    .pricing-card.popular { border-color: #ea5808; }
+    .pricing-badge {
+      position: absolute; top: -10px; right: 16px;
+      padding: 4px 10px; background: #ea5808; border-radius: 4px;
+      font-size: 9px; font-weight: 700; color: #fff; text-transform: uppercase;
+    }
+    .pricing-name { font-size: 14px; font-weight: 700; color: #e4e4e7; margin-bottom: 8px; }
+    .pricing-price {
+      font-size: 32px; font-weight: 800; color: #e4e4e7;
+      font-family: 'JetBrains Mono', monospace; margin-bottom: 4px;
+    }
+    .pricing-price span { font-size: 14px; font-weight: 400; color: #71717a; }
+    .pricing-desc { font-size: 12px; color: #71717a; margin-bottom: 16px; }
+    .pricing-features { list-style: none; margin-bottom: 20px; }
+    .pricing-features li {
+      padding: 6px 0; font-size: 12px; color: #a1a1aa;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .pricing-features li::before { content: '✓'; color: #22c55e; font-weight: 700; }
+    .pricing-features li.disabled { color: #52525b; }
+    .pricing-features li.disabled::before { content: '✕'; color: #52525b; }
+    .pricing-btn {
+      width: 100%; padding: 10px; border-radius: 6px; font-size: 12px; font-weight: 600;
+      cursor: pointer; border: 1px solid #27272a; transition: all 0.15s; text-align: center;
+    }
+    .pricing-btn-primary { background: #ea5808; color: #fff; border-color: #ea5808; }
+    .pricing-btn-primary:hover { background: #c2410c; }
+    .pricing-btn-secondary { background: transparent; color: #e4e4e7; }
+    .pricing-btn-secondary:hover { background: #1a1a1a; }
+    .pricing-btn-current { background: #22c55e; color: #fff; border-color: #22c55e; cursor: default; }
+
+    /* ── Usage Stats ── */
+    .usage-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
+    .usage-card {
+      background: #111113; border: 1px solid #27272a; border-radius: 8px; padding: 16px;
+    }
+    .usage-card-title { font-size: 11px; color: #71717a; margin-bottom: 8px; }
+    .usage-card-value { font-size: 24px; font-weight: 700; font-family: 'JetBrains Mono', monospace; margin-bottom: 4px; }
+    .usage-card-limit { font-size: 10px; color: #52525b; }
+    .usage-meter { height: 6px; background: #27272a; border-radius: 3px; margin-top: 8px; overflow: hidden; }
+    .usage-fill { height: 100%; border-radius: 3px; }
+
+    /* ── Invoice Table ── */
+    .invoice-table { width: 100%; border-collapse: collapse; }
+    .invoice-table th {
+      padding: 10px 12px; text-align: left; font-size: 10px; color: #52525b;
+      text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #27272a;
+    }
+    .invoice-table td {
+      padding: 12px; font-size: 12px; color: #a1a1aa; border-bottom: 1px solid #1a1a1a;
+    }
+    .invoice-table tr:hover td { background: rgba(255,255,255,0.02); }
+    .invoice-status { padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: 600; }
+    .status-paid { background: rgba(34,197,94,0.12); color: #22c55e; }
+    .status-pending { background: rgba(234,179,8,0.12); color: #eab308; }
+
+    .device-chain { height: 60px; background: #111113; border-top: 1px solid #27272a; display: flex; align-items: center; padding: 0 16px; gap: 8px; }
+    .device { padding: 6px 12px; background: #0d0d0d; border: 1px solid #27272a; border-radius: 4px; font-size: 10px; color: #a1a1aa; display: flex; align-items: center; gap: 6px; cursor: pointer; transition: all 0.1s; }
+    .device:hover { border-color: #3f3f46; color: #e4e4e7; }
+    .device.active { border-color: #ea5808; color: #ea5808; background: rgba(234,88,8,0.08); }
+    .device .led { width: 6px; height: 6px; border-radius: 50%; background: #27272a; }
+    .device.active .led { background: #22c55e; box-shadow: 0 0 6px rgba(34,197,94,0.5); }
+    .device-chain-spacer { flex: 1; }
+    .device-chain-label { font-size: 9px; color: #52525b; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; }
+  </style>
+</head>
+<body>
+  <div class="transport-bar">
+    <div class="transport-logo">Sound<span>Hub</span></div>
+    <div class="transport-divider"></div>
+    <div class="transport-group">
+      <span class="transport-label">Plan</span>
+      <div class="transport-value" style="color:#ea5808">Pro</div>
+    </div>
+    <div class="transport-group">
+      <span class="transport-label">Renewal</span>
+      <div class="transport-value">Sep 15</div>
+    </div>
+    <div class="transport-group">
+      <span class="transport-label">Cost</span>
+      <div class="transport-value">$29/mo</div>
+    </div>
+    <div class="transport-spacer"></div>
+    <div class="transport-time">BILLING</div>
+    <div class="transport-divider"></div>
+    <div class="transport-group">
+      <span class="transport-label">Status</span>
+      <div class="transport-value" style="color:#22c55e">Active</div>
+    </div>
+  </div>
+
+  <div class="app-body">
+    <div class="sidebar">
+      <div class="sidebar-search"><input type="text" placeholder="Search..."></div>
+      <div class="sidebar-nav">
+        <div class="sidebar-section">Main</div>
+        <div class="sidebar-item"><span class="icon">📊</span> Dashboard</div>
+        <div class="sidebar-item"><span class="icon">📁</span> Projects</div>
+        <div class="sidebar-item"><span class="icon">🛒</span> Marketplace</div>
+        <div class="sidebar-section">Workspace</div>
+        <div class="sidebar-item"><span class="icon">💬</span> Reviews</div>
+        <div class="sidebar-item"><span class="icon">📋</span> Sessions</div>
+        <div class="sidebar-section">Account</div>
+        <div class="sidebar-item active"><span class="icon">⚙️</span> Settings</div>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="page-header">
+        <div class="page-title">Billing & Plans</div>
+        <div class="header-actions">
+          <button class="btn btn-secondary">📄 View Invoices</button>
+          <button class="btn btn-ghost">💬 Contact Support</button>
+        </div>
+      </div>
+
+      <div class="settings-layout">
+        <div class="settings-nav">
+          <div class="settings-nav-title">Account</div>
+          <div class="settings-nav-item"><span class="icon">👤</span> Profile</div>
+          <div class="settings-nav-item"><span class="icon">🔐</span> Security</div>
+          <div class="settings-nav-item"><span class="icon">🔔</span> Notifications</div>
+          <div class="settings-nav-title">Workspace</div>
+          <div class="settings-nav-item"><span class="icon">🎨</span> Appearance</div>
+          <div class="settings-nav-item"><span class="icon">💾</span> Storage</div>
+          <div class="settings-nav-item"><span class="icon">🔌</span> API Keys</div>
+          <div class="settings-nav-title">Billing</div>
+          <div class="settings-nav-item active"><span class="icon">💳</span> Subscription</div>
+          <div class="settings-nav-item"><span class="icon">📄</span> Invoices</div>
+        </div>
+
+        <div class="settings-content">
+          <!-- Current Plan -->
+          <div class="settings-section">
+            <div class="settings-section-title">Current Plan</div>
+            <div class="settings-section-desc">You are on the Pro plan. Renews on Sep 15, 2026.</div>
+
+            <div class="pricing-grid">
+              <div class="pricing-card">
+                <div class="pricing-name">Free</div>
+                <div class="pricing-price">$0<span>/mo</span></div>
+                <div class="pricing-desc">For hobbyists getting started</div>
+                <ul class="pricing-features">
+                  <li>3 projects</li>
+                  <li>1 GB storage</li>
+                  <li>5 reviews/month</li>
+                  <li class="disabled">No API access</li>
+                  <li class="disabled">No priority support</li>
+                </ul>
+                <div class="pricing-btn pricing-btn-secondary">Downgrade</div>
+              </div>
+
+              <div class="pricing-card current">
+                <div class="pricing-badge">Current</div>
+                <div class="pricing-name">Pro</div>
+                <div class="pricing-price">$29<span>/mo</span></div>
+                <div class="pricing-desc">For professional producers</div>
+                <ul class="pricing-features">
+                  <li>Unlimited projects</li>
+                  <li>100 GB storage</li>
+                  <li>Unlimited reviews</li>
+                  <li>API access (1K req/min)</li>
+                  <li>Priority support</li>
+                </ul>
+                <div class="pricing-btn pricing-btn-current">Current Plan</div>
+              </div>
+
+              <div class="pricing-card popular">
+                <div class="pricing-badge">Popular</div>
+                <div class="pricing-name">Studio</div>
+                <div class="pricing-price">$99<span>/mo</span></div>
+                <div class="pricing-desc">For studios and teams</div>
+                <ul class="pricing-features">
+                  <li>Everything in Pro</li>
+                  <li>1 TB storage</li>
+                  <li>Team collaboration (10 seats)</li>
+                  <li>API access (10K req/min)</li>
+                  <li>Custom integrations</li>
+                </ul>
+                <div class="pricing-btn pricing-btn-primary">Upgrade to Studio</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Usage -->
+          <div class="settings-section">
+            <div class="settings-section-title">Usage This Month</div>
+            <div class="settings-section-desc">Your current resource consumption.</div>
+
+            <div class="usage-grid">
+              <div class="usage-card">
+                <div class="usage-card-title">Storage</div>
+                <div class="usage-card-value" style="color:#ea5808">2.3 GB</div>
+                <div class="usage-card-limit">of 100 GB</div>
+                <div class="usage-meter"><div class="usage-fill" style="width:2.3%;background:#ea5808"></div></div>
+              </div>
+              <div class="usage-card">
+                <div class="usage-card-title">Projects</div>
+                <div class="usage-card-value" style="color:#22c55e">12</div>
+                <div class="usage-card-limit">Unlimited</div>
+                <div class="usage-meter"><div class="usage-fill" style="width:100%;background:#22c55e"></div></div>
+              </div>
+              <div class="usage-card">
+                <div class="usage-card-title">API Calls</div>
+                <div class="usage-card-value" style="color:#eab308">8.2K</div>
+                <div class="usage-card-limit">of 30K/month</div>
+                <div class="usage-meter"><div class="usage-fill" style="width:27%;background:#eab308"></div></div>
+              </div>
+              <div class="usage-card">
+                <div class="usage-card-title">Bandwidth</div>
+                <div class="usage-card-value" style="color:#3b82f6">45 GB</div>
+                <div class="usage-card-limit">of 500 GB</div>
+                <div class="usage-meter"><div class="usage-fill" style="width:9%;background:#3b82f6"></div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Payment Method -->
+          <div class="settings-section">
+            <div class="settings-section-title">Payment Method</div>
+            <div class="settings-section-desc">Manage your payment methods.</div>
+
+            <div style="display:flex;gap:12px">
+              <div style="flex:1;padding:16px;background:#111113;border:1px solid #ea5808;border-radius:8px">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+                  <div style="display:flex;align-items:center;gap:12px">
+                    <div style="width:40px;height:28px;background:#1a1a1a;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:14px">💳</div>
+                    <div>
+                      <div style="font-size:12px;font-weight:600;color:#e4e4e7">•••• •••• •••• 4242</div>
+                      <div style="font-size:10px;color:#71717a">Visa · Expires 12/2028</div>
+                    </div>
+                  </div>
+                  <div style="padding:3px 8px;background:rgba(234,88,8,0.12);border-radius:4px;font-size:9px;color:#ea5808;font-weight:600">DEFAULT</div>
+                </div>
+                <div style="display:flex;gap:8px">
+                  <button class="btn btn-ghost" style="font-size:11px">Edit</button>
+                  <button class="btn btn-ghost" style="font-size:11px;color:#ef4444">Remove</button>
+                </div>
+              </div>
+              <div style="padding:16px;background:#111113;border:1px dashed #27272a;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;min-width:200px">
+                <div style="text-align:center;color:#71717a;font-size:12px">+ Add Payment Method</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Invoices -->
+          <div class="settings-section">
+            <div class="settings-section-title">Recent Invoices</div>
+            <div class="settings-section-desc">Download past invoices for your records.</div>
+
+            <table class="invoice-table">
+              <thead>
+                <tr>
+                  <th>Invoice</th>
+                  <th>Date</th>
+                  <th>Amount</th>
+                  <th>Status</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="color:#e4e4e7;font-weight:600">INV-2026-008</td>
+                  <td>Aug 15, 2026</td>
+                  <td style="font-family:'JetBrains Mono',monospace">$29.00</td>
+                  <td><span class="invoice-status status-paid">Paid</span></td>
+                  <td><button class="btn btn-ghost" style="font-size:10px">⬇ PDF</button></td>
+                </tr>
+                <tr>
+                  <td style="color:#e4e4e7;font-weight:600">INV-2026-007</td>
+                  <td>Jul 15, 2026</td>
+                  <td style="font-family:'JetBrains Mono',monospace">$29.00</td>
+                  <td><span class="invoice-status status-paid">Paid</span></td>
+                  <td><button class="btn btn-ghost" style="font-size:10px">⬇ PDF</button></td>
+                </tr>
+                <tr>
+                  <td style="color:#e4e4e7;font-weight:600">INV-2026-006</td>
+                  <td>Jun 15, 2026</td>
+                  <td style="font-family:'JetBrains Mono',monospace">$29.00</td>
+                  <td><span class="invoice-status status-paid">Paid</span></td>
+                  <td><button class="btn btn-ghost" style="font-size:10px">⬇ PDF</button></td>
+                </tr>
+                <tr>
+                  <td style="color:#e4e4e7;font-weight:600">INV-2026-005</td>
+                  <td>May 15, 2026</td>
+                  <td style="font-family:'JetBrains Mono',monospace">$29.00</td>
+                  <td><span class="invoice-status status-paid">Paid</span></td>
+                  <td><button class="btn btn-ghost" style="font-size:10px">⬇ PDF</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="device-chain">
+        <span class="device-chain-label">Account:</span>
+        <div class="device active"><div class="led"></div> Pro Plan</div>
+        <div class="device"><div class="led"></div> Active</div>
+        <div class="device-chain-spacer"></div>
+        <span class="device-chain-label">Next Invoice:</span>
+        <div class="device"><div class="led"></div> Sep 15 — $29.00</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

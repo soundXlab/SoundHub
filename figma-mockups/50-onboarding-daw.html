@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <title>SoundHub — Onboarding (DAW Style)</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',-apple-system,sans-serif;background:#0d0d0d;color:#e4e4e7;overflow:hidden;height:100vh;display:flex;align-items:center;justify-content:center}
+    .onboarding-container{width:800px;max-width:90vw}
+    .onboarding-header{text-align:center;margin-bottom:32px}
+    .onboarding-logo{font-weight:800;font-size:24px;color:#ea5808;margin-bottom:8px}
+    .onboarding-logo span{color:#e4e4e7}
+    .onboarding-title{font-size:20px;font-weight:700;color:#e4e4e7;margin-bottom:8px}
+    .onboarding-desc{font-size:13px;color:#71717a}
+    .steps{display:flex;justify-content:center;gap:8px;margin-bottom:32px}
+    .step{width:40px;height:4px;border-radius:2px;background:#27272a}
+    .step.active{background:#ea5808}
+    .step.done{background:#22c55e}
+    .step-card{background:#111113;border:1px solid #27272a;border-radius:12px;padding:32px;margin-bottom:24px}
+    .step-icon{width:64px;height:64px;background:rgba(234,88,8,.1);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:16px}
+    .step-title{font-size:16px;font-weight:700;color:#e4e4e7;margin-bottom:8px}
+    .step-desc{font-size:12px;color:#71717a;line-height:1.6;margin-bottom:20px}
+    .role-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .role-card{padding:16px;background:#0d0d0d;border:2px solid #27272a;border-radius:8px;cursor:pointer;transition:all .15s;text-align:center}
+    .role-card:hover{border-color:#3f3f46}
+    .role-card.selected{border-color:#ea5808;background:rgba(234,88,8,.05)}
+    .role-icon{font-size:24px;margin-bottom:8px}
+    .role-name{font-size:12px;font-weight:600;color:#e4e4e7}
+    .role-desc{font-size:10px;color:#52525b;margin-top:4px}
+    .btn{padding:10px 24px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid #27272a;transition:all .15s}
+    .btn-primary{background:#ea5808;color:#fff;border-color:#ea5808}
+    .btn-primary:hover{background:#c2410c}
+    .btn-ghost{background:transparent;color:#71717a;border-color:transparent}
+    .onboarding-footer{display:flex;justify-content:space-between;align-items:center}
+    .progress-text{font-size:11px;color:#52525b}
+  </style>
+</head>
+<body>
+  <div class="onboarding-container">
+    <div class="onboarding-header">
+      <div class="onboarding-logo">Sound<span>Hub</span></div>
+      <div class="onboarding-title">Welcome to SoundHub! 🎵</div>
+      <div class="onboarding-desc">Let's set up your account in 3 quick steps.</div>
+    </div>
+
+    <div class="steps">
+      <div class="step done"></div>
+      <div class="step active"></div>
+      <div class="step"></div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-icon">🎭</div>
+      <div class="step-title">What's your role?</div>
+      <div class="step-desc">This helps us personalize your experience and show relevant content.</div>
+      <div class="role-grid">
+        <div class="role-card">
+          <div class="role-icon">🎹</div>
+          <div class="role-name">Producer</div>
+          <div class="role-desc">Create beats, compose music</div>
+        </div>
+        <div class="role-card selected">
+          <div class="role-icon">🎚️</div>
+          <div class="role-name">Mixing Engineer</div>
+          <div class="role-desc">Mix & master tracks</div>
+        </div>
+        <div class="role-card">
+          <div class="role-icon">🎤</div>
+          <div class="role-name">Vocalist</div>
+          <div class="role-desc">Record vocals & lyrics</div>
+        </div>
+        <div class="role-card">
+          <div class="role-icon">🎬</div>
+          <div class="role-name">Sound Designer</div>
+          <div class="role-desc">Create sound effects</div>
+        </div>
+        <div class="role-card">
+          <div class="role-icon">🏢</div>
+          <div class="role-name">Studio Owner</div>
+          <div class="role-desc">Manage studio sessions</div>
+        </div>
+        <div class="role-card">
+          <div class="role-icon">🛒</div>
+          <div class="role-name">Sample Seller</div>
+          <div class="role-desc">Sell sounds & presets</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="onboarding-footer">
+      <button class="btn btn-ghost">Skip for now</button>
+      <div class="progress-text">Step 2 of 3</div>
+      <button class="btn btn-primary">Continue →</button>
+    </div>
+  </div>
+</body>
+</html>
