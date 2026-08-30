@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=1440">
-  <title>SoundHub — VST Instruments (Pixel-Perfect Ableton)</title>
+  <title>SoundHub — VST Instruments (Ableton Live)</title>
   <style>
     * { margin:0; padding:0; box-sizing:border-box; }
     body {
@@ -12,7 +12,7 @@
       font-size:11px; user-select:none; -webkit-font-smoothing:antialiased;
     }
 
-    /* ── Transport Bar (top) ── */
+    /* ── Transport Bar ── */
     .transport {
       height:24px; background:#444; border-bottom:1px solid #555;
       display:flex; align-items:center; padding:0 4px; gap:3px;
@@ -37,10 +37,22 @@
     .t-spacer { flex:1; }
     .t-info { font-size:8px; color:#888; font-family:monospace; padding:0 2px; }
 
+    /* ── View Toggle (Session/Arrangement) ── */
+    .view-toggle {
+      display:flex; gap:1px; margin:0 2px;
+    }
+    .view-btn {
+      width:16px; height:16px; border-radius:1px; display:flex; align-items:center;
+      justify-content:center; font-size:8px; background:#444; border:1px solid #555;
+      cursor:pointer; color:#888; transition:all 0.1s;
+    }
+    .view-btn:hover { background:#555; color:#bbb; }
+    .view-btn.active { background:#ea5808; border-color:#ea5808; color:#fff; }
+
     /* ── Main Layout ── */
     .app { display:flex; height:calc(100vh - 24px); }
 
-    /* ── Browser (left) ── */
+    /* ── Browser ── */
     .browser {
       width:200px; background:#3a3a3a; border-right:1px solid #444;
       display:flex; flex-direction:column; flex-shrink:0;
@@ -53,14 +65,8 @@
       background-repeat:no-repeat; background-position:4px center;
     }
     .br-nav { flex:1; overflow-y:auto; }
-    .br-sec {
-      padding:3px 5px 1px; font-size:8px; color:#888;
-      text-transform:uppercase; letter-spacing:0.5px; font-weight:700;
-    }
-    .br-item {
-      padding:1px 5px; font-size:9px; color:#aaa; cursor:pointer;
-      display:flex; align-items:center; gap:4px; line-height:1.5;
-    }
+    .br-sec { padding:3px 5px 1px; font-size:8px; color:#888; text-transform:uppercase; letter-spacing:0.5px; font-weight:700; }
+    .br-item { padding:1px 5px; font-size:9px; color:#aaa; cursor:pointer; display:flex; align-items:center; gap:4px; line-height:1.5; }
     .br-item:hover { color:#ddd; background:rgba(255,255,255,0.04); }
     .br-item.on { color:#ea5808; background:rgba(234,88,8,0.08); }
     .br-item .ic { width:10px; text-align:center; font-size:8px; }
@@ -68,42 +74,26 @@
     .br-sub { padding-left:12px; font-size:8px; color:#888; line-height:1.6; }
     .br-div { height:1px; background:#444; margin:2px 4px; }
 
-    /* ── Center Area ── */
+    /* ── Center ── */
     .center { flex:1; display:flex; flex-direction:column; overflow:hidden; }
 
-    /* ── Session View ── */
-    .session { flex:1; display:flex; overflow:hidden; background:#333; }
+    /* ── SESSION VIEW ── */
+    .session-view { flex:1; display:flex; overflow:hidden; background:#333; }
     .tracks { flex:1; display:flex; overflow-x:auto; }
     .trk { min-width:82px; border-right:1px solid #444; display:flex; flex-direction:column; }
-    .trk-hdr {
-      height:70px; background:#3a3a3a; border-bottom:1px solid #444;
-      padding:3px 4px; display:flex; flex-direction:column;
-    }
+    .trk-hdr { height:70px; background:#3a3a3a; border-bottom:1px solid #444; padding:3px 4px; display:flex; flex-direction:column; }
     .trk-top { display:flex; align-items:center; justify-content:space-between; }
     .trk-name { font-size:9px; font-weight:700; color:#ddd; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .trk-btns { display:flex; gap:2px; }
-    .trk-b {
-      width:12px; height:12px; border-radius:1px; font-size:6px; font-weight:800;
-      display:flex; align-items:center; justify-content:center;
-      background:#444; border:1px solid #555; cursor:pointer; color:#888;
-    }
+    .trk-b { width:12px; height:12px; border-radius:1px; font-size:6px; font-weight:800; display:flex; align-items:center; justify-content:center; background:#444; border:1px solid #555; cursor:pointer; color:#888; }
     .trk-b:hover { background:#555; }
     .trk-b.s { color:#4a9eff; }
     .trk-b.m { color:#eab308; }
     .trk-b.r { color:#e04040; }
-
-    /* Clip Slots */
     .clips { flex:1; display:flex; flex-direction:column; }
-    .cl-slot {
-      flex:1; border-bottom:1px solid #2a2a2a; cursor:pointer;
-      display:flex; align-items:center; padding:0 2px; min-height:0;
-    }
+    .cl-slot { flex:1; border-bottom:1px solid #2a2a2a; cursor:pointer; display:flex; align-items:center; padding:0 2px; }
     .cl-slot:hover { background:rgba(255,255,255,0.03); }
-    .cl {
-      width:100%; height:calc(100% - 2px); border-radius:1px; padding:0 3px;
-      font-size:7px; line-height:normal; white-space:nowrap; overflow:hidden;
-      cursor:pointer; display:flex; align-items:center;
-    }
+    .cl { width:100%; height:calc(100% - 2px); border-radius:1px; padding:0 3px; font-size:7px; line-height:normal; white-space:nowrap; overflow:hidden; cursor:pointer; display:flex; align-items:center; }
     .cl:hover { filter:brightness(1.12); }
     .cl-g { background:#3d8a5e; color:#b8e8c8; }
     .cl-y { background:#b8960b; color:#ffeaa7; }
@@ -113,155 +103,119 @@
     .cl-p { background:#6a3090; color:#d9b3ff; }
     .cl-c { background:#1a7070; color:#b3e6e6; }
     .cl-e { background:transparent; }
-
-    /* Scene Launch (right edge) */
-    .scenes {
-      width:24px; background:#3a3a3a; border-left:1px solid #444;
-      display:flex; flex-direction:column; flex-shrink:0;
-    }
-    .sc-btn {
-      flex:1; display:flex; align-items:center; justify-content:center;
-      font-size:7px; color:#777; cursor:pointer; border-bottom:1px solid #2a2a2a;
-    }
+    .scenes { width:24px; background:#3a3a3a; border-left:1px solid #444; display:flex; flex-direction:column; flex-shrink:0; }
+    .sc-btn { flex:1; display:flex; align-items:center; justify-content:center; font-size:7px; color:#777; cursor:pointer; border-bottom:1px solid #2a2a2a; }
     .sc-btn:hover { background:rgba(255,255,255,0.04); color:#ddd; }
     .sc-btn.play { color:#ea5808; }
 
-    /* ── Mixer Area ── */
+    /* ── ARRANGEMENT VIEW ── */
+    .arr-view { flex:1; display:none; overflow:hidden; background:#333; }
+    .arr-view.active { display:flex; flex-direction:column; }
+    .session-view.hidden { display:none; }
+
+    /* Arrangement Timeline Ruler */
+    .arr-ruler {
+      height:16px; background:#3a3a3a; border-bottom:1px solid #444;
+      display:flex; overflow:hidden;
+    }
+    .arr-ruler-label {
+      width:100px; background:#3a3a3a; border-right:1px solid #444;
+      flex-shrink:0;
+    }
+    .arr-ruler-beats { flex:1; display:flex; }
+    .arr-beat { flex:1; border-right:1px solid #444; font-size:7px; color:#666; font-family:monospace; display:flex; align-items:center; padding-left:2px; }
+    .arr-beat.bar { color:#888; font-weight:700; }
+
+    /* Arrangement Tracks */
+    .arr-tracks { flex:1; overflow-y:auto; }
+    .arr-track {
+      display:flex; height:40px; border-bottom:1px solid #444;
+    }
+    .arr-track-hdr {
+      width:100px; background:#3a3a3a; border-right:1px solid #444;
+      padding:3px 4px; display:flex; flex-direction:column; justify-content:center;
+      flex-shrink:0;
+    }
+    .arr-track-name { font-size:8px; font-weight:700; color:#ddd; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .arr-track-btns { display:flex; gap:2px; margin-top:2px; }
+    .arr-track-content { flex:1; position:relative; background:#2a2a2a; overflow:hidden; }
+    .arr-clip {
+      position:absolute; top:2px; bottom:2px; border-radius:2px;
+      padding:2px 4px; font-size:6px; color:rgba(255,255,255,0.7);
+      display:flex; align-items:center; white-space:nowrap; overflow:hidden;
+      cursor:pointer; transition:filter 0.1s;
+    }
+    .arr-clip:hover { filter:brightness(1.15); }
+    .arr-clip-inner { width:100%; height:100%; display:flex; align-items:center; }
+
+    /* Arrangement vertical grid lines */
+    .arr-grid-line {
+      position:absolute; top:0; bottom:0; width:1px; background:rgba(255,255,255,0.04);
+    }
+
+    /* ── Mixer (shared) ── */
     .mixer {
       height:105px; background:#3a3a3a; border-top:1px solid #444;
       display:flex; overflow-x:auto;
     }
-    .mx-ch {
-      min-width:82px; border-right:1px solid #444; padding:3px 4px;
-      display:flex; flex-direction:column; align-items:center; gap:1px;
-    }
+    .mx-ch { min-width:82px; border-right:1px solid #444; padding:3px 4px; display:flex; flex-direction:column; align-items:center; gap:1px; }
     .mx-lbl { font-size:7px; color:#777; text-transform:uppercase; letter-spacing:0.2px; }
     .mx-route { font-size:6px; color:#666; text-align:center; line-height:1.3; }
     .mx-mon { display:flex; gap:1px; }
-    .mx-mon-b {
-      padding:0 2px; font-size:5px; font-weight:800; background:#333;
-      border:1px solid #444; color:#555; cursor:pointer; line-height:1.4;
-    }
+    .mx-mon-b { padding:0 2px; font-size:5px; font-weight:800; background:#333; border:1px solid #444; color:#555; cursor:pointer; line-height:1.4; }
     .mx-mon-b.on { background:#ea5808; color:#fff; border-color:#ea5808; }
     .mx-audio { font-size:6px; color:#666; text-align:center; }
     .mx-sends { display:flex; gap:2px; margin-top:1px; }
-    .mx-send {
-      width:14px; height:14px; border-radius:50%; background:#2a2a2a;
-      border:1.5px solid #555; position:relative; cursor:pointer;
-    }
-    .mx-send::after {
-      content:''; position:absolute; width:1.5px; height:5px;
-      background:#ea5808; top:1px; left:50%; transform:translateX(-50%);
-      border-radius:1px;
-    }
+    .mx-send { width:14px; height:14px; border-radius:50%; background:#2a2a2a; border:1.5px solid #555; position:relative; cursor:pointer; }
+    .mx-send::after { content:''; position:absolute; width:1.5px; height:5px; background:#ea5808; top:1px; left:50%; transform:translateX(-50%); border-radius:1px; }
     .mx-send-lbl { font-size:5px; color:#555; text-align:center; }
     .mx-fader-area { display:flex; align-items:flex-end; gap:2px; height:40px; }
-    .mx-fader {
-      width:6px; height:40px; background:#2a2a2a; border-radius:2px;
-      position:relative; cursor:pointer;
-    }
+    .mx-fader { width:6px; height:40px; background:#2a2a2a; border-radius:2px; position:relative; cursor:pointer; }
     .mx-fader-fill { position:absolute; bottom:0; width:100%; background:#4a9eff; border-radius:2px; }
-    .mx-fader-knob {
-      position:absolute; width:12px; height:5px; background:#ccc;
-      border:1px solid #888; border-radius:1px; left:-3px; cursor:grab;
-    }
-    .mx-meter {
-      width:3px; height:40px; background:#2a2a2a; border-radius:1px;
-      position:relative; overflow:hidden;
-    }
+    .mx-fader-knob { position:absolute; width:12px; height:5px; background:#ccc; border:1px solid #888; border-radius:1px; left:-3px; cursor:grab; }
+    .mx-meter { width:3px; height:40px; background:#2a2a2a; border-radius:1px; position:relative; overflow:hidden; }
     .mx-meter-fill { position:absolute; bottom:0; width:100%; border-radius:1px; }
-    .mx-pan {
-      width:18px; height:18px; border-radius:50%; background:#2a2a2a;
-      border:1.5px solid #555; position:relative; cursor:pointer; margin-top:1px;
-    }
-    .mx-pan::after {
-      content:''; position:absolute; width:1.5px; height:5px;
-      background:#bbb; top:1px; left:50%; transform:translateX(-50%);
-      border-radius:1px;
-    }
+    .mx-pan { width:18px; height:18px; border-radius:50%; background:#2a2a2a; border:1.5px solid #555; position:relative; cursor:pointer; margin-top:1px; }
+    .mx-pan::after { content:''; position:absolute; width:1.5px; height:5px; background:#bbb; top:1px; left:50%; transform:translateX(-50%); border-radius:1px; }
     .mx-pan-lbl { font-size:5px; color:#555; text-align:center; font-family:monospace; }
     .mx-sm { display:flex; gap:1px; }
-    .mx-sb {
-      width:11px; height:11px; border-radius:1px; font-size:5px; font-weight:800;
-      display:flex; align-items:center; justify-content:center;
-      background:#444; color:#4a9eff; cursor:pointer;
-    }
-    .mx-mb {
-      width:11px; height:11px; border-radius:1px; font-size:5px; font-weight:800;
-      display:flex; align-items:center; justify-content:center;
-      background:#444; color:#eab308; cursor:pointer;
-    }
+    .mx-sb { width:11px; height:11px; border-radius:1px; font-size:5px; font-weight:800; display:flex; align-items:center; justify-content:center; background:#444; color:#4a9eff; cursor:pointer; }
+    .mx-mb { width:11px; height:11px; border-radius:1px; font-size:5px; font-weight:800; display:flex; align-items:center; justify-content:center; background:#444; color:#eab308; cursor:pointer; }
 
-    /* ── Detail View (bottom) ── */
+    /* ── Detail View ── */
     .detail {
       height:125px; background:#3a3a3a; border-top:1px solid #444;
       display:flex; overflow:hidden;
     }
-    .dtl-left {
-      width:220px; border-right:1px solid #444; padding:4px 6px;
-      display:flex; flex-direction:column; gap:2px; font-size:8px;
-    }
+    .dtl-left { width:220px; border-right:1px solid #444; padding:4px 6px; display:flex; flex-direction:column; gap:2px; font-size:8px; }
     .dtl-clip { font-size:10px; font-weight:800; color:#ddd; margin-bottom:2px; }
     .dtl-clip-sub { font-size:7px; color:#777; margin-bottom:3px; }
     .dtl-row { display:flex; align-items:center; gap:3px; }
     .dtl-lbl { color:#666; width:40px; font-size:7px; }
-    .dtl-val {
-      background:#2a2a2a; border:1px solid #555; border-radius:1px;
-      padding:0 3px; font-family:monospace; font-size:8px; color:#bbb;
-      min-width:22px; text-align:center; line-height:1.5;
-    }
+    .dtl-val { background:#2a2a2a; border:1px solid #555; border-radius:1px; padding:0 3px; font-family:monospace; font-size:8px; color:#bbb; min-width:22px; text-align:center; line-height:1.5; }
     .dtl-val.on { background:#ea5808; color:#fff; border-color:#ea5808; }
-    .dtl-btn {
-      padding:0 5px; background:#444; border:1px solid #555; border-radius:1px;
-      font-size:7px; color:#999; cursor:pointer; line-height:1.5;
-    }
+    .dtl-btn { padding:0 5px; background:#444; border:1px solid #555; border-radius:1px; font-size:7px; color:#999; cursor:pointer; line-height:1.5; }
     .dtl-btn:hover { background:#555; }
     .dtl-btn.on { background:#ea5808; color:#fff; border-color:#ea5808; }
 
     /* ── MIDI Grid ── */
-    .midi-grid {
-      flex:1; background:#2a2a2a; border:1px solid #444; border-radius:1px;
-      display:flex; flex-direction:column; overflow:hidden;
-    }
-    .midi-ruler {
-      height:12px; background:#333; border-bottom:1px solid #444;
-      display:flex; font-size:6px; color:#666; font-family:monospace;
-    }
+    .midi-grid { flex:1; background:#2a2a2a; border:1px solid #444; border-radius:1px; display:flex; flex-direction:column; overflow:hidden; }
+    .midi-ruler { height:12px; background:#333; border-bottom:1px solid #444; display:flex; font-size:6px; color:#666; font-family:monospace; }
     .midi-beat { flex:1; text-align:center; border-right:1px solid #3a3a3a; line-height:12px; }
     .midi-body { flex:1; display:flex; }
-    .piano {
-      width:24px; background:#333; border-right:1px solid #444;
-      display:flex; flex-direction:column;
-    }
-    .pkey {
-      flex:1; border-bottom:1px solid #3a3a3a; font-size:5px;
-      display:flex; align-items:center; justify-content:flex-end;
-      padding-right:1px; color:#555;
-    }
+    .piano { width:24px; background:#333; border-right:1px solid #444; display:flex; flex-direction:column; }
+    .pkey { flex:1; border-bottom:1px solid #3a3a3a; font-size:5px; display:flex; align-items:center; justify-content:flex-end; padding-right:1px; color:#555; }
     .pkey.blk { background:#2a2a2a; color:#444; }
     .pkey.cur { color:#ea5808; font-weight:700; }
     .notes-area { flex:1; position:relative; }
-    .note {
-      position:absolute; height:7px; border-radius:1px;
-      font-size:5px; color:rgba(255,255,255,0.5); padding:0 1px;
-      line-height:7px; cursor:pointer;
-    }
+    .note { position:absolute; height:7px; border-radius:1px; font-size:5px; color:rgba(255,255,255,0.5); padding:0 1px; line-height:7px; cursor:pointer; }
     .note:hover { filter:brightness(1.3); }
-    .vel-lane {
-      height:18px; background:#2a2a2a; border-top:1px solid #444;
-      display:flex; align-items:flex-end; gap:1px; padding:1px 24px 1px 24px;
-    }
+    .vel-lane { height:18px; background:#2a2a2a; border-top:1px solid #444; display:flex; align-items:flex-end; gap:1px; padding:1px 24px 1px 24px; }
     .vel-bar { flex:1; background:#4a9eff; border-radius:1px 1px 0 0; min-height:1px; }
-    .vel-info {
-      position:absolute; bottom:1px; right:4px; font-size:6px; color:#666;
-      display:flex; gap:3px;
-    }
+    .vel-info { position:absolute; bottom:1px; right:4px; font-size:6px; color:#666; display:flex; gap:3px; }
 
     /* ── Right Info Panel ── */
-    .info {
-      width:200px; background:#3a3a3a; border-left:1px solid #444;
-      padding:6px; overflow-y:auto; font-size:8px;
-    }
+    .info { width:200px; background:#3a3a3a; border-left:1px solid #444; padding:6px; overflow-y:auto; font-size:8px; }
     .info-title { font-size:11px; font-weight:800; color:#ddd; margin-bottom:3px; }
     .info-desc { font-size:8px; color:#888; line-height:1.5; margin-bottom:6px; }
     .info-row { display:flex; justify-content:space-between; padding:1px 0; border-bottom:1px solid #333; }
@@ -274,7 +228,19 @@
     ::-webkit-scrollbar { width:4px; height:4px; }
     ::-webkit-scrollbar-track { background:#333; }
     ::-webkit-scrollbar-thumb { background:#555; border-radius:2px; }
-    ::-webkit-scrollbar-thumb:hover { background:#666; }
+
+    /* ── Tab Key Hint ── */
+    .tab-hint {
+      position:fixed; bottom:8px; left:50%; transform:translateX(-50%);
+      background:rgba(0,0,0,0.8); color:#888; padding:4px 10px;
+      border-radius:4px; font-size:9px; pointer-events:none;
+      opacity:0; transition:opacity 0.3s; z-index:100;
+    }
+    .tab-hint.show { opacity:1; }
+    .tab-hint kbd {
+      background:#444; padding:1px 4px; border-radius:2px;
+      font-family:monospace; color:#bbb; border:1px solid #555;
+    }
   </style>
 </head>
 <body>
@@ -287,7 +253,7 @@
     <div class="t-disp" style="min-width:14px;font-size:9px">4</div>
     <div class="t-disp" style="min-width:14px;font-size:9px">4</div>
     <div class="t-sep"></div>
-    <div class="t-disp" style="min-width:50px">1. 1. 1</div>
+    <div class="t-disp" style="min-width:50px" id="transport-pos">1. 1. 1</div>
     <div class="t-sep"></div>
     <div class="t-btn">⏹</div>
     <div class="t-btn on">▶</div>
@@ -295,8 +261,12 @@
     <div class="t-sep"></div>
     <div class="t-lbl">Bar</div>
     <div class="t-sep"></div>
-    <div class="t-btn" style="font-size:6px">☐</div>
-    <div class="t-btn" style="font-size:6px">☐</div>
+    <!-- View Toggle -->
+    <div class="view-toggle">
+      <div class="view-btn active" id="btn-session" title="Session View (Tab)"> vertical lines</div>
+      <div class="view-btn" id="btn-arrange" title="Arrangement View (Tab)">≡</div>
+    </div>
+    <div class="t-sep"></div>
     <div class="t-spacer"></div>
     <div class="t-info">Key</div>
     <div class="t-disp" style="min-width:36px;font-size:8px">Major</div>
@@ -315,41 +285,24 @@
       <div class="br-nav">
         <div class="br-sec">Collections</div>
         <div class="br-item"><span class="ic" style="color:#e04040">●</span> Favorites</div>
-
         <div class="br-div"></div>
         <div class="br-sec">Library</div>
         <div class="br-item"><span class="ic">📄</span> Content</div>
         <div class="br-sub">Type</div>
         <div class="br-sub">Sounds</div>
-
         <div class="br-div"></div>
         <div class="br-item"><span class="ic">🔊</span> Sounds</div>
-        <div class="br-sub">Bass</div>
-        <div class="br-sub">Guitar & Plucked</div>
-        <div class="br-sub">Lead</div>
-        <div class="br-sub">Mallets</div>
-        <div class="br-sub">Pad</div>
-        <div class="br-sub">Piano & Keys</div>
-        <div class="br-sub">String</div>
-        <div class="br-sub">Voice</div>
-        <div class="br-sub">Woodwind</div>
+        <div class="br-sub">Bass</div><div class="br-sub">Guitar & Plucked</div><div class="br-sub">Lead</div>
+        <div class="br-sub">Mallets</div><div class="br-sub">Pad</div><div class="br-sub">Piano & Keys</div>
+        <div class="br-sub">String</div><div class="br-sub">Voice</div><div class="br-sub">Woodwind</div>
         <div class="br-sub">Ambience & FX</div>
-
         <div class="br-item"><span class="ic">🥁</span> Drums</div>
-        <div class="br-sub">Kick</div>
-        <div class="br-sub">Snare</div>
-        <div class="br-sub">Clap</div>
-        <div class="br-sub">Hihat</div>
-        <div class="br-sub">Cymbal</div>
-        <div class="br-sub">Tom</div>
-        <div class="br-sub">Percussion</div>
-        <div class="br-sub">Drum Loop</div>
-        <div class="br-sub">Acoustic Kit</div>
-        <div class="br-sub">Drum Machine Kit</div>
-        <div class="br-sub">Hybrid Kit</div>
-        <div class="br-sub">Percussion Kit</div>
+        <div class="br-sub">Kick</div><div class="br-sub">Snare</div><div class="br-sub">Clap</div>
+        <div class="br-sub">Hihat</div><div class="br-sub">Cymbal</div><div class="br-sub">Tom</div>
+        <div class="br-sub">Percussion</div><div class="br-sub">Drum Loop</div>
+        <div class="br-sub">Acoustic Kit</div><div class="br-sub">Drum Machine Kit</div>
+        <div class="br-sub">Hybrid Kit</div><div class="br-sub">Percussion Kit</div>
         <div class="br-sub">Vintage Kit</div>
-
         <div class="br-item on"><span class="ic">🎹</span> Instruments <span class="ct">48</span></div>
         <div class="br-item"><span class="ic">🎛️</span> Audio Effects</div>
         <div class="br-item"><span class="ic">🎚️</span> MIDI Effects</div>
@@ -359,17 +312,11 @@
         <div class="br-item"><span class="ic">🎶</span> Grooves</div>
         <div class="br-item"><span class="ic">🎵</span> Samples</div>
         <div class="br-item"><span class="ic">📋</span> Templates</div>
-
         <div class="br-div"></div>
         <div class="br-sec">Character</div>
-        <div class="br-sub" style="display:flex;justify-content:space-between">
-          <span>1 Filter</span>
-          <span style="color:#ea5808;cursor:pointer">Clear</span>
-        </div>
-
+        <div class="br-sub" style="display:flex;justify-content:space-between"><span>1 Filter</span><span style="color:#ea5808;cursor:pointer">Clear</span></div>
         <div class="br-div"></div>
         <div class="br-sec">Results <span style="color:#ea5808">(12)</span></div>
-
         <div class="br-div"></div>
         <div class="br-sec">Places</div>
         <div class="br-item"><span class="ic">📁</span> Packs</div>
@@ -378,7 +325,6 @@
         <div class="br-item"><span class="ic">📁</span> User Library</div>
         <div class="br-item"><span class="ic">📁</span> Current Project</div>
         <div class="br-item" style="color:#666"><span class="ic">➕</span> Add Folder...</div>
-
         <div class="br-div"></div>
         <div class="br-sec">Tags</div>
         <div class="br-sub">Hybrid Kit</div>
@@ -388,358 +334,168 @@
 
     <!-- Center -->
     <div class="center">
-      <!-- Session View -->
-      <div class="session">
+      <!-- ═══ SESSION VIEW ═══ -->
+      <div class="session-view" id="session-view">
         <div class="tracks">
+          <div class="trk"><div class="trk-hdr"><div class="trk-top"><div class="trk-name">Kicks</div><div class="trk-btns"><div class="trk-b s">S</div><div class="trk-b m">M</div><div class="trk-b r">⏺</div></div></div></div><div class="clips"><div class="cl-slot"><div class="cl cl-g">kick01.pattern01</div></div><div class="cl-slot"><div class="cl cl-g">kick02.pattern02</div></div><div class="cl-slot"><div class="cl cl-g">kick03.pattern01</div></div><div class="cl-slot"><div class="cl cl-g">kick04.pattern01</div></div><div class="cl-slot"><div class="cl cl-g">kick05.pattern03</div></div><div class="cl-slot"><div class="cl cl-g">random kicks pattern03</div></div><div class="cl-slot"><div class="cl cl-g">kick04.pattern04</div></div><div class="cl-slot"><div class="cl cl-e"></div></div></div></div>
+          <div class="trk"><div class="trk-hdr"><div class="trk-top"><div class="trk-name">HiHats Manual</div><div class="trk-btns"><div class="trk-b s">S</div><div class="trk-b m">M</div><div class="trk-b r">⏺</div></div></div></div><div class="clips"><div class="cl-slot"><div class="cl cl-y">hh01.pattern02</div></div><div class="cl-slot"><div class="cl cl-y">hh02.pattern03</div></div><div class="cl-slot"><div class="cl cl-y">TR909_HH_Tommy_Big</div></div><div class="cl-slot"><div class="cl cl-y">hh04.pattern02</div></div><div class="cl-slot"><div class="cl cl-y">hh05.pattern01</div></div><div class="cl-slot"><div class="cl cl-e"></div></div><div class="cl-slot"><div class="cl cl-e"></div></div><div class="cl-slot"><div class="cl cl-e"></div></div></div></div>
+          <div class="trk"><div class="trk-hdr"><div class="trk-top"><div class="trk-name">Loops / Noise</div><div class="trk-btns"><div class="trk-b s">S</div><div class="trk-b m">M</div><div class="trk-b r">⏺</div></div></div></div><div class="clips"><div class="cl-slot"><div class="cl cl-o">teasmoustv4175</div></div><div class="cl-slot"><div class="cl cl-o">teasmoustv4176</div></div><div class="cl-slot"><div class="cl cl-o">TR8080_HH_Tommy_Big</div></div><div class="cl-slot"><div class="cl cl-o">TR8080_HH_Tommy_Big_</div></div><div class="cl-slot"><div class="cl cl-e"></div></div><div class="cl-slot"><div class="cl cl-e"></div></div><div class="cl-slot"><div class="cl cl-e"></div></div><div class="cl-slot"><div class="cl cl-e"></div></div></div></div>
+          <div class="trk"><div class="trk-hdr"><div class="trk-top"><div class="trk-name">Loops 1/Bar</div><div class="trk-btns"><div class="trk-b s">S</div><div class="trk-b m">M</div><div class="trk-b r">⏺</div></div></div></div><div class="clips"><div class="cl-slot"><div class="cl cl-c">cr8000beat.1</div></div><div class="cl-slot"><div class="cl cl-c">DIGO_BEAT</div></div><div class="cl-slot"><div class="cl cl-c">dignitybeat01</div></div><div class="cl-slot"><div class="cl cl-c">instablack_beat</div></div><div class="cl-slot"><div class="cl cl-c">cr8000beat.2</div></div><div class="cl-slot"><div class="cl cl-c">ferroxs.3</div></div><div class="cl-slot"><div class="cl cl-e"></div></div><div class="cl-slot"><div class="cl cl-e"></div></div></div></div>
+          <div class="trk"><div class="trk-hdr"><div class="trk-top"><div class="trk-name">Perc 01</div><div class="trk-btns"><div class="trk-b s">S</div><div class="trk-b m">M</div><div class="trk-b r">⏺</div></div></div></div><div class="clips"><div class="cl-slot"><div class="cl cl-b">perc01.1</div></div><div class="cl-slot"><div class="cl cl-b">perc01.2</div></div><div class="cl-slot"><div class="cl cl-b">perc01.3</div></div><div class="cl-slot"><div class="cl cl-b">perc01.4</div></div><div class="cl-slot"><div class="cl cl-b">perc01.5</div></div><div class="cl-slot"><div class="cl cl-b">perc01.6</div></div><div class="cl-slot"><div class="cl cl-e"></div></div><div class="cl-slot"><div class="cl cl-e"></div></div></div></div>
+          <div class="trk"><div class="trk-hdr"><div class="trk-top"><div class="trk-name">Perc 02</div><div class="trk-btns"><div class="trk-b s">S</div><div class="trk-b m">M</div><div class="trk-b r">⏺</div></div></div></div><div class="clips"><div class="cl-slot"><div class="cl" style="background:#2a7a5e;color:#a8e8c8">chord1.1</div></div><div class="cl-slot"><div class="cl" style="background:#2a7a5e;color:#a8e8c8">chord1.2</div></div><div class="cl-slot"><div class="cl cl-e"></div></div><div class="cl-slot"><div class="cl cl-e"></div></div><div class="cl-slot"><div class="cl cl-e"></div></div><div class="cl-slot"><div class="cl cl-e"></div></div><div class="cl-slot"><div class="cl cl-e"></div></div><div class="cl-slot"><div class="cl cl-e"></div></div></div></div>
+          <div class="trk"><div class="trk-hdr"><div class="trk-top"><div class="trk-name">Chords</div><div class="trk-btns"><div class="trk-b s">S</div><div class="trk-b m">M</div><div class="trk-b r">⏺</div></div></div></div><div class="clips"><div class="cl-slot"><div class="cl cl-p">tone01.1</div></div><div class="cl-slot"><div class="cl cl-p">tone02.1</div></div><div class="cl-slot"><div class="cl cl-e"></div></div><div class="cl-slot"><div class="cl cl-e"></div></div><div class="cl-slot"><div class="cl cl-e"></div></div><div class="cl-slot"><div class="cl cl-e"></div></div><div class="cl-slot"><div class="cl cl-e"></div></div><div class="cl-slot"><div class="cl cl-e"></div></div></div></div>
+          <div class="trk"><div class="trk-hdr"><div class="trk-top"><div class="trk-name">Tones</div><div class="trk-btns"><div class="trk-b s">S</div><div class="trk-b m">M</div><div class="trk-b r">⏺</div></div></div></div><div class="clips"><div class="cl-slot"><div class="cl cl-r">tone01.1</div></div><div class="cl-slot"><div class="cl cl-r">tone02.1</div></div><div class="cl-slot"><div class="cl cl-e"></div></div><div class="cl-slot"><div class="cl cl-e"></div></div><div class="cl-slot"><div class="cl cl-e"></div></div><div class="cl-slot"><div class="cl cl-e"></div></div><div class="cl-slot"><div class="cl cl-e"></div></div><div class="cl-slot"><div class="cl cl-e"></div></div></div></div>
+          <div class="trk"><div class="trk-hdr"><div class="trk-top"><div class="trk-name">Pads</div><div class="trk-btns"><div class="trk-b s">S</div><div class="trk-b m">M</div><div class="trk-b r">⏺</div></div></div></div><div class="clips"><div class="cl-slot"><div class="cl cl-g">CHORD_LOOP</div></div><div class="cl-slot"><div class="cl cl-g">delayloop</div></div><div class="cl-slot"><div class="cl cl-e"></div></div><div class="cl-slot"><div class="cl cl-e"></div></div><div class="cl-slot"><div class="cl cl-e"></div></div><div class="cl-slot"><div class="cl cl-e"></div></div><div class="cl-slot"><div class="cl cl-e"></div></div><div class="cl-slot"><div class="cl cl-e"></div></div></div></div>
+          <div class="trk" style="min-width:60px"><div class="trk-hdr" style="background:#333"><div class="trk-top"><div class="trk-name" style="font-size:7px">A Reverb</div></div></div><div class="clips"></div></div>
+          <div class="trk" style="min-width:90px"><div class="trk-hdr" style="background:#3a3a5a"><div class="trk-top"><div class="trk-name" style="color:#5ec4e8">Main</div></div></div><div class="clips"><div class="cl-slot"><div class="cl" style="background:#2d5a3e;color:#a8e8c8;font-size:6px">01 Basic Pattern</div></div><div class="cl-slot"><div class="cl" style="background:#2d5a3e;color:#a8e8c8;font-size:6px">02 Variation</div></div><div class="cl-slot"><div class="cl" style="background:#2d5a3e;color:#a8e8c8;font-size:6px">03 Hook</div></div><div class="cl-slot"><div class="cl" style="background:#2d5a3e;color:#a8e8c8;font-size:6px">04 Piano</div></div><div class="cl-slot"><div class="cl" style="background:#2d5a3e;color:#a8e8c8;font-size:6px">05 Bridge</div></div><div class="cl-slot"><div class="cl" style="background:#2d5a3e;color:#a8e8c8;font-size:6px">06 Transition</div></div><div class="cl-slot"><div class="cl" style="background:#2d5a3e;color:#a8e8c8;font-size:6px">07 Groove A</div></div><div class="cl-slot"><div class="cl" style="background:#2d5a3e;color:#a8e8c8;font-size:6px">08 Groove B</div></div></div></div>
+        </div>
+        <div class="scenes"><div class="sc-btn play">▶</div><div class="sc-btn">1</div><div class="sc-btn">2</div><div class="sc-btn">3</div><div class="sc-btn">4</div><div class="sc-btn">5</div><div class="sc-btn">6</div><div class="sc-btn">7</div><div class="sc-btn">8</div></div>
+      </div>
+
+      <!-- ═══ ARRANGEMENT VIEW ═══ -->
+      <div class="arr-view" id="arr-view">
+        <!-- Timeline Ruler -->
+        <div class="arr-ruler">
+          <div class="arr-ruler-label"></div>
+          <div class="arr-ruler-beats">
+            <div class="arr-beat bar">1</div><div class="arr-beat"></div><div class="arr-beat"></div><div class="arr-beat"></div>
+            <div class="arr-beat bar">2</div><div class="arr-beat"></div><div class="arr-beat"></div><div class="arr-beat"></div>
+            <div class="arr-beat bar">3</div><div class="arr-beat"></div><div class="arr-beat"></div><div class="arr-beat"></div>
+            <div class="arr-beat bar">4</div><div class="arr-beat"></div><div class="arr-beat"></div><div class="arr-beat"></div>
+            <div class="arr-beat bar">5</div><div class="arr-beat"></div><div class="arr-beat"></div><div class="arr-beat"></div>
+            <div class="arr-beat bar">6</div><div class="arr-beat"></div><div class="arr-beat"></div><div class="arr-beat"></div>
+            <div class="arr-beat bar">7</div><div class="arr-beat"></div><div class="arr-beat"></div><div class="arr-beat"></div>
+            <div class="arr-beat bar">8</div><div class="arr-beat"></div><div class="arr-beat"></div><div class="arr-beat"></div>
+            <div class="arr-beat bar">9</div><div class="arr-beat"></div><div class="arr-beat"></div><div class="arr-beat"></div>
+            <div class="arr-beat bar">10</div><div class="arr-beat"></div><div class="arr-beat"></div><div class="arr-beat"></div>
+            <div class="arr-beat bar">11</div><div class="arr-beat"></div><div class="arr-beat"></div><div class="arr-beat"></div>
+            <div class="arr-beat bar">12</div><div class="arr-beat"></div><div class="arr-beat"></div><div class="arr-beat"></div>
+            <div class="arr-beat bar">13</div><div class="arr-beat"></div><div class="arr-beat"></div><div class="arr-beat"></div>
+            <div class="arr-beat bar">14</div><div class="arr-beat"></div><div class="arr-beat"></div><div class="arr-beat"></div>
+            <div class="arr-beat bar">15</div><div class="arr-beat"></div><div class="arr-beat"></div><div class="arr-beat"></div>
+            <div class="arr-beat bar">16</div><div class="arr-beat"></div><div class="arr-beat"></div><div class="arr-beat"></div>
+          </div>
+        </div>
+        <!-- Arrangement Tracks -->
+        <div class="arr-tracks">
           <!-- Kicks -->
-          <div class="trk">
-            <div class="trk-hdr">
-              <div class="trk-top"><div class="trk-name">Kicks</div><div class="trk-btns"><div class="trk-b s">S</div><div class="trk-b m">M</div><div class="trk-b r">⏺</div></div></div>
-            </div>
-            <div class="clips">
-              <div class="cl-slot"><div class="cl cl-g">kick01.pattern01</div></div>
-              <div class="cl-slot"><div class="cl cl-g">kick02.pattern02</div></div>
-              <div class="cl-slot"><div class="cl cl-g">kick03.pattern01</div></div>
-              <div class="cl-slot"><div class="cl cl-g">kick04.pattern01</div></div>
-              <div class="cl-slot"><div class="cl cl-g">kick05.pattern03</div></div>
-              <div class="cl-slot"><div class="cl cl-g">random kicks pattern03</div></div>
-              <div class="cl-slot"><div class="cl cl-g">kick04.pattern04</div></div>
-              <div class="cl-slot"><div class="cl cl-e"></div></div>
+          <div class="arr-track">
+            <div class="arr-track-hdr"><div class="arr-track-name">Kicks</div><div class="arr-track-btns"><div class="trk-b s">S</div><div class="trk-b m">M</div><div class="trk-b r">⏺</div></div></div>
+            <div class="arr-track-content">
+              <div class="arr-grid-line" style="left:6.25%"></div><div class="arr-grid-line" style="left:12.5%"></div><div class="arr-grid-line" style="left:18.75%"></div><div class="arr-grid-line" style="left:25%"></div><div class="arr-grid-line" style="left:31.25%"></div><div class="arr-grid-line" style="left:37.5%"></div><div class="arr-grid-line" style="left:43.75%"></div><div class="arr-grid-line" style="left:50%"></div><div class="arr-grid-line" style="left:56.25%"></div><div class="arr-grid-line" style="left:62.5%"></div><div class="arr-grid-line" style="left:68.75%"></div><div class="arr-grid-line" style="left:75%"></div><div class="arr-grid-line" style="left:81.25%"></div><div class="arr-grid-line" style="left:87.5%"></div><div class="arr-grid-line" style="left:93.75%"></div>
+              <div class="arr-clip" style="left:0%;width:25%;background:#3d8a5e;color:#b8e8c8"><div class="arr-clip-inner">kick01.pattern01</div></div>
+              <div class="arr-clip" style="left:25%;width:25%;background:#3d8a5e;color:#b8e8c8"><div class="arr-clip-inner">kick02.pattern02</div></div>
+              <div class="arr-clip" style="left:50%;width:25%;background:#3d8a5e;color:#b8e8c8"><div class="arr-clip-inner">kick03.pattern01</div></div>
+              <div class="arr-clip" style="left:75%;width:25%;background:#3d8a5e;color:#b8e8c8"><div class="arr-clip-inner">kick04.pattern01</div></div>
             </div>
           </div>
           <!-- HiHats -->
-          <div class="trk">
-            <div class="trk-hdr">
-              <div class="trk-top"><div class="trk-name">HiHats Manual</div><div class="trk-btns"><div class="trk-b s">S</div><div class="trk-b m">M</div><div class="trk-b r">⏺</div></div></div>
-            </div>
-            <div class="clips">
-              <div class="cl-slot"><div class="cl cl-y">hh01.pattern02</div></div>
-              <div class="cl-slot"><div class="cl cl-y">hh02.pattern03</div></div>
-              <div class="cl-slot"><div class="cl cl-y">TR909_HH_Tommy_Big</div></div>
-              <div class="cl-slot"><div class="cl cl-y">hh04.pattern02</div></div>
-              <div class="cl-slot"><div class="cl cl-y">hh05.pattern01</div></div>
-              <div class="cl-slot"><div class="cl cl-e"></div></div>
-              <div class="cl-slot"><div class="cl cl-e"></div></div>
-              <div class="cl-slot"><div class="cl cl-e"></div></div>
+          <div class="arr-track">
+            <div class="arr-track-hdr"><div class="arr-track-name">HiHats</div><div class="arr-track-btns"><div class="trk-b s">S</div><div class="trk-b m">M</div><div class="trk-b r">⏺</div></div></div>
+            <div class="arr-track-content">
+              <div class="arr-grid-line" style="left:6.25%"></div><div class="arr-grid-line" style="left:12.5%"></div><div class="arr-grid-line" style="left:18.75%"></div><div class="arr-grid-line" style="left:25%"></div><div class="arr-grid-line" style="left:31.25%"></div><div class="arr-grid-line" style="left:37.5%"></div><div class="arr-grid-line" style="left:43.75%"></div><div class="arr-grid-line" style="left:50%"></div><div class="arr-grid-line" style="left:56.25%"></div><div class="arr-grid-line" style="left:62.5%"></div><div class="arr-grid-line" style="left:68.75%"></div><div class="arr-grid-line" style="left:75%"></div><div class="arr-grid-line" style="left:81.25%"></div><div class="arr-grid-line" style="left:87.5%"></div><div class="arr-grid-line" style="left:93.75%"></div>
+              <div class="arr-clip" style="left:0%;width:12.5%;background:#b8960b;color:#ffeaa7"><div class="arr-clip-inner">hh01.pattern02</div></div>
+              <div class="arr-clip" style="left:12.5%;width:12.5%;background:#b8960b;color:#ffeaa7"><div class="arr-clip-inner">hh02.pattern03</div></div>
+              <div class="arr-clip" style="left:25%;width:25%;background:#b8960b;color:#ffeaa7"><div class="arr-clip-inner">TR909_HH_Tommy_Big</div></div>
+              <div class="arr-clip" style="left:50%;width:12.5%;background:#b8960b;color:#ffeaa7"><div class="arr-clip-inner">hh04.pattern02</div></div>
+              <div class="arr-clip" style="left:62.5%;width:12.5%;background:#b8960b;color:#ffeaa7"><div class="arr-clip-inner">hh05.pattern01</div></div>
+              <div class="arr-clip" style="left:75%;width:25%;background:#b8960b;color:#ffeaa7"><div class="arr-clip-inner">hh01.pattern02</div></div>
             </div>
           </div>
           <!-- Loops / Noise -->
-          <div class="trk">
-            <div class="trk-hdr">
-              <div class="trk-top"><div class="trk-name">Loops / Noise</div><div class="trk-btns"><div class="trk-b s">S</div><div class="trk-b m">M</div><div class="trk-b r">⏺</div></div></div>
-            </div>
-            <div class="clips">
-              <div class="cl-slot"><div class="cl cl-o">teasmoustv4175</div></div>
-              <div class="cl-slot"><div class="cl cl-o">teasmoustv4176</div></div>
-              <div class="cl-slot"><div class="cl cl-o">TR8080_HH_Tommy_Big</div></div>
-              <div class="cl-slot"><div class="cl cl-o">TR8080_HH_Tommy_Big_</div></div>
-              <div class="cl-slot"><div class="cl cl-e"></div></div>
-              <div class="cl-slot"><div class="cl cl-e"></div></div>
-              <div class="cl-slot"><div class="cl cl-e"></div></div>
-              <div class="cl-slot"><div class="cl cl-e"></div></div>
+          <div class="arr-track">
+            <div class="arr-track-hdr"><div class="arr-track-name">Loops / Noise</div><div class="arr-track-btns"><div class="trk-b s">S</div><div class="trk-b m">M</div><div class="trk-b r">⏺</div></div></div>
+            <div class="arr-track-content">
+              <div class="arr-grid-line" style="left:6.25%"></div><div class="arr-grid-line" style="left:12.5%"></div><div class="arr-grid-line" style="left:18.75%"></div><div class="arr-grid-line" style="left:25%"></div><div class="arr-grid-line" style="left:31.25%"></div><div class="arr-grid-line" style="left:37.5%"></div><div class="arr-grid-line" style="left:43.75%"></div><div class="arr-grid-line" style="left:50%"></div><div class="arr-grid-line" style="left:56.25%"></div><div class="arr-grid-line" style="left:62.5%"></div><div class="arr-grid-line" style="left:68.75%"></div><div class="arr-grid-line" style="left:75%"></div><div class="arr-grid-line" style="left:81.25%"></div><div class="arr-grid-line" style="left:87.5%"></div><div class="arr-grid-line" style="left:93.75%"></div>
+              <div class="arr-clip" style="left:12.5%;width:37.5%;background:#c06a0a;color:#ffcc80"><div class="arr-clip-inner">teasmoustv4175</div></div>
+              <div class="arr-clip" style="left:56.25%;width:18.75%;background:#c06a0a;color:#ffcc80"><div class="arr-clip-inner">TR8080_HH_Tommy_Big</div></div>
             </div>
           </div>
-          <!-- Loops 1/BarBeat -->
-          <div class="trk">
-            <div class="trk-hdr">
-              <div class="trk-top"><div class="trk-name">Loops 1/BarBeat</div><div class="trk-btns"><div class="trk-b s">S</div><div class="trk-b m">M</div><div class="trk-b r">⏺</div></div></div>
-            </div>
-            <div class="clips">
-              <div class="cl-slot"><div class="cl cl-c">cr8000beat.1</div></div>
-              <div class="cl-slot"><div class="cl cl-c">DIGO_BEAT</div></div>
-              <div class="cl-slot"><div class="cl cl-c">dignitybeat01</div></div>
-              <div class="cl-slot"><div class="cl cl-c">instablack_beat</div></div>
-              <div class="cl-slot"><div class="cl cl-c">cr8000beat.2</div></div>
-              <div class="cl-slot"><div class="cl cl-c">ferroxs.3</div></div>
-              <div class="cl-slot"><div class="cl cl-e"></div></div>
-              <div class="cl-slot"><div class="cl cl-e"></div></div>
+          <!-- Loops 1/Bar -->
+          <div class="arr-track">
+            <div class="arr-track-hdr"><div class="arr-track-name">Loops 1/Bar</div><div class="arr-track-btns"><div class="trk-b s">S</div><div class="trk-b m">M</div><div class="trk-b r">⏺</div></div></div>
+            <div class="arr-track-content">
+              <div class="arr-grid-line" style="left:6.25%"></div><div class="arr-grid-line" style="left:12.5%"></div><div class="arr-grid-line" style="left:18.75%"></div><div class="arr-grid-line" style="left:25%"></div><div class="arr-grid-line" style="left:31.25%"></div><div class="arr-grid-line" style="left:37.5%"></div><div class="arr-grid-line" style="left:43.75%"></div><div class="arr-grid-line" style="left:50%"></div><div class="arr-grid-line" style="left:56.25%"></div><div class="arr-grid-line" style="left:62.5%"></div><div class="arr-grid-line" style="left:68.75%"></div><div class="arr-grid-line" style="left:75%"></div><div class="arr-grid-line" style="left:81.25%"></div><div class="arr-grid-line" style="left:87.5%"></div><div class="arr-grid-line" style="left:93.75%"></div>
+              <div class="arr-clip" style="left:0%;width:18.75%;background:#1a7070;color:#b3e6e6"><div class="arr-clip-inner">cr8000beat.1</div></div>
+              <div class="arr-clip" style="left:18.75%;width:12.5%;background:#1a7070;color:#b3e6e6"><div class="arr-clip-inner">DIGO_BEAT</div></div>
+              <div class="arr-clip" style="left:31.25%;width:18.75%;background:#1a7070;color:#b3e6e6"><div class="arr-clip-inner">dignitybeat01</div></div>
+              <div class="arr-clip" style="left:50%;width:25%;background:#1a7070;color:#b3e6e6"><div class="arr-clip-inner">instablack_beat</div></div>
+              <div class="arr-clip" style="left:75%;width:25%;background:#1a7070;color:#b3e6e6"><div class="arr-clip-inner">cr8000beat.2</div></div>
             </div>
           </div>
-          <!-- Percussion 01 -->
-          <div class="trk">
-            <div class="trk-hdr">
-              <div class="trk-top"><div class="trk-name">Percussion 01</div><div class="trk-btns"><div class="trk-b s">S</div><div class="trk-b m">M</div><div class="trk-b r">⏺</div></div></div>
-            </div>
-            <div class="clips">
-              <div class="cl-slot"><div class="cl cl-b">perc01.1</div></div>
-              <div class="cl-slot"><div class="cl cl-b">perc01.2</div></div>
-              <div class="cl-slot"><div class="cl cl-b">perc01.3</div></div>
-              <div class="cl-slot"><div class="cl cl-b">perc01.4, timeswitch</div></div>
-              <div class="cl-slot"><div class="cl cl-b">perc01.5</div></div>
-              <div class="cl-slot"><div class="cl cl-b">perc01.6, timeswitch_pitch</div></div>
-              <div class="cl-slot"><div class="cl cl-e"></div></div>
-              <div class="cl-slot"><div class="cl cl-e"></div></div>
+          <!-- Perc 01 -->
+          <div class="arr-track">
+            <div class="arr-track-hdr"><div class="arr-track-name">Perc 01</div><div class="arr-track-btns"><div class="trk-b s">S</div><div class="trk-b m">M</div><div class="trk-b r">⏺</div></div></div>
+            <div class="arr-track-content">
+              <div class="arr-grid-line" style="left:6.25%"></div><div class="arr-grid-line" style="left:12.5%"></div><div class="arr-grid-line" style="left:18.75%"></div><div class="arr-grid-line" style="left:25%"></div><div class="arr-grid-line" style="left:31.25%"></div><div class="arr-grid-line" style="left:37.5%"></div><div class="arr-grid-line" style="left:43.75%"></div><div class="arr-grid-line" style="left:50%"></div><div class="arr-grid-line" style="left:56.25%"></div><div class="arr-grid-line" style="left:62.5%"></div><div class="arr-grid-line" style="left:68.75%"></div><div class="arr-grid-line" style="left:75%"></div><div class="arr-grid-line" style="left:81.25%"></div><div class="arr-grid-line" style="left:87.5%"></div><div class="arr-grid-line" style="left:93.75%"></div>
+              <div class="arr-clip" style="left:0%;width:50%;background:#2a6090;color:#b3d9ff"><div class="arr-clip-inner">perc01.1 — perc01.4</div></div>
+              <div class="arr-clip" style="left:50%;width:25%;background:#2a6090;color:#b3d9ff"><div class="arr-clip-inner">perc01.5</div></div>
+              <div class="arr-clip" style="left:75%;width:25%;background:#2a6090;color:#b3d9ff"><div class="arr-clip-inner">perc01.6</div></div>
             </div>
           </div>
-          <!-- Percussion 02 -->
-          <div class="trk">
-            <div class="trk-hdr">
-              <div class="trk-top"><div class="trk-name">Percussion 02</div><div class="trk-btns"><div class="trk-b s">S</div><div class="trk-b m">M</div><div class="trk-b r">⏺</div></div></div>
-            </div>
-            <div class="clips">
-              <div class="cl-slot"><div class="cl" style="background:#2a7a5e;color:#a8e8c8">chord1.1</div></div>
-              <div class="cl-slot"><div class="cl" style="background:#2a7a5e;color:#a8e8c8">chord1.2</div></div>
-              <div class="cl-slot"><div class="cl cl-e"></div></div>
-              <div class="cl-slot"><div class="cl cl-e"></div></div>
-              <div class="cl-slot"><div class="cl cl-e"></div></div>
-              <div class="cl-slot"><div class="cl cl-e"></div></div>
-              <div class="cl-slot"><div class="cl cl-e"></div></div>
-              <div class="cl-slot"><div class="cl cl-e"></div></div>
+          <!-- Perc 02 -->
+          <div class="arr-track">
+            <div class="arr-track-hdr"><div class="arr-track-name">Perc 02</div><div class="arr-track-btns"><div class="trk-b s">S</div><div class="trk-b m">M</div><div class="trk-b r">⏺</div></div></div>
+            <div class="arr-track-content">
+              <div class="arr-grid-line" style="left:6.25%"></div><div class="arr-grid-line" style="left:12.5%"></div><div class="arr-grid-line" style="left:18.75%"></div><div class="arr-grid-line" style="left:25%"></div><div class="arr-grid-line" style="left:31.25%"></div><div class="arr-grid-line" style="left:37.5%"></div><div class="arr-grid-line" style="left:43.75%"></div><div class="arr-grid-line" style="left:50%"></div><div class="arr-grid-line" style="left:56.25%"></div><div class="arr-grid-line" style="left:62.5%"></div><div class="arr-grid-line" style="left:68.75%"></div><div class="arr-grid-line" style="left:75%"></div><div class="arr-grid-line" style="left:81.25%"></div><div class="arr-grid-line" style="left:87.5%"></div><div class="arr-grid-line" style="left:93.75%"></div>
+              <div class="arr-clip" style="left:25%;width:25%;background:#2a7a5e;color:#a8e8c8"><div class="arr-clip-inner">chord1.1</div></div>
+              <div class="arr-clip" style="left:50%;width:25%;background:#2a7a5e;color:#a8e8c8"><div class="arr-clip-inner">chord1.2</div></div>
             </div>
           </div>
-          <!-- Chords 01 -->
-          <div class="trk">
-            <div class="trk-hdr">
-              <div class="trk-top"><div class="trk-name">Chords 01</div><div class="trk-btns"><div class="trk-b s">S</div><div class="trk-b m">M</div><div class="trk-b r">⏺</div></div></div>
-            </div>
-            <div class="clips">
-              <div class="cl-slot"><div class="cl cl-p">tone01.1</div></div>
-              <div class="cl-slot"><div class="cl cl-p">tone02.1</div></div>
-              <div class="cl-slot"><div class="cl cl-e"></div></div>
-              <div class="cl-slot"><div class="cl cl-e"></div></div>
-              <div class="cl-slot"><div class="cl cl-e"></div></div>
-              <div class="cl-slot"><div class="cl cl-e"></div></div>
-              <div class="cl-slot"><div class="cl cl-e"></div></div>
-              <div class="cl-slot"><div class="cl cl-e"></div></div>
+          <!-- Chords -->
+          <div class="arr-track">
+            <div class="arr-track-hdr"><div class="arr-track-name">Chords</div><div class="arr-track-btns"><div class="trk-b s">S</div><div class="trk-b m">M</div><div class="trk-b r">⏺</div></div></div>
+            <div class="arr-track-content">
+              <div class="arr-grid-line" style="left:6.25%"></div><div class="arr-grid-line" style="left:12.5%"></div><div class="arr-grid-line" style="left:18.75%"></div><div class="arr-grid-line" style="left:25%"></div><div class="arr-grid-line" style="left:31.25%"></div><div class="arr-grid-line" style="left:37.5%"></div><div class="arr-grid-line" style="left:43.75%"></div><div class="arr-grid-line" style="left:50%"></div><div class="arr-grid-line" style="left:56.25%"></div><div class="arr-grid-line" style="left:62.5%"></div><div class="arr-grid-line" style="left:68.75%"></div><div class="arr-grid-line" style="left:75%"></div><div class="arr-grid-line" style="left:81.25%"></div><div class="arr-grid-line" style="left:87.5%"></div><div class="arr-grid-line" style="left:93.75%"></div>
+              <div class="arr-clip" style="left:37.5%;width:25%;background:#6a3090;color:#d9b3ff"><div class="arr-clip-inner">tone01.1</div></div>
+              <div class="arr-clip" style="left:62.5%;width:12.5%;background:#6a3090;color:#d9b3ff"><div class="arr-clip-inner">tone02.1</div></div>
             </div>
           </div>
           <!-- Tones -->
-          <div class="trk">
-            <div class="trk-hdr">
-              <div class="trk-top"><div class="trk-name">Tones</div><div class="trk-btns"><div class="trk-b s">S</div><div class="trk-b m">M</div><div class="trk-b r">⏺</div></div></div>
-            </div>
-            <div class="clips">
-              <div class="cl-slot"><div class="cl cl-r">tone01.1</div></div>
-              <div class="cl-slot"><div class="cl cl-r">tone02.1</div></div>
-              <div class="cl-slot"><div class="cl cl-e"></div></div>
-              <div class="cl-slot"><div class="cl cl-e"></div></div>
-              <div class="cl-slot"><div class="cl cl-e"></div></div>
-              <div class="cl-slot"><div class="cl cl-e"></div></div>
-              <div class="cl-slot"><div class="cl cl-e"></div></div>
-              <div class="cl-slot"><div class="cl cl-e"></div></div>
+          <div class="arr-track">
+            <div class="arr-track-hdr"><div class="arr-track-name">Tones</div><div class="arr-track-btns"><div class="trk-b s">S</div><div class="trk-b m">M</div><div class="trk-b r">⏺</div></div></div>
+            <div class="arr-track-content">
+              <div class="arr-grid-line" style="left:6.25%"></div><div class="arr-grid-line" style="left:12.5%"></div><div class="arr-grid-line" style="left:18.75%"></div><div class="arr-grid-line" style="left:25%"></div><div class="arr-grid-line" style="left:31.25%"></div><div class="arr-grid-line" style="left:37.5%"></div><div class="arr-grid-line" style="left:43.75%"></div><div class="arr-grid-line" style="left:50%"></div><div class="arr-grid-line" style="left:56.25%"></div><div class="arr-grid-line" style="left:62.5%"></div><div class="arr-grid-line" style="left:68.75%"></div><div class="arr-grid-line" style="left:75%"></div><div class="arr-grid-line" style="left:81.25%"></div><div class="arr-grid-line" style="left:87.5%"></div><div class="arr-grid-line" style="left:93.75%"></div>
+              <div class="arr-clip" style="left:0%;width:12.5%;background:#a03535;color:#ffb3b3"><div class="arr-clip-inner">tone01.1</div></div>
+              <div class="arr-clip" style="left:12.5%;width:12.5%;background:#a03535;color:#ffb3b3"><div class="arr-clip-inner">tone02.1</div></div>
             </div>
           </div>
           <!-- Pads -->
-          <div class="trk">
-            <div class="trk-hdr">
-              <div class="trk-top"><div class="trk-name">Pads</div><div class="trk-btns"><div class="trk-b s">S</div><div class="trk-b m">M</div><div class="trk-b r">⏺</div></div></div>
+          <div class="arr-track">
+            <div class="arr-track-hdr"><div class="arr-track-name">Pads</div><div class="arr-track-btns"><div class="trk-b s">S</div><div class="trk-b m">M</div><div class="trk-b r">⏺</div></div></div>
+            <div class="arr-track-content">
+              <div class="arr-grid-line" style="left:6.25%"></div><div class="arr-grid-line" style="left:12.5%"></div><div class="arr-grid-line" style="left:18.75%"></div><div class="arr-grid-line" style="left:25%"></div><div class="arr-grid-line" style="left:31.25%"></div><div class="arr-grid-line" style="left:37.5%"></div><div class="arr-grid-line" style="left:43.75%"></div><div class="arr-grid-line" style="left:50%"></div><div class="arr-grid-line" style="left:56.25%"></div><div class="arr-grid-line" style="left:62.5%"></div><div class="arr-grid-line" style="left:68.75%"></div><div class="arr-grid-line" style="left:75%"></div><div class="arr-grid-line" style="left:81.25%"></div><div class="arr-grid-line" style="left:87.5%"></div><div class="arr-grid-line" style="left:93.75%"></div>
+              <div class="arr-clip" style="left:0%;width:50%;background:#3d8a5e;color:#b8e8c8"><div class="arr-clip-inner">CHORD_LOOP</div></div>
+              <div class="arr-clip" style="left:50%;width:25%;background:#3d8a5e;color:#b8e8c8"><div class="arr-clip-inner">delayloop</div></div>
             </div>
-            <div class="clips">
-              <div class="cl-slot"><div class="cl cl-g">CHORD_LOOP</div></div>
-              <div class="cl-slot"><div class="cl cl-g">delayloop</div></div>
-              <div class="cl-slot"><div class="cl cl-e"></div></div>
-              <div class="cl-slot"><div class="cl cl-e"></div></div>
-              <div class="cl-slot"><div class="cl cl-e"></div></div>
-              <div class="cl-slot"><div class="cl cl-e"></div></div>
-              <div class="cl-slot"><div class="cl cl-e"></div></div>
-              <div class="cl-slot"><div class="cl cl-e"></div></div>
-            </div>
-          </div>
-          <!-- A Reverb / Compressor -->
-          <div class="trk" style="min-width:60px">
-            <div class="trk-hdr" style="background:#333">
-              <div class="trk-top"><div class="trk-name" style="font-size:7px">A Reverb / Compressor</div></div>
-            </div>
-            <div class="clips"></div>
           </div>
           <!-- Main -->
-          <div class="trk" style="min-width:90px">
-            <div class="trk-hdr" style="background:#3a3a5a">
-              <div class="trk-top"><div class="trk-name" style="color:#5ec4e8">Main</div></div>
-            </div>
-            <div class="clips">
-              <div class="cl-slot"><div class="cl" style="background:#2d5a3e;color:#a8e8c8;font-size:6px">01 Basic Pattern</div></div>
-              <div class="cl-slot"><div class="cl" style="background:#2d5a3e;color:#a8e8c8;font-size:6px">02 Basic Pattern Variation</div></div>
-              <div class="cl-slot"><div class="cl" style="background:#2d5a3e;color:#a8e8c8;font-size:6px">03 Hook</div></div>
-              <div class="cl-slot"><div class="cl" style="background:#2d5a3e;color:#a8e8c8;font-size:6px">04 Piano Part 1</div></div>
-              <div class="cl-slot"><div class="cl" style="background:#2d5a3e;color:#a8e8c8;font-size:6px">05 Bridge</div></div>
-              <div class="cl-slot"><div class="cl" style="background:#2d5a3e;color:#a8e8c8;font-size:6px">06 Transition</div></div>
-              <div class="cl-slot"><div class="cl" style="background:#2d5a3e;color:#a8e8c8;font-size:6px">07 Groove A</div></div>
-              <div class="cl-slot"><div class="cl" style="background:#2d5a3e;color:#a8e8c8;font-size:6px">08 Groove B</div></div>
+          <div class="arr-track" style="height:30px">
+            <div class="arr-track-hdr" style="background:#3a3a5a"><div class="arr-track-name" style="color:#5ec4e8;font-size:7px">Main</div></div>
+            <div class="arr-track-content" style="background:#2a2a3a">
+              <div class="arr-grid-line" style="left:6.25%"></div><div class="arr-grid-line" style="left:12.5%"></div><div class="arr-grid-line" style="left:18.75%"></div><div class="arr-grid-line" style="left:25%"></div><div class="arr-grid-line" style="left:31.25%"></div><div class="arr-grid-line" style="left:37.5%"></div><div class="arr-grid-line" style="left:43.75%"></div><div class="arr-grid-line" style="left:50%"></div><div class="arr-grid-line" style="left:56.25%"></div><div class="arr-grid-line" style="left:62.5%"></div><div class="arr-grid-line" style="left:68.75%"></div><div class="arr-grid-line" style="left:75%"></div><div class="arr-grid-line" style="left:81.25%"></div><div class="arr-grid-line" style="left:87.5%"></div><div class="arr-grid-line" style="left:93.75%"></div>
+              <div class="arr-clip" style="left:0%;width:100%;background:rgba(94,196,232,0.15);color:#5ec4e8;font-size:5px"><div class="arr-clip-inner">Master Output — Main (1/2)</div></div>
             </div>
           </div>
         </div>
-        <!-- Scene Launch -->
-        <div class="scenes">
-          <div class="sc-btn play">▶</div>
-          <div class="sc-btn">1</div>
-          <div class="sc-btn">2</div>
-          <div class="sc-btn">3</div>
-          <div class="sc-btn">4</div>
-          <div class="sc-btn">5</div>
-          <div class="sc-btn">6</div>
-          <div class="sc-btn">7</div>
-          <div class="sc-btn">8</div>
-        </div>
       </div>
 
-      <!-- Mixer -->
+      <!-- ═══ MIXER (shared) ═══ -->
       <div class="mixer">
-        <!-- Kicks -->
-        <div class="mx-ch">
-          <div class="mx-lbl">Kicks</div>
-          <div class="mx-route">MIDI From<br>All Ins<br>All Channels</div>
-          <div class="mx-mon"><div class="mx-mon-b">In</div><div class="mx-mon-b on">Auto</div><div class="mx-mon-b">Off</div></div>
-          <div class="mx-audio">Audio To<br>Main</div>
-          <div class="mx-sends"><div><div class="mx-send" style="transform:rotate(-30deg)"></div><div class="mx-send-lbl">Sends</div></div></div>
-          <div class="mx-fader-area">
-            <div class="mx-fader"><div class="mx-fader-fill" style="height:72%"></div><div class="mx-fader-knob" style="bottom:calc(72% - 2px)"></div></div>
-            <div class="mx-meter"><div class="mx-meter-fill" style="height:65%;background:#22c55e"></div></div>
-          </div>
-          <div class="mx-pan" style="transform:rotate(0deg)"></div>
-          <div class="mx-pan-lbl">C</div>
-          <div class="mx-sm"><div class="mx-sb">S</div><div class="mx-mb">M</div></div>
-        </div>
-        <!-- HiHats -->
-        <div class="mx-ch">
-          <div class="mx-lbl">HiHats</div>
-          <div class="mx-route">MIDI From<br>All Ins<br>All Channels</div>
-          <div class="mx-mon"><div class="mx-mon-b">In</div><div class="mx-mon-b on">Auto</div><div class="mx-mon-b">Off</div></div>
-          <div class="mx-audio">Audio To<br>Main</div>
-          <div class="mx-sends"><div><div class="mx-send" style="transform:rotate(-20deg)"></div><div class="mx-send-lbl">Sends</div></div></div>
-          <div class="mx-fader-area">
-            <div class="mx-fader"><div class="mx-fader-fill" style="height:62%"></div><div class="mx-fader-knob" style="bottom:calc(62% - 2px)"></div></div>
-            <div class="mx-meter"><div class="mx-meter-fill" style="height:55%;background:#22c55e"></div></div>
-          </div>
-          <div class="mx-pan" style="transform:rotate(30deg)"></div>
-          <div class="mx-pan-lbl">3R</div>
-          <div class="mx-sm"><div class="mx-sb">S</div><div class="mx-mb">M</div></div>
-        </div>
-        <!-- Loops -->
-        <div class="mx-ch">
-          <div class="mx-lbl">Loops</div>
-          <div class="mx-route">MIDI From<br>All Ins<br>All Channels</div>
-          <div class="mx-mon"><div class="mx-mon-b">In</div><div class="mx-mon-b on">Auto</div><div class="mx-mon-b">Off</div></div>
-          <div class="mx-audio">Audio To<br>Main</div>
-          <div class="mx-sends"><div><div class="mx-send" style="transform:rotate(-45deg)"></div><div class="mx-send-lbl">Sends</div></div></div>
-          <div class="mx-fader-area">
-            <div class="mx-fader"><div class="mx-fader-fill" style="height:55%"></div><div class="mx-fader-knob" style="bottom:calc(55% - 2px)"></div></div>
-            <div class="mx-meter"><div class="mx-meter-fill" style="height:48%;background:#eab308"></div></div>
-          </div>
-          <div class="mx-pan" style="transform:rotate(-20deg)"></div>
-          <div class="mx-pan-lbl">2L</div>
-          <div class="mx-sm"><div class="mx-sb">S</div><div class="mx-mb">M</div></div>
-        </div>
-        <!-- LoopBeat -->
-        <div class="mx-ch">
-          <div class="mx-lbl">LoopBeat</div>
-          <div class="mx-route">MIDI From<br>All Ins<br>All Channels</div>
-          <div class="mx-mon"><div class="mx-mon-b">In</div><div class="mx-mon-b on">Auto</div><div class="mx-mon-b">Off</div></div>
-          <div class="mx-audio">Audio To<br>Main</div>
-          <div class="mx-sends"><div><div class="mx-send" style="transform:rotate(-15deg)"></div><div class="mx-send-lbl">Sends</div></div></div>
-          <div class="mx-fader-area">
-            <div class="mx-fader"><div class="mx-fader-fill" style="height:50%"></div><div class="mx-fader-knob" style="bottom:calc(50% - 2px)"></div></div>
-            <div class="mx-meter"><div class="mx-meter-fill" style="height:42%;background:#22c55e"></div></div>
-          </div>
-          <div class="mx-pan" style="transform:rotate(0deg)"></div>
-          <div class="mx-pan-lbl">C</div>
-          <div class="mx-sm"><div class="mx-sb">S</div><div class="mx-mb">M</div></div>
-        </div>
-        <!-- Perc 01 -->
-        <div class="mx-ch">
-          <div class="mx-lbl">Perc 01</div>
-          <div class="mx-route">MIDI From<br>All Ins<br>All Channels</div>
-          <div class="mx-mon"><div class="mx-mon-b">In</div><div class="mx-mon-b on">Auto</div><div class="mx-mon-b">Off</div></div>
-          <div class="mx-audio">Audio To<br>Main</div>
-          <div class="mx-sends"><div><div class="mx-send" style="transform:rotate(-35deg)"></div><div class="mx-send-lbl">Sends</div></div></div>
-          <div class="mx-fader-area">
-            <div class="mx-fader"><div class="mx-fader-fill" style="height:65%"></div><div class="mx-fader-knob" style="bottom:calc(65% - 2px)"></div></div>
-            <div class="mx-meter"><div class="mx-meter-fill" style="height:58%;background:#22c55e"></div></div>
-          </div>
-          <div class="mx-pan" style="transform:rotate(50deg)"></div>
-          <div class="mx-pan-lbl">5R</div>
-          <div class="mx-sm"><div class="mx-sb">S</div><div class="mx-mb">M</div></div>
-        </div>
-        <!-- Perc 02 -->
-        <div class="mx-ch">
-          <div class="mx-lbl">Perc 02</div>
-          <div class="mx-route">MIDI From<br>All Ins<br>All Channels</div>
-          <div class="mx-mon"><div class="mx-mon-b">In</div><div class="mx-mon-b on">Auto</div><div class="mx-mon-b">Off</div></div>
-          <div class="mx-audio">Audio To<br>Main</div>
-          <div class="mx-sends"><div><div class="mx-send" style="transform:rotate(-25deg)"></div><div class="mx-send-lbl">Sends</div></div></div>
-          <div class="mx-fader-area">
-            <div class="mx-fader"><div class="mx-fader-fill" style="height:45%"></div><div class="mx-fader-knob" style="bottom:calc(45% - 2px)"></div></div>
-            <div class="mx-meter"><div class="mx-meter-fill" style="height:38%;background:#22c55e"></div></div>
-          </div>
-          <div class="mx-pan" style="transform:rotate(-40deg)"></div>
-          <div class="mx-pan-lbl">4L</div>
-          <div class="mx-sm"><div class="mx-sb">S</div><div class="mx-mb">M</div></div>
-        </div>
-        <!-- Chords -->
-        <div class="mx-ch">
-          <div class="mx-lbl">Chords</div>
-          <div class="mx-route">MIDI From<br>All Ins<br>All Channels</div>
-          <div class="mx-mon"><div class="mx-mon-b">In</div><div class="mx-mon-b on">Auto</div><div class="mx-mon-b">Off</div></div>
-          <div class="mx-audio">Audio To<br>Main</div>
-          <div class="mx-sends"><div><div class="mx-send" style="transform:rotate(-60deg)"></div><div class="mx-send-lbl">Sends</div></div></div>
-          <div class="mx-fader-area">
-            <div class="mx-fader"><div class="mx-fader-fill" style="height:40%"></div><div class="mx-fader-knob" style="bottom:calc(40% - 2px)"></div></div>
-            <div class="mx-meter"><div class="mx-meter-fill" style="height:35%;background:#22c55e"></div></div>
-          </div>
-          <div class="mx-pan" style="transform:rotate(-80deg)"></div>
-          <div class="mx-pan-lbl">8L</div>
-          <div class="mx-sm"><div class="mx-sb">S</div><div class="mx-mb">M</div></div>
-        </div>
-        <!-- Tones -->
-        <div class="mx-ch">
-          <div class="mx-lbl">Tones</div>
-          <div class="mx-route">MIDI From<br>All Ins<br>All Channels</div>
-          <div class="mx-mon"><div class="mx-mon-b">In</div><div class="mx-mon-b on">Auto</div><div class="mx-mon-b">Off</div></div>
-          <div class="mx-audio">Audio To<br>Main</div>
-          <div class="mx-sends"><div><div class="mx-send" style="transform:rotate(-30deg)"></div><div class="mx-send-lbl">Sends</div></div></div>
-          <div class="mx-fader-area">
-            <div class="mx-fader"><div class="mx-fader-fill" style="height:38%"></div><div class="mx-fader-knob" style="bottom:calc(38% - 2px)"></div></div>
-            <div class="mx-meter"><div class="mx-meter-fill" style="height:32%;background:#22c55e"></div></div>
-          </div>
-          <div class="mx-pan" style="transform:rotate(30deg)"></div>
-          <div class="mx-pan-lbl">3L</div>
-          <div class="mx-sm"><div class="mx-sb">S</div><div class="mx-mb">M</div></div>
-        </div>
-        <!-- Pads -->
-        <div class="mx-ch">
-          <div class="mx-lbl">Pads</div>
-          <div class="mx-route">MIDI From<br>All Ins<br>All Channels</div>
-          <div class="mx-mon"><div class="mx-mon-b">In</div><div class="mx-mon-b on">Auto</div><div class="mx-mon-b">Off</div></div>
-          <div class="mx-audio">Audio To<br>Main</div>
-          <div class="mx-sends"><div><div class="mx-send" style="transform:rotate(-70deg)"></div><div class="mx-send-lbl">Sends</div></div></div>
-          <div class="mx-fader-area">
-            <div class="mx-fader"><div class="mx-fader-fill" style="height:35%"></div><div class="mx-fader-knob" style="bottom:calc(35% - 2px)"></div></div>
-            <div class="mx-meter"><div class="mx-meter-fill" style="height:30%;background:#22c55e"></div></div>
-          </div>
-          <div class="mx-pan" style="transform:rotate(-100deg)"></div>
-          <div class="mx-pan-lbl">10L</div>
-          <div class="mx-sm"><div class="mx-sb">S</div><div class="mx-mb">M</div></div>
-        </div>
-        <!-- Return A -->
-        <div class="mx-ch" style="min-width:45px">
-          <div class="mx-lbl" style="color:#ea5808">A</div>
-          <div class="mx-route" style="font-size:5px">Reverb/<br>Compressor</div>
-          <div class="mx-audio">Sends Only</div>
-          <div class="mx-fader-area">
-            <div class="mx-fader"><div class="mx-fader-fill" style="height:50%"></div><div class="mx-fader-knob" style="bottom:calc(50% - 2px)"></div></div>
-            <div class="mx-meter"><div class="mx-meter-fill" style="height:45%;background:#ea5808"></div></div>
-          </div>
-          <div class="mx-pan" style="transform:rotate(0deg)"></div>
-          <div class="mx-pan-lbl">C</div>
-          <div class="mx-sm"><div class="mx-sb">S</div><div class="mx-mb">M</div></div>
-        </div>
-        <!-- Main -->
-        <div class="mx-ch" style="background:#3a3a5a;min-width:70px">
-          <div class="mx-lbl" style="color:#5ec4e8">Main</div>
-          <div class="mx-audio" style="color:#5ec4e8">Cue Out<br>1/2</div>
-          <div class="mx-audio">Main Out<br>Main<br>1/2</div>
-          <div class="mx-sends"><div><div class="mx-send" style="transform:rotate(-40deg);border-color:#5ec4e8"></div><div class="mx-send-lbl" style="color:#5ec4e8">Sends</div></div></div>
-          <div class="mx-fader-area">
-            <div class="mx-fader"><div class="mx-fader-fill" style="height:72%;background:#5ec4e8"></div><div class="mx-fader-knob" style="bottom:calc(72% - 2px);background:#5ec4e8"></div></div>
-            <div class="mx-meter"><div class="mx-meter-fill" style="height:65%;background:#5ec4e8"></div></div>
-          </div>
-          <div class="mx-pan" style="transform:rotate(0deg);border-color:#5ec4e8"></div>
-          <div class="mx-pan-lbl" style="color:#5ec4e8">C</div>
-          <div class="mx-sm"><div class="mx-sb" style="background:#5ec4e8;color:#333">S</div><div class="mx-mb">M</div></div>
-        </div>
+        <div class="mx-ch"><div class="mx-lbl">Kicks</div><div class="mx-route">MIDI From<br>All Ins<br>All Channels</div><div class="mx-mon"><div class="mx-mon-b">In</div><div class="mx-mon-b on">Auto</div><div class="mx-mon-b">Off</div></div><div class="mx-audio">Audio To<br>Main</div><div class="mx-sends"><div><div class="mx-send" style="transform:rotate(-30deg)"></div><div class="mx-send-lbl">Sends</div></div></div><div class="mx-fader-area"><div class="mx-fader"><div class="mx-fader-fill" style="height:72%"></div><div class="mx-fader-knob" style="bottom:calc(72% - 2px)"></div></div><div class="mx-meter"><div class="mx-meter-fill" style="height:65%;background:#22c55e"></div></div></div><div class="mx-pan" style="transform:rotate(0deg)"></div><div class="mx-pan-lbl">C</div><div class="mx-sm"><div class="mx-sb">S</div><div class="mx-mb">M</div></div></div>
+        <div class="mx-ch"><div class="mx-lbl">HiHats</div><div class="mx-route">MIDI From<br>All Ins<br>All Channels</div><div class="mx-mon"><div class="mx-mon-b">In</div><div class="mx-mon-b on">Auto</div><div class="mx-mon-b">Off</div></div><div class="mx-audio">Audio To<br>Main</div><div class="mx-sends"><div><div class="mx-send" style="transform:rotate(-20deg)"></div><div class="mx-send-lbl">Sends</div></div></div><div class="mx-fader-area"><div class="mx-fader"><div class="mx-fader-fill" style="height:62%"></div><div class="mx-fader-knob" style="bottom:calc(62% - 2px)"></div></div><div class="mx-meter"><div class="mx-meter-fill" style="height:55%;background:#22c55e"></div></div></div><div class="mx-pan" style="transform:rotate(30deg)"></div><div class="mx-pan-lbl">3R</div><div class="mx-sm"><div class="mx-sb">S</div><div class="mx-mb">M</div></div></div>
+        <div class="mx-ch"><div class="mx-lbl">Loops</div><div class="mx-route">MIDI From<br>All Ins<br>All Channels</div><div class="mx-mon"><div class="mx-mon-b">In</div><div class="mx-mon-b on">Auto</div><div class="mx-mon-b">Off</div></div><div class="mx-audio">Audio To<br>Main</div><div class="mx-sends"><div><div class="mx-send" style="transform:rotate(-45deg)"></div><div class="mx-send-lbl">Sends</div></div></div><div class="mx-fader-area"><div class="mx-fader"><div class="mx-fader-fill" style="height:55%"></div><div class="mx-fader-knob" style="bottom:calc(55% - 2px)"></div></div><div class="mx-meter"><div class="mx-meter-fill" style="height:48%;background:#eab308"></div></div></div><div class="mx-pan" style="transform:rotate(-20deg)"></div><div class="mx-pan-lbl">2L</div><div class="mx-sm"><div class="mx-sb">S</div><div class="mx-mb">M</div></div></div>
+        <div class="mx-ch"><div class="mx-lbl">LoopBeat</div><div class="mx-route">MIDI From<br>All Ins<br>All Channels</div><div class="mx-mon"><div class="mx-mon-b">In</div><div class="mx-mon-b on">Auto</div><div class="mx-mon-b">Off</div></div><div class="mx-audio">Audio To<br>Main</div><div class="mx-sends"><div><div class="mx-send" style="transform:rotate(-15deg)"></div><div class="mx-send-lbl">Sends</div></div></div><div class="mx-fader-area"><div class="mx-fader"><div class="mx-fader-fill" style="height:50%"></div><div class="mx-fader-knob" style="bottom:calc(50% - 2px)"></div></div><div class="mx-meter"><div class="mx-meter-fill" style="height:42%;background:#22c55e"></div></div></div><div class="mx-pan" style="transform:rotate(0deg)"></div><div class="mx-pan-lbl">C</div><div class="mx-sm"><div class="mx-sb">S</div><div class="mx-mb">M</div></div></div>
+        <div class="mx-ch"><div class="mx-lbl">Perc 01</div><div class="mx-route">MIDI From<br>All Ins<br>All Channels</div><div class="mx-mon"><div class="mx-mon-b">In</div><div class="mx-mon-b on">Auto</div><div class="mx-mon-b">Off</div></div><div class="mx-audio">Audio To<br>Main</div><div class="mx-sends"><div><div class="mx-send" style="transform:rotate(-35deg)"></div><div class="mx-send-lbl">Sends</div></div></div><div class="mx-fader-area"><div class="mx-fader"><div class="mx-fader-fill" style="height:65%"></div><div class="mx-fader-knob" style="bottom:calc(65% - 2px)"></div></div><div class="mx-meter"><div class="mx-meter-fill" style="height:58%;background:#22c55e"></div></div></div><div class="mx-pan" style="transform:rotate(50deg)"></div><div class="mx-pan-lbl">5R</div><div class="mx-sm"><div class="mx-sb">S</div><div class="mx-mb">M</div></div></div>
+        <div class="mx-ch"><div class="mx-lbl">Perc 02</div><div class="mx-route">MIDI From<br>All Ins<br>All Channels</div><div class="mx-mon"><div class="mx-mon-b">In</div><div class="mx-mon-b on">Auto</div><div class="mx-mon-b">Off</div></div><div class="mx-audio">Audio To<br>Main</div><div class="mx-sends"><div><div class="mx-send" style="transform:rotate(-25deg)"></div><div class="mx-send-lbl">Sends</div></div></div><div class="mx-fader-area"><div class="mx-fader"><div class="mx-fader-fill" style="height:45%"></div><div class="mx-fader-knob" style="bottom:calc(45% - 2px)"></div></div><div class="mx-meter"><div class="mx-meter-fill" style="height:38%;background:#22c55e"></div></div></div><div class="mx-pan" style="transform:rotate(-40deg)"></div><div class="mx-pan-lbl">4L</div><div class="mx-sm"><div class="mx-sb">S</div><div class="mx-mb">M</div></div></div>
+        <div class="mx-ch"><div class="mx-lbl">Chords</div><div class="mx-route">MIDI From<br>All Ins<br>All Channels</div><div class="mx-mon"><div class="mx-mon-b">In</div><div class="mx-mon-b on">Auto</div><div class="mx-mon-b">Off</div></div><div class="mx-audio">Audio To<br>Main</div><div class="mx-sends"><div><div class="mx-send" style="transform:rotate(-60deg)"></div><div class="mx-send-lbl">Sends</div></div></div><div class="mx-fader-area"><div class="mx-fader"><div class="mx-fader-fill" style="height:40%"></div><div class="mx-fader-knob" style="bottom:calc(40% - 2px)"></div></div><div class="mx-meter"><div class="mx-meter-fill" style="height:35%;background:#22c55e"></div></div></div><div class="mx-pan" style="transform:rotate(-80deg)"></div><div class="mx-pan-lbl">8L</div><div class="mx-sm"><div class="mx-sb">S</div><div class="mx-mb">M</div></div></div>
+        <div class="mx-ch"><div class="mx-lbl">Tones</div><div class="mx-route">MIDI From<br>All Ins<br>All Channels</div><div class="mx-mon"><div class="mx-mon-b">In</div><div class="mx-mon-b on">Auto</div><div class="mx-mon-b">Off</div></div><div class="mx-audio">Audio To<br>Main</div><div class="mx-sends"><div><div class="mx-send" style="transform:rotate(-30deg)"></div><div class="mx-send-lbl">Sends</div></div></div><div class="mx-fader-area"><div class="mx-fader"><div class="mx-fader-fill" style="height:38%"></div><div class="mx-fader-knob" style="bottom:calc(38% - 2px)"></div></div><div class="mx-meter"><div class="mx-meter-fill" style="height:32%;background:#22c55e"></div></div></div><div class="mx-pan" style="transform:rotate(30deg)"></div><div class="mx-pan-lbl">3L</div><div class="mx-sm"><div class="mx-sb">S</div><div class="mx-mb">M</div></div></div>
+        <div class="mx-ch"><div class="mx-lbl">Pads</div><div class="mx-route">MIDI From<br>All Ins<br>All Channels</div><div class="mx-mon"><div class="mx-mon-b">In</div><div class="mx-mon-b on">Auto</div><div class="mx-mon-b">Off</div></div><div class="mx-audio">Audio To<br>Main</div><div class="mx-sends"><div><div class="mx-send" style="transform:rotate(-70deg)"></div><div class="mx-send-lbl">Sends</div></div></div><div class="mx-fader-area"><div class="mx-fader"><div class="mx-fader-fill" style="height:35%"></div><div class="mx-fader-knob" style="bottom:calc(35% - 2px)"></div></div><div class="mx-meter"><div class="mx-meter-fill" style="height:30%;background:#22c55e"></div></div></div><div class="mx-pan" style="transform:rotate(-100deg)"></div><div class="mx-pan-lbl">10L</div><div class="mx-sm"><div class="mx-sb">S</div><div class="mx-mb">M</div></div></div>
+        <div class="mx-ch" style="min-width:45px"><div class="mx-lbl" style="color:#ea5808">A</div><div class="mx-route" style="font-size:5px">Reverb/<br>Compressor</div><div class="mx-audio">Sends Only</div><div class="mx-fader-area"><div class="mx-fader"><div class="mx-fader-fill" style="height:50%"></div><div class="mx-fader-knob" style="bottom:calc(50% - 2px)"></div></div><div class="mx-meter"><div class="mx-meter-fill" style="height:45%;background:#ea5808"></div></div></div><div class="mx-pan" style="transform:rotate(0deg)"></div><div class="mx-pan-lbl">C</div><div class="mx-sm"><div class="mx-sb">S</div><div class="mx-mb">M</div></div></div>
+        <div class="mx-ch" style="background:#3a3a5a;min-width:70px"><div class="mx-lbl" style="color:#5ec4e8">Main</div><div class="mx-audio" style="color:#5ec4e8">Cue Out<br>1/2</div><div class="mx-audio">Main Out<br>Main<br>1/2</div><div class="mx-sends"><div><div class="mx-send" style="transform:rotate(-40deg);border-color:#5ec4e8"></div><div class="mx-send-lbl" style="color:#5ec4e8">Sends</div></div></div><div class="mx-fader-area"><div class="mx-fader"><div class="mx-fader-fill" style="height:72%;background:#5ec4e8"></div><div class="mx-fader-knob" style="bottom:calc(72% - 2px);background:#5ec4e8"></div></div><div class="mx-meter"><div class="mx-meter-fill" style="height:65%;background:#5ec4e8"></div></div></div><div class="mx-pan" style="transform:rotate(0deg);border-color:#5ec4e8"></div><div class="mx-pan-lbl" style="color:#5ec4e8">C</div><div class="mx-sm"><div class="mx-sb" style="background:#5ec4e8;color:#333">S</div><div class="mx-mb">M</div></div></div>
       </div>
 
-      <!-- Detail View -->
+      <!-- ═══ DETAIL VIEW ═══ -->
       <div class="detail">
         <div class="dtl-left">
           <div class="dtl-clip">kick01.pattern01</div>
@@ -747,35 +503,16 @@
           <div class="dtl-row"><div class="dtl-lbl">Start</div><div class="dtl-val">1</div><div class="dtl-val">1</div><div class="dtl-val">1</div></div>
           <div class="dtl-row"><div class="dtl-lbl">End</div><div class="dtl-val">5</div><div class="dtl-val">1</div><div class="dtl-val">1</div></div>
           <div class="dtl-row"><div class="dtl-lbl"></div><div class="dtl-val" style="font-size:6px">Duplicate</div></div>
-          <div style="display:flex;gap:2px;margin-top:1px">
-            <div class="dtl-btn on">Loop</div>
-            <div class="dtl-val" style="font-size:6px">1</div>
-            <div class="dtl-val" style="font-size:6px">4</div>
-            <div class="dtl-val" style="font-size:6px">0</div>
-            <div class="dtl-btn" style="font-size:6px">Loop Length</div>
-          </div>
+          <div style="display:flex;gap:2px;margin-top:1px"><div class="dtl-btn on">Loop</div><div class="dtl-val" style="font-size:6px">1</div><div class="dtl-val" style="font-size:6px">4</div><div class="dtl-val" style="font-size:6px">0</div><div class="dtl-btn" style="font-size:6px">Loop Length</div></div>
           <div class="dtl-row" style="margin-top:1px"><div class="dtl-lbl">Push</div><div class="dtl-val" style="font-size:6px">×2</div><div class="dtl-val" style="font-size:6px">×1/2</div></div>
           <div class="dtl-row"><div class="dtl-lbl">Signature</div><div class="dtl-val">4</div><div class="dtl-val">4</div></div>
           <div class="dtl-row"><div class="dtl-lbl">Groove</div><div class="dtl-val" style="min-width:50px">None</div></div>
         </div>
-
-        <!-- MIDI Grid -->
         <div class="midi-grid">
-          <div class="midi-ruler">
-            <div class="midi-beat">1.1.1</div><div class="midi-beat">1.1.2</div><div class="midi-beat">1.1.3</div><div class="midi-beat">1.1.4</div>
-            <div class="midi-beat">1.2.1</div><div class="midi-beat">1.2.2</div><div class="midi-beat">1.2.3</div><div class="midi-beat">1.2.4</div>
-            <div class="midi-beat">1.3.1</div><div class="midi-beat">1.3.2</div><div class="midi-beat">1.3.3</div><div class="midi-beat">1.3.4</div>
-            <div class="midi-beat">1.4.1</div><div class="midi-beat">1.4.2</div><div class="midi-beat">1.4.3</div><div class="midi-beat">1.4.4</div>
-          </div>
+          <div class="midi-ruler"><div class="midi-beat">1.1.1</div><div class="midi-beat">1.1.2</div><div class="midi-beat">1.1.3</div><div class="midi-beat">1.1.4</div><div class="midi-beat">1.2.1</div><div class="midi-beat">1.2.2</div><div class="midi-beat">1.2.3</div><div class="midi-beat">1.2.4</div><div class="midi-beat">1.3.1</div><div class="midi-beat">1.3.2</div><div class="midi-beat">1.3.3</div><div class="midi-beat">1.3.4</div><div class="midi-beat">1.4.1</div><div class="midi-beat">1.4.2</div><div class="midi-beat">1.4.3</div><div class="midi-beat">1.4.4</div></div>
           <div class="midi-body">
-            <div class="piano">
-              <div class="pkey">C3</div><div class="pkey blk">B2</div><div class="pkey">A#2</div><div class="pkey blk">A2</div>
-              <div class="pkey">G#2</div><div class="pkey blk">G2</div><div class="pkey">F#2</div><div class="pkey blk">F2</div>
-              <div class="pkey">E2</div><div class="pkey blk">D#2</div><div class="pkey">D2</div><div class="pkey blk">C#2</div>
-              <div class="pkey cur">C2</div><div class="pkey blk">B1</div><div class="pkey">A#1</div><div class="pkey blk">A1</div>
-            </div>
+            <div class="piano"><div class="pkey">C3</div><div class="pkey blk">B2</div><div class="pkey">A#2</div><div class="pkey blk">A2</div><div class="pkey">G#2</div><div class="pkey blk">G2</div><div class="pkey">F#2</div><div class="pkey blk">F2</div><div class="pkey">E2</div><div class="pkey blk">D#2</div><div class="pkey">D2</div><div class="pkey blk">C#2</div><div class="pkey cur">C2</div><div class="pkey blk">B1</div><div class="pkey">A#1</div><div class="pkey blk">A1</div></div>
             <div class="notes-area">
-              <!-- Kick pattern (C2) -->
               <div class="note" style="left:0%;width:4.5%;top:7px;background:#ea5808">C2</div>
               <div class="note" style="left:6.25%;width:4.5%;top:7px;background:#ea5808">C2</div>
               <div class="note" style="left:12.5%;width:4.5%;top:7px;background:#ea5808">C2</div>
@@ -792,7 +529,6 @@
               <div class="note" style="left:81.25%;width:4.5%;top:7px;background:#ea5808">C2</div>
               <div class="note" style="left:87.5%;width:4.5%;top:7px;background:#ea5808">C2</div>
               <div class="note" style="left:93.75%;width:4.5%;top:7px;background:#ea5808">C2</div>
-              <!-- D#2 (hi-hat) -->
               <div class="note" style="left:6.25%;width:3.5%;top:0;background:#4a9eff">D#2</div>
               <div class="note" style="left:18.75%;width:3.5%;top:0;background:#4a9eff">D#2</div>
               <div class="note" style="left:31.25%;width:3.5%;top:0;background:#4a9eff">D#2</div>
@@ -801,13 +537,11 @@
               <div class="note" style="left:68.75%;width:3.5%;top:0;background:#4a9eff">D#2</div>
               <div class="note" style="left:81.25%;width:3.5%;top:0;background:#4a9eff">D#2</div>
               <div class="note" style="left:93.75%;width:3.5%;top:0;background:#4a9eff">D#2</div>
-              <!-- C+2 chord -->
               <div class="note" style="left:12.5%;width:17%;top:14px;background:#22c55e">C+2 1</div>
               <div class="note" style="left:50%;width:17%;top:14px;background:#22c55e">C+2 1</div>
               <div class="note" style="left:81.25%;width:12%;top:14px;background:#22c55e">C+2 1</div>
             </div>
           </div>
-          <!-- Velocity -->
           <div class="vel-lane">
             <div style="font-size:6px;color:#666;position:absolute;left:3px;bottom:1px">127</div>
             <div class="vel-bar" style="height:100%"></div><div class="vel-bar" style="height:85%"></div>
@@ -819,42 +553,74 @@
             <div class="vel-bar" style="height:88%"></div><div class="vel-bar" style="height:78%"></div>
             <div class="vel-bar" style="height:100%"></div><div class="vel-bar" style="height:90%"></div>
           </div>
-          <div class="vel-info">
-            <span>Velocity:</span>
-            <span style="color:#ea5808">Randomize</span>
-            <span style="color:#ea5808">±</span>
-            <span style="background:#444;padding:0 2px;border-radius:1px">127</span>
-            <span>Deviation 0</span>
-          </div>
+          <div class="vel-info"><span>Velocity:</span><span style="color:#ea5808">Randomize</span><span style="color:#ea5808">±</span><span style="background:#444;padding:0 2px;border-radius:1px">127</span><span>Deviation 0</span></div>
         </div>
-
-        <!-- Right Info Panel -->
         <div class="info">
           <div class="info-title">Bad Karma Box</div>
-          <div class="info-desc">
-            This Live Pack allows you to step into the "headquarters" between 2008 and 2012. It's a collection of loops, sounds and clips I've used in all my releases and remixes for many years by now. It's pretty close to a everyday template.
-          </div>
-          <div class="info-desc">
-            This particular kit is just for you, and was arranged in a way that will make it easy to add your own material and either play with your friends or create a original track. It features a lot of stems and drafts from my albums (under my alias "Shackleton666") lined up in a way that makes them freely combinable... so technically, it's up to you now to write those missing track(s).
-          </div>
+          <div class="info-desc">This Live Pack allows you to step into the "headquarters" between 2008 and 2012. It's a collection of loops, sounds and clips I've used in all my releases and remixes for many years by now.</div>
+          <div class="info-desc">This particular kit is just for you, and was arranged in a way that will make it easy to add your own material and either play with your friends or create a original track.</div>
           <div style="margin-top:6px">
             <div class="info-row"><div class="info-lbl">Pack</div><div class="info-val">Bad Karma Box</div></div>
             <div class="info-row"><div class="info-lbl">Type</div><div class="info-val">Drum Kit</div></div>
             <div class="info-row"><div class="info-lbl">Format</div><div class="info-val">.adv / .adg</div></div>
-            <div class="info-row"><div class="info-lbl">Instruments</div><div class="info-val">Serum, Vital</div></div>
             <div class="info-row"><div class="info-lbl">BPM</div><div class="info-val">120</div></div>
             <div class="info-row"><div class="info-lbl">Key</div><div class="info-val">Am</div></div>
             <div class="info-row"><div class="info-lbl">Size</div><div class="info-val">62 KB</div></div>
           </div>
-          <div class="info-tags">
-            <div class="info-tag">hybrid kit</div>
-            <div class="info-tag">electronic</div>
-            <div class="info-tag">drums</div>
-            <div class="info-tag">loops</div>
-          </div>
+          <div class="info-tags"><div class="info-tag">hybrid kit</div><div class="info-tag">electronic</div><div class="info-tag">drums</div><div class="info-tag">loops</div></div>
         </div>
       </div>
     </div>
   </div>
+
+  <!-- Tab Hint -->
+  <div class="tab-hint" id="tab-hint">Press <kbd>Tab</kbd> to switch between Session and Arrangement View</div>
+
+  <script>
+    // ── Tab Key: Switch Session ↔ Arrangement ──
+    const sessionView = document.getElementById('session-view');
+    const arrView = document.getElementById('arr-view');
+    const btnSession = document.getElementById('btn-session');
+    const btnArrange = document.getElementById('btn-arrange');
+    const tabHint = document.getElementById('tab-hint');
+
+    let currentView = 'session';
+
+    function switchView(view) {
+      currentView = view;
+      if (view === 'session') {
+        sessionView.classList.remove('hidden');
+        arrView.classList.remove('active');
+        btnSession.classList.add('active');
+        btnArrange.classList.remove('active');
+      } else {
+        sessionView.classList.add('hidden');
+        arrView.classList.add('active');
+        btnSession.classList.remove('active');
+        btnArrange.classList.add('active');
+      }
+    }
+
+    // Tab key handler
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        switchView(currentView === 'session' ? 'arrangement' : 'session');
+        // Show hint briefly
+        tabHint.classList.add('show');
+        setTimeout(() => tabHint.classList.remove('show'), 1500);
+      }
+    });
+
+    // Click toggle buttons
+    btnSession.addEventListener('click', () => switchView('session'));
+    btnArrange.addEventListener('click', () => switchView('arrangement'));
+
+    // Show hint on load
+    setTimeout(() => {
+      tabHint.classList.add('show');
+      setTimeout(() => tabHint.classList.remove('show'), 3000);
+    }, 1000);
+  </script>
 </body>
 </html>
