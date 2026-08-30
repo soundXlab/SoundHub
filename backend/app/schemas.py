@@ -2,7 +2,7 @@
 from datetime import datetime
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 class ORMModel(BaseModel):
@@ -433,7 +433,7 @@ class ShareSettingsUpdate(BaseModel):
 
 # ---------- Brief ----------
 class ReviewBriefUpdate(BaseModel):
-    service_type: str = "mix"
+    service_type: Literal["mix", "mix_master", "mastering", "production", "arrangement"] = "mix"
     genre: str = Field(default="", max_length=128)
     goal: str = Field(default="", max_length=64)
     deadline_at: datetime | None = None
@@ -494,6 +494,12 @@ class ReleasePackageOut(ORMModel):
     session_manifest: dict
     consolidate_audio: bool
     archive_status: str
+    archive_expires_at: datetime | None = None
+    force_locked_reason: str | None = None
+    force_locked_by: str | None = None
+    last_verified_opened_at: datetime | None = None
+    retention_until: datetime | None = None
+    share_token: str | None = None
     events: list[dict] | None = None
     deliverables: list[dict] | None = None
 
@@ -520,7 +526,15 @@ class DeliverableOut(ORMModel):
     integrated_lufs: float | None = None
     true_peak: float | None = None
     is_required: bool
+    from_version_id: int | None = None
     created_at: datetime
+
+    @model_validator(mode="before")
+    @classmethod
+    def _map_source_version_id(cls, data: dict):
+        if isinstance(data, dict) and "source_version_id" in data and "from_version_id" not in data:
+            data["from_version_id"] = data["source_version_id"]
+        return data
 
 
 # ---------- Checkout ----------
@@ -851,6 +865,9 @@ class VersionComparisonOut(ORMModel):
     mode: str
     stem_logical_name: str | None = None
     created_at: datetime
+    label: str | None = None
+    request_id: int | None = None
+    short_term_lufs: dict | None = None
 
 
 class ReferenceComparisonCreate(BaseModel):

@@ -105,6 +105,7 @@ export const api = {
     bio: string;
     specialty: string;
     location: string;
+    created_at: string;
   }>("/api/auth/me"),
   updateProfile: (patch: { bio?: string; specialty?: string; location?: string }) =>
     request<{
@@ -738,19 +739,19 @@ export const api = {
     request<any>(`/api/projects/${pid}/sprints/${sid}/assign`, { method: 'POST', body: JSON.stringify({ task_id: taskId, points }) }),
 
   // Retrospectives
-  listRetros: (pid: number) => request<any[]>(`/api/projects/${pid}/retros`),
+  listRetros: (pid: number) => request<Retrospective[]>(`/api/projects/${pid}/retros`),
   createRetro: (pid: number, name: string, sprintId?: number) =>
     request<any>(`/api/projects/${pid}/retros`, { method: 'POST', body: JSON.stringify({ name, sprint_id: sprintId }) }),
   updateRetro: (pid: number, rid: number, state: string) =>
     request<any>(`/api/projects/${pid}/retros/${rid}`, { method: 'PATCH', body: JSON.stringify({ state }) }),
-  listRetroItems: (pid: number, rid: number) => request<any[]>(`/api/projects/${pid}/retros/${rid}/items`),
+  listRetroItems: (pid: number, rid: number) => request<RetroItem[]>(`/api/projects/${pid}/retros/${rid}/items`),
   addRetroItem: (pid: number, rid: number, category: string, content: string) =>
     request<any>(`/api/projects/${pid}/retros/${rid}/items`, { method: 'POST', body: JSON.stringify({ category, content }) }),
   voteRetroItem: (pid: number, iid: number) =>
     request<any>(`/api/projects/${pid}/retro-items/${iid}/vote`, { method: 'POST' }),
 
   // Test Plans
-  listTestPlans: (pid: number) => request<any[]>(`/api/projects/${pid}/test-plans`),
+  listTestPlans: (pid: number) => request<TestPlan[]>(`/api/projects/${pid}/test-plans`),
   createTestPlan: (pid: number, name: string) =>
     request<any>(`/api/projects/${pid}/test-plans`, { method: 'POST', body: JSON.stringify({ name }) }),
   listTestSuites: (pid: number, planId: number) => request<any[]>(`/api/projects/${pid}/test-plans/${planId}/suites`),
@@ -759,7 +760,7 @@ export const api = {
   listTestCases: (pid: number, suiteId: number) => request<any[]>(`/api/projects/${pid}/test-suites/${suiteId}/cases`),
   createTestCase: (pid: number, suiteId: number, title: string, steps?: string, priority?: string) =>
     request<any>(`/api/projects/${pid}/test-suites/${suiteId}/cases`, { method: 'POST', body: JSON.stringify({ title, steps, priority }) }),
-  listTestRuns: (pid: number) => request<any[]>(`/api/projects/${pid}/test-runs`),
+  listTestRuns: (pid: number) => request<TestRun[]>(`/api/projects/${pid}/test-runs`),
   createTestRun: (pid: number, name: string, planId?: number) =>
     request<any>(`/api/projects/${pid}/test-runs`, { method: 'POST', body: JSON.stringify({ name, plan_id: planId }) }),
   submitTestResult: (pid: number, runId: number, caseId: number, outcome: string, comment?: string) =>
@@ -778,18 +779,18 @@ export const api = {
     request<any>(`/api/projects/${pid}/milestones`, { method: 'POST', body: JSON.stringify({ title, due_date: dueDate }) }),
 
   // Kanban
-  listKanbanBoards: (pid: number) => request<any[]>(`/api/projects/${pid}/kanban`),
+  listKanbanBoards: (pid: number) => request<KanbanBoard[]>(`/api/projects/${pid}/kanban`),
   createKanbanBoard: (pid: number, name: string) =>
     request<any>(`/api/projects/${pid}/kanban`, { method: 'POST', body: JSON.stringify({ name }) }),
   getKanbanBoard: (pid: number, bid: number) => request<any>(`/api/projects/${pid}/kanban/${bid}`),
 
   // Discussions
-  listDiscussions: (pid: number) => request<any[]>(`/api/projects/${pid}/discussions`),
+  listDiscussions: (pid: number) => request<Discussion[]>(`/api/projects/${pid}/discussions`),
   createDiscussion: (pid: number, title: string, body: string) =>
     request<any>(`/api/projects/${pid}/discussions`, { method: 'POST', body: JSON.stringify({ title, body }) }),
 
   // Tasks (Issues)
-  listTasks: (pid: number) => request<any[]>(`/api/projects/${pid}/tasks`),
+  listTasks: (pid: number) => request<Task[]>(`/api/projects/${pid}/tasks`),
   createTask: (pid: number, title: string, body?: string, type?: string, priority?: string) =>
     request<any>(`/api/projects/${pid}/tasks`, { method: 'POST', body: JSON.stringify({ title, body, type, priority }) }),
 
@@ -810,7 +811,7 @@ export const api = {
   listFeedPackages: (pid: number, feedId: number) => request<any[]>(`/api/projects/${pid}/artifact-feeds/${feedId}/packages`),
 
   // Workflows
-  listWorkflows: (pid: number) => request<any[]>(`/api/projects/${pid}/workflows`),
+  listWorkflows: (pid: number) => request<Workflow[]>(`/api/projects/${pid}/workflows`),
   createWorkflow: (pid: number, name: string, yamlContent: string) =>
     request<any>(`/api/projects/${pid}/workflows`, { method: 'POST', body: JSON.stringify({ name, yaml_content: yamlContent }) }),
   getWorkflow: (pid: number, wid: number) => request<any>(`/api/projects/${pid}/workflows/${wid}`),
@@ -818,7 +819,7 @@ export const api = {
     request<any>(`/api/projects/${pid}/workflows/${wid}`, { method: 'PUT', body: JSON.stringify({ name, yaml_content: yamlContent, enabled }) }),
   deleteWorkflow: (pid: number, wid: number) =>
     request<void>(`/api/projects/${pid}/workflows/${wid}`, { method: 'DELETE' }),
-  listWorkflowRuns: (pid: number, wid: number) => request<any[]>(`/api/projects/${pid}/workflows/${wid}/runs`),
+  listWorkflowRuns: (pid: number, wid: number) => request<WorkflowRun[]>(`/api/projects/${pid}/workflows/${wid}/runs`),
   createWorkflowRun: (pid: number, wid: number, trigger?: string, commitId?: number) =>
     request<any>(`/api/projects/${pid}/workflows/${wid}/runs`, { method: 'POST', body: JSON.stringify({ trigger, commit_id: commitId }) }),
   cancelWorkflowRun: (pid: number, wid: number, runId: number) =>
@@ -826,12 +827,12 @@ export const api = {
   getWorkflowRunLogs: (pid: number, wid: number, runId: number) => request<any>(`/api/projects/${pid}/workflows/${wid}/runs/${runId}/logs`),
 
   // Incidents
-  listIncidents: (pid: number) => request<any[]>(`/api/projects/${pid}/incidents`),
+  listIncidents: (pid: number) => request<Incident[]>(`/api/projects/${pid}/incidents`),
   createIncident: (pid: number, title: string, severity?: string) =>
     request<any>(`/api/projects/${pid}/incidents`, { method: 'POST', body: JSON.stringify({ title, severity }) }),
 
   // Feature Flags
-  listFeatureFlags: (pid: number) => request<any[]>(`/api/projects/${pid}/feature-flags`),
+  listFeatureFlags: (pid: number) => request<FeatureFlag[]>(`/api/projects/${pid}/feature-flags`),
   createFeatureFlag: (pid: number, name: string, description?: string) =>
     request<any>(`/api/projects/${pid}/feature-flags`, { method: 'POST', body: JSON.stringify({ name, description }) }),
   toggleFeatureFlag: (pid: number, fid: number, enabled: boolean) =>
@@ -843,12 +844,12 @@ export const api = {
     request<any>(`/api/projects/${pid}/time`, { method: 'POST', body: JSON.stringify({ hours, description }) }),
 
   // Status Page
-  getStatusPage: (pid: number) => request<any>(`/api/projects/${pid}/status-page`),
+  getStatusPage: (pid: number) => request<StatusPageData>(`/api/projects/${pid}/status-page`),
   addStatusComponent: (pid: number, name: string) =>
     request<any>(`/api/projects/${pid}/status-page/components`, { method: 'POST', body: JSON.stringify({ name }) }),
 
   // OKRs
-  listOKRs: (pid: number) => request<any[]>(`/api/projects/${pid}/okrs`),
+  listOKRs: (pid: number) => request<Objective[]>(`/api/projects/${pid}/okrs`),
   createOKR: (pid: number, title: string, period?: string) =>
     request<any>(`/api/projects/${pid}/okrs`, { method: 'POST', body: JSON.stringify({ title, period }) }),
 

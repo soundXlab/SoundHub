@@ -22,6 +22,11 @@ import DocsPage from "./pages/DocsPage";
 import ProjectFeaturesHub from "./pages/ProjectFeaturesHub";
 import DashboardPage from "./pages/DashboardPage";
 import ProjectViewPage from "./pages/ProjectViewPage";
+import ReviewsPage from "./pages/ReviewsPage";
+import UploadPage from "./pages/UploadPage";
+import AnalyticsPage from "./pages/AnalyticsPage";
+import CalendarPage from "./pages/CalendarPage";
+import SettingsPage from "./pages/SettingsPage";
 
 // Integration pages for individual DAWs — same layout, per-DAW accent color.
 const CUBASE = {
@@ -92,7 +97,7 @@ const THEME_KEY = "soundhub_theme";
 function getInitialTheme(): "light" | "dark" {
   const saved = localStorage.getItem(THEME_KEY);
   if (saved === "light" || saved === "dark") return saved;
-  return "light";
+  return "dark";
 }
 
 function RequireAuth({ children }: { children: JSX.Element }) {
@@ -123,11 +128,23 @@ export default function App() {
     pathname.startsWith("/d/");
   const showNav = isPublic;
 
+  // Full-page routes use FullPageLayout (their own sidebar + topbar)
+  const isFullPage =
+    pathname === "/dashboard" ||
+    pathname === "/projects" ||
+    pathname === "/market" ||
+    pathname === "/reviews" ||
+    pathname === "/upload" ||
+    pathname === "/analytics" ||
+    pathname === "/calendar" ||
+    pathname === "/settings" ||
+    pathname.startsWith("/projects/");
+
   return (
     <div className="app">
       {/* bandcamp-style global header: logo + search + auth, subnav below */}
-      <SiteHeader theme={theme} onToggleTheme={toggleTheme} showNav={showNav} />
-      <main className="content">
+      {!isFullPage && <SiteHeader theme={theme} onToggleTheme={toggleTheme} showNav={showNav} />}
+      <main className="content" style={isFullPage ? { padding: 0, maxWidth: 'none' } : undefined}>
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/kettle" element={<KettlePage />} />
@@ -150,9 +167,7 @@ export default function App() {
             path="/dashboard"
             element={
               <RequireAuth>
-                <SidebarLayout>
-                  <DashboardPage />
-                </SidebarLayout>
+                <DashboardPage />
               </RequireAuth>
             }
           />
@@ -160,9 +175,7 @@ export default function App() {
             path="/projects"
             element={
               <RequireAuth>
-                <SidebarLayout>
-                  <ProjectsPage />
-                </SidebarLayout>
+                <ProjectsPage />
               </RequireAuth>
             }
           />
@@ -180,9 +193,7 @@ export default function App() {
             path="/projects/:id/branches"
             element={
               <RequireAuth>
-                <SidebarLayout>
-                  <BranchesPage />
-                </SidebarLayout>
+                <BranchesPage />
               </RequireAuth>
             }
           />
@@ -230,9 +241,7 @@ export default function App() {
             path="/market"
             element={
               <RequireAuth>
-                <SidebarLayout>
-                  <MarketplacePage />
-                </SidebarLayout>
+                <MarketplacePage />
               </RequireAuth>
             }
           />
@@ -243,6 +252,46 @@ export default function App() {
                 <SidebarLayout>
                   <GitHubRepoPage />
                 </SidebarLayout>
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/reviews"
+            element={
+              <RequireAuth>
+                <ReviewsPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/upload"
+            element={
+              <RequireAuth>
+                <UploadPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/analytics"
+            element={
+              <RequireAuth>
+                <AnalyticsPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/calendar"
+            element={
+              <RequireAuth>
+                <CalendarPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <RequireAuth>
+                <SettingsPage />
               </RequireAuth>
             }
           />

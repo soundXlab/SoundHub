@@ -1,0 +1,15 @@
+librechat/
+voice_bot/
+buffy-bridge/
+buffy-windows/
+figma-plugin/
+penpot-plugin/
+penpot-mockups/
+profiling/
+screenshots/
+tools/
+soundhub-app/
+soundhub-backend/
+vst3/
+*.md
+!README.md

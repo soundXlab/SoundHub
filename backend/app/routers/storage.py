@@ -159,8 +159,6 @@ def create_upload_intent(
             if existing.project_id is not None:
                 from ..models import Project
                 from ..services.storage.policy import StorageTier, determine_storage_tier
-                from datetime import datetime, timezone
-
                 project = db.get(Project, existing.project_id)
                 if project:
                     current_timestamp = datetime.now(timezone.utc).timestamp()

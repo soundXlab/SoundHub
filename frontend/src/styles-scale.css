@@ -1,0 +1,24 @@
+/* ==========================================================================
+   SoundHub — DaVinci Resolve 21 Scale System
+   Minimal scaling — most sizes are in styles.css and design-tokens.ts
+   ========================================================================== */
+
+/* Global reset — minimal */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Headings — inherit from parent, no override */
+h1, h2, h3, h4, h5, h6 {
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+p {
+  line-height: 1.4;
+}

@@ -1,7 +1,11 @@
+import * as React from "react";
 import { useEffect, useState, useCallback, type FormEvent } from "react";
 import { useParams, Link, useSearchParams } from "react-router-dom";
 import { api } from "../api";
-import { shortDate } from "../types";
+import { shortDate, WikiPage, Sprint, Retrospective, RetroItem, TestPlan, TestRun, Task, KanbanBoard, WorkflowRun, Workflow, PullRequest, Milestone, Epic, Discussion, Tag, ArtifactFeed, Incident, FeatureFlag, TimeEntry, Component, Objective, KeyResult, StatusPageData } from "../types";
+import { colors, spacing, radii, typography } from "../design-tokens";
+
+/* global alert, console */
 
 type FeatureTab =
   | "wiki" | "sprints" | "retros" | "tests" | "kanban"
@@ -95,18 +99,51 @@ export default function ProjectFeaturesHub() {
 function useList<T>(fn: () => Promise<T[]>) {
   const [items, setItems] = useState<T[]>([]);
   const [loading, setLoading] = useState(true);
-  const load = useCallback(async () => {
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function load() {
+      setLoading(true);
+      try {
+        const result = await fn();
+        if (!cancelled) {
+          setItems(result);
+          setLoading(false);
+        }
+      } catch {
+        if (!cancelled) {
+          setLoading(false);
+          // Error is swallowed intentionally to prevent crashing the UI
+        }
+      }
+    }
+
+    load();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [fn]);
+
+  const reload = useCallback(async () => {
     setLoading(true);
-    try { setItems(await fn()); } catch { /* */ }
-    setLoading(false);
-  }, []);
-  useEffect(() => { load(); }, [load]);
-  return { items, loading, reload: load };
+    try {
+      const result = await fn();
+      setItems(result);
+    } catch {
+      // Error is swallowed intentionally to prevent crashing the UI
+    } finally {
+      setLoading(false);
+    }
+  }, [fn]);
+
+  return { items, loading, reload };
 }
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="card" style={{ marginTop: 16 }}>
+    <div className="card" style={{ marginTop: spacing.lg }}>
       <h2>{title}</h2>
       {children}
     </div>
@@ -114,7 +151,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 }
 
 function Empty({ text }: { text: string }) {
-  return <p className="muted" style={{ fontSize: 14 }}>{text}</p>;
+  return <p className="muted" style={{ fontSize: typography.fontSize.caption }}>{text}</p>;
 }
 
 // ── Wiki ────────────────────────────────────────────────────────────────────
@@ -142,7 +179,7 @@ function WikiTab({ pid }: { pid: number }) {
           <Empty text="No wiki pages yet. Create one below." />
         ) : (
           <div className="commit-list">
-            {items.map((p: any) => (
+            {items.map((p: WikiPage) => (
               <div className="commit-list-row" key={p.slug}>
                 <span>📄</span>
                 <span className="commit-msg">{p.title}</span>
@@ -179,7 +216,7 @@ function SprintsTab({ pid }: { pid: number }) {
     setName(""); reload();
   };
 
-  const stateColor = (s: string) => s === "active" ? "var(--green)" : s === "completed" ? "var(--muted)" : "var(--blue)";
+  const stateColor = (s: string) => s === "active" ? colors.success : s === "completed" ? colors.text.muted : colors.brand.secondary;
 
   return (
     <Section title="Sprints">
@@ -187,13 +224,13 @@ function SprintsTab({ pid }: { pid: number }) {
         <Empty text="No sprints yet." />
       ) : (
         <div className="commit-list">
-          {items.map((s: any) => (
+          {items.map((s: Sprint) => (
             <div className="commit-list-row" key={s.id}>
               <span style={{ color: stateColor(s.state) }}>●</span>
               <span className="commit-msg">{s.name}</span>
-              {s.goal && <span className="muted" style={{ fontSize: 12 }}>{s.goal}</span>}
-              <span className="chip" style={{ borderColor: stateColor(s.state), color: stateColor(s.state) }}>{s.state}</span>
-              {s.velocity > 0 && <span className="muted" style={{ fontSize: 12 }}>{s.velocity} pts</span>}
+              {s.goal && <span style={{ color: colors.text.muted, fontSize: typography.fontSize.caption }}>{s.goal}</span>}
+              <span className="chip" style={{ borderColor: stateColor(s.state), color: stateColor(s.state), borderRadius: radii.md }}>{s.state}</span>
+              {s.velocity > 0 && <span className="muted" style={{ fontSize: typography.fontSize.small }}>{s.velocity} pts</span>}
               {s.state === "planned" && (
                 <button className="btn sm ghost" onClick={() => api.updateSprint(pid, s.id, "active").then(reload)}>Start</button>
               )}
@@ -214,10 +251,10 @@ function SprintsTab({ pid }: { pid: number }) {
 
 // ── Retrospectives ──────────────────────────────────────────────────────────
 function RetrosTab({ pid }: { pid: number }) {
-  const { items, loading, reload } = useList(() => api.listRetros(pid));
+  const { items, loading, reload } = useList<Retrospective[]>(() => api.listRetros(pid));
   const [name, setName] = useState("");
   const [selected, setSelected] = useState<number | null>(null);
-  const [retroItems, setRetroItems] = useState<any[]>([]);
+  const [retroItems, setRetroItems] = useState<RetroItem[]>([]);
   const [itemContent, setItemContent] = useState("");
   const [itemCat, setItemCat] = useState("went_well");
 
@@ -247,9 +284,24 @@ function RetrosTab({ pid }: { pid: number }) {
           <Empty text="No retrospectives yet." />
         ) : (
           <div className="commit-list">
-            {items.map((r: any) => (
-              <div className="commit-list-row" key={r.id} onClick={() => setSelected(r.id)}
-                style={{ cursor: "pointer", background: selected === r.id ? "var(--bg3)" : undefined }}>
+            {items.map((r: Retrospective) => (
+              <div
+                className="commit-list-row"
+                key={r.id}
+                onClick={() => setSelected(r.id)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setSelected(r.id);
+                  }
+                }}
+                tabIndex={0}
+                role="button"
+                style={{
+                  cursor: "pointer",
+                  background: selected === r.id ? colors.bg.elevated : undefined,
+                }}
+              >
                 <span>🔄</span>
                 <span className="commit-msg">{r.name}</span>
                 <span className="chip">{r.state}</span>
@@ -276,8 +328,8 @@ function RetrosTab({ pid }: { pid: number }) {
               onKeyDown={(e) => e.key === "Enter" && addItem()} style={{ flex: 1 }} />
             <button className="btn sm" onClick={addItem}>Add</button>
           </div>
-          {retroItems.map((item: any) => (
-            <div key={item.id} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 0", borderBottom: "1px solid var(--border)" }}>
+          {retroItems.map((item: RetroItem) => (
+            <div key={item.id} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 0", borderBottom: `1px solid ${colors.border.default}` }}>
               <span>{catEmoji(item.category)}</span>
               <span style={{ flex: 1, fontSize: 14 }}>{item.content}</span>
               <button className="btn sm ghost" onClick={() => api.voteRetroItem(pid, item.id).then(() => api.listRetroItems(pid, selected).then(setRetroItems))}>
@@ -293,9 +345,9 @@ function RetrosTab({ pid }: { pid: number }) {
 
 // ── Test Plans ──────────────────────────────────────────────────────────────
 function TestsTab({ pid }: { pid: number }) {
-  const { items: plans, loading, reload } = useList(() => api.listTestPlans(pid));
+  const { items: plans, loading, reload } = useList<TestPlan[]>(() => api.listTestPlans(pid));
   const [name, setName] = useState("");
-  const { items: runs } = useList(() => api.listTestRuns(pid));
+  const { items: runs } = useList<TestRun[]>(() => api.listTestRuns(pid));
 
   const create = async (e: FormEvent) => {
     e.preventDefault();
@@ -310,7 +362,7 @@ function TestsTab({ pid }: { pid: number }) {
           <Empty text="No test plans yet." />
         ) : (
           <div className="commit-list">
-            {plans.map((p: any) => (
+            {plans.map((p: TestPlan) => (
               <div className="commit-list-row" key={p.id}>
                 <span>🧪</span>
                 <span className="commit-msg">{p.name}</span>
@@ -328,7 +380,7 @@ function TestsTab({ pid }: { pid: number }) {
       <Section title="Test Runs">
         {runs.length === 0 ? <Empty text="No test runs yet." /> : (
           <div className="commit-list">
-            {runs.map((r: any) => (
+            {runs.map((r: TestRun) => (
               <div className="commit-list-row" key={r.id}>
                 <span>{r.state === "completed" ? (r.failed === 0 ? "✅" : "❌") : "🔄"}</span>
                 <span className="commit-msg">{r.name}</span>
@@ -349,14 +401,14 @@ function TestsTab({ pid }: { pid: number }) {
 
 // ── Kanban ──────────────────────────────────────────────────────────────────
 function KanbanTab({ pid }: { pid: number }) {
-  const { items, loading } = useList(() => api.listKanbanBoards(pid));
+  const { items, loading } = useList<KanbanBoard[]>(() => api.listKanbanBoards(pid));
   return (
     <Section title="Kanban Boards">
       {loading ? <Empty text="Loading..." /> : items.length === 0 ? (
         <Empty text="No boards yet. Create one via the API." />
       ) : (
         <div className="commit-list">
-          {items.map((b: any) => (
+          {items.map((b: KanbanBoard) => (
             <div className="commit-list-row" key={b.id}>
               <span>📋</span>
               <span className="commit-msg">{b.name}</span>
@@ -370,7 +422,7 @@ function KanbanTab({ pid }: { pid: number }) {
 
 // ── Tasks ───────────────────────────────────────────────────────────────────
 function TasksTab({ pid }: { pid: number }) {
-  const { items, loading, reload } = useList(() => api.listTasks(pid));
+  const { items, loading, reload } = useList<Task[]>(() => api.listTasks(pid));
   const [title, setTitle] = useState("");
   const [type, setType] = useState("task");
 
@@ -380,7 +432,7 @@ function TasksTab({ pid }: { pid: number }) {
     setTitle(""); reload();
   };
 
-  const priorityColor = (p: string) => p === "high" || p === "critical" ? "var(--red)" : p === "medium" ? "var(--yellow)" : "var(--muted)";
+  const priorityColor = (p: string) => p === "high" || p === "critical" ? colors.error : p === "medium" ? colors.warning : colors.text.muted;
   const typeEmoji = (t: string) => t === "bug" ? "🐛" : t === "feature" ? "✨" : t === "question" ? "❓" : "📌";
 
   return (
@@ -389,7 +441,7 @@ function TasksTab({ pid }: { pid: number }) {
         <Empty text="No tasks yet." />
       ) : (
         <div className="commit-list">
-          {items.map((t: any) => (
+          {items.map((t: Task) => (
             <div className="commit-list-row" key={t.id}>
               <span>{typeEmoji(t.type)}</span>
               <span className="commit-msg">{t.title}</span>
@@ -418,7 +470,7 @@ function TasksTab({ pid }: { pid: number }) {
 // ── Pull Requests ───────────────────────────────────────────────────────────
 function PRsTab({ pid }: { pid: number }) {
   const { items, loading } = useList(() => api.listPullRequests(pid));
-  const statusColor = (s: string) => s === "open" ? "var(--green)" : s === "merged" ? "var(--blue)" : "var(--muted)";
+  const statusColor = (s: string) => s === "open" ? colors.success : s === "merged" ? colors.brand.secondary : colors.text.muted;
 
   return (
     <Section title="Pull Requests">
@@ -426,7 +478,7 @@ function PRsTab({ pid }: { pid: number }) {
         <Empty text="No pull requests yet." />
       ) : (
         <div className="commit-list">
-          {items.map((pr: any) => (
+          {items.map((pr: PullRequest) => (
             <div className="commit-list-row" key={pr.id}>
               <span style={{ color: statusColor(pr.status) }}>●</span>
               <span className="commit-msg">{pr.title}</span>
@@ -442,18 +494,18 @@ function PRsTab({ pid }: { pid: number }) {
 
 // ── Milestones ──────────────────────────────────────────────────────────────
 function MilestonesTab({ pid }: { pid: number }) {
-  const { items, loading } = useList(() => api.listMilestones(pid));
+  const { items, loading } = useList<Milestone[]>(() => api.listMilestones(pid));
   return (
     <Section title="Milestones">
       {loading ? <Empty text="Loading..." /> : items.length === 0 ? (
         <Empty text="No milestones yet." />
       ) : (
         <div className="commit-list">
-          {items.map((m: any) => (
+          {items.map((m: Milestone) => (
             <div className="commit-list-row" key={m.id}>
               <span>🏁</span>
               <span className="commit-msg">{m.title}</span>
-              <span className="chip">{m.status}</span>
+              <span className="chip" style={{ borderRadius: radii.md }}>{m.status}</span>
               {m.due_date && <span className="muted" style={{ fontSize: 12 }}>Due: {shortDate(m.due_date)}</span>}
             </div>
           ))}
@@ -465,16 +517,16 @@ function MilestonesTab({ pid }: { pid: number }) {
 
 // ── Epics ───────────────────────────────────────────────────────────────────
 function EpicsTab({ pid }: { pid: number }) {
-  const { items, loading } = useList(() => api.listEpics(pid));
+  const { items, loading } = useList<Epic[]>(() => api.listEpics(pid));
   return (
     <Section title="Epics">
       {loading ? <Empty text="Loading..." /> : items.length === 0 ? (
         <Empty text="No epics yet." />
       ) : (
         <div className="commit-list">
-          {items.map((e: any) => (
+          {items.map((e: Epic) => (
             <div className="commit-list-row" key={e.id}>
-              <span style={{ color: e.color || "var(--accent)" }}>●</span>
+              <span style={{ color: e.color || colors.brand.primary }}>●</span>
               <span className="commit-msg">{e.title}</span>
               <span className="chip">{e.status}</span>
               <span className="muted" style={{ fontSize: 12 }}>{e.task_count} tasks</span>
@@ -488,14 +540,14 @@ function EpicsTab({ pid }: { pid: number }) {
 
 // ── Discussions ─────────────────────────────────────────────────────────────
 function DiscussionsTab({ pid }: { pid: number }) {
-  const { items, loading } = useList(() => api.listDiscussions(pid));
+  const { items, loading } = useList<Discussion[]>(() => api.listDiscussions(pid));
   return (
     <Section title="Discussions">
       {loading ? <Empty text="Loading..." /> : items.length === 0 ? (
         <Empty text="No discussions yet." />
       ) : (
         <div className="commit-list">
-          {items.map((d: any) => (
+          {items.map((d: Discussion) => (
             <div className="commit-list-row" key={d.id}>
               <span>💬</span>
               <span className="commit-msg">{d.title}</span>
@@ -511,11 +563,14 @@ function DiscussionsTab({ pid }: { pid: number }) {
 
 // ── Workflows ───────────────────────────────────────────────────────────────
 function WorkflowsTab({ pid }: { pid: number }) {
-  const { items: workflows, loading: wfLoading } = useList(() => api.listWorkflows(pid));
+  const { items: workflows, loading: wfLoading } = useList<Workflow[]>(() => api.listWorkflows(pid));
   const [selectedWorkflow, setSelectedWorkflow] = useState<number | null>(null);
-  const { items: runs, loading: runLoading } = selectedWorkflow
-    ? useList(() => api.listWorkflowRuns(pid, selectedWorkflow))
-    : { items: [], loading: false };
+
+  // Always call useList, but with a function that returns empty array when no workflow selected
+  const workflowRunsFn = selectedWorkflow
+    ? () => api.listWorkflowRuns(pid, selectedWorkflow)
+    : () => Promise.resolve([]);
+  const { items: runs, loading: runLoading } = useList<WorkflowRun[]>(workflowRunsFn);
 
   const statusColor = (s: string) =>
     s === "success" ? "#10b981" :
@@ -563,11 +618,19 @@ function WorkflowsTab({ pid }: { pid: number }) {
       ) : (
         <>
           <div className="commit-list">
-            {workflows.map((w: any) => (
+            {workflows.map((w: Workflow) => (
               <div
                 key={w.id}
                 className={`commit-list-row ${selectedWorkflow === w.id ? "selected-workflow" : ""}`}
                 onClick={() => setSelectedWorkflow(selectedWorkflow === w.id ? null : w.id)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setSelectedWorkflow(selectedWorkflow === w.id ? null : w.id);
+                  }
+                }}
+                tabIndex={0}
+                role="button"
                 style={{ cursor: "pointer" }}
               >
                 <span>⚙️</span>
@@ -616,7 +679,7 @@ function WorkflowsTab({ pid }: { pid: number }) {
                 <p className="muted">No runs yet. Run the workflow to see execution history.</p>
               ) : (
                 <div className="commit-list">
-                  {runs.map((r: any) => (
+                  {runs.map((r: WorkflowRun) => (
                     <div key={r.id} className="commit-list-row">
                       <span>🏃</span>
                       <div style={{ display: "flex", flexDirection: "column" }}>
@@ -657,7 +720,7 @@ function TagsTab({ pid }: { pid: number }) {
         <Empty text="No tags yet." />
       ) : (
         <div className="commit-list">
-          {items.map((t: any) => (
+          {items.map((t: Tag) => (
             <div className="commit-list-row" key={t.id}>
               <span>🏷</span>
               <span className="commit-msg">{t.name}</span>
@@ -680,7 +743,7 @@ function ArtifactsTab({ pid }: { pid: number }) {
         <Empty text="No artifact feeds yet." />
       ) : (
         <div className="commit-list">
-          {items.map((f: any) => (
+          {items.map((f: ArtifactFeed) => (
             <div className="commit-list-row" key={f.id}>
               <span>📦</span>
               <span className="commit-msg">{f.name}</span>
@@ -696,7 +759,7 @@ function ArtifactsTab({ pid }: { pid: number }) {
 
 // ── Incidents ───────────────────────────────────────────────────────────────
 function IncidentsTab({ pid }: { pid: number }) {
-  const { items, loading } = useList(() => api.listIncidents(pid));
+  const { items, loading } = useList<Incident[]>(() => api.listIncidents(pid));
   const sevColor = (s: string) => s === "critical" ? "var(--red)" : s === "major" ? "var(--yellow)" : "var(--muted)";
   return (
     <Section title="Incidents">
@@ -704,7 +767,7 @@ function IncidentsTab({ pid }: { pid: number }) {
         <Empty text="No incidents." />
       ) : (
         <div className="commit-list">
-          {items.map((i: any) => (
+          {items.map((i: Incident) => (
             <div className="commit-list-row" key={i.id}>
               <span style={{ color: sevColor(i.severity) }}>●</span>
               <span className="commit-msg">{i.title}</span>
@@ -720,14 +783,14 @@ function IncidentsTab({ pid }: { pid: number }) {
 
 // ── Feature Flags ───────────────────────────────────────────────────────────
 function FlagsTab({ pid }: { pid: number }) {
-  const { items, loading, reload } = useList(() => api.listFeatureFlags(pid));
+  const { items, loading, reload } = useList<FeatureFlag[]>(() => api.listFeatureFlags(pid));
   return (
     <Section title="Feature Flags">
       {loading ? <Empty text="Loading..." /> : items.length === 0 ? (
         <Empty text="No feature flags." />
       ) : (
         <div className="commit-list">
-          {items.map((f: any) => (
+          {items.map((f: FeatureFlag) => (
             <div className="commit-list-row" key={f.id}>
               <span>{f.enabled ? "🟢" : "🔴"}</span>
               <span className="commit-msg">{f.name}</span>
@@ -745,7 +808,7 @@ function FlagsTab({ pid }: { pid: number }) {
 
 // ── Time Tracking ───────────────────────────────────────────────────────────
 function TimeTab({ pid }: { pid: number }) {
-  const [data, setData] = useState<any>({ entries: [], total_minutes: 0 });
+  const [data, setData] = useState<{ entries: TimeEntry[]; total_minutes: number }>({ entries: [], total_minutes: 0 });
   const [hours, setHours] = useState("");
   const [desc, setDesc] = useState("");
 
@@ -766,9 +829,9 @@ function TimeTab({ pid }: { pid: number }) {
         <span style={{ fontSize: 24, fontWeight: 700 }}>{fmt(data.total_minutes)}</span>
         <span className="muted">total logged</span>
       </div>
-      {data.entries?.length > 0 && (
+      {data.entries.length > 0 && (
         <div className="commit-list" style={{ marginBottom: 12 }}>
-          {data.entries.map((e: any) => (
+          {data.entries.map((e: TimeEntry) => (
             <div className="commit-list-row" key={e.id}>
               <span>⏱</span>
               <span className="commit-msg">{fmt(e.hours)}</span>
@@ -790,20 +853,20 @@ function TimeTab({ pid }: { pid: number }) {
 
 // ── OKRs ────────────────────────────────────────────────────────────────────
 function OKRsTab({ pid }: { pid: number }) {
-  const { items, loading } = useList(() => api.listOKRs(pid));
+  const { items, loading } = useList<Objective[]>(() => api.listOKRs(pid));
   return (
     <Section title="Objectives & Key Results">
       {loading ? <Empty text="Loading..." /> : items.length === 0 ? (
         <Empty text="No OKRs yet." />
       ) : (
-        items.map((o: any) => (
+        items.map((o: Objective) => (
           <div key={o.id} style={{ marginBottom: 16, padding: 12, border: "1px solid var(--border)", borderRadius: 6 }}>
             <div style={{ fontWeight: 700, marginBottom: 4 }}>{o.title}</div>
             <div className="muted" style={{ fontSize: 12, marginBottom: 8 }}>{o.period} · {o.progress}%</div>
             <div style={{ background: "var(--bg3)", borderRadius: 4, height: 6, marginBottom: 8 }}>
               <div style={{ background: "var(--accent)", height: "100%", borderRadius: 4, width: `${o.progress}%` }} />
             </div>
-            {o.key_results?.map((kr: any) => (
+            {o.key_results?.map((kr: KeyResult) => (
               <div key={kr.id} style={{ display: "flex", gap: 8, fontSize: 13, padding: "2px 0" }}>
                 <span className="muted">KR:</span>
                 <span style={{ flex: 1 }}>{kr.title}</span>
@@ -819,34 +882,56 @@ function OKRsTab({ pid }: { pid: number }) {
 
 // ── Status Page ─────────────────────────────────────────────────────────────
 function StatusTab({ pid }: { pid: number }) {
-  const [data, setData] = useState<any>({ components: [], incidents: [] });
+  const [data, setData] = useState<StatusPageData>({ components: [], incidents: [] });
   useEffect(() => { api.getStatusPage(pid).then(setData).catch(() => {}); }, [pid]);
 
   const statusIcon = (s: string) => s === "operational" ? "🟢" : s === "degraded" ? "🟡" : "🔴";
+  const statusColor = (s: string) =>
+    s === "operational" ? colors.success :
+    s === "degraded" ? colors.warning :
+    colors.error;
 
   return (
     <Section title="Status Page">
-      <h3 style={{ fontSize: 14, marginBottom: 8 }}>Components</h3>
+      <h3 style={{ fontSize: typography.fontSize.h3, marginBottom: spacing.md }}>Components</h3>
       {data.components?.length === 0 ? <Empty text="No components." /> : (
-        <div className="commit-list" style={{ marginBottom: 16 }}>
-          {data.components?.map((c: any) => (
+        <div className="commit-list" style={{ marginBottom: spacing.lg }}>
+          {data.components?.map((c: Component) => (
             <div className="commit-list-row" key={c.id}>
-              <span>{statusIcon(c.status)}</span>
+              <span style={{ color: statusColor(c.status) }}>{statusIcon(c.status)}</span>
               <span className="commit-msg">{c.name}</span>
-              <span className="chip">{c.status}</span>
+              <span
+                className="chip"
+                style={{
+                  backgroundColor: statusColor(c.status) + '20',
+                  color: statusColor(c.status),
+                  borderRadius: radii.md
+                }}
+              >
+                {c.status}
+              </span>
             </div>
           ))}
         </div>
       )}
-      <h3 style={{ fontSize: 14, marginBottom: 8 }}>Active Incidents</h3>
+      <h3 style={{ fontSize: typography.fontSize.h3, marginBottom: spacing.md }}>Active Incidents</h3>
       {data.incidents?.length === 0 ? <Empty text="No active incidents." /> : (
         <div className="commit-list">
-          {data.incidents?.map((i: any) => (
+          {data.incidents?.map((i: Incident) => (
             <div className="commit-list-row" key={i.id}>
               <span>🚨</span>
               <span className="commit-msg">{i.title}</span>
-              <span className="chip">{i.status}</span>
-              <span className="muted" style={{ fontSize: 12 }}>{i.impact}</span>
+              <span
+                className="chip"
+                style={{
+                  backgroundColor: colors.text.muted + '20',
+                  color: colors.text.muted,
+                  borderRadius: radii.md
+                }}
+              >
+                {i.status}
+              </span>
+              <span className="muted" style={{ fontSize: typography.fontSize.caption }}>{i.impact}</span>
             </div>
           ))}
         </div>

@@ -1,6 +1,7 @@
 """Review sessions — the core review loop for music production."""
 import hmac
 import secrets
+from datetime import timezone
 from pathlib import PurePosixPath
 
 from fastapi import APIRouter, BackgroundTasks, Depends, File, Form, HTTPException, Query, UploadFile, status
@@ -12,6 +13,7 @@ from sqlalchemy.orm import Session
 from ..config import MAX_UPLOAD_SIZE
 from ..database import get_db
 from ..models import (
+    ChangeOrder,
     LedgerEvent,
     ReferenceComparison,
     ReviewApproval,
@@ -44,6 +46,7 @@ from ..schemas import (
     ShareSettingsUpdate,
     ReviewVersionOut,
     VersionDiffOut,
+    ChangeOrderOut,
 )
 from ..security import get_current_user
 from ..services import ledger, storage, versioning, watermark, waveform
@@ -471,11 +474,12 @@ def guest_comment(share_token: str, version_id: int, payload: GuestReviewComment
         time_s=payload.time_s,
         body=payload.body.strip(),
         parent_id=payload.parent_id,
-        status="open",
+        status="draft",
     )
     db.add(comment)
+    db.flush()  # Assign ID before ledger entry
     _log_access(db, session, payload.author_name, "commented", f"{version.label} @ {payload.time_s:.1f}s")
-    ledger.append(db, "request.created", session_id=session.id, actor=payload.author_name, entity_type="request", entity_id=comment.id, payload={"version": version.label, "time_s": payload.time_s})
+    ledger.append(db, "feedback.draft_created", session_id=session.id, actor=payload.author_name, entity_type="request", entity_id=comment.id, payload={"version": version.label, "time_s": payload.time_s})
     session.updated_at = utcnow()
     db.commit()
     db.refresh(comment)
@@ -511,6 +515,7 @@ def guest_voice_comment(
         status="open",
     )
     db.add(comment)
+    db.flush()  # Assign ID before ledger entry
     _log_access(db, session, author_name, "voice_comment", f"{version.label} @ {time_s:.1f}s")
     ledger.append(db, "feedback.draft_created", session_id=session.id, actor=author_name, entity_type="request", entity_id=comment.id, payload={"version": version.label, "time_s": time_s, "voice": True})
     session.updated_at = utcnow()
@@ -611,6 +616,143 @@ def public_compare_reference(share_token: str, payload: dict, db: Session = Depe
         "ref_audio_url": f"/api/sessions/public/{share_token}/references/{reference_id}/audio",
         "start_ms": start_ms, "end_ms": end_ms,
     }
+
+
+
+@router.post("/public/{share_token}/compare", status_code=status.HTTP_201_CREATED)
+def public_compare_versions(share_token: str, payload: dict, db: Session = Depends(get_db)):
+    """Guest compares two versions via the share link."""
+    from ..models import ReviewVersion
+    session = get_public_session(db, share_token)
+    base_id = payload.get("base_version_id")
+    compare_id = payload.get("compare_version_id")
+    start_ms = payload.get("start_ms", 0)
+    end_ms = payload.get("end_ms")
+    mode = payload.get("mode", "full")
+    stem_logical = payload.get("stem_logical_name")
+
+    if mode == "stem":
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "Stem comparison is engineer-only")
+
+    base = db.get(ReviewVersion, base_id)
+    compare = db.get(ReviewVersion, compare_id)
+    if base is None or base.session_id != session.id:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Base version not found")
+    if compare is None or compare.session_id != session.id:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Compare version not found")
+
+    # Compute level-match gain using short-term LUFS
+    from ..services.loudness import analyse
+    try:
+        base_data = storage.read_blob(base.blob_sha)
+        compare_data = storage.read_blob(compare.blob_sha)
+        base_loudness = analyse(base_data)
+        compare_loudness = analyse(compare_data)
+        base_lufs = base_loudness.get("short_term_lufs", base_loudness.get("integrated_lufs", -23.0))
+        compare_lufs = compare_loudness.get("short_term_lufs", compare_loudness.get("integrated_lufs", -23.0))
+        import math
+        compare_gain_db = round(base_lufs - compare_lufs, 2) if compare_lufs != 0 else 0.0
+    except Exception:
+        compare_gain_db = 0.0
+
+    comp = {
+        "id": f"compare_{base_id}_{compare_id}",
+        "level_match": "short_term_lufs",
+        "compare_gain_db": compare_gain_db,
+        "base_label": base.label,
+        "compare_label": compare.label,
+        "base_version_id": base_id,
+        "compare_version_id": compare_id,
+        "start_ms": start_ms,
+        "end_ms": end_ms,
+    }
+    return comp
+
+
+# ---------- Public change order endpoints ----------
+
+@router.get("/public/{share_token}/change-orders", response_model=list[ChangeOrderOut])
+def public_list_change_orders(share_token: str, db: Session = Depends(get_db)):
+    """Guest lists change orders via the share link."""
+    from ..models import ChangeOrder
+    session = get_public_session(db, share_token)
+    orders = db.scalars(
+        select(ChangeOrder).where(ChangeOrder.session_id == session.id).order_by(ChangeOrder.created_at.desc())
+    ).all()
+    return [ChangeOrderOut.model_validate(o, from_attributes=True) for o in orders]
+
+
+@router.post("/public/{share_token}/change-orders", status_code=status.HTTP_201_CREATED)
+def public_create_change_order(share_token: str, payload: dict, actor: str = Query(""), db: Session = Depends(get_db)):
+    """Guest creates a change order via the share link."""
+    from ..models import ChangeOrder
+    session = get_public_session(db, share_token)
+    # Change orders only allowed for approved projects (at least one approved version)
+    has_approved = db.scalars(
+        select(ReviewVersion).where(
+            ReviewVersion.session_id == session.id,
+            ReviewVersion.status == "approved",
+        )
+    ).first()
+    if not has_approved:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "Change orders are only available for approved projects")
+    # Check no active change order already exists
+    active = db.scalars(
+        select(ChangeOrder).where(
+            ChangeOrder.session_id == session.id,
+            ChangeOrder.status.in_(["requested", "quoted", "accepted"]),
+        )
+    ).all()
+    if active:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "An active change order already exists")
+    order = ChangeOrder(
+        session_id=session.id,
+        created_by=actor or "guest",
+        reason=payload.get("reason", "other"),
+        description=payload.get("description", ""),
+        target_round=session.round_number,
+    )
+    db.add(order)
+    ledger.append(db, "change_order.created", session_id=session.id, actor=actor, entity_type="change_order", entity_id=order.id, payload={"reason": order.reason})
+    session.updated_at = utcnow()
+    db.commit()
+    db.refresh(order)
+    from ..schemas import ChangeOrderOut
+    return ChangeOrderOut.model_validate(order, from_attributes=True)
+
+
+@router.post("/public/{share_token}/change-orders/{order_id}/accept")
+def public_accept_change_order(share_token: str, order_id: int, actor: str = Query(""), db: Session = Depends(get_db)):
+    """Guest accepts a quoted change order via the share link."""
+    from ..models import ChangeOrder
+    session = get_public_session(db, share_token)
+    order = db.get(ChangeOrder, order_id)
+    if order is None or order.session_id != session.id:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Change order not found")
+    if order.quote_expires_at:
+        expires = order.quote_expires_at.replace(tzinfo=timezone.utc) if order.quote_expires_at.tzinfo is None else order.quote_expires_at
+        if expires < utcnow():
+            raise HTTPException(status.HTTP_400_BAD_REQUEST, "Quote has expired")
+    order.status = "accepted"
+    order.accepted_at = utcnow()
+    # For courtesy or zero-price, auto-pay and grant
+    if order.decision == "courtesy" or (order.price_cents is not None and order.price_cents == 0):
+        order.status = "paid"
+        order.paid_at = utcnow()
+        if not order.round_granted:
+            session.change_rounds_granted += 1
+            session.rounds_open = True
+            session.status = "in_review"
+            order.round_granted = True
+    ledger.append(db, "change_order.accepted", session_id=session.id, actor=actor, entity_type="change_order", entity_id=order.id, payload={})
+    if order.status == "paid":
+        ledger.append(db, "change_order.paid", session_id=session.id, actor=actor, entity_type="change_order", entity_id=order.id, payload={})
+        ledger.append(db, "change_order.round_opened", session_id=session.id, actor=actor, entity_type="change_order", entity_id=order.id, payload={})
+    session.updated_at = utcnow()
+    db.commit()
+    db.refresh(order)
+    from ..schemas import ChangeOrderOut
+    return ChangeOrderOut.model_validate(order, from_attributes=True)
 
 
 @router.post("/public/{share_token}/versions/{version_id}/approvals", response_model=ReviewApprovalOut, status_code=status.HTTP_201_CREATED)
@@ -808,14 +950,16 @@ def get_version_audio(
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    """Return a presigned URL for the version audio."""
+    """Return raw audio bytes for the version."""
     v = get_version_or_404(db, session_id, version_id)
     if not v.blob_sha:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "No audio available")
-    from ..services.storage import get_storage
-    storage = get_storage()
-    url = storage.presign_get(v.blob_sha)
-    return {"url": url}
+    data = storage.read_blob(v.blob_sha)
+    return Response(
+        content=data,
+        media_type=f"audio/{v.audio_format}",
+        headers={"Content-Disposition": f'inline; filename="{v.filename}"'},
+    )
 
 
 @router.post("/{session_id}/versions/from-storage", status_code=status.HTTP_201_CREATED)
@@ -1124,6 +1268,7 @@ def add_comment(session_id: int, version_id: int, payload: ReviewCommentCreate, 
         parent_id=payload.parent_id,
     )
     db.add(comment)
+    db.flush()  # Assign ID before ledger entry
     ledger.append(db, "request.created", session_id=session_id, actor=user.username, entity_type="request", entity_id=comment.id, payload={"version": version.label, "time_s": payload.time_s})
     db.commit()
     db.refresh(comment)
@@ -1156,6 +1301,7 @@ def add_voice_comment(
         voice_duration_s=voice_duration_s,
     )
     db.add(comment)
+    db.flush()  # Assign ID before ledger entry
     ledger.append(db, "feedback.draft_created", session_id=session_id, actor=user.username, entity_type="request", entity_id=comment.id, payload={"version": version.label, "time_s": time_s, "voice": True})
     db.commit()
     db.refresh(comment)
@@ -1182,6 +1328,24 @@ def update_comment(session_id: int, version_id: int, comment_id: int, resolved: 
         comment.resolved = resolved
     if body is not None:
         comment.body = body.strip()
+    db.commit()
+    db.refresh(comment)
+    return _comment_out(comment)
+
+
+@router.post("/{session_id}/versions/{version_id}/requests/{comment_id}/status")
+def update_request_status(session_id: int, version_id: int, comment_id: int, payload: ReviewRequestStatusUpdate, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Move a review request through its lifecycle (acknowledged, in_progress, verified, approved, etc.)."""
+    get_session_or_404(db, user, session_id)
+    version = get_version_or_404(db, session_id, version_id)
+    comment = db.get(ReviewComment, comment_id)
+    if comment is None or comment.version_id != version.id:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Comment not found")
+    comment.status = payload.status
+    if payload.status == "verified":
+        comment.verified_at = utcnow()
+    if payload.status == "approved":
+        comment.resolved = True
     db.commit()
     db.refresh(comment)
     return _comment_out(comment)
@@ -1298,7 +1462,7 @@ def get_ledger(session_id: int, user: User = Depends(get_current_user), db: Sess
                 "entity_type": e.entity_type,
                 "entity_id": e.entity_id,
                 "payload": e.payload,
-                "occurred_at": e.occurred_at.isoformat(),
+                "occurred_at": e.occurred_at.replace(tzinfo=timezone.utc).isoformat() if e.occurred_at.tzinfo is None else e.occurred_at.isoformat(),
                 "prev_event_hash": e.prev_event_hash,
                 "event_hash": e.event_hash,
             }
@@ -1430,6 +1594,66 @@ class SubmitFeedbackPayload(BaseModel):
     note: str = Field(default="", max_length=2000)
 
 
+@router.post("/{session_id}/submit-feedback")
+def submit_feedback_owner(session_id: int, payload: SubmitFeedbackPayload = SubmitFeedbackPayload(), user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Owner submits feedback — closes the current review round."""
+    session = get_session_or_404(db, user, session_id)
+    if not session.rounds_open:
+        raise HTTPException(
+            status.HTTP_409_CONFLICT,
+            "No open review round.",
+        )
+    current_round = db.scalar(
+        select(ReviewRound).where(
+            ReviewRound.session_id == session.id,
+            ReviewRound.status == "open",
+        ).order_by(ReviewRound.number.desc()).limit(1)
+    )
+    if current_round is None:
+        raise HTTPException(
+            status.HTTP_409_CONFLICT,
+            "No open review round found.",
+        )
+    # Extra round budget check: included_rounds + rounds_paid = total allowed
+    # round_number tracks how many rounds have been submitted
+    # After included_rounds submissions, need payment
+    total_allowed = session.included_rounds + session.rounds_paid + session.change_rounds_granted
+    if session.round_number > total_allowed:
+        if session.extra_round_price_cents and session.extra_round_price_cents > 0:
+            raise HTTPException(status.HTTP_402_PAYMENT_REQUIRED, "Extra round payment required")
+        else:
+            raise HTTPException(status.HTTP_403_FORBIDDEN, "Round limit reached")
+    # Promote draft comments to open requests
+    draft_comments = db.scalars(
+        select(ReviewComment).join(ReviewVersion, ReviewComment.version_id == ReviewVersion.id).where(
+            ReviewVersion.session_id == session.id,
+            ReviewComment.status == "draft",
+        )
+    ).all()
+    for c in draft_comments:
+        c.status = "open"
+    current_round.status = "submitted"
+    current_round.submitted_at = utcnow()
+    current_round.note = payload.note
+    current_round.request_count = len(draft_comments)
+    session.rounds_open = False
+    session.round_number += 1
+    session.updated_at = utcnow()
+    ledger.append(db, "round.submitted", session_id=session.id, actor=user.username, entity_type="round", entity_id=current_round.id, payload={"note": payload.note, "request_count": len(draft_comments)})
+    db.commit()
+    # Return session detail with rounds and versions
+    detail = _session_detail(db, session)
+    rounds = db.scalars(
+        select(ReviewRound).where(ReviewRound.session_id == session.id).order_by(ReviewRound.number)
+    ).all()
+    detail_dict = {
+        "round_number": session.round_number,
+        "rounds": [{"number": r.number, "status": r.status, "request_count": r.request_count} for r in rounds],
+        "versions": [v for v in detail.versions] if hasattr(detail, 'versions') else [],
+    }
+    return detail_dict
+
+
 @router.post("/public/{share_token}/submit-feedback")
 def submit_feedback(
     share_token: str,
@@ -1447,6 +1671,10 @@ def submit_feedback(
     """
     session = get_public_session(db, share_token)
     _require_share_permission(session, "comment", actor, password)
+
+    # If a feedback_owner is set, only they can submit feedback
+    if session.feedback_owner and actor.strip().lower() != session.feedback_owner.strip().lower():
+        raise HTTPException(status.HTTP_403_FORBIDDEN, "Only the designated feedback owner can submit feedback")
 
     if not session.rounds_open:
         raise HTTPException(
@@ -1471,9 +1699,28 @@ def submit_feedback(
             "No open review round found. The session state is inconsistent; the owner should upload a new version.",
         )
 
+    # Extra round budget check
+    total_allowed = session.included_rounds + session.rounds_paid + session.change_rounds_granted
+    if session.round_number > total_allowed:
+        if session.extra_round_price_cents and session.extra_round_price_cents > 0:
+            raise HTTPException(status.HTTP_402_PAYMENT_REQUIRED, "Extra round payment required")
+        else:
+            raise HTTPException(status.HTTP_403_FORBIDDEN, "Round limit reached")
+
+    # Promote draft comments to open requests
+    draft_comments = db.scalars(
+        select(ReviewComment).join(ReviewVersion, ReviewComment.version_id == ReviewVersion.id).where(
+            ReviewVersion.session_id == session.id,
+            ReviewComment.status == "draft",
+        )
+    ).all()
+    for c in draft_comments:
+        c.status = "open"
+
     current_round.status = "submitted"
     current_round.submitted_at = utcnow()
     current_round.note = payload.note
+    current_round.request_count = len(draft_comments)
 
     session.rounds_open = False
     session.round_number += 1
@@ -1481,7 +1728,17 @@ def submit_feedback(
     _log_access(db, session, actor, "submitted_feedback", payload.note)
     ledger.append(db, "round.submitted", session_id=session.id, actor=actor, entity_type="round", entity_id=current_round.id, payload={"note": payload.note})
     db.commit()
-    return {"ok": True, "round_number": session.round_number}
+    # Return session detail with rounds and versions
+    detail = _session_detail(db, session)
+    rounds = db.scalars(
+        select(ReviewRound).where(ReviewRound.session_id == session.id).order_by(ReviewRound.number)
+    ).all()
+    detail_dict = {
+        "round_number": session.round_number,
+        "rounds": [{"number": r.number, "status": r.status, "request_count": r.request_count} for r in rounds],
+        "versions": [v for v in detail.versions] if hasattr(detail, 'versions') else [],
+    }
+    return detail_dict
 
 
 # ---------- Export open requests ----------

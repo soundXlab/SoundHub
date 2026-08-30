@@ -62,6 +62,10 @@ def _run_alp_cpp_worker(data: bytes) -> dict | None:
 
     Returns dict with analysis results or None if failed.
     """
+    # Validate ZIP signature before spawning subprocess
+    if len(data) < 4 or data[:2] != b"PK":
+        return None
+
     CPP_WORKER_PATH = os.path.join(
         os.path.dirname(__file__),
         '..',

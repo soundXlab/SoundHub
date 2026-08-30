@@ -116,32 +116,17 @@ def list_packages(user: User = Depends(get_current_user), db: Session = Depends(
     # Convert to ReleasePackageOut and populate events
     result = []
     for package in packages:
-        # Debug: Check what's actually in the relationships and also query directly
-        print(f"Package {package.id}: events count = {len(package.delivery_events)}, delivery_events count = {len(package.delivery_events)}", flush=True)
+        # Query LedgerEvents and DeliveryEvents for this package
         direct_events = db.scalars(sql_select(LedgerEvent).where(LedgerEvent.package_id == package.id)).all()
-        print(f"  Direct ledger query count = {len(direct_events)}", flush=True)
-        for e in package.delivery_events:
-            print(f"  LedgerEvent (from relationship): {e.event}", flush=True)
-        for e in direct_events:
-            print(f"  LedgerEvent (direct): {e.event}", flush=True)
         direct_delivery = db.scalars(sql_select(DeliveryEvent).where(DeliveryEvent.package_id == package.id)).all()
-        print(f"  Direct delivery query count = {len(direct_delivery)}", flush=True)
-        for e in package.delivery_events:
-            print(f"  DeliveryEvent (from relationship): {e.event}", flush=True)
-        for e in direct_delivery:
-            print(f"  DeliveryEvent (direct): {e.event}", flush=True)
 
         # Convert to ReleasePackageOut and populate events
-        # Exclude the events relationships and SQLAlchemy state
         package_data = {k: v for k, v in package.__dict__.items()
                         if not k.startswith('_') and k not in ('events', 'delivery_events', 'deliverables')}
         package_out = ReleasePackageOut.model_validate(package_data)
         # Populate events field with both LedgerEvents and DeliveryEvents
-        events = []
-        for e in package.delivery_events:
-            events.append({"event": e.event})
-        for e in package.delivery_events:
-            events.append({"event": e.event})
+        events = [{"event": e.event} for e in direct_events]
+        events += [{"event": e.event} for e in direct_delivery]
         package_out.events = events
         # Populate deliverables
         deliverables_list = [{"id": d.id, "type": d.type, "filename": d.filename, "size": d.size, "sha256": d.sha256} for d in package.deliverables]
@@ -185,27 +170,17 @@ def create_package(payload: ReleasePackageCreate, user: User = Depends(get_curre
     ledger.append(db, "package.created", session_id=payload.session_id, package_id=package.id, actor=user.username, entity_type="package", entity_id=package.id, payload={"name": package.name})
     print(f"ABOUT TO COMMIT IN CREATE_PACKAGE", flush=True)
     db.commit()
-    print(f"AFTER COMMIT IN CREATE_PACKAGE", flush=True)
     db.refresh(package)
-    # Debug: Query for ledger events directly to see if they were saved
-    from sqlalchemy import select as sql_select
-    ledger_count = db.scalars(
-        sql_select(LedgerEvent).where(LedgerEvent.package_id == package.id)
+    # Query LedgerEvents directly
+    direct_ledger_events = db.scalars(
+        select(LedgerEvent).where(LedgerEvent.package_id == package.id)
     ).all()
-    print(f"AFTER CREATE: Package {package.id}: events count = {len(package.delivery_events)}, delivery_events count = {len(package.delivery_events)}, direct ledger query count = {len(ledger_count)}", flush=True)
-    if ledger_count:
-        print(f"  First ledger event: {ledger_count[0].event}", flush=True)
     # Convert to ReleasePackageOut and populate events
-    # Exclude the events relationships and SQLAlchemy state
     package_data = {k: v for k, v in package.__dict__.items()
                     if not k.startswith('_') and k not in ('events', 'delivery_events', 'deliverables')}
     package_out = ReleasePackageOut.model_validate(package_data)
-    # Populate events field with both LedgerEvents and DeliveryEvents
-    events = []
-    for e in package.delivery_events:
-        events.append({"event": e.event})
-    for e in package.delivery_events:
-        events.append({"event": e.event})
+    events = [{"event": e.event} for e in direct_ledger_events]
+    events += [{"event": e.event} for e in package.delivery_events]
     package_out.events = events
     return package_out
 
@@ -234,6 +209,49 @@ def preflight_check(package_id: int, user: User = Depends(get_current_user), db:
     for d in deliverables:
         if d.size == 0:
             checks.append({"status": "block", "label": "Empty file", "detail": d.filename})
+    # Check for placeholder blob_sha
+    for d in deliverables:
+        if d.blob_sha == "placeholder_blob_sha":
+            checks.append({"status": "block", "label": "Placeholder blob not replaced", "detail": d.filename})
+    # Check stem version alignment
+    if "stems" in required and "stems" not in delivered_types:
+        pass  # already flagged as missing required
+    elif "stems" in delivered_types:
+        stem_dels = [d for d in deliverables if d.type == "stems"]
+        stem_versions = {d.from_version_id for d in stem_dels if d.from_version_id}
+        if not stem_versions:
+            checks.append({"status": "block", "label": "Stems not linked to version", "detail": ""})
+    # Check if any deliverable has zero sample rate (bad WAV)
+    for d in deliverables:
+        if d.size > 0 and (d.sample_rate == 0 or d.sample_rate is None):
+            checks.append({"status": "block", "label": "Invalid audio metadata", "detail": d.filename})
+    # Check that required deliverables have a sha256 hash
+    for d in deliverables:
+        if d.type in required and not d.sha256:
+            checks.append({"status": "block", "label": "Missing SHA-256 for required deliverable", "detail": d.filename})
+    # Check that session has a brief with required fields
+    session = db.get(ReviewSession, package.session_id)
+    if session and not session.genre:
+        checks.append({"status": "block", "label": "Session brief missing genre", "detail": ""})
+    # Check that approved version has a watermark
+    if package.approved_version_id:
+        approved_v = db.get(ReviewVersion, package.approved_version_id)
+        if approved_v and not approved_v.watermark_sha:
+            checks.append({"status": "warn", "label": "No watermark on approved version", "detail": approved_v.label})
+    # Check that session brief has required fields for templates that need them
+    session = db.get(ReviewSession, package.session_id)
+    if package.template == "label_sync" and session:
+        if not session.required_deliverables.strip():
+            checks.append({"status": "block", "label": "Session brief missing required_deliverables", "detail": ""})
+        if not session.genre.strip():
+            checks.append({"status": "block", "label": "Session brief missing genre", "detail": ""})
+    # Check for duplicate deliverable types
+    type_counts = {}
+    for d in deliverables:
+        type_counts[d.type] = type_counts.get(d.type, 0) + 1
+    for t, cnt in type_counts.items():
+        if cnt > 1:
+            checks.append({"status": "warn", "label": f"Duplicate deliverable type: {t}", "detail": f"{cnt} files"})
     # Already locked
     if package.status == "ready":
         checks.append({"status": "block", "label": "Already locked", "detail": ""})
@@ -253,6 +271,10 @@ def lock_package(package_id: int, payload: dict = {}, user: User = Depends(get_c
     force_reason = payload.get("force_reason", "")
     if force and not force_reason.strip():
         raise HTTPException(status.HTTP_400_BAD_REQUEST, "force_reason is required when force=True")
+    # Deposit gate — block lock until deposit is paid or waived
+    session = db.get(ReviewSession, package.session_id)
+    if session and session.deposit_status == "deposit_due" and session.deposit_due_cents and session.deposit_due_cents > 0:
+        raise HTTPException(402, "Deposit must be paid before locking")
     # Check preflight unless force
     if not force:
         deliverables = db.scalars(select(Deliverable).where(Deliverable.package_id == package_id)).all()
@@ -265,6 +287,11 @@ def lock_package(package_id: int, payload: dict = {}, user: User = Depends(get_c
         missing = [r for r in required if r not in delivered_types]
         if missing:
             raise HTTPException(status.HTTP_400_BAD_REQUEST, f"Preflight failed: missing deliverables: {', '.join(missing)}")
+        # Check for empty audio deliverables (blocks lock without force)
+        AUDIO_TYPES = {"master", "instrumental", "acapella", "stems", "clean_edit", "radio_edit"}
+        empty_audio = [d for d in deliverables if d.size == 0 and d.type in AUDIO_TYPES]
+        if empty_audio:
+            raise HTTPException(status.HTTP_400_BAD_REQUEST, "Preflight failed: empty audio deliverables")
     package.locked_by = user.username
     package.status = "ready"
     if force:
@@ -307,34 +334,27 @@ def lock_package(package_id: int, payload: dict = {}, user: User = Depends(get_c
 
     # Add ledger entry for package locked
     lock_event = "package.lock_forced" if force else "package.locked"
-    ledger.append(db, lock_event, session_id=package.session_id, package_id=package.id, actor=user.username, entity_type="package", entity_id=package.id, payload={"scope": "master", "note": "final" if not force else force_reason})
+    ledger_payload = {"scope": "master", "note": "final"}
+    if force:
+        ledger_payload["reason"] = force_reason
+        ledger_payload["confirmed_by"] = user.username
+    ledger.append(db, lock_event, session_id=package.session_id, package_id=package.id, actor=user.username, entity_type="package", entity_id=package.id, payload=ledger_payload)
 
     db.commit()
     db.refresh(package)
-    # Debug: Query for ledger events directly to see if they were saved
-    from sqlalchemy import select as sql_select
-    ledger_count = db.scalars(
-        sql_select(LedgerEvent).where(LedgerEvent.package_id == package.id)
+    # Query LedgerEvents and DeliveryEvents directly
+    direct_ledger_events = db.scalars(
+        select(LedgerEvent).where(LedgerEvent.package_id == package.id)
     ).all()
-    print(f"AFTER LOCK: Package {package.id}: events count = {len(package.delivery_events)}, delivery_events count = {len(package.delivery_events)}, direct ledger query count = {len(ledger_count)}", flush=True)
-    if ledger_count:
-        print(f"  First ledger event: {ledger_count[0].event}", flush=True)
-        print(f"  All ledger events: {[e.event for e in ledger_count]}", flush=True)
-    # Ensure deliverables relationship is loaded (access it to trigger lazy load if needed)
+    # Ensure deliverables relationship is loaded
     _ = len(package.deliverables)
     # Convert to ReleasePackageOut and populate events
-    # Exclude the events relationships and SQLAlchemy state
     package_data = {k: v for k, v in package.__dict__.items()
                     if not k.startswith('_') and k not in ('events', 'delivery_events', 'deliverables')}
     package_out = ReleasePackageOut.model_validate(package_data)
-    # Populate events field with both LedgerEvents and DeliveryEvents
-    events = []
-    for e in package.delivery_events:
-        events.append({"event": e.event})
-    for e in package.delivery_events:
-        events.append({"event": e.event})
+    events = [{"event": e.event} for e in direct_ledger_events]
+    events += [{"event": e.event} for e in package.delivery_events]
     package_out.events = events
-    # Populate deliverables
     deliverables_list = [{"id": d.id, "type": d.type, "filename": d.filename, "size": d.size, "sha256": d.sha256} for d in package.deliverables]
     package_out.deliverables = deliverables_list
     return package_out
@@ -397,18 +417,26 @@ def upload_deliverable(package_id: int, type: str = Form(...), filename: str = F
     package = db.get(ReleasePackage, package_id)
     if package is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Package not found")
-    # For testing purposes, return a basic deliverable (we're not actually processing the uploaded file)
+    # Process the uploaded file: store blob, compute hash, extract metadata
+    import hashlib as _hashlib
+    file_data = file.file.read()
+    blob_sha = storage.put_blob(file_data)
+    computed_sha = _hashlib.sha256(file_data).hexdigest()
+    # Extract audio metadata for WAV files
+    audio_meta = {"sample_rate": None, "bit_depth": None, "channels": None}
+    if file_data[:4] == b"RIFF" and len(file_data) > 44:
+        audio_meta = _extract_wav_metadata(file_data)
     deliverable = Deliverable(
         package_id=package_id,
         type=type,
-        filename=filename or "uploaded",
-        blob_sha="placeholder_blob_sha",
-        size=0,
+        filename=filename or file.filename or "uploaded",
+        blob_sha=blob_sha,
+        size=len(file_data),
         source_version_id=None,
-        sha256=sha256,
-        sample_rate=sample_rate,
-        bit_depth=bit_depth,
-        channels=channels,
+        sha256=sha256 or computed_sha,
+        sample_rate=sample_rate or audio_meta["sample_rate"],
+        bit_depth=bit_depth or audio_meta["bit_depth"],
+        channels=channels or audio_meta["channels"],
         format=format,
         is_required=is_required,
     )
@@ -430,12 +458,21 @@ def handoff_package(package_id: int, payload: dict, user: User = Depends(get_cur
         package.session_manifest = payload["session_manifest"]
     if "consolidate_audio" in payload:
         package.consolidate_audio = payload["consolidate_audio"]
+    if "last_verified_opened_at" in payload:
+        from datetime import datetime as dt
+        val = payload["last_verified_opened_at"]
+        if val:
+            package.last_verified_opened_at = dt.fromisoformat(val.replace("Z", "+00:00"))
+    if "archive_expires_at" in payload:
+        from datetime import datetime as dt
+        val = payload["archive_expires_at"]
+        if val:
+            package.archive_expires_at = dt.fromisoformat(val.replace("Z", "+00:00"))
     db.commit()
     db.refresh(package)
     return _package_out(package)
 
-
-@router.patch("/{package_id}/archive", response_model=ReleasePackageOut)
+@router.post("/{package_id}/archive", response_model=ReleasePackageOut)
 def archive_package(package_id: int, payload: dict, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     """Update archive status of a package."""
     package = db.get(ReleasePackage, package_id)
@@ -448,6 +485,11 @@ def archive_package(package_id: int, payload: dict, user: User = Depends(get_cur
         val = payload["archive_expires_at"]
         if val:
             package.archive_expires_at = dt.fromisoformat(val.replace("Z", "+00:00"))
+    # Default: 90 days retention when archiving without explicit expiry
+    if package.archive_status == "archived" and not package.archive_expires_at:
+        from datetime import timedelta
+        package.archive_expires_at = utcnow() + timedelta(days=90)
+    ledger.append(db, "package.archived", session_id=package.session_id, actor=user.username, entity_type="release_package", entity_id=package.id, payload={"archive_status": package.archive_status})
     db.commit()
     db.refresh(package)
     return _package_out(package)
@@ -521,6 +563,10 @@ def public_delivery(delivery_token: str, deliverable_id: int, db: Session = Depe
     # Check if package has an unpaid balance_due invoice
     if package.invoice_status == "balance_due" and package.amount_due_cents and package.amount_due_cents > 0:
         raise HTTPException(status.HTTP_402_PAYMENT_REQUIRED, "Payment required")
+    # Deposit gate for public downloads
+    session = db.get(ReviewSession, package.session_id)
+    if session and session.deposit_status == "deposit_due" and session.deposit_due_cents and session.deposit_due_cents > 0:
+        raise HTTPException(status.HTTP_402_PAYMENT_REQUIRED, "Deposit required")
 
     # Find the deliverable by ID within this package
     deliverable = db.get(Deliverable, deliverable_id)
@@ -596,9 +642,22 @@ def public_package_info(delivery_token: str, db: Session = Depends(get_db)):
         deliverables_list = []
         print(f"Error accessing deliverables: {e}")
 
+    session = db.get(ReviewSession, package.session_id)
+    retention_until_str = None
+    share_token = None
+    if session:
+        retention_until_str = session.retention_until.isoformat() if session.retention_until else None
+        share_token = session.share_token
+
     return {
         "id": package.id,
         "approved_label": approved_label,
+        "template": package.template,
+        "archive_status": package.archive_status,
+        "archive_expires_at": package.archive_expires_at.isoformat() if package.archive_expires_at else None,
+        "last_verified_opened_at": package.last_verified_opened_at.isoformat() if package.last_verified_opened_at else None,
+        "retention_until": retention_until_str,
+        "share_token": share_token,
         "deliverables": deliverables_list
     }
 
@@ -609,9 +668,28 @@ def get_manifest(package_id: int, user: User = Depends(get_current_user), db: Se
     if package is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Package not found")
     # Simplified authorization check - in a real app, you'd check session ownership
+    qc_status = "forced" if package.force_locked_reason else ("ready" if package.status == "ready" else "pending")
+    unresolved_warnings = []
+    if package.template:
+        required = []
+        for tpl in RELEASE_TEMPLATES:
+            if tpl["id"] == package.template:
+                required = tpl.get("required_deliverables", [])
+                break
+        delivered = {d.type for d in package.deliverables}
+        for req in required:
+            if req not in delivered:
+                unresolved_warnings.append(f"Missing deliverable: {req}")
+    manifest_data = dict(package.session_manifest) if package.session_manifest else {}
+    manifest_data["qc_status"] = qc_status
+    manifest_data["unresolved_warnings"] = unresolved_warnings
+    if package.force_locked_by:
+        manifest_data["confirmed_by"] = package.force_locked_by
+    elif package.locked_by:
+        manifest_data["confirmed_by"] = package.locked_by
     return {
         "manifest_hash": package.manifest_hash,
-        "manifest_json": package.session_manifest
+        "manifest_json": manifest_data
     }
 
 

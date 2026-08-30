@@ -7,21 +7,22 @@ import {
   CardTitle,
   CardDescription,
   CardContent,
-  CardFooter,
   Button,
   Input,
 } from '../components/ui';
 import {
-  User, Shield, Bell, Database, Key, Save, Check, CreditCard,
-  Globe, Moon, Sun, Palette, Monitor, LogOut, Trash2, Download,
-  Upload, RefreshCw, ExternalLink, Copy, Eye, EyeOff, Smartphone,
-  Mail, MessageSquare, AlertTriangle, Clock, HardDrive, Zap,
-} from 'lucide-react';
-import { colors, radii, typography } from '../components/ui';
+  User as LucideUser,
+  Shield, Bell, Database, Key, Save, Check, CreditCard,
+  Moon, Sun, Palette, Monitor, LogOut, Trash2, Download,
+  Upload, RefreshCw, Copy, Eye, Smartphone,
+  AlertTriangle, HardDrive, Zap,
+} from "lucide-react";
+import type { User } from '../types';
+import { colors, radii, typography, spacing } from '../design-tokens';
 
 // ─── Sidebar nav items ───────────────────────────────────
 const sections = [
-  { id: 'profile', label: 'Profile', icon: <User size={15} />, description: 'Your public identity' },
+  { id: 'profile', label: 'Profile', icon: <LucideUser size={15} />, description: 'Your public identity' },
   { id: 'appearance', label: 'Appearance', icon: <Palette size={15} />, description: 'Theme & display' },
   { id: 'security', label: 'Security', icon: <Shield size={15} />, description: 'Password & 2FA' },
   { id: 'notifications', label: 'Notifications', icon: <Bell size={15} />, description: 'Email & push alerts' },
@@ -34,7 +35,7 @@ const sections = [
 // ─── Main Settings Page ──────────────────────────────────
 export default function SettingsPage() {
   const [activeSection, setActiveSection] = useState('profile');
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [bio, setBio] = useState('');
   const [specialty, setSpecialty] = useState('');
   const [location, setLocation] = useState('');
@@ -55,7 +56,6 @@ export default function SettingsPage() {
   const [notifSound, setNotifSound] = useState(true);
 
   // Security
-  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     api.me().then(u => {
@@ -72,9 +72,9 @@ export default function SettingsPage() {
       const updated = await api.updateProfile({ bio, specialty, location });
       setUser(updated);
       setSaved(true);
-      setTimeout(() => setSaved(false), 2000);
+      window.setTimeout(() => setSaved(false), 2000);
     } catch (err) {
-      console.error(err);
+      window.console.error(err);
     }
   };
 
@@ -104,15 +104,17 @@ export default function SettingsPage() {
                         style={{
                           display: 'flex', alignItems: 'center', gap: '10px',
                           padding: '10px 12px',
-                          borderRadius: 'var(--radius-sm)',
+                          borderRadius: radii.sm,
                           textAlign: 'left',
-                          color: activeSection === s.id ? 'var(--brand-primary)' : 'var(--text-muted)',
+                          color: activeSection === s.id ? colors.brand.primary : colors.text.secondary,
                           fontSize: '14px',
-                          fontWeight: activeSection === s.id ? 600 : 400,
+                          fontWeight: activeSection === s.id ? typography.fontWeight.semiBold : typography.fontWeight.regular,
                           fontFamily: 'inherit',
                           width: '100%',
                           transition: 'all 0.15s',
-                          borderLeft: activeSection === s.id ? '3px solid var(--brand-primary)' : '3px solid transparent',
+                          borderLeft: activeSection === s.id
+                            ? `${radii.sm} solid ${colors.brand.primary}`
+                            : `${radii.sm} solid transparent`,
                         }}
                         onMouseEnter={e => {
                           if (activeSection !== s.id) e.currentTarget.style.background = 'var(--bg-hover)';
@@ -147,37 +149,37 @@ export default function SettingsPage() {
                         </CardHeader>
                         <CardContent>
                           {/* Avatar */}
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '20px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: spacing.xl, marginBottom: spacing['2xl'] }}>
                             <div style={{
-                              width: '72px', height: '72px', borderRadius: '50%',
-                              background: 'var(--brand-muted)', display: 'flex',
+                              width: '72px', height: '72px', borderRadius: radii.full,
+                              background: colors.brand.muted, display: 'flex',
                               alignItems: 'center', justifyContent: 'center', fontSize: '28px',
-                              fontWeight: 700, color: 'var(--brand-primary)',
+                              fontWeight: typography.fontWeight.bold, color: colors.text.secondary,
                             }}>
                               {user?.username?.charAt(0)?.toUpperCase() || '?'}
                             </div>
                             <div>
-                              <div style={{ fontSize: '18px', fontWeight: 700, color: 'var(--text-primary)' }}>
+                              <div style={{ fontSize: typography.fontSize.h2, fontWeight: typography.fontWeight.bold, color: colors.text.primary }}>
                                 @{user?.username || '…'}
                               </div>
-                              <div style={{ fontSize: '14px', color: 'var(--text-muted)' }}>
+                              <div style={{ fontSize: typography.fontSize.body, color: colors.text.muted }}>
                                 Member since {user?.created_at ? new Date(user.created_at).toLocaleDateString() : '…'}
                               </div>
-                              <Button variant="outline" size="sm" style={{ marginTop: '6px', padding: '4px 12px', fontSize: '13px' }}>
+                              <Button variant="outline" size="sm" style={{ marginTop: spacing.sm, padding: `${spacing.xs} ${spacing.md}`, fontSize: typography.fontSize.small }}>
                                 <Upload size={12} /> Change Avatar
                               </Button>
                             </div>
                           </div>
 
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
-                            <label style={{ fontSize: '10px', fontWeight: 500, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Bio</label>
-                            <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '4px' }}>A short description about yourself.</div>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.xs }}>
+                            <label htmlFor="bio" style={{ fontSize: typography.fontSize.small, fontWeight: typography.fontWeight.medium, color: colors.text.secondary, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Bio</label>
+                            <div style={{ fontSize: typography.fontSize.body, color: colors.text.secondary, marginBottom: spacing.sm }}>A short description about yourself.</div>
                             <textarea
                               value={bio}
-                              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setBio(e.target.value)}
+                              onChange={(e) => setBio(e.target.value)}
                               placeholder="Tell us about your work, style, and experience…"
                               rows={4}
-                              style={{ padding: '10px 14px', background: 'var(--bg-elevated)', color: 'var(--text-primary)', border: '1px solid var(--border-default)', borderRadius: 'var(--radius-sm)', fontSize: '14px', fontFamily: 'inherit', resize: 'vertical', lineHeight: 1.5 }}
+                              style={{ padding: `${spacing.md} ${spacing.lg}`, background: colors.bg.elevated, color: colors.text.primary, border: `1px solid ${colors.border.default}`, borderRadius: radii.sm, fontSize: typography.fontSize.body, fontFamily: 'inherit', resize: 'vertical', lineHeight: 1.5 }}
                             />
                           </div>
 
@@ -206,12 +208,12 @@ export default function SettingsPage() {
                             placeholder="https://yourstudio.com"
                           />
 
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '8px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: spacing.md, marginTop: spacing.md }}>
                             <Button variant="primary" onClick={handleSaveProfile}>
                               {saved ? <><Check size={14} /> Saved!</> : <><Save size={14} /> Save Profile</>}
                             </Button>
                             {saved && (
-                              <span style={{ fontSize: '13px', color: 'var(--success)' }}>Profile updated successfully.</span>
+                              <span style={{ fontSize: typography.fontSize.h3, color: colors.success }}>Profile updated successfully.</span>
                             )}
                           </div>
                         </CardContent>
@@ -232,14 +234,14 @@ export default function SettingsPage() {
                           ].map(acc => (
                             <div key={acc.name} style={{
                               display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                              padding: '12px 14px', background: 'var(--bg-primary)', borderRadius: 'var(--radius-sm)',
-                              border: '1px solid var(--border-default)', marginBottom: '8px',
+                              padding: `${spacing.lg} ${spacing.xl}`, background: colors.bg.primary, borderRadius: radii.sm,
+                              border: `1px solid ${colors.border.default}`, marginBottom: spacing.sm,
                             }}>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                <span style={{ fontSize: '20px' }}>{acc.icon}</span>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: `${spacing.md}` }}>
+                                <span style={{ fontSize: typography.fontSize.h1 }}>{acc.icon}</span>
                                 <div>
-                                  <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)' }}>{acc.name}</div>
-                                  <div style={{ fontSize: '13px', color: acc.status === 'Connected' ? 'var(--success)' : 'var(--text-muted)' }}>
+                                  <div style={{ fontSize: typography.fontSize.h3, fontWeight: typography.fontWeight.semiBold, color: colors.text.primary }}>{acc.name}</div>
+                                  <div style={{ fontSize: typography.fontSize.h3, color: acc.status === 'Connected' ? colors.success : colors.text.muted }}>
                                     {acc.status}
                                   </div>
                                 </div>
@@ -268,32 +270,32 @@ export default function SettingsPage() {
                           </CardDescription>
                         </CardHeader>
                         <CardContent>
-                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
-                            {[
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: `${spacing.md}` }}>
+                            {([
                               { id: 'dark', label: 'Dark', icon: <Moon size={18} />, desc: 'Easy on the eyes' },
                               { id: 'light', label: 'Light', icon: <Sun size={18} />, desc: 'Clean and bright' },
-                              { id: 'system', label: 'System', icon: <Monitor size={18} />, desc: 'Follow OS setting' },
-                            ].map(t => (
+                              { id: 'system', label: 'System', icon: <Monitor size={18} />, desc: 'Follow OS setting' }
+                            ] as const).map(t => (
                               <Button
                                 key={t.id}
                                 variant={theme === t.id ? 'outline' : 'ghost'}
                                 size="sm"
-                                onClick={() => setTheme(t.id as any)}
+                                onClick={() => setTheme(t.id)}
                                 style={{
-                                  padding: '16px',
-                                  background: theme === t.id ? 'var(--brand-muted)' : 'var(--bg-primary)',
-                                  border: `2px solid ${theme === t.id ? 'var(--brand-primary)' : 'var(--border-default)'}`,
-                                  borderRadius: 'var(--radius-sm)',
+                                  padding: spacing.xl,
+                                  background: theme === t.id ? colors.brand.muted : colors.bg.primary,
+                                  border: `2px solid ${theme === t.id ? colors.brand.primary : colors.border.default}`,
+                                  borderRadius: radii.sm,
                                   cursor: 'pointer',
                                   textAlign: 'center',
                                   transition: 'all 0.15s',
                                   fontFamily: 'inherit',
                                 }}>
-                                <div style={{ color: theme === t.id ? 'var(--brand-primary)' : 'var(--text-muted)', marginBottom: '6px' }}>
+                                <div style={{ color: theme === t.id ? colors.brand.primary : colors.text.muted, marginBottom: spacing.sm }}>
                                   {t.icon}
                                 </div>
-                                <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)' }}>{t.label}</div>
-                                <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '2px' }}>{t.desc}</div>
+                                <div style={{ fontSize: typography.fontSize.h3, fontWeight: typography.fontWeight.semiBold, color: colors.text.primary }}>{t.label}</div>
+                                <div style={{ fontSize: typography.fontSize.body, color: colors.text.secondary, marginTop: spacing.xs }}>{t.desc}</div>
                               </Button>
                             ))}
                           </div>
@@ -308,12 +310,12 @@ export default function SettingsPage() {
                           </CardDescription>
                         </CardHeader>
                         <CardContent>
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '3px', marginBottom: '8px' }}>
-                            <label style={{ fontSize: '10px', fontWeight: 500, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Base Font Size</label>
-                            <select
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.xs, marginBottom: spacing.sm }}>
+                            <label htmlFor="fontSizeSelect" style={{ fontSize: typography.fontSize.small, fontWeight: typography.fontWeight.medium, color: colors.text.secondary, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Base Font Size</label>
+                            <select id="fontSizeSelect"
                               value={fontSize}
                               onChange={(e) => setFontSize(e.target.value)}
-                              style={{ padding: '6px 10px', background: 'var(--bg-elevated)', color: 'var(--text-primary)', border: '1px solid var(--border-default)', borderRadius: 'var(--radius-sm)', fontSize: '14px' }}
+                              style={{ padding: `${spacing.sm} ${spacing.md}`, background: colors.bg.elevated, color: colors.text.primary, border: `1px solid ${colors.border.default}`, borderRadius: radii.sm, fontSize: typography.fontSize.h3 }}
                             >
                               <option value="12">Small (12px)</option>
                               <option value="14">Default (14px)</option>
@@ -322,19 +324,19 @@ export default function SettingsPage() {
                             </select>
                           </div>
 
-                          <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', borderRadius: 'var(--radius-sm)', cursor: 'pointer' }}>
-                            <span style={{ fontSize: '14px', color: 'var(--text-primary)' }}>Collapse sidebar by default</span>
-                            <input type="checkbox" checked={sidebarCollapsed} onChange={(e) => setSidebarCollapsed(e.target.checked)} style={{ width: '18px', height: '18px', accentColor: 'var(--brand-primary)' }} />
+                          <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: `${spacing.sm} ${spacing.md}`, borderRadius: radii.sm, cursor: 'pointer' }}>
+                            <span style={{ fontSize: typography.fontSize.h3, color: colors.text.primary }}>Collapse sidebar by default</span>
+                            <input type="checkbox" checked={sidebarCollapsed} onChange={(e) => setSidebarCollapsed(e.target.checked)} style={{ width: spacing.xl, height: spacing.xl, accentColor: colors.brand.primary }} />
                           </label>
 
-                          <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', borderRadius: 'var(--radius-sm)', cursor: 'pointer' }}>
-                            <span style={{ fontSize: '14px', color: 'var(--text-primary)' }}>Show waveforms in project cards</span>
-                            <input type="checkbox" checked={true} onChange={() => {}} style={{ width: '18px', height: '18px', accentColor: 'var(--brand-primary)' }} />
+                          <label htmlFor="showWaveformsCheckbox" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: `${spacing.sm} ${spacing.md}`, borderRadius: radii.sm, cursor: 'pointer' }}>
+                            <span style={{ fontSize: typography.fontSize.h3, color: colors.text.primary }}>Show waveforms in project cards</span>
+                            <input type="checkbox" id="showWaveformsCheckbox" checked={true} onChange={() => {}} style={{ width: spacing.xl, height: spacing.xl, accentColor: colors.brand.primary }} />
                           </label>
 
-                          <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', borderRadius: 'var(--radius-sm)', cursor: 'pointer' }}>
-                            <span style={{ fontSize: '14px', color: 'var(--text-primary)' }}>Enable smooth transitions and animations</span>
-                            <input type="checkbox" checked={true} onChange={() => {}} style={{ width: '18px', height: '18px', accentColor: 'var(--brand-primary)' }} />
+                          <label htmlFor="enableAnimationsCheckbox" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: `${spacing.sm} ${spacing.md}`, borderRadius: radii.sm, cursor: 'pointer' }}>
+                            <span style={{ fontSize: typography.fontSize.h3, color: colors.text.primary }}>Enable smooth transitions and animations</span>
+                            <input type="checkbox" id="enableAnimationsCheckbox" checked={true} onChange={() => {}} style={{ width: spacing.xl, height: spacing.xl, accentColor: colors.brand.primary }} />
                           </label>
                         </CardContent>
                       </Card>
@@ -353,27 +355,27 @@ export default function SettingsPage() {
                         </CardHeader>
                         <CardContent>
                           <div style={{
-                            padding: '16px',
-                            background: 'var(--bg-primary)',
-                            borderRadius: 'var(--radius-sm)',
-                            border: '1px solid var(--border-default)',
-                            marginBottom: '12px',
+                            padding: spacing.xl,
+                            background: colors.bg.primary,
+                            borderRadius: radii.sm,
+                            border: `1px solid ${colors.border.default}`,
+                            marginBottom: spacing.lg,
                           }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: spacing.md, marginBottom: spacing.md }}>
                               <div style={{
-                                width: '32px', height: '32px', borderRadius: 'var(--radius-sm)',
+                                width: spacing['3xl'], height: spacing['3xl'], borderRadius: radii.sm,
                                 background: 'var(--success-muted)', display: 'flex',
-                                alignItems: 'center', justifyContent: 'center', color: 'var(--success)',
+                                alignItems: 'center', justifyContent: 'center', color: colors.success,
                               }}>
                                 <Shield size={16} />
                               </div>
                               <div>
-                                <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)' }}>Password Protected</div>
-                                <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Last changed: never</div>
+                                <div style={{ fontSize: typography.fontSize.h3, fontWeight: typography.fontWeight.semiBold, color: colors.text.primary }}>Password Protected</div>
+                                <div style={{ fontSize: typography.fontSize.h3, color: colors.text.secondary }}>Last changed: never</div>
                               </div>
                             </div>
                           </div>
-                          <div style={{ display: 'flex', gap: '8px' }}>
+                          <div style={{ display: 'flex', gap: spacing.md }}>
                             <Button variant="primary">Change Password</Button>
                           </div>
                         </CardContent>
@@ -388,19 +390,19 @@ export default function SettingsPage() {
                         </CardHeader>
                         <CardContent>
                           <div style={{
-                            padding: '16px',
-                            background: 'var(--warning-muted)',
-                            borderRadius: 'var(--radius-sm)',
-                            border: '1px solid var(--warning)',
-                            marginBottom: '12px',
+                            padding: spacing.xl,
+                            background: colors.bg.elevated,
+                            borderRadius: radii.sm,
+                            border: `1px solid ${colors.warning}`,
+                            marginBottom: spacing.lg,
                           }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                              <AlertTriangle size={16} style={{ color: 'var(--warning)' }} />
-                              <div style={{ fontSize: '14px', color: 'var(--warning)', fontWeight: 600 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: spacing.md }}>
+                              <AlertTriangle size={16} style={{ color: colors.warning }} />
+                              <div style={{ fontSize: typography.fontSize.h3, fontWeight: typography.fontWeight.semiBold, color: colors.warning }}>
                                 2FA is not enabled
                               </div>
                             </div>
-                            <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '6px' }}>
+                            <div style={{ fontSize: typography.fontSize.h3, color: colors.text.secondary, marginTop: spacing.sm }}>
                               We strongly recommend enabling two-factor authentication for enhanced security.
                             </div>
                           </div>
@@ -419,33 +421,33 @@ export default function SettingsPage() {
                         </CardHeader>
                         <CardContent>
                           <div style={{
-                            padding: '14px',
-                            background: 'var(--bg-primary)',
-                            borderRadius: 'var(--radius-sm)',
-                            border: '1px solid var(--border-default)',
+                            padding: spacing.md,
+                            background: colors.bg.surface,
+                            borderRadius: radii.md,
+                            border: `1px solid ${colors.border.default}`,
+                            marginBottom: spacing.lg,
                             display: 'flex',
                             justifyContent: 'space-between',
                             alignItems: 'center',
-                            marginBottom: '8px',
                           }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                              <Monitor size={18} style={{ color: 'var(--success)' }} />
+                            <div style={{ display: 'flex', alignItems: 'center', gap: spacing.xs }}>
+                              <Monitor size={18} style={{ color: colors.text.secondary }} />
                               <div>
-                                <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)' }}>
+                                <div style={{ fontSize: typography.fontSize.body, fontWeight: typography.fontWeight.semiBold, color: colors.text.primary }}>
                                   Current Session
                                 </div>
-                                <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
+                                <div style={{ fontSize: typography.fontSize.small, color: colors.text.secondary }}>
                                   Chrome on Windows · Last active: just now
                                 </div>
                               </div>
                             </div>
                             <span style={{
-                              fontSize: '12px',
-                              fontWeight: 600,
-                              padding: '3px 8px',
-                              background: 'var(--success-muted)',
-                              color: 'var(--success)',
-                              borderRadius: '4px',
+                              fontSize: typography.fontSize.small,
+                              fontWeight: typography.fontWeight.semiBold,
+                              padding: `${spacing.xs} ${spacing.sm}`,
+                              background: colors.bg.elevated,
+                              color: colors.text.primary,
+                              borderRadius: radii.sm,
                             }}>
                               Active
                             </span>
@@ -453,7 +455,7 @@ export default function SettingsPage() {
                           <Button
                             variant="outline"
                             size="sm"
-                            style={{ marginTop: '8px', color: 'var(--error)', borderColor: 'var(--error)' }}
+                            style={{ marginTop: spacing.lg, color: colors.text.primary, borderColor: colors.border.default }}
                           >
                             <LogOut size={14} /> Sign out all other sessions
                           </Button>
@@ -469,7 +471,7 @@ export default function SettingsPage() {
                         <CardHeader>
                           <CardTitle>Email Notifications</CardTitle>
                           <CardDescription>
-                            Choose what emails you'd like to receive.
+                            Choose what emails you&apos;d like to receive.
                           </CardDescription>
                         </CardHeader>
                         <CardContent>
@@ -481,13 +483,11 @@ export default function SettingsPage() {
                               { label: 'Invoice Updates', desc: 'Payment confirmations and overdue reminders', checked: notifInvoice, onChange: (v: boolean) => setNotifInvoice(v) },
                               { label: 'Change Orders', desc: 'When a client requests changes', checked: notifChangeOrder, onChange: (v: boolean) => setNotifChangeOrder(v) },
                               { label: 'Weekly Digest', desc: 'Summary of activity across all your sessions', checked: notifDigest, onChange: (v: boolean) => setNotifDigest(v) },
-                            ].map(item => (
-                              <label key={item.label} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', borderRadius: 'var(--radius-sm)', cursor: 'pointer' }}>
-                                <div>
-                                  <div style={{ fontSize: '14px', color: 'var(--text-primary)' }}>{item.label}</div>
-                                  <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>{item.desc}</div>
-                                </div>
-                                <input type="checkbox" checked={item.checked} onChange={(e) => item.onChange(e.target.checked)} style={{ width: '18px', height: '18px', accentColor: 'var(--brand-primary)' }} />
+                            ].map((item, index) => (
+                              <label key={item.label} htmlFor={`notification-${index}`} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', borderRadius: 'var(--radius-sm)', cursor: 'pointer' }}>
+                                <span style={{ fontSize: '14px', color: 'var(--text-primary)' }}>{item.label}</span>
+                                <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>{item.desc}</span>
+                                <input id={`notification-${index}`} type="checkbox" checked={item.checked} onChange={(e) => item.onChange(e.target.checked)} style={{ width: '18px', height: '18px', accentColor: 'var(--brand-primary)' }}/>
                               </label>
                             ))}
                           </div>
@@ -502,13 +502,13 @@ export default function SettingsPage() {
                           </CardDescription>
                         </CardHeader>
                         <CardContent>
-                          <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', borderRadius: 'var(--radius-sm)', cursor: 'pointer' }}>
-                            <div>
-                              <div style={{ fontSize: '14px', color: 'var(--text-primary)' }}>Sound Alerts</div>
-                              <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Play a sound when a notification arrives</div>
-                            </div>
-                            <input type="checkbox" checked={notifSound} onChange={(e) => setNotifSound(e.target.checked)} style={{ width: '18px', height: '18px', accentColor: 'var(--brand-primary)' }} />
-                          </label>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', borderRadius: 'var(--radius-sm)', cursor: 'pointer' }}>
+                            <label htmlFor="sound-alerts-checkbox" style={{ display: 'flex', flexDirection: 'column' }}>
+                              <span style={{ fontSize: '14px', color: 'var(--text-primary)' }}>Sound Alerts</span>
+                              <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Play a sound when a notification arrives</span>
+                            </label>
+                            <input id="sound-alerts-checkbox" type="checkbox" checked={notifSound} onChange={(e) => setNotifSound(e.target.checked)} style={{ width: '18px', height: '18px', accentColor: 'var(--brand-primary)' }} />
+                          </div>
                         </CardContent>
                       </Card>
 
@@ -582,7 +582,7 @@ export default function SettingsPage() {
                             color: 'var(--text-muted)',
                             fontSize: '14px',
                           }}>
-                            No payment history yet. You're on the Free plan.
+                            No payment history yet. You&apos;re on the Free plan.
                           </div>
                         </CardContent>
                       </Card>
@@ -732,9 +732,9 @@ export default function SettingsPage() {
                                 <Copy size={14} />
                               </Button>
                             </div>
-                          </div>
-                          <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
-                            ⚠️ Keep your token secret. Do not share it or commit it to version control.
+                            <div style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
+                              ⚠️ Keep your token secret. Do not share it or commit it to version control.
+                            </div>
                           </div>
                         </CardContent>
                       </Card>

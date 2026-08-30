@@ -1,13 +1,14 @@
 """Public portfolio and engineer profiles."""
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.responses import Response
 from sqlalchemy import select
 from sqlalchemy.orm import Session, joinedload
 
 from ..database import get_db
-from ..models import ReviewSession, User, ReviewVersion
+from ..models import ReleasePackage, ReviewSession, User, ReviewVersion
 from ..schemas import UserOut
 from ..security import get_current_user
-from ..services import catalog, reputation
+from ..services import catalog, reputation, storage, watermark
 
 router = APIRouter(prefix="/api/portfolio", tags=["portfolio"])
 
@@ -45,6 +46,13 @@ def get_portfolio(username: str, db: Session = Depends(get_db)):
                 ).order_by(ReviewVersion.number.desc())
             ).first()
 
+            # Find locked release package for delivery token
+            pkg = db.scalars(
+                select(ReleasePackage).where(
+                    ReleasePackage.session_id == session.id,
+                    ReleasePackage.status == "ready",
+                )
+            ).first()
             tracks.append({
                 "session_id": session.id,
                 "name": session.name,
@@ -56,7 +64,7 @@ def get_portfolio(username: str, db: Session = Depends(get_db)):
                 "approved_version_id": approved_version.id if approved_version else None,
                 "approved_duration_s": approved_version.duration_s if approved_version else None,
                 "approved_at": approved_version.created_at if approved_version else None,
-                "delivery_token": session.share_token,
+                "delivery_token": pkg.delivery_token if pkg else session.share_token,
             })
 
         rep = reputation.compute_reputation(db, user.id)
@@ -68,5 +76,31 @@ def get_portfolio(username: str, db: Session = Depends(get_db)):
             "tracks": tracks,
             "reputation": rep,
         }
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/{username}/preview/{version_id}")
+def portfolio_preview(username: str, version_id: int, db: Session = Depends(get_db)):
+    """Watermarked preview of a version from the public portfolio."""
+    user = db.scalar(select(User).where(User.username == username))
+    if user is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Engineer not found")
+    version = db.get(ReviewVersion, version_id)
+    if version is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Version not found")
+    # Verify the version belongs to a session owned by this user and is portfolio-public
+    session = db.get(ReviewSession, version.session_id)
+    if session is None or session.owner_id != user.id or not session.portfolio_public:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Version not found")
+    # Always serve watermarked preview for portfolio
+    data = storage.read_blob(version.blob_sha)
+    if session.watermark_enabled:
+        data = watermark.watermarked_blob(db, version)
+    return Response(
+        content=data,
+        media_type=f"audio/{version.audio_format}",
+        headers={"Content-Disposition": f'inline; filename="{version.filename}"'},
+    )

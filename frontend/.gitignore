@@ -1,3 +1,6 @@
 .vercel
 .env*
 frontend/src/components/__tests__/**
+
+*storybook.log
+storybook-static

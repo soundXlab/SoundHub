@@ -33,13 +33,20 @@ def client(tmp_path, monkeypatch):
         database, "SessionLocal", sessionmaker(bind=test_engine, autoflush=False, autocommit=False)
     )
     Base.metadata.create_all(bind=test_engine)
+    # Clear any dependency overrides left by other test modules
+    # (e.g. test_project_assets.py sets override_get_db at module level)
+    app.dependency_overrides.clear()
     with TestClient(app) as c:
         yield c
 
 
 def _register(client) -> str:
     r = client.post("/api/auth/register", json={"username": "producer", "password": "secret1"})
-    assert r.status_code == 200
+    if r.status_code == 200:
+        return r.json()["access_token"]
+    # User already exists — fall back to login
+    r = client.post("/api/auth/login", json={"username": "producer", "password": "secret1"})
+    assert r.status_code == 200, f"Login failed: {r.status_code} {r.text}"
     return r.json()["access_token"]
 
 

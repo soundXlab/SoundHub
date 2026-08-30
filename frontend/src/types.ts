@@ -1,7 +1,11 @@
 export interface User {
   id: number;
   username: string;
-  created_at: string;
+  wallet_address: string | null;
+  bio: string;
+  specialty: string;
+  location: string;
+  created_at?: string;
 }
 
 export interface TokenResponse {
@@ -759,3 +763,179 @@ export const DAW_COLORS: Record<string, string> = {
   rpp: "#9b5de5",
   flp: "#39d98a",
 };
+
+export interface WikiPage {
+  id: number;
+  slug: string;
+  title: string;
+  content: string;
+  created_at: string;
+  updated_at: string;
+  author: User; // Assuming a User made the change
+}
+
+export interface WikiRevision {
+  id: number;
+  wiki_page_id: number;
+  version: number;
+  title: string;
+  content: string;
+  created_at: string;
+  author: User;
+}
+
+export interface Sprint {
+  id: number;
+  name: string;
+  goal?: string;
+  state: string; // e.g., 'todo', 'in_progress', 'done'
+  start_date?: string;
+  end_date?: string;
+  created_at: string;
+}
+
+export interface Retrospective {
+  id: number;
+  session_id: number;
+  notes: string;
+  created_at: string;
+}
+
+export interface RetroItem {
+  id: number;
+  category: 'went_well' | 'to_improve' | 'action_item';
+  content: string;
+  votes: number;
+}
+
+export interface TestPlan {
+  id: number;
+  session_id: number;
+  title: string;
+  description: string;
+  created_at: string;
+}
+
+export interface TestRun {
+  id: number;
+  name: string;
+  state: string; // e.g., 'pending', 'running', 'completed'
+  total: number;
+  passed: number;
+  failed: number;
+  started_at?: string;
+  completed_at?: string;
+}
+
+export interface KanbanBoard {
+  id: number;
+  name: string;
+}
+
+export interface Task {
+  id: number;
+  title: string;
+  type: string; // e.g., 'task', 'bug', 'feature', 'question'
+  priority: string; // e.g., 'low', 'medium', 'high', 'critical'
+  status: string; // e.g., 'todo', 'in_progress', 'done'
+}
+
+export interface PullRequest {
+  id: number;
+  title: string;
+  source_branch: string;
+  target_branch: string;
+  status: string; // e.g., 'open', 'closed', 'merged'
+}
+
+export interface Milestone {
+  id: number;
+  title: string;
+  status: string;
+  due_date?: string;
+  task_count: number;
+}
+
+export interface Epic {
+  id: number;
+  title: string;
+  status: string;
+  color?: string;
+  task_count: number;
+}
+
+export interface Discussion {
+  id: number;
+  title: string;
+  category: string;
+  pinned: boolean;
+}
+
+export interface Workflow {
+  id: number;
+  name: string;
+  filename: string;
+  enabled: boolean;
+}
+
+export interface Tag {
+  id: number;
+  name: string;
+  is_release: boolean;
+  message?: string;
+}
+
+export interface ArtifactFeed {
+  id: number;
+  name: string;
+  type: string;
+  visibility: string;
+}
+
+export interface Incident {
+  id: number;
+  title: string;
+  severity: string; // e.g., 'critical', 'major', 'minor'
+  status: string;
+}
+
+export interface FeatureFlag {
+  id: number;
+  name: string;
+  description?: string;
+  enabled: boolean;
+}
+
+export interface Objective {
+  id: number;
+  title: string;
+  period: string;
+  progress: number; // percentage
+  key_results: KeyResult[];
+}
+
+export interface KeyResult {
+  id: number;
+  title: string;
+  current: number;
+  target: number;
+  unit: string;
+}
+
+export interface StatusPageData {
+  components: Component[];
+  incidents: Incident[];
+}
+
+export interface Component {
+  id: number;
+  name: string;
+  status: string; // e.g., 'operational', 'degraded', 'partial_outage', 'major_outage'
+}
+
+export interface TimeEntry {
+  id: number;
+  hours: number;
+  description: string;
+  date: string;
+}

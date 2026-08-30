@@ -1559,6 +1559,258 @@ def trigger_storage_lifecycle(
     }
 
 
+# ── Project-Aware Sound Library ────────────────────────────────────────────────
+
+@router.get("/{project_id}/sounds", response_model=list[dict])
+def get_project_sounds(
+    project_id: int,
+    q: str = Query("", description="Search query"),
+    genre: str = Query("", description="Filter by genre"),
+    key: str = Query("", description="Filter by key"),
+    license: str = Query("", description="Filter by license"),
+    format: str = Query("", description="Filter by format"),
+    plugin: str = Query("", description="Filter by plugin"),
+    bpm_min: str = Query("", description="Minimum BPM"),
+    bpm_max: str = Query("", description="Maximum BPM"),
+    limit: int = Query(50, ge=1, le=100),
+    offset: int = Query(0, ge=0),
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Browse sounds in context of specific project with filtering."""
+    project = _get_project(db, project_id, user)
+
+    # Import here to avoid circular imports
+    from ..services.project_assets import get_project_assets
+    from ..services.catalog import list_assets
+
+    # Get assets used in this project
+    project_assets = get_project_assets(
+        db,
+        project_id,
+        skip=offset,
+        limit=limit,
+        filters={
+            "q": q if q else None,
+            "genre": genre if genre else None,
+            "key": key if key else None,
+            "license": license if license else None,
+            "format": format if format else None,
+            "plugin": plugin if plugin else None,
+            "bpmMin": bpm_min if bpm_min else None,
+            "bpmMax": bpm_max if bpm_max else None,
+        } if any([q, genre, key, license, format, plugin, bpm_min, bpm_max]) else None
+    )
+
+    # Format response to match CatalogAsset structure
+    results = []
+    for asset in project_assets:
+        pkg = asset.package
+        results.append({
+            "listing_id": pkg.id,
+            "name": pkg.name,
+            "assetUri": f"ipfs://{pkg.content_hash}" if pkg.content_hash else "",
+            "price": 0,  # Project assets are free to use within project
+            "license": pkg.license,
+            "active": True,
+            "seller": "",
+            "buyer": user.wallet_address or "",
+            "escrowed": 0,
+            "released": False,
+            # Additional metadata for frontend
+            "author": pkg.author or "Unknown Artist",
+            "bmprange": [pkg.bpm_min, pkg.bpm_max] if hasattr(pkg, 'bpm_min') and pkg.bpm_min else [0, 0],
+            "key": pkg.key or "",
+            "genres": pkg.genres or [],
+            "format": pkg.format or "",
+            "plugins": pkg.plugins or [],
+            "durationSeconds": pkg.duration_seconds or 0,
+            "waveform": pkg.waveform or [],
+            # Project-specific metadata
+            "inProject": True,
+            "usageCount": len([a for a in project_assets if a.package_id == pkg.id]),
+            "licenseStatus": "licensed" if pkg.license > 0 else "proprietary"
+        })
+
+    return results
+
+
+@router.get("/{project_id}/sounds/recommend", response_model=list[dict])
+def get_project_sound_recommendations(
+    project_id: int,
+    limit: int = Query(20, ge=1, le=50),
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Get context-aware sound recommendations based on project metadata."""
+    project = _get_project(db, project_id, user)
+
+    from ..services.project_assets import get_context_aware_recommendations
+
+    recommendations = get_context_aware_recommendations(db, project_id, limit=limit)
+
+    # Format response to match CatalogAsset structure
+    results = []
+    for pkg in recommendations:
+        results.append({
+            "listing_id": pkg.id,
+            "name": pkg.name,
+            "assetUri": f"ipfs://{pkg.content_hash}" if pkg.content_hash else "",
+            "price": pkg.price or 0,
+            "license": pkg.license,
+            "active": True,
+            "seller": pkg.seller_address or "",
+            "buyer": "",
+            "escrowed": 0,
+            "released": False,
+            # Additional metadata for frontend
+            "author": pkg.author or "Unknown Artist",
+            "bmprange": [pkg.bpm_min, pkg.bpm_max] if hasattr(pkg, 'bpm_min') and pkg.bpm_min else [0, 0],
+            "key": pkg.key or "",
+            "genres": pkg.genres or [],
+            "format": pkg.format or "",
+            "plugins": pkg.plugins or [],
+            "durationSeconds": pkg.duration_seconds or 0,
+            "waveform": pkg.waveform or [],
+            # Recommendation metadata
+            "inProject": False,
+            "reason": "Context-aware recommendation based on project's existing assets"
+        })
+
+    return results
+
+
+@router.get("/{project_id}/assets", response_model=list[dict])
+def get_project_dependencies(
+    project_id: int,
+    limit: int = Query(100, ge=1, le=500),
+    offset: int = Query(0, ge=0),
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """List project dependencies (assets used in project)."""
+    project = _get_project(db, project_id, user)
+
+    from ..services.project_assets import get_project_assets
+
+    project_assets = get_project_assets(db, project_id, skip=offset, limit=limit)
+
+    # Format response
+    results = []
+    for asset in project_assets:
+        pkg = asset.package
+        results.append({
+            "assetId": asset.id,
+            "packageId": pkg.id,
+            "name": pkg.name,
+            "assetUri": f"ipfs://{pkg.content_hash}" if pkg.content_hash else "",
+            "price": pkg.price or 0,
+            "license": pkg.license,
+            "author": pkg.author or "Unknown Artist",
+            "bmprange": [pkg.bpm_min, pkg.bpm_max] if hasattr(pkg, 'bpm_min') and pkg.bpm_min else [0, 0],
+            "key": pkg.key or "",
+            "genres": pkg.genres or [],
+            "format": pkg.format or "",
+            "plugins": pkg.plugins or [],
+            "durationSeconds": pkg.duration_seconds or 0,
+            "waveform": pkg.waveform or [],
+            # Usage metadata
+            "firstUsedAt": asset.created_at.isoformat() if asset.created_at else "",
+            "lastUsedAt": asset.updated_at.isoformat() if asset.updated_at else "",
+            "usageCount": len([a for a in project_assets if a.package_id == pkg.id]),
+            "licenseStatus": "licensed" if pkg.license > 0 else "proprietary"
+        })
+
+    return results
+
+
+@router.post("/{project_id}/assets", response_model=dict)
+def add_asset_to_project_endpoint(
+    project_id: int,
+    asset_id: int = Form(...),
+    commit_message: str = Form(""),
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Add asset to project dependencies."""
+    project = _get_project(db, project_id, user)
+
+    from ..services.project_assets import add_asset_to_project
+
+    try:
+        commit = add_asset_to_project(
+            db,
+            project_id,
+            asset_id,
+            user.id,
+            commit_message if commit_message else None
+        )
+
+        return {
+            "success": True,
+            "commitId": commit.id,
+            "message": "Asset added to project",
+            "commitMessage": commit.message
+        }
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Failed to add asset to project")
+
+
+@router.delete("/{project_id}/assets/{asset_id}", response_model=dict)
+def remove_asset_from_project_endpoint(
+    project_id: int,
+    asset_id: int,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Remove asset from project dependencies."""
+    project = _get_project(db, project_id, user)
+
+    from ..services.project_assets import remove_asset_from_project
+
+    try:
+        success = remove_asset_from_project(db, project_id, asset_id, user.id)
+
+        if success:
+            return {
+                "success": True,
+                "message": "Asset removed from project"
+            }
+        else:
+            raise HTTPException(status_code=404, detail="Asset not found in project")
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Failed to remove asset from project")
+
+
+@router.post("/{project_id}/release/preflight", response_model=dict)
+def release_preflight_check(
+    project_id: int,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Check dependency resolution and license validation before release."""
+    project = _get_project(db, project_id, user)
+
+    from ..services.project_assets import check_asset_licenses_for_release
+
+    result = check_asset_licenses_for_release(db, project_id)
+
+    return {
+        "projectId": project_id,
+        "projectName": project.name,
+        "validForRelease": result["valid"],
+        "issues": result["issues"],
+        "warnings": result["warnings"],
+        "assetDetails": result["asset_details"],
+        "totalAssetsChecked": result["total_assets"],
+        "checkedAt": result["checked_at"]
+    }
+
+
 def _dawinfo_to_dict(info) -> dict | None:
     """Convert DAWInfo dataclass to a plain dict for diff_engine."""
     if info is None:

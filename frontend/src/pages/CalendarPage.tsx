@@ -10,7 +10,7 @@ import {
   CardContent,
   Button,
 } from '../components/ui';
-import { Calendar, ChevronLeft, ChevronRight, Clock, FileAudio, MessageSquare, Check, Folder, AlertCircle, RefreshCw } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Clock, FileAudio, MessageSquare, Check, Folder, AlertCircle, RefreshCw, Calendar } from 'lucide-react';
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];

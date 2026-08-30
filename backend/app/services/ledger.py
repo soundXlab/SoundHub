@@ -126,9 +126,15 @@ def verify_history(db: Session, session_id: int | None = None, package_id: int |
 
         # If the stored hash doesn't match what it should be, the chain is broken
         if e.event_hash != expected_hash:
-            return {"valid": False, "total": len(events), "broken_at": e.id, "broken_event": e.event}
+            return {
+                "valid": False,
+                "total": len(events),
+                "broken_at": e.id,
+                "broken_event": e.event,
+                "problems": [f"Event {e.id} ({e.event}): hash mismatch"],
+            }
 
         # Update prev_hash for next iteration
         prev_hash = e.event_hash
 
-    return {"valid": True, "total": len(events), "broken_at": None, "head_hash": events[-1].event_hash}
+    return {"valid": True, "total": len(events), "broken_at": None, "head_hash": events[-1].event_hash, "problems": []}

@@ -608,15 +608,28 @@ def test_decision_ledger_hash_chain(client):
     assert len(events) >= 4
     assert r.json()["head_hash"]
 
-    # each event is chained: hash = sha256(prev_hash + canonical payload)
+    # each event is chained: hash = sha256(full canonical payload)
     import hashlib
     import json as _json
 
     prev = None
     for e in events:
-        canonical = _json.dumps(e["payload"], sort_keys=True, separators=(",", ":")).encode()
-        expected = hashlib.sha256((prev or "").encode() + canonical).hexdigest()
-        assert e["event_hash"] == expected
+        # Recompute canonical matching the ledger service format
+        canonical = _json.dumps(
+            {
+                "event": e["event"],
+                "actor": e["actor"],
+                "entity_type": e["entity_type"],
+                "entity_id": e["entity_id"],
+                "payload": e["payload"],
+                "occurred_at": e["occurred_at"],
+                "prev_event_hash": prev,
+            },
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode()
+        expected = hashlib.sha256(canonical).hexdigest()
+        assert e["event_hash"] == expected, f"Hash mismatch at event {e['event']}"
         assert e["prev_event_hash"] == prev
         prev = e["event_hash"]
 
