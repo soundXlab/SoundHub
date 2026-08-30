@@ -7,240 +7,422 @@
   <link rel="stylesheet" href="design-system/shared.css">
   <style>
     * { margin:0; padding:0; box-sizing:border-box; }
-    body { font-family:'Inter',-apple-system,'Segoe UI',sans-serif; background:#1a1a1a; color:#b0b0b0; overflow:hidden; height:100vh; font-size:11px; user-select:none; }
+    body { font-family:'Inter',-apple-system,'Segoe UI',sans-serif; background:#333; color:#bbb; overflow:hidden; height:100vh; font-size:11px; user-select:none; }
 
-    /* ── Ableton Transport Bar ── */
+    /* ── Ableton-style Transport Bar ── */
     .transport {
-      height:30px; background:#2a2a2a; border-bottom:1px solid #3a3a3a;
-      display:flex; align-items:center; padding:0 8px; gap:8px;
+      height:26px; background:#3a3a3a; border-bottom:1px solid #444;
+      display:flex; align-items:center; padding:0 6px; gap:6px;
     }
-    .transport-left { display:flex; align-items:center; gap:6px; }
+    .transport-link { font-size:9px; color:#999; cursor:pointer; text-decoration:underline; }
     .transport-btn {
-      width:20px; height:20px; border-radius:3px; display:flex;
-      align-items:center; justify-content:center; font-size:10px;
-      background:#333; border:1px solid #444; cursor:pointer; color:#888;
+      width:18px; height:18px; border-radius:2px; display:flex; align-items:center;
+      justify-content:center; font-size:9px; background:#444; border:1px solid #555;
+      cursor:pointer; color:#aaa; transition:all 0.1s;
     }
-    .transport-btn:hover { background:#444; color:#ccc; }
+    .transport-btn:hover { background:#555; color:#ddd; }
     .transport-btn.active { background:#4a9eff; border-color:#4a9eff; color:#fff; }
     .transport-btn.record { color:#ff4444; }
-    .transport-divider { width:1px; height:16px; background:#3a3a3a; }
+    .transport-divider { width:1px; height:14px; background:#555; }
     .transport-display {
-      background:#1a1a1a; border:1px solid #333; border-radius:3px;
-      padding:1px 6px; font-family:'JetBrains Mono',monospace; font-size:11px;
-      color:#4a9eff; font-weight:600; min-width:50px; text-align:center;
+      background:#2a2a2a; border:1px solid #555; border-radius:2px;
+      padding:0 5px; font-family:'JetBrains Mono',monospace; font-size:11px;
+      color:#6ee7ff; font-weight:700; min-width:40px; text-align:center;
+      line-height:18px;
     }
-    .transport-label { font-size:9px; color:#666; text-transform:uppercase; letter-spacing:0.5px; }
+    .transport-label { font-size:8px; color:#777; text-transform:uppercase; letter-spacing:0.3px; }
     .transport-spacer { flex:1; }
-    .transport-right { display:flex; align-items:center; gap:6px; }
+    .transport-info { font-size:9px; color:#777; font-family:monospace; }
 
     /* ── Main Layout ── */
-    .app-layout { display:flex; height:calc(100vh - 30px); }
+    .app-layout { display:flex; height:calc(100vh - 26px); }
 
     /* ── Browser Panel (left) ── */
     .browser {
-      width:220px; background:#2a2a2a; border-right:1px solid #3a3a3a;
-      display:flex; flex-direction:column;
+      width:210px; background:#3a3a3a; border-right:1px solid #444;
+      display:flex; flex-direction:column; flex-shrink:0;
     }
     .browser-search {
-      padding:4px 6px; border-bottom:1px solid #3a3a3a;
+      padding:3px 5px; border-bottom:1px solid #444;
     }
     .browser-search input {
-      width:100%; background:#1a1a1a; border:1px solid #333; border-radius:3px;
-      padding:3px 6px 3px 22px; font-size:10px; color:#b0b0b0; outline:none;
-      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");
-      background-repeat:no-repeat; background-position:6px center;
+      width:100%; background:#2a2a2a; border:1px solid #555; border-radius:2px;
+      padding:2px 5px 2px 18px; font-size:10px; color:#bbb; outline:none;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23777' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");
+      background-repeat:no-repeat; background-position:5px center;
     }
-    .browser-nav { flex:1; overflow-y:auto; padding:2px 0; }
+    .browser-nav { flex:1; overflow-y:auto; padding:1px 0; }
     .browser-section {
-      padding:4px 8px 2px; font-size:9px; color:#666;
-      text-transform:uppercase; letter-spacing:0.8px; font-weight:700;
+      padding:4px 6px 2px; font-size:8px; color:#888;
+      text-transform:uppercase; letter-spacing:0.6px; font-weight:700;
     }
     .browser-item {
-      padding:3px 8px; font-size:10px; color:#999; cursor:pointer;
-      display:flex; align-items:center; gap:6px; transition:all 0.1s;
+      padding:2px 6px; font-size:10px; color:#aaa; cursor:pointer;
+      display:flex; align-items:center; gap:5px; transition:all 0.1s;
+      line-height:1.4;
     }
-    .browser-item:hover { color:#ddd; background:rgba(255,255,255,0.03); }
-    .browser-item.active { color:#4a9eff; background:rgba(74,158,255,0.08); }
-    .browser-item .icon { width:14px; text-align:center; font-size:10px; }
-    .browser-item .count { margin-left:auto; font-size:8px; color:#555; font-family:monospace; }
-    .browser-sub { padding-left:16px; }
-    .browser-divider { height:1px; background:#3a3a3a; margin:4px 6px; }
+    .browser-item:hover { color:#ddd; background:rgba(255,255,255,0.04); }
+    .browser-item.active { color:#ea5808; background:rgba(234,88,8,0.1); }
+    .browser-item .icon { width:12px; text-align:center; font-size:9px; }
+    .browser-item .count { margin-left:auto; font-size:7px; color:#666; font-family:monospace; }
+    .browser-sub { padding-left:14px; }
+    .browser-sub-sub { padding-left:28px; font-size:9px; }
+    .browser-divider { height:1px; background:#444; margin:3px 5px; }
+
+    /* Content filter bar */
+    .browser-filters { padding:3px 5px; border-bottom:1px solid #444; display:flex; gap:3px; flex-wrap:wrap; }
+    .browser-filter-chip {
+      padding:1px 5px; border-radius:2px; font-size:8px; font-weight:600;
+      background:#444; color:#999; cursor:pointer; border:none;
+    }
+    .browser-filter-chip:hover { background:#555; color:#ccc; }
+    .browser-filter-chip.active { background:#ea5808; color:#fff; }
+
+    /* Results */
+    .browser-results { border-top:1px solid #444; }
+    .browser-result-item {
+      padding:2px 6px; font-size:10px; color:#aaa; cursor:pointer;
+      display:flex; align-items:center; gap:5px; transition:all 0.1s;
+    }
+    .browser-result-item:hover { color:#ddd; background:rgba(255,255,255,0.04); }
+    .browser-result-item.selected { color:#ea5808; background:rgba(234,88,8,0.08); }
+    .browser-result-name { flex:1; }
+    .browser-result-size { font-size:8px; color:#666; font-family:monospace; }
 
     /* ── Center Content ── */
     .center { flex:1; display:flex; flex-direction:column; overflow:hidden; }
 
-    /* ── Session View (clips grid) ── */
-    .session-view { flex:1; display:flex; overflow:hidden; }
+    /* ── Session View (top) ── */
+    .session-view {
+      flex:1; display:flex; overflow:hidden; background:#333;
+    }
     .session-tracks { flex:1; display:flex; overflow-x:auto; }
     .track {
-      min-width:100px; border-right:1px solid #333; display:flex; flex-direction:column;
+      min-width:90px; border-right:1px solid #444; display:flex; flex-direction:column;
     }
     .track-header {
-      height:80px; background:#2a2a2a; border-bottom:1px solid #333;
-      padding:6px 8px; display:flex; flex-direction:column; justify-content:space-between;
+      height:90px; background:#3a3a3a; border-bottom:1px solid #444;
+      padding:4px 5px; display:flex; flex-direction:column; font-size:9px;
     }
-    .track-name { font-size:10px; font-weight:600; color:#ccc; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .track-controls { display:flex; gap:4px; }
+    .track-header-top {
+      display:flex; align-items:center; justify-content:space-between;
+      margin-bottom:3px;
+    }
+    .track-name { font-size:10px; font-weight:600; color:#ddd; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .track-controls { display:flex; gap:3px; }
     .track-btn {
-      width:16px; height:16px; border-radius:2px; font-size:8px;
+      width:14px; height:14px; border-radius:2px; font-size:7px; font-weight:700;
       display:flex; align-items:center; justify-content:center;
-      background:#333; border:1px solid #444; cursor:pointer; color:#888;
+      background:#444; border:1px solid #555; cursor:pointer; color:#999;
     }
-    .track-btn:hover { background:#444; }
+    .track-btn:hover { background:#555; }
     .track-btn.solo { color:#4a9eff; }
     .track-btn.mute { color:#eab308; }
     .track-btn.record { color:#ff4444; }
+    .track-routing { margin-top:auto; }
+    .track-routing-row {
+      display:flex; justify-content:space-between; font-size:7px; color:#777;
+      padding:1px 0; border-top:1px solid #444;
+    }
+    .track-routing-label { color:#666; }
+    .track-routing-value { color:#999; font-family:monospace; }
+
+    /* Monitor section */
+    .track-monitor {
+      display:flex; gap:1px; margin-top:2px;
+    }
+    .monitor-btn {
+      flex:1; padding:1px 0; text-align:center; font-size:7px; font-weight:700;
+      background:#333; border:1px solid #444; color:#666; cursor:pointer;
+    }
+    .monitor-btn.active { background:#ea5808; color:#fff; border-color:#ea5808; }
+
     .clips-column { flex:1; display:flex; flex-direction:column; }
     .clip-slot {
-      height:20px; border-bottom:1px solid #222; cursor:pointer;
-      display:flex; align-items:center; padding:0 4px; font-size:9px;
+      height:18px; border-bottom:1px solid #2a2a2a; cursor:pointer;
+      display:flex; align-items:center; padding:0 3px; font-size:8px;
       transition:background 0.1s;
     }
-    .clip-slot:hover { background:rgba(255,255,255,0.03); }
+    .clip-slot:hover { background:rgba(255,255,255,0.04); }
     .clip {
-      width:100%; height:14px; border-radius:2px; padding:0 4px;
-      font-size:8px; line-height:14px; white-space:nowrap; overflow:hidden;
+      width:100%; height:12px; border-radius:1px; padding:0 3px;
+      font-size:7px; line-height:12px; white-space:nowrap; overflow:hidden;
       cursor:pointer; transition:filter 0.1s;
     }
-    .clip:hover { filter:brightness(1.2); }
-    .clip-green { background:#2d8a4e; color:#a8e6c3; }
-    .clip-yellow { background:#b8860b; color:#ffeaa7; }
-    .clip-orange { background:#c0600a; color:#ffcc80; }
-    .clip-red { background:#a03030; color:#ffb3b3; }
+    .clip:hover { filter:brightness(1.15); }
+    .clip-green { background:#3a8a5e; color:#b8e6c3; }
+    .clip-yellow { background:#b8960b; color:#ffeaa7; }
+    .clip-orange { background:#c06a0a; color:#ffcc80; }
+    .clip-red { background:#a03535; color:#ffb3b3; }
     .clip-blue { background:#2a6090; color:#b3d9ff; }
     .clip-purple { background:#6a3090; color:#d9b3ff; }
     .clip-cyan { background:#1a7070; color:#b3e6e6; }
     .clip-empty { background:transparent; }
 
-    /* ── Mixer ── */
+    /* Scene launch buttons */
+    .scene-launch {
+      display:flex; flex-direction:column; border-left:1px solid #444; width:28px;
+      background:#3a3a3a; flex-shrink:0;
+    }
+    .scene-btn {
+      height:18px; display:flex; align-items:center; justify-content:center;
+      font-size:8px; color:#888; cursor:pointer; border-bottom:1px solid #2a2a2a;
+      transition:all 0.1s;
+    }
+    .scene-btn:hover { background:rgba(255,255,255,0.05); color:#ddd; }
+
+    /* ── Mixer Section ── */
     .mixer {
-      height:120px; background:#2a2a2a; border-top:1px solid #3a3a3a;
+      height:115px; background:#3a3a3a; border-top:1px solid #444;
       display:flex; overflow-x:auto;
     }
     .mixer-channel {
-      min-width:100px; border-right:1px solid #333; padding:6px 8px;
-      display:flex; flex-direction:column; align-items:center; gap:4px;
+      min-width:90px; border-right:1px solid #444; padding:4px 5px;
+      display:flex; flex-direction:column; align-items:center; gap:2px;
     }
-    .mixer-label { font-size:8px; color:#666; text-transform:uppercase; letter-spacing:0.5px; }
+    .mixer-label { font-size:7px; color:#777; text-transform:uppercase; letter-spacing:0.3px; }
+    .mixer-routing {
+      font-size:7px; color:#666; text-align:center; line-height:1.3;
+    }
+    .mixer-monitor {
+      display:flex; gap:1px;
+    }
+    .mixer-monitor-btn {
+      padding:0 3px; font-size:6px; font-weight:700; background:#333;
+      border:1px solid #444; color:#666; cursor:pointer;
+    }
+    .mixer-monitor-btn.active { background:#ea5808; color:#fff; border-color:#ea5808; }
+    .mixer-audio-to {
+      font-size:7px; color:#666; margin-top:1px;
+    }
+    .mixer-sends {
+      display:flex; gap:2px; margin-top:2px;
+    }
+    .mixer-send-knob {
+      width:18px; height:18px; border-radius:50%; background:#2a2a2a;
+      border:2px solid #555; position:relative; cursor:pointer;
+    }
+    .mixer-send-knob::after {
+      content:''; position:absolute; width:2px; height:6px;
+      background:#ea5808; top:2px; left:50%; transform:translateX(-50%);
+      border-radius:1px;
+    }
+    .mixer-send-label { font-size:6px; color:#666; text-align:center; }
+
+    .mixer-fader-area {
+      display:flex; align-items:flex-end; gap:3px; height:45px;
+    }
     .mixer-fader-track {
-      width:6px; height:60px; background:#1a1a1a; border-radius:3px;
+      width:8px; height:45px; background:#2a2a2a; border-radius:3px;
       position:relative; cursor:pointer;
     }
     .mixer-fader-fill { position:absolute; bottom:0; width:100%; background:#4a9eff; border-radius:3px; }
     .mixer-fader-knob {
-      position:absolute; width:14px; height:8px; background:#ccc;
-      border:1px solid #888; border-radius:2px; left:-4px;
-      cursor:grab;
+      position:absolute; width:16px; height:6px; background:#ccc;
+      border:1px solid #888; border-radius:2px; left:-4px; cursor:grab;
     }
     .mixer-meter {
-      width:4px; height:40px; background:#1a1a1a; border-radius:2px;
+      width:4px; height:45px; background:#2a2a2a; border-radius:2px;
       position:relative; overflow:hidden;
     }
     .mixer-meter-fill { position:absolute; bottom:0; width:100%; border-radius:2px; }
-    .mixer-send { font-size:8px; color:#555; font-family:monospace; }
-    .mixer-pan { font-size:8px; color:#666; font-family:monospace; }
-    .mixer-solo-btn {
-      width:14px; height:14px; border-radius:2px; font-size:7px;
-      display:flex; align-items:center; justify-content:center;
-      background:#333; color:#4a9eff; cursor:pointer;
+    .mixer-pan-knob {
+      width:22px; height:22px; border-radius:50%; background:#2a2a2a;
+      border:2px solid #555; position:relative; cursor:pointer; margin-top:2px;
     }
-    .mixer-mute-btn {
-      width:14px; height:14px; border-radius:2px; font-size:7px;
-      display:flex; align-items:center; justify-content:center;
-      background:#333; color:#eab308; cursor:pointer;
-    }
-
-    /* ── Device Chain (bottom) ── */
-    .device-chain {
-      height:100px; background:#2a2a2a; border-top:1px solid #3a3a3a;
-      display:flex; align-items:stretch; padding:0 8px; gap:2px;
-    }
-    .device {
-      background:#333; border:1px solid #444; border-radius:3px;
-      padding:6px 10px; min-width:120px; cursor:pointer;
-      display:flex; flex-direction:column; transition:all 0.1s;
-    }
-    .device:hover { border-color:#555; }
-    .device.active { border-color:#4a9eff; background:rgba(74,158,255,0.08); }
-    .device-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:4px; }
-    .device-name { font-size:9px; font-weight:600; color:#ccc; }
-    .device-toggle {
-      width:10px; height:10px; border-radius:50%; background:#444; cursor:pointer;
-    }
-    .device-toggle.on { background:#4a9eff; box-shadow:0 0 4px rgba(74,158,255,0.5); }
-    .device-params { display:flex; gap:6px; flex-wrap:wrap; }
-    .device-knob {
-      display:flex; flex-direction:column; align-items:center; gap:2px;
-    }
-    .knob-ring {
-      width:24px; height:24px; border-radius:50%; background:#1a1a1a;
-      border:2px solid #555; position:relative; cursor:pointer;
-    }
-    .knob-ring::after {
-      content:''; position:absolute; width:2px; height:8px;
-      background:#4a9eff; top:2px; left:50%; transform:translateX(-50%);
+    .mixer-pan-knob::after {
+      content:''; position:absolute; width:2px; height:7px;
+      background:#bbb; top:2px; left:50%; transform:translateX(-50%);
       border-radius:1px;
     }
-    .knob-label { font-size:7px; color:#666; }
-    .knob-value { font-size:8px; color:#999; font-family:monospace; }
+    .mixer-pan-label { font-size:6px; color:#666; text-align:center; font-family:monospace; }
+    .mixer-solo-btn {
+      width:14px; height:14px; border-radius:2px; font-size:7px; font-weight:700;
+      display:flex; align-items:center; justify-content:center;
+      background:#444; color:#4a9eff; cursor:pointer;
+    }
+    .mixer-mute-btn {
+      width:14px; height:14px; border-radius:2px; font-size:7px; font-weight:700;
+      display:flex; align-items:center; justify-content:center;
+      background:#444; color:#eab308; cursor:pointer;
+    }
 
-    /* ── Detail View (bottom-right) ── */
+    /* ── Device Chain / Detail View (bottom) ── */
     .detail-view {
-      width:300px; background:#2a2a2a; border-left:1px solid #3a3a3a;
-      padding:8px; overflow-y:auto;
+      height:130px; background:#3a3a3a; border-top:1px solid #444;
+      display:flex; overflow:hidden;
     }
-    .detail-title { font-size:10px; font-weight:700; color:#ccc; margin-bottom:8px; }
-    .detail-row { display:flex; justify-content:space-between; padding:3px 0; font-size:9px; border-bottom:1px solid #2a2a2a; }
-    .detail-label { color:#666; }
-    .detail-value { color:#b0b0b0; font-family:monospace; }
-    .detail-tags { display:flex; gap:3px; flex-wrap:wrap; margin-top:6px; }
-    .detail-tag {
-      padding:1px 5px; background:#333; border-radius:2px; font-size:8px;
-      color:#888;
+    .detail-left {
+      width:280px; border-right:1px solid #444; padding:6px 8px;
+      display:flex; flex-direction:column; gap:3px;
     }
+    .detail-clip-info {
+      display:flex; gap:6px; align-items:center; padding-bottom:4px;
+      border-bottom:1px solid #444; margin-bottom:4px;
+    }
+    .detail-clip-name { font-size:11px; font-weight:700; color:#ddd; }
+    .detail-clip-meta { font-size:8px; color:#777; }
+    .detail-row {
+      display:flex; align-items:center; gap:4px; font-size:9px;
+    }
+    .detail-row-label { color:#777; width:50px; font-size:8px; }
+    .detail-row-value {
+      background:#2a2a2a; border:1px solid #555; border-radius:2px;
+      padding:1px 5px; font-family:monospace; font-size:9px; color:#bbb;
+      min-width:30px; text-align:center;
+    }
+    .detail-row-value.active { background:#ea5808; color:#fff; border-color:#ea5808; }
+    .detail-btn {
+      padding:2px 8px; background:#444; border:1px solid #555; border-radius:2px;
+      font-size:8px; color:#999; cursor:pointer;
+    }
+    .detail-btn:hover { background:#555; color:#ddd; }
+    .detail-btn.active { background:#ea5808; color:#fff; border-color:#ea5808; }
+
+    /* Timeline / MIDI editor */
+    .detail-timeline {
+      flex:1; background:#2a2a2a; border:1px solid #444; border-radius:2px;
+      position:relative; overflow:hidden;
+    }
+    .timeline-ruler {
+      height:14px; background:#333; border-bottom:1px solid #444;
+      display:flex; align-items:center; font-size:7px; color:#777;
+      font-family:monospace;
+    }
+    .timeline-beat {
+      flex:1; text-align:center; border-right:1px solid #444;
+    }
+    .timeline-grid {
+      flex:1; position:relative;
+    }
+    .timeline-note {
+      position:absolute; height:8px; border-radius:1px;
+      font-size:6px; color:rgba(255,255,255,0.6); padding:0 2px;
+      line-height:8px; cursor:pointer;
+    }
+    .timeline-note:hover { filter:brightness(1.3); }
+    .piano-roll {
+      width:30px; background:#333; border-right:1px solid #444;
+      display:flex; flex-direction:column;
+    }
+    .piano-key {
+      height:8px; border-bottom:1px solid #444; font-size:5px;
+      display:flex; align-items:center; justify-content:flex-end;
+      padding-right:2px; color:#666;
+    }
+    .piano-key.black { background:#2a2a2a; color:#555; }
+
+    /* Velocity lane */
+    .velocity-lane {
+      height:22px; background:#2a2a2a; border-top:1px solid #444;
+      display:flex; align-items:flex-end; gap:1px; padding:2px 30px 2px 30px;
+    }
+    .velocity-bar {
+      flex:1; background:#4a9eff; border-radius:1px 1px 0 0; min-height:2px;
+    }
+
+    /* ── Right Info Panel ── */
+    .info-panel {
+      width:240px; background:#3a3a3a; border-left:1px solid #444;
+      padding:8px; overflow-y:auto; display:flex; flex-direction:column;
+    }
+    .info-panel-title {
+      font-size:12px; font-weight:800; color:#ddd; margin-bottom:4px;
+    }
+    .info-panel-desc {
+      font-size:9px; color:#888; line-height:1.5; margin-bottom:8px;
+    }
+    .info-panel-row {
+      display:flex; justify-content:space-between; padding:2px 0;
+      font-size:9px; border-bottom:1px solid #333;
+    }
+    .info-panel-label { color:#666; }
+    .info-panel-value { color:#bbb; font-family:monospace; }
+    .info-panel-tags { display:flex; gap:3px; flex-wrap:wrap; margin-top:6px; }
+    .info-panel-tag {
+      padding:1px 4px; background:#444; border-radius:2px; font-size:7px; color:#999;
+    }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width:5px; height:5px; }
+    ::-webkit-scrollbar-track { background:#333; }
+    ::-webkit-scrollbar-thumb { background:#555; border-radius:3px; }
+    ::-webkit-scrollbar-thumb:hover { background:#666; }
   </style>
 </head>
 <body>
   <!-- Transport Bar -->
   <div class="transport">
-    <div class="transport-left">
-      <div class="transport-btn">⟲</div>
-      <div class="transport-btn">⟳</div>
-      <div class="transport-divider"></div>
-      <div class="transport-btn">⏹</div>
-      <div class="transport-btn active">▶</div>
-      <div class="transport-btn record">⏺</div>
-      <div class="transport-divider"></div>
-    </div>
+    <div class="transport-link">Link</div>
+    <div class="transport-btn" style="font-size:7px">Tap</div>
     <div class="transport-display">120.00</div>
-    <div class="transport-label">BPM</div>
     <div class="transport-divider"></div>
-    <div class="transport-display" style="min-width:30px">4/4</div>
+    <div class="transport-display" style="min-width:20px;font-size:9px">4</div>
+    <div class="transport-display" style="min-width:20px;font-size:9px">4</div>
     <div class="transport-divider"></div>
-    <div class="transport-display" style="min-width:80px">1.  1.  1</div>
+    <div class="transport-display" style="min-width:60px">1. 1. 1</div>
+    <div class="transport-btn">⏹</div>
+    <div class="transport-btn active">▶</div>
+    <div class="transport-btn record">⏺</div>
+    <div class="transport-divider"></div>
+    <div class="transport-label">Bar</div>
+    <div class="transport-divider"></div>
+    <div class="transport-display" style="min-width:20px">☐</div>
+    <div class="transport-display" style="min-width:20px">☐</div>
     <div class="transport-spacer"></div>
-    <div style="font-size:9px;color:#666;letter-spacing:0.5px">SOUNDHUB — VST INSTRUMENTS</div>
+    <div class="transport-info">Key</div>
+    <div class="transport-display" style="min-width:30px;font-size:9px">Major</div>
     <div class="transport-spacer"></div>
-    <div class="transport-label">Key</div>
-    <div class="transport-display" style="min-width:30px">—</div>
-    <div class="transport-label">MIDI</div>
-    <div class="transport-display" style="min-width:30px">0%</div>
-    <div class="transport-label">CPU</div>
-    <div class="transport-display" style="min-width:30px">12%</div>
+    <div class="transport-info" style="margin-right:4px">MIDI</div>
+    <div class="transport-display" style="min-width:20px">0%</div>
+    <div class="transport-display" style="min-width:20px;font-size:8px;color:#888">44.1 kHz</div>
+    <div class="transport-display" style="min-width:20px">0%</div>
+    <div class="transport-display" style="min-width:20px">8%</div>
   </div>
 
   <div class="app-layout">
     <!-- Browser Panel -->
     <div class="browser">
       <div class="browser-search"><input type="text" placeholder="Search (Ctrl+F)"></div>
+
       <div class="browser-nav">
         <div class="browser-section">Collections</div>
         <div class="browser-item"><span class="icon" style="color:#ff6b6b">●</span> Favorites</div>
 
         <div class="browser-divider"></div>
-        <div class="browser-section">Categories</div>
+        <div class="browser-section">Library</div>
+        <div class="browser-item"><span class="icon">📄</span> Content</div>
+        <div class="browser-sub"><span style="font-size:8px;color:#666">Type</span></div>
+        <div class="browser-sub"><span style="font-size:8px;color:#666">Sounds</span></div>
+
+        <div class="browser-divider"></div>
         <div class="browser-item"><span class="icon">🔊</span> Sounds</div>
+        <div class="browser-sub-sub">Bass</div>
+        <div class="browser-sub-sub">Guitar & Plucked</div>
+        <div class="browser-sub-sub">Lead</div>
+        <div class="browser-sub-sub">Mallets</div>
+        <div class="browser-sub-sub">Pad</div>
+        <div class="browser-sub-sub">Piano & Keys</div>
+        <div class="browser-sub-sub">String</div>
+        <div class="browser-sub-sub">Voice</div>
+        <div class="browser-sub-sub">Woodwind</div>
+        <div class="browser-sub-sub">Ambience & FX</div>
+
         <div class="browser-item"><span class="icon">🥁</span> Drums</div>
+        <div class="browser-sub-sub">Kick</div>
+        <div class="browser-sub-sub">Snare</div>
+        <div class="browser-sub-sub">Clap</div>
+        <div class="browser-sub-sub">Hihat</div>
+        <div class="browser-sub-sub">Cymbal</div>
+        <div class="browser-sub-sub">Tom</div>
+        <div class="browser-sub-sub">Percussion</div>
+        <div class="browser-sub-sub">Drum Loop</div>
+        <div class="browser-sub-sub">Acoustic Kit</div>
+        <div class="browser-sub-sub">Drum Machine Kit</div>
+        <div class="browser-sub-sub">Hybrid Kit</div>
+        <div class="browser-sub-sub">Percussion Kit</div>
+        <div class="browser-sub-sub">Vintage Kit</div>
+
         <div class="browser-item active"><span class="icon">🎹</span> Instruments <span class="count">48</span></div>
         <div class="browser-item"><span class="icon">🎛️</span> Audio Effects</div>
         <div class="browser-item"><span class="icon">🎚️</span> MIDI Effects</div>
@@ -250,31 +432,39 @@
         <div class="browser-item"><span class="icon">🎶</span> Samples</div>
 
         <div class="browser-divider"></div>
+        <div class="browser-section">Character</div>
+        <div class="browser-sub"><span style="font-size:8px;color:#666">1 Filter</span></div>
+        <div style="padding:0 6px"><span style="font-size:8px;color:#ea5808;cursor:pointer">Clear</span></div>
+
+        <div class="browser-divider"></div>
+        <div class="browser-section">Results <span style="color:#ea5808">(12)</span></div>
+
+        <div class="browser-divider"></div>
         <div class="browser-section">Places</div>
         <div class="browser-item"><span class="icon">📁</span> Packs</div>
+        <div class="browser-item"><span class="icon">📁</span> Splice</div>
+        <div class="browser-item"><span class="icon">☁️</span> Cloud</div>
         <div class="browser-item"><span class="icon">📁</span> User Library</div>
         <div class="browser-item"><span class="icon">📁</span> Current Project</div>
+        <div class="browser-item" style="color:#666"><span class="icon">➕</span> Add Folder...</div>
+      </div>
 
-        <div class="browser-divider"></div>
-        <div class="browser-section">Results <span style="color:#4a9eff">(9)</span></div>
-        <div class="browser-item" style="padding-left:12px">🎹 Serum.adv <span class="count">189 KB</span></div>
-        <div class="browser-item" style="padding-left:12px">🔮 Vital.adv <span class="count">0 KB</span></div>
-        <div class="browser-item" style="padding-left:12px">⚡ Massive X.adv <span class="count">142 KB</span></div>
-        <div class="browser-item" style="padding-left:12px">🎹 Diva.adv <span class="count">96 KB</span></div>
-        <div class="browser-item" style="padding-left:12px">🎨 Pigments.adv <span class="count">128 KB</span></div>
-        <div class="browser-item" style="padding-left:12px">🌌 Omnisphere.adv <span class="count">256 KB</span></div>
-        <div class="browser-item" style="padding-left:12px">🎻 Kontakt.adv <span class="count">64 KB</span></div>
-        <div class="browser-item" style="padding-left:12px">🌀 Spire.adv <span class="count">112 KB</span></div>
-        <div class="browser-item" style="padding-left:12px">🔬 Phase Plant.adv <span class="count">80 KB</span></div>
-
-        <div class="browser-divider"></div>
-        <div class="browser-section">Tags</div>
-        <div class="browser-item" style="padding-left:12px">Hybrid Kit</div>
-        <div class="browser-item" style="padding-left:12px">Add...</div>
+      <!-- Results List -->
+      <div class="browser-results">
+        <div class="browser-result-item selected"><span class="browser-result-name">🎵 808 Core Kit.adv</span><span class="browser-result-size">104 KB</span></div>
+        <div class="browser-result-item"><span class="browser-result-name">🎵 808 Kit.adv</span><span class="browser-result-size">121 KB</span></div>
+        <div class="browser-result-item"><span class="browser-result-name">🎵 909 Core Kit.adv</span><span class="browser-result-size">106 KB</span></div>
+        <div class="browser-result-item"><span class="browser-result-name">🎵 909 Kit.adv</span><span class="browser-result-size">119 KB</span></div>
+        <div class="browser-result-item"><span class="browser-result-name">🎵 606 Core Kit.adv</span><span class="browser-result-size">98 KB</span></div>
+        <div class="browser-result-item"><span class="browser-result-name">🎵 Acid Kit.adv</span><span class="browser-result-size">86 KB</span></div>
+        <div class="browser-result-item"><span class="browser-result-name">🎵 606 Core Kit.adv</span><span class="browser-result-size">62 KB</span></div>
+        <div class="browser-result-item"><span class="browser-result-name">🎵 Afrika Kit.adv</span><span class="browser-result-size">12 KB</span></div>
+        <div class="browser-result-item"><span class="browser-result-name">🎵 Akustikkit Kit.adv</span><span class="browser-result-size">73 KB</span></div>
+        <div class="browser-result-item"><span class="browser-result-name">🎵 Alert Kit.adv</span><span class="browser-result-size">103 KB</span></div>
       </div>
     </div>
 
-    <!-- Center -->
+    <!-- Center Content -->
     <div class="center">
       <!-- Session View -->
       <div class="session-view">
@@ -282,11 +472,25 @@
           <!-- Track 1: Kicks -->
           <div class="track">
             <div class="track-header">
-              <div class="track-name">Kicks</div>
-              <div class="track-controls">
-                <div class="track-btn solo">S</div>
-                <div class="track-btn mute">M</div>
-                <div class="track-btn record">⏺</div>
+              <div class="track-header-top">
+                <div class="track-name">Kicks</div>
+                <div class="track-controls">
+                  <div class="track-btn solo">S</div>
+                  <div class="track-btn mute">M</div>
+                  <div class="track-btn record">⏺</div>
+                </div>
+              </div>
+              <div class="track-routing">
+                <div class="track-routing-row"><span class="track-routing-label">MIDI From</span></div>
+                <div class="track-routing-row"><span class="track-routing-value">All Ins</span></div>
+                <div class="track-routing-row"><span class="track-routing-value">All Channels</span></div>
+                <div class="track-monitor">
+                  <div class="monitor-btn">In</div>
+                  <div class="monitor-btn active">Auto</div>
+                  <div class="monitor-btn">Off</div>
+                </div>
+                <div class="track-routing-row"><span class="track-routing-label">Audio To</span></div>
+                <div class="track-routing-row"><span class="track-routing-value">Main</span></div>
               </div>
             </div>
             <div class="clips-column">
@@ -295,18 +499,34 @@
               <div class="clip-slot"><div class="clip clip-green">kick03.pattern01</div></div>
               <div class="clip-slot"><div class="clip clip-green">kick04.pattern01</div></div>
               <div class="clip-slot"><div class="clip clip-green">kick05.pattern03</div></div>
+              <div class="clip-slot"><div class="clip clip-green">random kicks pattern03</div></div>
+              <div class="clip-slot"><div class="clip clip-green">kick04.pattern04</div></div>
               <div class="clip-slot"><div class="clip clip-empty"></div></div>
             </div>
           </div>
 
-          <!-- Track 2: HiHats -->
+          <!-- Track 2: HiHats Manual -->
           <div class="track">
             <div class="track-header">
-              <div class="track-name">HiHats Manual</div>
-              <div class="track-controls">
-                <div class="track-btn solo">S</div>
-                <div class="track-btn mute">M</div>
-                <div class="track-btn record">⏺</div>
+              <div class="track-header-top">
+                <div class="track-name">HiHats Manual</div>
+                <div class="track-controls">
+                  <div class="track-btn solo">S</div>
+                  <div class="track-btn mute">M</div>
+                  <div class="track-btn record">⏺</div>
+                </div>
+              </div>
+              <div class="track-routing">
+                <div class="track-routing-row"><span class="track-routing-label">MIDI From</span></div>
+                <div class="track-routing-row"><span class="track-routing-value">All Ins</span></div>
+                <div class="track-routing-row"><span class="track-routing-value">All Channels</span></div>
+                <div class="track-monitor">
+                  <div class="monitor-btn">In</div>
+                  <div class="monitor-btn active">Auto</div>
+                  <div class="monitor-btn">Off</div>
+                </div>
+                <div class="track-routing-row"><span class="track-routing-label">Audio To</span></div>
+                <div class="track-routing-row"><span class="track-routing-value">Main</span></div>
               </div>
             </div>
             <div class="clips-column">
@@ -316,17 +536,33 @@
               <div class="clip-slot"><div class="clip clip-yellow">hh04.pattern02</div></div>
               <div class="clip-slot"><div class="clip clip-yellow">hh05.pattern01</div></div>
               <div class="clip-slot"><div class="clip clip-empty"></div></div>
+              <div class="clip-slot"><div class="clip clip-empty"></div></div>
+              <div class="clip-slot"><div class="clip clip-empty"></div></div>
             </div>
           </div>
 
-          <!-- Track 3: Loops -->
+          <!-- Track 3: Loops / Noise -->
           <div class="track">
             <div class="track-header">
-              <div class="track-name">Loops / Noise</div>
-              <div class="track-controls">
-                <div class="track-btn solo">S</div>
-                <div class="track-btn mute">M</div>
-                <div class="track-btn record">⏺</div>
+              <div class="track-header-top">
+                <div class="track-name">Loops / Noise</div>
+                <div class="track-controls">
+                  <div class="track-btn solo">S</div>
+                  <div class="track-btn mute">M</div>
+                  <div class="track-btn record">⏺</div>
+                </div>
+              </div>
+              <div class="track-routing">
+                <div class="track-routing-row"><span class="track-routing-label">MIDI From</span></div>
+                <div class="track-routing-row"><span class="track-routing-value">All Ins</span></div>
+                <div class="track-routing-row"><span class="track-routing-value">All Channels</span></div>
+                <div class="track-monitor">
+                  <div class="monitor-btn">In</div>
+                  <div class="monitor-btn active">Auto</div>
+                  <div class="monitor-btn">Off</div>
+                </div>
+                <div class="track-routing-row"><span class="track-routing-label">Audio To</span></div>
+                <div class="track-routing-row"><span class="track-routing-value">Main</span></div>
               </div>
             </div>
             <div class="clips-column">
@@ -336,17 +572,33 @@
               <div class="clip-slot"><div class="clip clip-orange">TR8080_HH_Tommy_Big_</div></div>
               <div class="clip-slot"><div class="clip clip-empty"></div></div>
               <div class="clip-slot"><div class="clip clip-empty"></div></div>
+              <div class="clip-slot"><div class="clip clip-empty"></div></div>
+              <div class="clip-slot"><div class="clip clip-empty"></div></div>
             </div>
           </div>
 
-          <!-- Track 4: Loops 1/Bar -->
+          <!-- Track 4: Loops 1/BarBeat -->
           <div class="track">
             <div class="track-header">
-              <div class="track-name">Loops 1/BarBeat</div>
-              <div class="track-controls">
-                <div class="track-btn solo">S</div>
-                <div class="track-btn mute">M</div>
-                <div class="track-btn record">⏺</div>
+              <div class="track-header-top">
+                <div class="track-name">Loops 1/BarBeat</div>
+                <div class="track-controls">
+                  <div class="track-btn solo">S</div>
+                  <div class="track-btn mute">M</div>
+                  <div class="track-btn record">⏺</div>
+                </div>
+              </div>
+              <div class="track-routing">
+                <div class="track-routing-row"><span class="track-routing-label">MIDI From</span></div>
+                <div class="track-routing-row"><span class="track-routing-value">All Ins</span></div>
+                <div class="track-routing-row"><span class="track-routing-value">All Channels</span></div>
+                <div class="track-monitor">
+                  <div class="monitor-btn">In</div>
+                  <div class="monitor-btn active">Auto</div>
+                  <div class="monitor-btn">Off</div>
+                </div>
+                <div class="track-routing-row"><span class="track-routing-label">Audio To</span></div>
+                <div class="track-routing-row"><span class="track-routing-value">Main</span></div>
               </div>
             </div>
             <div class="clips-column">
@@ -355,6 +607,8 @@
               <div class="clip-slot"><div class="clip clip-cyan">dignitybeat01</div></div>
               <div class="clip-slot"><div class="clip clip-cyan">instablack_beat</div></div>
               <div class="clip-slot"><div class="clip clip-cyan">cr8000beat.2</div></div>
+              <div class="clip-slot"><div class="clip clip-cyan">ferroxs.3</div></div>
+              <div class="clip-slot"><div class="clip clip-empty"></div></div>
               <div class="clip-slot"><div class="clip clip-empty"></div></div>
             </div>
           </div>
@@ -362,36 +616,68 @@
           <!-- Track 5: Percussion 01 -->
           <div class="track">
             <div class="track-header">
-              <div class="track-name">Percussion 01</div>
-              <div class="track-controls">
-                <div class="track-btn solo">S</div>
-                <div class="track-btn mute">M</div>
-                <div class="track-btn record">⏺</div>
+              <div class="track-header-top">
+                <div class="track-name">Percussion 01</div>
+                <div class="track-controls">
+                  <div class="track-btn solo">S</div>
+                  <div class="track-btn mute">M</div>
+                  <div class="track-btn record">⏺</div>
+                </div>
+              </div>
+              <div class="track-routing">
+                <div class="track-routing-row"><span class="track-routing-label">MIDI From</span></div>
+                <div class="track-routing-row"><span class="track-routing-value">All Ins</span></div>
+                <div class="track-routing-row"><span class="track-routing-value">All Channels</span></div>
+                <div class="track-monitor">
+                  <div class="monitor-btn">In</div>
+                  <div class="monitor-btn active">Auto</div>
+                  <div class="monitor-btn">Off</div>
+                </div>
+                <div class="track-routing-row"><span class="track-routing-label">Audio To</span></div>
+                <div class="track-routing-row"><span class="track-routing-value">Main</span></div>
               </div>
             </div>
             <div class="clips-column">
               <div class="clip-slot"><div class="clip clip-blue">perc01.1</div></div>
               <div class="clip-slot"><div class="clip clip-blue">perc01.2</div></div>
               <div class="clip-slot"><div class="clip clip-blue">perc01.3</div></div>
-              <div class="clip-slot"><div class="clip clip-blue">perc01.4</div></div>
+              <div class="clip-slot"><div class="clip clip-blue">perc01.4, timeswitch</div></div>
               <div class="clip-slot"><div class="clip clip-blue">perc01.5</div></div>
-              <div class="clip-slot"><div class="clip clip-blue">perc01.6</div></div>
+              <div class="clip-slot"><div class="clip clip-blue">perc01.6, timeswitch_pitch</div></div>
+              <div class="clip-slot"><div class="clip clip-empty"></div></div>
+              <div class="clip-slot"><div class="clip clip-empty"></div></div>
             </div>
           </div>
 
-          <!-- Track 6: Chords 01 -->
+          <!-- Track 6: Percussion 02 -->
           <div class="track">
             <div class="track-header">
-              <div class="track-name">Chords 01</div>
-              <div class="track-controls">
-                <div class="track-btn solo">S</div>
-                <div class="track-btn mute">M</div>
-                <div class="track-btn record">⏺</div>
+              <div class="track-header-top">
+                <div class="track-name">Percussion 02</div>
+                <div class="track-controls">
+                  <div class="track-btn solo">S</div>
+                  <div class="track-btn mute">M</div>
+                  <div class="track-btn record">⏺</div>
+                </div>
+              </div>
+              <div class="track-routing">
+                <div class="track-routing-row"><span class="track-routing-label">MIDI From</span></div>
+                <div class="track-routing-row"><span class="track-routing-value">All Ins</span></div>
+                <div class="track-routing-row"><span class="track-routing-value">All Channels</span></div>
+                <div class="track-monitor">
+                  <div class="monitor-btn">In</div>
+                  <div class="monitor-btn active">Auto</div>
+                  <div class="monitor-btn">Off</div>
+                </div>
+                <div class="track-routing-row"><span class="track-routing-label">Audio To</span></div>
+                <div class="track-routing-row"><span class="track-routing-value">Main</span></div>
               </div>
             </div>
             <div class="clips-column">
-              <div class="clip-slot"><div class="clip clip-purple">chord1.1</div></div>
-              <div class="clip-slot"><div class="clip clip-purple">chord1.2</div></div>
+              <div class="clip-slot"><div class="clip" style="background:#2a7a5e;color:#a8e6c3">chord1.1</div></div>
+              <div class="clip-slot"><div class="clip" style="background:#2a7a5e;color:#a8e6c3">chord1.2</div></div>
+              <div class="clip-slot"><div class="clip clip-empty"></div></div>
+              <div class="clip-slot"><div class="clip clip-empty"></div></div>
               <div class="clip-slot"><div class="clip clip-empty"></div></div>
               <div class="clip-slot"><div class="clip clip-empty"></div></div>
               <div class="clip-slot"><div class="clip clip-empty"></div></div>
@@ -399,14 +685,64 @@
             </div>
           </div>
 
-          <!-- Track 7: Tones -->
+          <!-- Track 7: Chords 01 -->
           <div class="track">
             <div class="track-header">
-              <div class="track-name">Tones</div>
-              <div class="track-controls">
-                <div class="track-btn solo">S</div>
-                <div class="track-btn mute">M</div>
-                <div class="track-btn record">⏺</div>
+              <div class="track-header-top">
+                <div class="track-name">Chords 01</div>
+                <div class="track-controls">
+                  <div class="track-btn solo">S</div>
+                  <div class="track-btn mute">M</div>
+                  <div class="track-btn record">⏺</div>
+                </div>
+              </div>
+              <div class="track-routing">
+                <div class="track-routing-row"><span class="track-routing-label">MIDI From</span></div>
+                <div class="track-routing-row"><span class="track-routing-value">All Ins</span></div>
+                <div class="track-routing-row"><span class="track-routing-value">All Channels</span></div>
+                <div class="track-monitor">
+                  <div class="monitor-btn">In</div>
+                  <div class="monitor-btn active">Auto</div>
+                  <div class="monitor-btn">Off</div>
+                </div>
+                <div class="track-routing-row"><span class="track-routing-label">Audio To</span></div>
+                <div class="track-routing-row"><span class="track-routing-value">Main</span></div>
+              </div>
+            </div>
+            <div class="clips-column">
+              <div class="clip-slot"><div class="clip clip-purple">tone01.1</div></div>
+              <div class="clip-slot"><div class="clip clip-purple">tone02.1</div></div>
+              <div class="clip-slot"><div class="clip clip-empty"></div></div>
+              <div class="clip-slot"><div class="clip clip-empty"></div></div>
+              <div class="clip-slot"><div class="clip clip-empty"></div></div>
+              <div class="clip-slot"><div class="clip clip-empty"></div></div>
+              <div class="clip-slot"><div class="clip clip-empty"></div></div>
+              <div class="clip-slot"><div class="clip clip-empty"></div></div>
+            </div>
+          </div>
+
+          <!-- Track 8: Tones -->
+          <div class="track">
+            <div class="track-header">
+              <div class="track-header-top">
+                <div class="track-name">Tones</div>
+                <div class="track-controls">
+                  <div class="track-btn solo">S</div>
+                  <div class="track-btn mute">M</div>
+                  <div class="track-btn record">⏺</div>
+                </div>
+              </div>
+              <div class="track-routing">
+                <div class="track-routing-row"><span class="track-routing-label">MIDI From</span></div>
+                <div class="track-routing-row"><span class="track-routing-value">All Ins</span></div>
+                <div class="track-routing-row"><span class="track-routing-value">All Channels</span></div>
+                <div class="track-monitor">
+                  <div class="monitor-btn">In</div>
+                  <div class="monitor-btn active">Auto</div>
+                  <div class="monitor-btn">Off</div>
+                </div>
+                <div class="track-routing-row"><span class="track-routing-label">Audio To</span></div>
+                <div class="track-routing-row"><span class="track-routing-value">Main</span></div>
               </div>
             </div>
             <div class="clips-column">
@@ -416,17 +752,33 @@
               <div class="clip-slot"><div class="clip clip-empty"></div></div>
               <div class="clip-slot"><div class="clip clip-empty"></div></div>
               <div class="clip-slot"><div class="clip clip-empty"></div></div>
+              <div class="clip-slot"><div class="clip clip-empty"></div></div>
+              <div class="clip-slot"><div class="clip clip-empty"></div></div>
             </div>
           </div>
 
-          <!-- Track 8: Pads -->
+          <!-- Track 9: Pads -->
           <div class="track">
             <div class="track-header">
-              <div class="track-name">Pads</div>
-              <div class="track-controls">
-                <div class="track-btn solo">S</div>
-                <div class="track-btn mute">M</div>
-                <div class="track-btn record">⏺</div>
+              <div class="track-header-top">
+                <div class="track-name">Pads</div>
+                <div class="track-controls">
+                  <div class="track-btn solo">S</div>
+                  <div class="track-btn mute">M</div>
+                  <div class="track-btn record">⏺</div>
+                </div>
+              </div>
+              <div class="track-routing">
+                <div class="track-routing-row"><span class="track-routing-label">MIDI From</span></div>
+                <div class="track-routing-row"><span class="track-routing-value">All Ins</span></div>
+                <div class="track-routing-row"><span class="track-routing-value">All Channels</span></div>
+                <div class="track-monitor">
+                  <div class="monitor-btn">In</div>
+                  <div class="monitor-btn active">Auto</div>
+                  <div class="monitor-btn">Off</div>
+                </div>
+                <div class="track-routing-row"><span class="track-routing-label">Audio To</span></div>
+                <div class="track-routing-row"><span class="track-routing-value">Main</span></div>
               </div>
             </div>
             <div class="clips-column">
@@ -436,186 +788,477 @@
               <div class="clip-slot"><div class="clip clip-empty"></div></div>
               <div class="clip-slot"><div class="clip clip-empty"></div></div>
               <div class="clip-slot"><div class="clip clip-empty"></div></div>
+              <div class="clip-slot"><div class="clip clip-empty"></div></div>
+              <div class="clip-slot"><div class="clip clip-empty"></div></div>
             </div>
           </div>
 
-          <!-- Track 9: Main -->
-          <div class="track" style="min-width:140px">
-            <div class="track-header" style="background:#333">
-              <div class="track-name" style="color:#4a9eff">Main</div>
-              <div class="track-controls">
-                <div class="track-btn solo">S</div>
-                <div class="track-btn mute">M</div>
+          <!-- Track 10: A Reverb / Compressor (Return) -->
+          <div class="track" style="min-width:70px">
+            <div class="track-header" style="background:#333;height:90px">
+              <div class="track-header-top">
+                <div class="track-name" style="font-size:8px">A Reverb / Compressor</div>
+              </div>
+              <div class="track-routing">
+                <div class="track-routing-row"><span class="track-routing-label">Audio From</span></div>
+                <div class="track-routing-row"><span class="track-routing-value">Sends Only</span></div>
+                <div class="track-routing-row"><span class="track-routing-label">Audio To</span></div>
+                <div class="track-routing-row"><span class="track-routing-value">Main</span></div>
+                <div class="track-routing-row"><span class="track-routing-value">1/2</span></div>
+              </div>
+            </div>
+            <div class="clips-column"></div>
+          </div>
+
+          <!-- Track 11: Main -->
+          <div class="track" style="min-width:100px">
+            <div class="track-header" style="background:#3a3a5a;height:90px">
+              <div class="track-header-top">
+                <div class="track-name" style="color:#6ee7ff">Main</div>
+              </div>
+              <div class="track-routing">
+                <div class="track-routing-row"><span class="track-routing-label">Audio From</span></div>
+                <div class="track-routing-row"><span class="track-routing-value">Sends Only</span></div>
+                <div class="track-routing-row"><span class="track-routing-label">Cue Out</span></div>
+                <div class="track-routing-row"><span class="track-routing-value">1/2</span></div>
+                <div class="track-routing-row"><span class="track-routing-label">Main Out</span></div>
+                <div class="track-routing-row"><span class="track-routing-value">Main</span></div>
+                <div class="track-routing-row"><span class="track-routing-value">1/2</span></div>
               </div>
             </div>
             <div class="clips-column">
-              <div class="clip-slot"><div class="clip" style="background:#2d5a3e;color:#a8e6c3;font-size:8px">01 Basic Pattern</div></div>
-              <div class="clip-slot"><div class="clip" style="background:#2d5a3e;color:#a8e6c3;font-size:8px">02 Basic Pattern Variation</div></div>
-              <div class="clip-slot"><div class="clip" style="background:#2d5a3e;color:#a8e6c3;font-size:8px">03 Hook</div></div>
-              <div class="clip-slot"><div class="clip" style="background:#2d5a3e;color:#a8e6c3;font-size:8px">04 Piano Part 1</div></div>
-              <div class="clip-slot"><div class="clip" style="background:#2d5a3e;color:#a8e6c3;font-size:8px">05 Bridge</div></div>
-              <div class="clip-slot"><div class="clip" style="background:#2d5a3e;color:#a8e6c3;font-size:8px">06 Transition</div></div>
+              <div class="clip-slot"><div class="clip" style="background:#2d5a3e;color:#a8e6c3;font-size:7px">01 Basic Pattern</div></div>
+              <div class="clip-slot"><div class="clip" style="background:#2d5a3e;color:#a8e6c3;font-size:7px">02 Basic Pattern Variation</div></div>
+              <div class="clip-slot"><div class="clip" style="background:#2d5a3e;color:#a8e6c3;font-size:7px">03 Hook</div></div>
+              <div class="clip-slot"><div class="clip" style="background:#2d5a3e;color:#a8e6c3;font-size:7px">04 Piano Part 1</div></div>
+              <div class="clip-slot"><div class="clip" style="background:#2d5a3e;color:#a8e6c3;font-size:7px">05 Bridge</div></div>
+              <div class="clip-slot"><div class="clip" style="background:#2d5a3e;color:#a8e6c3;font-size:7px">06 Transition</div></div>
+              <div class="clip-slot"><div class="clip" style="background:#2d5a3e;color:#a8e6c3;font-size:7px">07 Groove A (Transition)</div></div>
+              <div class="clip-slot"><div class="clip" style="background:#2d5a3e;color:#a8e6c3;font-size:7px">08 Groove B (Transition)</div></div>
             </div>
           </div>
+        </div>
+
+        <!-- Scene Launch Buttons -->
+        <div class="scene-launch">
+          <div class="scene-btn" style="color:#ea5808">▶</div>
+          <div class="scene-btn">1</div>
+          <div class="scene-btn">2</div>
+          <div class="scene-btn">3</div>
+          <div class="scene-btn">4</div>
+          <div class="scene-btn">5</div>
+          <div class="scene-btn">6</div>
+          <div class="scene-btn">7</div>
+          <div class="scene-btn">8</div>
         </div>
       </div>
 
       <!-- Mixer -->
       <div class="mixer">
+        <!-- Track 1: Kicks -->
         <div class="mixer-channel">
           <div class="mixer-label">Kicks</div>
-          <div style="display:flex;gap:4px;align-items:flex-end;height:60px">
-            <div class="mixer-fader-track"><div class="mixer-fader-fill" style="height:70%"></div><div class="mixer-fader-knob" style="bottom:calc(70% - 4px)"></div></div>
+          <div class="mixer-routing">MIDI From<br>All Ins<br>All Channels</div>
+          <div class="mixer-monitor">
+            <div class="mixer-monitor-btn">In</div>
+            <div class="mixer-monitor-btn active">Auto</div>
+            <div class="mixer-monitor-btn">Off</div>
+          </div>
+          <div class="mixer-audio-to">Audio To<br>Main</div>
+          <div class="mixer-sends">
+            <div><div class="mixer-send-knob" style="transform:rotate(-30deg)"></div><div class="mixer-send-label">Sends</div></div>
+          </div>
+          <div class="mixer-fader-area">
+            <div class="mixer-fader-track"><div class="mixer-fader-fill" style="height:72%"></div><div class="mixer-fader-knob" style="bottom:calc(72% - 3px)"></div></div>
             <div class="mixer-meter"><div class="mixer-meter-fill" style="height:65%;background:#22c55e"></div></div>
           </div>
-          <div class="mixer-pan">C</div>
+          <div class="mixer-pan-knob" style="transform:rotate(0deg)"></div>
+          <div class="mixer-pan-label">C</div>
           <div style="display:flex;gap:2px"><div class="mixer-solo-btn">S</div><div class="mixer-mute-btn">M</div></div>
         </div>
+
+        <!-- Track 2: HiHats -->
         <div class="mixer-channel">
           <div class="mixer-label">HiHats</div>
-          <div style="display:flex;gap:4px;align-items:flex-end;height:60px">
-            <div class="mixer-fader-track"><div class="mixer-fader-fill" style="height:60%"></div><div class="mixer-fader-knob" style="bottom:calc(60% - 4px)"></div></div>
+          <div class="mixer-routing">MIDI From<br>All Ins<br>All Channels</div>
+          <div class="mixer-monitor">
+            <div class="mixer-monitor-btn">In</div>
+            <div class="mixer-monitor-btn active">Auto</div>
+            <div class="mixer-monitor-btn">Off</div>
+          </div>
+          <div class="mixer-audio-to">Audio To<br>Main</div>
+          <div class="mixer-sends">
+            <div><div class="mixer-send-knob" style="transform:rotate(-20deg)"></div><div class="mixer-send-label">Sends</div></div>
+          </div>
+          <div class="mixer-fader-area">
+            <div class="mixer-fader-track"><div class="mixer-fader-fill" style="height:62%"></div><div class="mixer-fader-knob" style="bottom:calc(62% - 3px)"></div></div>
             <div class="mixer-meter"><div class="mixer-meter-fill" style="height:55%;background:#22c55e"></div></div>
           </div>
-          <div class="mixer-pan">3R</div>
+          <div class="mixer-pan-knob" style="transform:rotate(30deg)"></div>
+          <div class="mixer-pan-label">3R</div>
           <div style="display:flex;gap:2px"><div class="mixer-solo-btn">S</div><div class="mixer-mute-btn">M</div></div>
         </div>
+
+        <!-- Track 3: Loops -->
         <div class="mixer-channel">
           <div class="mixer-label">Loops</div>
-          <div style="display:flex;gap:4px;align-items:flex-end;height:60px">
-            <div class="mixer-fader-track"><div class="mixer-fader-fill" style="height:55%"></div><div class="mixer-fader-knob" style="bottom:calc(55% - 4px)"></div></div>
+          <div class="mixer-routing">MIDI From<br>All Ins<br>All Channels</div>
+          <div class="mixer-monitor">
+            <div class="mixer-monitor-btn">In</div>
+            <div class="mixer-monitor-btn active">Auto</div>
+            <div class="mixer-monitor-btn">Off</div>
+          </div>
+          <div class="mixer-audio-to">Audio To<br>Main</div>
+          <div class="mixer-sends">
+            <div><div class="mixer-send-knob" style="transform:rotate(-45deg)"></div><div class="mixer-send-label">Sends</div></div>
+          </div>
+          <div class="mixer-fader-area">
+            <div class="mixer-fader-track"><div class="mixer-fader-fill" style="height:55%"></div><div class="mixer-fader-knob" style="bottom:calc(55% - 3px)"></div></div>
             <div class="mixer-meter"><div class="mixer-meter-fill" style="height:48%;background:#eab308"></div></div>
           </div>
-          <div class="mixer-pan">2L</div>
+          <div class="mixer-pan-knob" style="transform:rotate(-20deg)"></div>
+          <div class="mixer-pan-label">2L</div>
           <div style="display:flex;gap:2px"><div class="mixer-solo-btn">S</div><div class="mixer-mute-btn">M</div></div>
         </div>
+
+        <!-- Track 4: LoopBeat -->
         <div class="mixer-channel">
           <div class="mixer-label">LoopBeat</div>
-          <div style="display:flex;gap:4px;align-items:flex-end;height:60px">
-            <div class="mixer-fader-track"><div class="mixer-fader-fill" style="height:50%"></div><div class="mixer-fader-knob" style="bottom:calc(50% - 4px)"></div></div>
+          <div class="mixer-routing">MIDI From<br>All Ins<br>All Channels</div>
+          <div class="mixer-monitor">
+            <div class="mixer-monitor-btn">In</div>
+            <div class="mixer-monitor-btn active">Auto</div>
+            <div class="mixer-monitor-btn">Off</div>
+          </div>
+          <div class="mixer-audio-to">Audio To<br>Main</div>
+          <div class="mixer-sends">
+            <div><div class="mixer-send-knob" style="transform:rotate(-15deg)"></div><div class="mixer-send-label">Sends</div></div>
+          </div>
+          <div class="mixer-fader-area">
+            <div class="mixer-fader-track"><div class="mixer-fader-fill" style="height:50%"></div><div class="mixer-fader-knob" style="bottom:calc(50% - 3px)"></div></div>
             <div class="mixer-meter"><div class="mixer-meter-fill" style="height:42%;background:#22c55e"></div></div>
           </div>
-          <div class="mixer-pan">C</div>
+          <div class="mixer-pan-knob" style="transform:rotate(0deg)"></div>
+          <div class="mixer-pan-label">C</div>
           <div style="display:flex;gap:2px"><div class="mixer-solo-btn">S</div><div class="mixer-mute-btn">M</div></div>
         </div>
+
+        <!-- Track 5: Perc 01 -->
         <div class="mixer-channel">
           <div class="mixer-label">Perc 01</div>
-          <div style="display:flex;gap:4px;align-items:flex-end;height:60px">
-            <div class="mixer-fader-track"><div class="mixer-fader-fill" style="height:65%"></div><div class="mixer-fader-knob" style="bottom:calc(65% - 4px)"></div></div>
+          <div class="mixer-routing">MIDI From<br>All Ins<br>All Channels</div>
+          <div class="mixer-monitor">
+            <div class="mixer-monitor-btn">In</div>
+            <div class="mixer-monitor-btn active">Auto</div>
+            <div class="mixer-monitor-btn">Off</div>
+          </div>
+          <div class="mixer-audio-to">Audio To<br>Main</div>
+          <div class="mixer-sends">
+            <div><div class="mixer-send-knob" style="transform:rotate(-35deg)"></div><div class="mixer-send-label">Sends</div></div>
+          </div>
+          <div class="mixer-fader-area">
+            <div class="mixer-fader-track"><div class="mixer-fader-fill" style="height:65%"></div><div class="mixer-fader-knob" style="bottom:calc(65% - 3px)"></div></div>
             <div class="mixer-meter"><div class="mixer-meter-fill" style="height:58%;background:#22c55e"></div></div>
           </div>
-          <div class="mixer-pan">5R</div>
+          <div class="mixer-pan-knob" style="transform:rotate(50deg)"></div>
+          <div class="mixer-pan-label">5R</div>
           <div style="display:flex;gap:2px"><div class="mixer-solo-btn">S</div><div class="mixer-mute-btn">M</div></div>
         </div>
+
+        <!-- Track 6: Perc 02 -->
         <div class="mixer-channel">
-          <div class="mixer-label">Chords</div>
-          <div style="display:flex;gap:4px;align-items:flex-end;height:60px">
-            <div class="mixer-fader-track"><div class="mixer-fader-fill" style="height:45%"></div><div class="mixer-fader-knob" style="bottom:calc(45% - 4px)"></div></div>
+          <div class="mixer-label">Perc 02</div>
+          <div class="mixer-routing">MIDI From<br>All Ins<br>All Channels</div>
+          <div class="mixer-monitor">
+            <div class="mixer-monitor-btn">In</div>
+            <div class="mixer-monitor-btn active">Auto</div>
+            <div class="mixer-monitor-btn">Off</div>
+          </div>
+          <div class="mixer-audio-to">Audio To<br>Main</div>
+          <div class="mixer-sends">
+            <div><div class="mixer-send-knob" style="transform:rotate(-25deg)"></div><div class="mixer-send-label">Sends</div></div>
+          </div>
+          <div class="mixer-fader-area">
+            <div class="mixer-fader-track"><div class="mixer-fader-fill" style="height:45%"></div><div class="mixer-fader-knob" style="bottom:calc(45% - 3px)"></div></div>
             <div class="mixer-meter"><div class="mixer-meter-fill" style="height:38%;background:#22c55e"></div></div>
           </div>
-          <div class="mixer-pan">8L</div>
+          <div class="mixer-pan-knob" style="transform:rotate(-40deg)"></div>
+          <div class="mixer-pan-label">4L</div>
           <div style="display:flex;gap:2px"><div class="mixer-solo-btn">S</div><div class="mixer-mute-btn">M</div></div>
         </div>
+
+        <!-- Track 7: Chords -->
         <div class="mixer-channel">
-          <div class="mixer-label">Tones</div>
-          <div style="display:flex;gap:4px;align-items:flex-end;height:60px">
-            <div class="mixer-fader-track"><div class="mixer-fader-fill" style="height:40%"></div><div class="mixer-fader-knob" style="bottom:calc(40% - 4px)"></div></div>
+          <div class="mixer-label">Chords</div>
+          <div class="mixer-routing">MIDI From<br>All Ins<br>All Channels</div>
+          <div class="mixer-monitor">
+            <div class="mixer-monitor-btn">In</div>
+            <div class="mixer-monitor-btn active">Auto</div>
+            <div class="mixer-monitor-btn">Off</div>
+          </div>
+          <div class="mixer-audio-to">Audio To<br>Main</div>
+          <div class="mixer-sends">
+            <div><div class="mixer-send-knob" style="transform:rotate(-60deg)"></div><div class="mixer-send-label">Sends</div></div>
+          </div>
+          <div class="mixer-fader-area">
+            <div class="mixer-fader-track"><div class="mixer-fader-fill" style="height:40%"></div><div class="mixer-fader-knob" style="bottom:calc(40% - 3px)"></div></div>
             <div class="mixer-meter"><div class="mixer-meter-fill" style="height:35%;background:#22c55e"></div></div>
           </div>
-          <div class="mixer-pan">3L</div>
+          <div class="mixer-pan-knob" style="transform:rotate(-80deg)"></div>
+          <div class="mixer-pan-label">8L</div>
           <div style="display:flex;gap:2px"><div class="mixer-solo-btn">S</div><div class="mixer-mute-btn">M</div></div>
         </div>
+
+        <!-- Track 8: Tones -->
+        <div class="mixer-channel">
+          <div class="mixer-label">Tones</div>
+          <div class="mixer-routing">MIDI From<br>All Ins<br>All Channels</div>
+          <div class="mixer-monitor">
+            <div class="mixer-monitor-btn">In</div>
+            <div class="mixer-monitor-btn active">Auto</div>
+            <div class="mixer-monitor-btn">Off</div>
+          </div>
+          <div class="mixer-audio-to">Audio To<br>Main</div>
+          <div class="mixer-sends">
+            <div><div class="mixer-send-knob" style="transform:rotate(-30deg)"></div><div class="mixer-send-label">Sends</div></div>
+          </div>
+          <div class="mixer-fader-area">
+            <div class="mixer-fader-track"><div class="mixer-fader-fill" style="height:38%"></div><div class="mixer-fader-knob" style="bottom:calc(38% - 3px)"></div></div>
+            <div class="mixer-meter"><div class="mixer-meter-fill" style="height:32%;background:#22c55e"></div></div>
+          </div>
+          <div class="mixer-pan-knob" style="transform:rotate(30deg)"></div>
+          <div class="mixer-pan-label">3L</div>
+          <div style="display:flex;gap:2px"><div class="mixer-solo-btn">S</div><div class="mixer-mute-btn">M</div></div>
+        </div>
+
+        <!-- Track 9: Pads -->
         <div class="mixer-channel">
           <div class="mixer-label">Pads</div>
-          <div style="display:flex;gap:4px;align-items:flex-end;height:60px">
-            <div class="mixer-fader-track"><div class="mixer-fader-fill" style="height:35%"></div><div class="mixer-fader-knob" style="bottom:calc(35% - 4px)"></div></div>
+          <div class="mixer-routing">MIDI From<br>All Ins<br>All Channels</div>
+          <div class="mixer-monitor">
+            <div class="mixer-monitor-btn">In</div>
+            <div class="mixer-monitor-btn active">Auto</div>
+            <div class="mixer-monitor-btn">Off</div>
+          </div>
+          <div class="mixer-audio-to">Audio To<br>Main</div>
+          <div class="mixer-sends">
+            <div><div class="mixer-send-knob" style="transform:rotate(-70deg)"></div><div class="mixer-send-label">Sends</div></div>
+          </div>
+          <div class="mixer-fader-area">
+            <div class="mixer-fader-track"><div class="mixer-fader-fill" style="height:35%"></div><div class="mixer-fader-knob" style="bottom:calc(35% - 3px)"></div></div>
             <div class="mixer-meter"><div class="mixer-meter-fill" style="height:30%;background:#22c55e"></div></div>
           </div>
-          <div class="mixer-pan">10L</div>
+          <div class="mixer-pan-knob" style="transform:rotate(-100deg)"></div>
+          <div class="mixer-pan-label">10L</div>
           <div style="display:flex;gap:2px"><div class="mixer-solo-btn">S</div><div class="mixer-mute-btn">M</div></div>
         </div>
-        <div class="mixer-channel" style="background:#333;border-color:#4a9eff">
-          <div class="mixer-label" style="color:#4a9eff">Main</div>
-          <div style="display:flex;gap:4px;align-items:flex-end;height:60px">
-            <div class="mixer-fader-track"><div class="mixer-fader-fill" style="height:72%;background:#4a9eff"></div><div class="mixer-fader-knob" style="bottom:calc(72% - 4px);background:#4a9eff"></div></div>
-            <div class="mixer-meter"><div class="mixer-meter-fill" style="height:68%;background:#4a9eff"></div></div>
+
+        <!-- Return A -->
+        <div class="mixer-channel" style="min-width:50px">
+          <div class="mixer-label" style="color:#ea5808">A</div>
+          <div class="mixer-routing" style="font-size:6px">Reverb/<br>Compressor</div>
+          <div class="mixer-audio-to">Sends Only</div>
+          <div class="mixer-fader-area">
+            <div class="mixer-fader-track"><div class="mixer-fader-fill" style="height:50%"></div><div class="mixer-fader-knob" style="bottom:calc(50% - 3px)"></div></div>
+            <div class="mixer-meter"><div class="mixer-meter-fill" style="height:45%;background:#ea5808"></div></div>
           </div>
-          <div class="mixer-pan" style="color:#4a9eff">C</div>
-          <div style="display:flex;gap:2px"><div class="mixer-solo-btn" style="background:#4a9eff;color:#fff">S</div><div class="mixer-mute-btn">M</div></div>
+          <div class="mixer-pan-knob" style="transform:rotate(0deg)"></div>
+          <div class="mixer-pan-label">C</div>
+          <div style="display:flex;gap:2px"><div class="mixer-solo-btn">S</div><div class="mixer-mute-btn">M</div></div>
+        </div>
+
+        <!-- Main -->
+        <div class="mixer-channel" style="background:#3a3a5a;border-color:#6ee7ff">
+          <div class="mixer-label" style="color:#6ee7ff">Main</div>
+          <div class="mixer-audio-to" style="color:#6ee7ff">Cue Out<br>1/2</div>
+          <div class="mixer-audio-to">Main Out<br>Main<br>1/2</div>
+          <div class="mixer-sends">
+            <div><div class="mixer-send-knob" style="transform:rotate(-40deg);border-color:#6ee7ff"></div><div class="mixer-send-label" style="color:#6ee7ff">Sends</div></div>
+          </div>
+          <div class="mixer-fader-area">
+            <div class="mixer-fader-track"><div class="mixer-fader-fill" style="height:72%;background:#6ee7ff"></div><div class="mixer-fader-knob" style="bottom:calc(72% - 3px);background:#6ee7ff"></div></div>
+            <div class="mixer-meter"><div class="mixer-meter-fill" style="height:65%;background:#6ee7ff"></div></div>
+          </div>
+          <div class="mixer-pan-knob" style="transform:rotate(0deg);border-color:#6ee7ff"></div>
+          <div class="mixer-pan-label" style="color:#6ee7ff">C</div>
+          <div style="display:flex;gap:2px"><div class="mixer-solo-btn" style="background:#6ee7ff;color:#333">S</div><div class="mixer-mute-btn">M</div></div>
         </div>
       </div>
 
-      <!-- Device Chain -->
-      <div class="device-chain">
-        <div class="device active">
-          <div class="device-header">
-            <div class="device-name">🎛️ EQ Eight</div>
-            <div class="device-toggle on"></div>
+      <!-- Detail View (bottom) -->
+      <div class="detail-view">
+        <div class="detail-left">
+          <div class="detail-clip-info">
+            <div>
+              <div class="detail-clip-name">kick01.pattern01</div>
+              <div class="detail-clip-meta">Kicks · kick01.pattern01</div>
+            </div>
           </div>
-          <div class="device-params">
-            <div class="device-knob"><div class="knob-ring" style="transform:rotate(-30deg)"></div><div class="knob-label">Freq</div><div class="knob-value">2.4 kHz</div></div>
-            <div class="device-knob"><div class="knob-ring" style="transform:rotate(15deg)"></div><div class="knob-label">Gain</div><div class="knob-value">+3.2 dB</div></div>
-            <div class="device-knob"><div class="knob-ring" style="transform:rotate(-60deg)"></div><div class="knob-label">Q</div><div class="knob-value">0.71</div></div>
+          <div class="detail-row">
+            <div class="detail-row-label">Start</div>
+            <div class="detail-row-value">1</div>
+            <div class="detail-row-value">1</div>
+            <div class="detail-row-value">1</div>
+          </div>
+          <div class="detail-row">
+            <div class="detail-row-label">End</div>
+            <div class="detail-row-value">5</div>
+            <div class="detail-row-value">1</div>
+            <div class="detail-row-value">1</div>
+          </div>
+          <div class="detail-row">
+            <div class="detail-row-label"></div>
+            <div class="detail-row-value" style="font-size:7px">Duplicate</div>
+          </div>
+          <div style="display:flex;gap:3px;margin-top:2px">
+            <div class="detail-btn active">Loop</div>
+            <div class="detail-row-value" style="font-size:7px">1</div>
+            <div class="detail-row-value" style="font-size:7px">4</div>
+            <div class="detail-row-value" style="font-size:7px">0</div>
+            <div class="detail-btn" style="font-size:7px">Loop Length</div>
+          </div>
+          <div class="detail-row" style="margin-top:2px">
+            <div class="detail-row-label">Push</div>
+            <div class="detail-row-value">×2</div>
+            <div class="detail-row-value">×1/2</div>
+          </div>
+          <div class="detail-row">
+            <div class="detail-row-label">Signature</div>
+            <div class="detail-row-value">4</div>
+            <div class="detail-row-value">4</div>
+          </div>
+          <div class="detail-row">
+            <div class="detail-row-label">Groove</div>
+            <div class="detail-row-value" style="min-width:60px">None</div>
           </div>
         </div>
-        <div class="device">
-          <div class="device-header">
-            <div class="device-name">🔊 Compressor</div>
-            <div class="device-toggle on"></div>
-          </div>
-          <div class="device-params">
-            <div class="device-knob"><div class="knob-ring" style="transform:rotate(-45deg)"></div><div class="knob-label">Thresh</div><div class="knob-value">-18 dB</div></div>
-            <div class="device-knob"><div class="knob-ring" style="transform:rotate(30deg)"></div><div class="knob-label">Ratio</div><div class="knob-value">4:1</div></div>
-            <div class="device-knob"><div class="knob-ring" style="transform:rotate(0deg)"></div><div class="knob-label">Attack</div><div class="knob-value">5 ms</div></div>
-            <div class="device-knob"><div class="knob-ring" style="transform:rotate(45deg)"></div><div class="knob-label">Release</div><div class="knob-value">120 ms</div></div>
-          </div>
-        </div>
-        <div class="device">
-          <div class="device-header">
-            <div class="device-name">🌊 Reverb</div>
-            <div class="device-toggle on"></div>
-          </div>
-          <div class="device-params">
-            <div class="device-knob"><div class="knob-ring" style="transform:rotate(-20deg)"></div><div class="knob-label">Size</div><div class="knob-value">35%</div></div>
-            <div class="device-knob"><div class="knob-ring" style="transform:rotate(10deg)"></div><div class="knob-label">Decay</div><div class="knob-value">2.1 s</div></div>
-            <div class="device-knob"><div class="knob-ring" style="transform:rotate(-40deg)"></div><div class="knob-label">Damp</div><div class="knob-value">45%</div></div>
-          </div>
-        </div>
-        <div class="device">
-          <div class="device-header">
-            <div class="device-name">🎹 Serum</div>
-            <div class="device-toggle on" style="background:#ea5808;box-shadow:0 0 4px rgba(234,88,8,0.5)"></div>
-          </div>
-          <div class="device-params">
-            <div class="device-knob"><div class="knob-ring" style="transform:rotate(-15deg);border-color:#ea5808"></div><div class="knob-label">Cutoff</div><div class="knob-value" style="color:#ea5808">2.4 kHz</div></div>
-            <div class="device-knob"><div class="knob-ring" style="transform:rotate(25deg);border-color:#ea5808"></div><div class="knob-label">Res</div><div class="knob-value" style="color:#ea5808">42%</div></div>
-            <div class="device-knob"><div class="knob-ring" style="transform:rotate(0deg);border-color:#ea5808"></div><div class="knob-label">Drive</div><div class="knob-value" style="color:#ea5808">18%</div></div>
-            <div class="device-knob"><div class="knob-ring" style="transform:rotate(-30deg);border-color:#ea5808"></div><div class="knob-label">Mix</div><div class="knob-value" style="color:#ea5808">100%</div></div>
-          </div>
-        </div>
-      </div>
-    </div>
 
-    <!-- Detail View -->
-    <div class="detail-view">
-      <div class="detail-title">🎹 Serum — Preset Info</div>
-      <div class="detail-row"><div class="detail-label">Preset</div><div class="detail-value">Dark Bass — Deep Impact</div></div>
-      <div class="detail-row"><div class="detail-label">Bank</div><div class="detail-value">SoundHub Essentials</div></div>
-      <div class="detail-row"><div class="detail-label">Category</div><div class="detail-value">Bass</div></div>
-      <div class="detail-row"><div class="detail-label">Author</div><div class="detail-value">@bassDesigner</div></div>
-      <div class="detail-row"><div class="detail-label">Price</div><div class="detail-value" style="color:#ea5808">$2.99</div></div>
-      <div class="detail-row"><div class="detail-label">Downloads</div><div class="detail-value">1,247</div></div>
-      <div class="detail-row"><div class="detail-label">Rating</div><div class="detail-value" style="color:#eab308">★ 4.8</div></div>
-      <div class="detail-row"><div class="detail-label">BPM</div><div class="detail-value">128</div></div>
-      <div class="detail-row"><div class="detail-label">Key</div><div class="detail-value">Am</div></div>
-      <div class="detail-row"><div class="detail-label">Format</div><div class="detail-value">.fxp</div></div>
-      <div class="detail-row"><div class="detail-label">Size</div><div class="detail-value">24 KB</div></div>
-      <div class="detail-tags">
-        <div class="detail-tag">bass</div>
-        <div class="detail-tag">dark</div>
-        <div class="detail-tag">sub</div>
-        <div class="detail-tag">808</div>
-        <div class="detail-tag">electronic</div>
+        <!-- Timeline / MIDI Grid -->
+        <div class="detail-timeline">
+          <div class="timeline-ruler">
+            <div class="timeline-beat">1.1.1</div>
+            <div class="timeline-beat">1.1.2</div>
+            <div class="timeline-beat">1.1.3</div>
+            <div class="timeline-beat">1.1.4</div>
+            <div class="timeline-beat">1.2.1</div>
+            <div class="timeline-beat">1.2.2</div>
+            <div class="timeline-beat">1.2.3</div>
+            <div class="timeline-beat">1.2.4</div>
+            <div class="timeline-beat">1.3.1</div>
+            <div class="timeline-beat">1.3.2</div>
+            <div class="timeline-beat">1.3.3</div>
+            <div class="timeline-beat">1.3.4</div>
+            <div class="timeline-beat">1.4.1</div>
+            <div class="timeline-beat">1.4.2</div>
+            <div class="timeline-beat">1.4.3</div>
+            <div class="timeline-beat">1.4.4</div>
+          </div>
+          <div style="display:flex;flex:1">
+            <div class="piano-roll">
+              <div class="piano-key">C3</div>
+              <div class="piano-key black">B2</div>
+              <div class="piano-key">A#2</div>
+              <div class="piano-key black">A2</div>
+              <div class="piano-key">G#2</div>
+              <div class="piano-key black">G2</div>
+              <div class="piano-key">F#2</div>
+              <div class="piano-key black">F2</div>
+              <div class="piano-key">E2</div>
+              <div class="piano-key black">D#2</div>
+              <div class="piano-key">D2</div>
+              <div class="piano-key black">C#2</div>
+              <div class="piano-key" style="color:#ea5808;font-weight:700">C2</div>
+              <div class="piano-key black">B1</div>
+              <div class="piano-key">A#1</div>
+              <div class="piano-key black">A1</div>
+            </div>
+            <div class="timeline-grid">
+              <!-- MIDI notes grid -->
+              <div class="timeline-note" style="left:0%;width:5%;top:8px;background:#ea5808">C2</div>
+              <div class="timeline-note" style="left:6.25%;width:5%;top:8px;background:#ea5808">C2</div>
+              <div class="timeline-note" style="left:12.5%;width:5%;top:8px;background:#ea5808">C2</div>
+              <div class="timeline-note" style="left:18.75%;width:5%;top:8px;background:#ea5808">C2</div>
+              <div class="timeline-note" style="left:25%;width:5%;top:8px;background:#ea5808">C2</div>
+              <div class="timeline-note" style="left:31.25%;width:5%;top:8px;background:#ea5808">C2</div>
+              <div class="timeline-note" style="left:37.5%;width:5%;top:8px;background:#ea5808">C2</div>
+              <div class="timeline-note" style="left:43.75%;width:5%;top:8px;background:#ea5808">C2</div>
+              <div class="timeline-note" style="left:50%;width:5%;top:8px;background:#ea5808">C2</div>
+              <div class="timeline-note" style="left:56.25%;width:5%;top:8px;background:#ea5808">C2</div>
+              <div class="timeline-note" style="left:62.5%;width:5%;top:8px;background:#ea5808">C2</div>
+              <div class="timeline-note" style="left:68.75%;width:5%;top:8px;background:#ea5808">C2</div>
+              <div class="timeline-note" style="left:75%;width:5%;top:8px;background:#ea5808">C2</div>
+              <div class="timeline-note" style="left:81.25%;width:5%;top:8px;background:#ea5808">C2</div>
+              <div class="timeline-note" style="left:87.5%;width:5%;top:8px;background:#ea5808">C2</div>
+              <div class="timeline-note" style="left:93.75%;width:5%;top:8px;background:#ea5808">C2</div>
+              <!-- D#2 notes (hi-hat pattern) -->
+              <div class="timeline-note" style="left:6.25%;width:4%;top:0;background:#4a9eff">D#2</div>
+              <div class="timeline-note" style="left:18.75%;width:4%;top:0;background:#4a9eff">D#2</div>
+              <div class="timeline-note" style="left:31.25%;width:4%;top:0;background:#4a9eff">D#2</div>
+              <div class="timeline-note" style="left:43.75%;width:4%;top:0;background:#4a9eff">D#2</div>
+              <div class="timeline-note" style="left:56.25%;width:4%;top:0;background:#4a9eff">D#2</div>
+              <div class="timeline-note" style="left:68.75%;width:4%;top:0;background:#4a9eff">D#2</div>
+              <div class="timeline-note" style="left:81.25%;width:4%;top:0;background:#4a9eff">D#2</div>
+              <div class="timeline-note" style="left:93.75%;width:4%;top:0;background:#4a9eff">D#2</div>
+              <!-- C+2 chord -->
+              <div class="timeline-note" style="left:12.5%;width:18%;top:16px;background:#22c55e">C+2 1</div>
+              <div class="timeline-note" style="left:50%;width:18%;top:16px;background:#22c55e">C+2 1</div>
+              <div class="timeline-note" style="left:81.25%;width:12%;top:16px;background:#22c55e">C+2 1</div>
+            </div>
+          </div>
+          <!-- Velocity lane -->
+          <div class="velocity-lane">
+            <div style="font-size:7px;color:#777;position:absolute;left:4px;bottom:2px">127</div>
+            <div class="velocity-bar" style="height:100%"></div>
+            <div class="velocity-bar" style="height:85%"></div>
+            <div class="velocity-bar" style="height:92%"></div>
+            <div class="velocity-bar" style="height:78%"></div>
+            <div class="velocity-bar" style="height:88%"></div>
+            <div class="velocity-bar" style="height:95%"></div>
+            <div class="velocity-bar" style="height:82%"></div>
+            <div class="velocity-bar" style="height:90%"></div>
+            <div class="velocity-bar" style="height:100%"></div>
+            <div class="velocity-bar" style="height:85%"></div>
+            <div class="velocity-bar" style="height:72%"></div>
+            <div class="velocity-bar" style="height:95%"></div>
+            <div class="velocity-bar" style="height:88%"></div>
+            <div class="velocity-bar" style="height:78%"></div>
+            <div class="velocity-bar" style="height:100%"></div>
+            <div class="velocity-bar" style="height:90%"></div>
+          </div>
+          <div style="position:absolute;bottom:2px;right:8px;font-size:7px;color:#777;display:flex;gap:4px">
+            <span>Velocity:</span>
+            <span style="color:#ea5808">Randomize</span>
+            <span style="color:#ea5808"> ±</span>
+            <span style="background:#444;padding:0 3px;border-radius:2px">127</span>
+            <span>Deviation 0</span>
+          </div>
+        </div>
+
+        <!-- Right Info Panel -->
+        <div class="info-panel">
+          <div class="info-panel-title">Bad Karma Box</div>
+          <div class="info-panel-desc">
+            This Live Pack allows you to step into the "headquarters" between 2008 and 2012. It's a collection of loops, sounds and clips I've used in all my releases and remixes for many years by now. It's pretty close to a everyday template.
+          </div>
+          <div class="info-panel-desc">
+            This particular kit is just for you, and was arranged in a way that will make it easy to add your own material and either play with your friends or create a original track. It features a lot of stems and drafts from my albums (under my alias "Shackleton666") lined up in a way that makes them freely combinable... so technically, it's up to you now to write those missing track(s).
+          </div>
+          <div style="margin-top:8px">
+            <div class="info-panel-row"><div class="info-panel-label">Pack</div><div class="info-panel-value">Bad Karma Box</div></div>
+            <div class="info-panel-row"><div class="info-panel-label">Type</div><div class="info-panel-value">Drum Kit</div></div>
+            <div class="info-panel-row"><div class="info-panel-label">Format</div><div class="info-panel-value">.adv / .adg</div></div>
+            <div class="info-panel-row"><div class="info-panel-label">Instruments</div><div class="info-panel-value">Serum, Vital, Diva</div></div>
+            <div class="info-panel-row"><div class="info-panel-label">BPM</div><div class="info-panel-value">120</div></div>
+            <div class="info-panel-row"><div class="info-panel-label">Key</div><div class="info-panel-value">Am</div></div>
+            <div class="info-panel-row"><div class="info-panel-label">Size</div><div class="info-panel-value">62 KB</div></div>
+          </div>
+          <div class="info-panel-tags">
+            <div class="info-panel-tag">hybrid kit</div>
+            <div class="info-panel-tag">electronic</div>
+            <div class="info-panel-tag">drums</div>
+            <div class="info-panel-tag">loops</div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
