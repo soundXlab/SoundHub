@@ -4,597 +4,212 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=1440">
   <title>SoundHub — VST Compare</title>
-  <link rel="stylesheet" href="design-system/shared.css">
   <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { font-family:'Inter',-apple-system,'Segoe UI',sans-serif; background:#1a1a1a; color:#b0b0b0; overflow:hidden; height:100vh; font-size:11px; user-select:none; }
-
-    /* ── Transport ── */
-    .transport {
-      height:30px; background:#2a2a2a; border-bottom:1px solid #3a3a3a;
-      display:flex; align-items:center; padding:0 8px; gap:8px;
-    }
-    .transport-btn {
-      width:20px; height:20px; border-radius:3px; display:flex; align-items:center;
-      justify-content:center; font-size:10px; background:#333; border:1px solid #444;
-      cursor:pointer; color:#888; transition:all 0.1s;
-    }
-    .transport-btn:hover { background:#444; color:#ccc; }
-    .transport-btn.active { background:#4a9eff; border-color:#4a9eff; color:#fff; }
-    .transport-btn.record { color:#ff4444; }
-    .transport-divider { width:1px; height:16px; background:#3a3a3a; }
-    .transport-display {
-      background:#1a1a1a; border:1px solid #333; border-radius:3px;
-      padding:1px 6px; font-family:'JetBrains Mono',monospace; font-size:11px;
-      color:#4a9eff; font-weight:600; min-width:50px; text-align:center;
-    }
-    .transport-label { font-size:9px; color:#666; text-transform:uppercase; letter-spacing:0.5px; }
-    .transport-spacer { flex:1; }
-
-    /* ── Main Layout ── */
-    .app-layout { display:flex; height:calc(100vh - 30px); }
-
-    /* ── Browser ── */
-    .browser {
-      width:220px; background:#2a2a2a; border-right:1px solid #3a3a3a;
-      display:flex; flex-direction:column; flex-shrink:0;
-    }
-    .browser-search { padding:4px 6px; border-bottom:1px solid #3a3a3a; }
-    .browser-search input {
-      width:100%; background:#1a1a1a; border:1px solid #333; border-radius:3px;
-      padding:3px 6px 3px 22px; font-size:10px; color:#b0b0b0; outline:none;
-      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");
-      background-repeat:no-repeat; background-position:6px center;
-    }
-    .browser-nav { flex:1; overflow-y:auto; padding:2px 0; }
-    .browser-section {
-      padding:4px 8px 2px; font-size:9px; color:#666;
-      text-transform:uppercase; letter-spacing:0.8px; font-weight:700;
-    }
-    .browser-item {
-      padding:3px 8px; font-size:10px; color:#999; cursor:pointer;
-      display:flex; align-items:center; gap:6px; transition:all 0.1s;
-    }
-    .browser-item:hover { color:#ddd; background:rgba(255,255,255,0.03); }
-    .browser-item.active { color:#ea5808; background:rgba(234,88,8,0.08); }
-    .browser-item .icon { width:14px; text-align:center; font-size:10px; }
-    .browser-item .count { margin-left:auto; font-size:8px; color:#555; font-family:monospace; }
-    .browser-divider { height:1px; background:#3a3a3a; margin:4px 6px; }
-
-    /* ── Center ── */
-    .center { flex:1; display:flex; flex-direction:column; overflow:hidden; }
-
-    /* ── Session View ── */
-    .session-view { flex:1; display:flex; overflow:hidden; }
-    .session-tracks { flex:1; display:flex; overflow-x:auto; }
-    .track { min-width:100px; border-right:1px solid #333; display:flex; flex-direction:column; }
-    .track-header {
-      height:80px; background:#2a2a2a; border-bottom:1px solid #333;
-      padding:6px 8px; display:flex; flex-direction:column; justify-content:space-between;
-    }
-    .track-name { font-size:10px; font-weight:600; color:#ccc; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .track-controls { display:flex; gap:4px; }
-    .track-btn {
-      width:16px; height:16px; border-radius:2px; font-size:8px;
-      display:flex; align-items:center; justify-content:center;
-      background:#333; border:1px solid #444; cursor:pointer; color:#888;
-    }
-    .track-btn:hover { background:#444; }
-    .clips-column { flex:1; display:flex; flex-direction:column; }
-    .clip-slot {
-      height:20px; border-bottom:1px solid #222; cursor:pointer;
-      display:flex; align-items:center; padding:0 4px; font-size:9px;
-    }
-    .clip-slot:hover { background:rgba(255,255,255,0.03); }
-    .clip {
-      width:100%; height:14px; border-radius:2px; padding:0 4px;
-      font-size:8px; line-height:14px; white-space:nowrap; overflow:hidden;
-      cursor:pointer; transition:filter 0.1s;
-    }
-    .clip:hover { filter:brightness(1.2); }
-    .clip-green { background:#2d8a4e; color:#a8e6c3; }
-    .clip-orange { background:#c0600a; color:#ffcc80; }
-    .clip-purple { background:#6a3090; color:#d9b3ff; }
-    .clip-cyan { background:#1a7070; color:#b3e6e6; }
-    .clip-empty { background:transparent; }
-
-    /* ── Mixer ── */
-    .mixer {
-      height:100px; background:#2a2a2a; border-top:1px solid #3a3a3a;
-      display:flex; overflow-x:auto;
-    }
-    .mixer-channel {
-      min-width:100px; border-right:1px solid #333; padding:6px 8px;
-      display:flex; flex-direction:column; align-items:center; gap:4px;
-    }
-    .mixer-label { font-size:8px; color:#666; text-transform:uppercase; letter-spacing:0.5px; }
-    .mixer-fader-track {
-      width:6px; height:50px; background:#1a1a1a; border-radius:3px;
-      position:relative; cursor:pointer;
-    }
-    .mixer-fader-fill { position:absolute; bottom:0; width:100%; background:#4a9eff; border-radius:3px; }
-    .mixer-fader-knob {
-      position:absolute; width:14px; height:8px; background:#ccc;
-      border:1px solid #888; border-radius:2px; left:-4px; cursor:grab;
-    }
-    .mixer-meter {
-      width:4px; height:35px; background:#1a1a1a; border-radius:2px;
-      position:relative; overflow:hidden;
-    }
-    .mixer-meter-fill { position:absolute; bottom:0; width:100%; border-radius:2px; }
-    .mixer-pan { font-size:8px; color:#666; font-family:monospace; }
-    .mixer-solo-btn {
-      width:14px; height:14px; border-radius:2px; font-size:7px;
-      display:flex; align-items:center; justify-content:center;
-      background:#333; color:#4a9eff; cursor:pointer;
-    }
-    .mixer-mute-btn {
-      width:14px; height:14px; border-radius:2px; font-size:7px;
-      display:flex; align-items:center; justify-content:center;
-      background:#333; color:#eab308; cursor:pointer;
-    }
-
-    /* ── Device Chain ── */
-    .device-chain {
-      height:80px; background:#2a2a2a; border-top:1px solid #3a3a3a;
-      display:flex; align-items:stretch; padding:0 8px; gap:2px;
-    }
-    .device {
-      background:#333; border:1px solid #444; border-radius:3px;
-      padding:6px 10px; min-width:120px; cursor:pointer;
-      display:flex; flex-direction:column; transition:all 0.1s;
-    }
-    .device:hover { border-color:#555; }
-    .device.active { border-color:#ea5808; background:rgba(234,88,8,0.08); }
-    .device-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:4px; }
-    .device-name { font-size:9px; font-weight:600; color:#ccc; }
-    .device-toggle {
-      width:10px; height:10px; border-radius:50%; background:#444; cursor:pointer;
-    }
-    .device-toggle.on { background:#ea5808; box-shadow:0 0 4px rgba(234,88,8,0.5); }
-    .device-params { display:flex; gap:6px; flex-wrap:wrap; }
-    .device-knob { display:flex; flex-direction:column; align-items:center; gap:2px; }
-    .knob-ring {
-      width:24px; height:24px; border-radius:50%; background:#1a1a1a;
-      border:2px solid #555; position:relative; cursor:pointer;
-    }
-    .knob-ring::after {
-      content:''; position:absolute; width:2px; height:8px;
-      background:#ea5808; top:2px; left:50%; transform:translateX(-50%); border-radius:1px;
-    }
-    .knob-label { font-size:7px; color:#666; }
-    .knob-value { font-size:8px; color:#999; font-family:monospace; }
-
-    /* ── Compare Panel ── */
-    .compare-panel {
-      width:320px; background:#2a2a2a; border-left:1px solid #3a3a3a;
-      display:flex; flex-direction:column; overflow:hidden;
-    }
-    .compare-header {
-      padding:12px; border-bottom:1px solid #3a3a3a;
-      display:flex; align-items:center; gap:8px;
-    }
-    .compare-vs {
-      font-size:14px; font-weight:800; color:#ea5808; padding:0 8px;
-    }
-    .compare-pill {
-      padding:3px 8px; border-radius:3px; font-size:9px; font-weight:600;
-      cursor:pointer; transition:all 0.1s;
-    }
-    .compare-pill.serum { background:rgba(234,88,8,0.15); color:#ea5808; border:1px solid #ea5808; }
-    .compare-pill.vital { background:rgba(99,102,241,0.15); color:#6366f1; border:1px solid #6366f1; }
-    .compare-tabs {
-      display:flex; border-bottom:1px solid #3a3a3a;
-    }
-    .compare-tab {
-      flex:1; padding:8px 4px; font-size:9px; font-weight:600; color:#666;
-      text-align:center; cursor:pointer; border-bottom:2px solid transparent;
-      transition:all 0.1s;
-    }
-    .compare-tab:hover { color:#999; }
-    .compare-tab.active { color:#ea5808; border-bottom-color:#ea5808; }
-    .compare-content { flex:1; overflow-y:auto; padding:4px; }
-
-    /* ── Compare Rows ── */
-    .compare-row {
-      display:flex; align-items:stretch; border-bottom:1px solid #2a2a2a;
-      transition:background 0.1s;
-    }
-    .compare-row:hover { background:rgba(255,255,255,0.02); }
-    .compare-row-header {
-      padding:6px 8px; font-size:9px; font-weight:700; color:#666;
-      text-transform:uppercase; letter-spacing:0.5px; background:#222;
-      border-bottom:1px solid #3a3a3a;
-    }
-    .compare-cell {
-      flex:1; padding:6px 8px; font-size:10px; display:flex;
-      align-items:center; justify-content:center; text-align:center;
-      border-right:1px solid #2a2a2a;
-    }
-    .compare-cell:last-child { border-right:none; }
-    .compare-cell-label {
-      width:80px; padding:6px 8px; font-size:9px; color:#666;
-      font-weight:600; text-align:center; border-right:1px solid #2a2a2a;
-    }
-    .compare-cell.serum { color:#ea5808; }
-    .compare-cell.vital { color:#6366f1; }
-    .compare-cell.better { color:#22c55e; font-weight:600; }
-    .compare-cell.equal { color:#888; }
-
-    /* ── Verdict ── */
-    .verdict {
-      padding:12px; border-top:1px solid #3a3a3a;
-      background:linear-gradient(180deg,rgba(234,88,8,0.04),transparent);
-    }
-    .verdict-title { font-size:10px; font-weight:700; color:#ccc; margin-bottom:6px; }
-    .verdict-text { font-size:10px; color:#888; line-height:1.5; }
-    .verdict-winner {
-      display:inline-flex; align-items:center; gap:4px;
-      padding:3px 8px; border-radius:3px; font-size:9px; font-weight:700;
-      margin-top:6px;
-    }
-    .verdict-winner.serum { background:rgba(234,88,8,0.15); color:#ea5808; }
-    .verdict-winner.vital { background:rgba(99,102,241,0.15); color:#6366f1; }
-
-    /* ── Scrollbar ── */
-    ::-webkit-scrollbar { width:6px; }
-    ::-webkit-scrollbar-track { background:#1a1a1a; }
-    ::-webkit-scrollbar-thumb { background:#3a3a3a; border-radius:3px; }
-    ::-webkit-scrollbar-thumb:hover { background:#4a4a4a; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Inter',-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;background:#333;color:#bbb;overflow:hidden;height:100vh;font-size:11px;user-select:none;-webkit-font-smoothing:antialiased}
+    .transport{height:24px;background:#444;border-bottom:1px solid #555;display:flex;align-items:center;padding:0 4px;gap:3px}
+    .t-link{font-size:8px;color:#aaa;cursor:pointer;padding:0 3px;text-decoration:underline}
+    .t-btn{width:16px;height:16px;border-radius:1px;display:flex;align-items:center;justify-content:center;font-size:8px;background:#555;border:1px solid #666;cursor:pointer;color:#bbb}
+    .t-btn:hover{background:#666}.t-btn.on{background:#4a9eff;border-color:#4a9eff;color:#fff}.t-btn.rec{color:#e04040}
+    .t-sep{width:1px;height:12px;background:#666}
+    .t-disp{background:#2a2a2a;border:1px solid #555;border-radius:1px;padding:0 4px;font-family:'JetBrains Mono',Consolas,monospace;font-size:11px;color:#5ec4e8;font-weight:700;min-width:36px;text-align:center;line-height:16px}
+    .t-lbl{font-size:7px;color:#888;text-transform:uppercase;letter-spacing:0.2px;padding:0 1px}
+    .t-spacer{flex:1}.t-info{font-size:8px;color:#888;font-family:monospace;padding:0 2px}
+    .view-toggle{display:flex;gap:1px;margin:0 2px}
+    .view-btn{width:16px;height:16px;border-radius:1px;display:flex;align-items:center;justify-content:center;font-size:8px;background:#444;border:1px solid #555;cursor:pointer;color:#888}
+    .view-btn:hover{background:#555;color:#bbb}.view-btn.active{background:#ea5808;border-color:#ea5808;color:#fff}
+    .app{display:flex;height:calc(100vh - 24px)}
+    .browser{width:200px;background:#3a3a3a;border-right:1px solid #444;display:flex;flex-direction:column;flex-shrink:0}
+    .br-search{padding:2px 4px;border-bottom:1px solid #444}
+    .br-search input{width:100%;background:#2a2a2a;border:1px solid #555;border-radius:1px;padding:1px 4px 1px 16px;font-size:9px;color:#bbb;outline:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 24 24' fill='none' stroke='%23777' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:4px center}
+    .br-nav{flex:1;overflow-y:auto}
+    .br-sec{padding:3px 5px 1px;font-size:8px;color:#888;text-transform:uppercase;letter-spacing:0.5px;font-weight:700}
+    .br-item{padding:1px 5px;font-size:9px;color:#aaa;cursor:pointer;display:flex;align-items:center;gap:4px;line-height:1.5}
+    .br-item:hover{color:#ddd;background:rgba(255,255,255,0.04)}.br-item.on{color:#ea5808;background:rgba(234,88,8,0.08)}
+    .br-item .ic{width:10px;text-align:center;font-size:8px}.br-item .ct{margin-left:auto;font-size:7px;color:#666;font-family:monospace}
+    .br-sub{padding-left:12px;font-size:8px;color:#888;line-height:1.6}.br-div{height:1px;background:#444;margin:2px 4px}
+    .center{flex:1;display:flex;flex-direction:column;overflow:hidden}
+    .session-view{flex:1;display:flex;overflow:hidden;background:#333}
+    .session-view.hidden{display:none}
+    .tracks{flex:1;display:flex;overflow-x:auto}
+    .trk{min-width:82px;border-right:1px solid #444;display:flex;flex-direction:column}
+    .trk-hdr{height:70px;background:#3a3a3a;border-bottom:1px solid #444;padding:3px 4px;display:flex;flex-direction:column}
+    .trk-top{display:flex;align-items:center;justify-content:space-between}
+    .trk-name{font-size:9px;font-weight:700;color:#ddd;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .trk-btns{display:flex;gap:2px}
+    .trk-b{width:12px;height:12px;border-radius:1px;font-size:6px;font-weight:800;display:flex;align-items:center;justify-content:center;background:#444;border:1px solid #555;cursor:pointer;color:#888}
+    .trk-b:hover{background:#555}.trk-b.s{color:#4a9eff}.trk-b.m{color:#eab308}.trk-b.r{color:#e04040}
+    .clips{flex:1;display:flex;flex-direction:column}
+    .cl-slot{flex:1;border-bottom:1px solid #2a2a2a;cursor:pointer;display:flex;align-items:center;padding:0 2px}
+    .cl-slot:hover{background:rgba(255,255,255,0.03)}
+    .cl{width:100%;height:calc(100% - 2px);border-radius:1px;padding:0 3px;font-size:7px;line-height:normal;white-space:nowrap;overflow:hidden;cursor:pointer;display:flex;align-items:center}
+    .cl:hover{filter:brightness(1.12)}
+    .cl-g{background:#3d8a5e;color:#b8e8c8}.cl-o{background:#c06a0a;color:#ffcc80}.cl-p{background:#6a3090;color:#d9b3ff}.cl-c{background:#1a7070;color:#b3e6e6}.cl-b{background:#2a6090;color:#b3d9ff}.cl-e{background:transparent}
+    .scenes{width:24px;background:#3a3a3a;border-left:1px solid #444;display:flex;flex-direction:column;flex-shrink:0}
+    .sc-btn{flex:1;display:flex;align-items:center;justify-content:center;font-size:7px;color:#777;cursor:pointer;border-bottom:1px solid #2a2a2a}
+    .sc-btn:hover{background:rgba(255,255,255,0.04);color:#ddd}.sc-btn.play{color:#ea5808}
+    .arr-view{flex:1;display:none;overflow:hidden;background:#333;flex-direction:column}.arr-view.active{display:flex}
+    .arr-ruler{height:16px;background:#3a3a3a;border-bottom:1px solid #444;display:flex;overflow:hidden}
+    .arr-ruler-label{width:100px;background:#3a3a3a;border-right:1px solid #444;flex-shrink:0}
+    .arr-ruler-beats{flex:1;display:flex}.arr-beat{flex:1;border-right:1px solid #444;font-size:7px;color:#666;font-family:monospace;display:flex;align-items:center;padding-left:2px}.arr-beat.bar{color:#888;font-weight:700}
+    .arr-tracks{flex:1;overflow-y:auto}.arr-track{display:flex;height:40px;border-bottom:1px solid #444}
+    .arr-track-hdr{width:100px;background:#3a3a3a;border-right:1px solid #444;padding:3px 4px;display:flex;flex-direction:column;justify-content:center;flex-shrink:0}
+    .arr-track-name{font-size:8px;font-weight:700;color:#ddd;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .arr-track-btns{display:flex;gap:2px;margin-top:2px}
+    .arr-track-content{flex:1;position:relative;background:#2a2a2a;overflow:hidden}
+    .arr-clip{position:absolute;top:2px;bottom:2px;border-radius:2px;padding:2px 4px;font-size:6px;color:rgba(255,255,255,0.7);display:flex;align-items:center;white-space:nowrap;overflow:hidden;cursor:pointer}.arr-clip:hover{filter:brightness(1.15)}
+    .arr-grid-line{position:absolute;top:0;bottom:0;width:1px;background:rgba(255,255,255,0.04)}
+    .mixer{height:105px;background:#3a3a3a;border-top:1px solid #444;display:flex;overflow-x:auto}
+    .mx-ch{min-width:82px;border-right:1px solid #444;padding:3px 4px;display:flex;flex-direction:column;align-items:center;gap:1px}
+    .mx-lbl{font-size:7px;color:#777;text-transform:uppercase;letter-spacing:0.2px}
+    .mx-route{font-size:6px;color:#666;text-align:center;line-height:1.3}
+    .mx-mon{display:flex;gap:1px}.mx-mon-b{padding:0 2px;font-size:5px;font-weight:800;background:#333;border:1px solid #444;color:#555;cursor:pointer;line-height:1.4}.mx-mon-b.on{background:#ea5808;color:#fff;border-color:#ea5808}
+    .mx-audio{font-size:6px;color:#666;text-align:center}
+    .mx-sends{display:flex;gap:2px;margin-top:1px}
+    .mx-send{width:14px;height:14px;border-radius:50%;background:#2a2a2a;border:1.5px solid #555;position:relative;cursor:pointer}.mx-send::after{content:'';position:absolute;width:1.5px;height:5px;background:#ea5808;top:1px;left:50%;transform:translateX(-50%);border-radius:1px}
+    .mx-send-lbl{font-size:5px;color:#555;text-align:center}
+    .mx-fader-area{display:flex;align-items:flex-end;gap:2px;height:40px}.mx-fader{width:6px;height:40px;background:#2a2a2a;border-radius:2px;position:relative;cursor:pointer}.mx-fader-fill{position:absolute;bottom:0;width:100%;background:#4a9eff;border-radius:2px}.mx-fader-knob{position:absolute;width:12px;height:5px;background:#ccc;border:1px solid #888;border-radius:1px;left:-3px;cursor:grab}
+    .mx-meter{width:3px;height:40px;background:#2a2a2a;border-radius:1px;position:relative;overflow:hidden}.mx-meter-fill{position:absolute;bottom:0;width:100%;border-radius:1px}
+    .mx-pan{width:18px;height:18px;border-radius:50%;background:#2a2a2a;border:1.5px solid #555;position:relative;cursor:pointer;margin-top:1px}.mx-pan::after{content:'';position:absolute;width:1.5px;height:5px;background:#bbb;top:1px;left:50%;transform:translateX(-50%);border-radius:1px}
+    .mx-pan-lbl{font-size:5px;color:#555;text-align:center;font-family:monospace}
+    .mx-sm{display:flex;gap:1px}.mx-sb{width:11px;height:11px;border-radius:1px;font-size:5px;font-weight:800;display:flex;align-items:center;justify-content:center;background:#444;color:#4a9eff;cursor:pointer}.mx-mb{width:11px;height:11px;border-radius:1px;font-size:5px;font-weight:800;display:flex;align-items:center;justify-content:center;background:#444;color:#eab308;cursor:pointer}
+    .detail{height:125px;background:#3a3a3a;border-top:1px solid #444;display:flex;overflow:hidden}
+    .dtl-left{width:220px;border-right:1px solid #444;padding:4px 6px;display:flex;flex-direction:column;gap:2px;font-size:8px}
+    .dtl-clip{font-size:10px;font-weight:800;color:#ddd;margin-bottom:2px}.dtl-clip-sub{font-size:7px;color:#777;margin-bottom:3px}
+    .dtl-row{display:flex;align-items:center;gap:3px}.dtl-lbl{color:#666;width:40px;font-size:7px}
+    .dtl-val{background:#2a2a2a;border:1px solid #555;border-radius:1px;padding:0 3px;font-family:monospace;font-size:8px;color:#bbb;min-width:22px;text-align:center;line-height:1.5}.dtl-val.on{background:#ea5808;color:#fff;border-color:#ea5808}
+    .dtl-btn{padding:0 5px;background:#444;border:1px solid #555;border-radius:1px;font-size:7px;color:#999;cursor:pointer;line-height:1.5}.dtl-btn:hover{background:#555}.dtl-btn.on{background:#ea5808;color:#fff;border-color:#ea5808}
+    .midi-grid{flex:1;background:#2a2a2a;border:1px solid #444;border-radius:1px;display:flex;flex-direction:column;overflow:hidden}
+    .midi-ruler{height:12px;background:#333;border-bottom:1px solid #444;display:flex;font-size:6px;color:#666;font-family:monospace}.midi-beat{flex:1;text-align:center;border-right:1px solid #3a3a3a;line-height:12px}
+    .midi-body{flex:1;display:flex}.piano{width:24px;background:#333;border-right:1px solid #444;display:flex;flex-direction:column}
+    .pkey{flex:1;border-bottom:1px solid #3a3a3a;font-size:5px;display:flex;align-items:center;justify-content:flex-end;padding-right:1px;color:#555}.pkey.blk{background:#2a2a2a;color:#444}.pkey.cur{color:#ea5808;font-weight:700}
+    .notes-area{flex:1;position:relative}.note{position:absolute;height:7px;border-radius:1px;font-size:5px;color:rgba(255,255,255,0.5);padding:0 1px;line-height:7px;cursor:pointer}.note:hover{filter:brightness(1.3)}
+    .vel-lane{height:18px;background:#2a2a2a;border-top:1px solid #444;display:flex;align-items:flex-end;gap:1px;padding:1px 24px}.vel-bar{flex:1;background:#4a9eff;border-radius:1px 1px 0 0;min-height:1px}
+    .vel-info{position:absolute;bottom:1px;right:4px;font-size:6px;color:#666;display:flex;gap:3px}
+    .info{width:200px;background:#3a3a3a;border-left:1px solid #444;padding:6px;overflow-y:auto;font-size:8px}
+    .info-title{font-size:11px;font-weight:800;color:#ddd;margin-bottom:3px}.info-desc{font-size:8px;color:#888;line-height:1.5;margin-bottom:6px}
+    .info-row{display:flex;justify-content:space-between;padding:1px 0;border-bottom:1px solid #333}.info-lbl{color:#666}.info-val{color:#bbb;font-family:monospace}
+    .info-tags{display:flex;gap:2px;flex-wrap:wrap;margin-top:4px}.info-tag{padding:1px 3px;background:#444;border-radius:1px;font-size:6px;color:#999}
+    /* Compare Panel */
+    .compare-panel{width:240px;background:#3a3a3a;border-left:1px solid #444;display:flex;flex-direction:column;overflow:hidden}
+    .compare-header{padding:6px;border-bottom:1px solid #444;display:flex;align-items:center;gap:6px}
+    .compare-pill{padding:2px 6px;border-radius:2px;font-size:7px;font-weight:700;cursor:pointer}
+    .compare-pill.serum{background:rgba(234,88,8,0.15);color:#ea5808;border:1px solid #ea5808}
+    .compare-pill.vital{background:rgba(99,102,241,0.15);color:#6366f1;border:1px solid #6366f1}
+    .compare-vs{font-size:10px;font-weight:800;color:#ea5808;padding:0 4px}
+    .compare-tabs{display:flex;border-bottom:1px solid #444}
+    .compare-tab{flex:1;padding:6px 2px;font-size:7px;font-weight:700;color:#666;text-align:center;cursor:pointer;border-bottom:1px solid transparent}.compare-tab:hover{color:#999}.compare-tab.active{color:#ea5808;border-bottom-color:#ea5808}
+    .compare-content{flex:1;overflow-y:auto;padding:2px}
+    .compare-row-header{padding:4px 6px;font-size:7px;font-weight:700;color:#777;text-transform:uppercase;letter-spacing:0.3px;background:#2a2a2a;border-bottom:1px solid #444}
+    .compare-row{display:flex;align-items:stretch;border-bottom:1px solid #2a2a2a}.compare-row:hover{background:rgba(255,255,255,0.02)}
+    .compare-cell{flex:1;padding:4px 6px;font-size:8px;display:flex;align-items:center;justify-content:center;text-align:center;border-right:1px solid #2a2a2a}.compare-cell:last-child{border-right:none}
+    .compare-cell-label{width:70px;padding:4px 6px;font-size:7px;color:#666;font-weight:600;text-align:center;border-right:1px solid #2a2a2a}
+    .compare-cell.serum{color:#ea5808}.compare-cell.vital{color:#6366f1}.compare-cell.better{color:#22c55e;font-weight:600}.compare-cell.equal{color:#888}
+    .verdict{padding:8px;border-top:1px solid #444;background:linear-gradient(180deg,rgba(234,88,8,0.04),transparent)}
+    .verdict-title{font-size:8px;font-weight:700;color:#ddd;margin-bottom:4px}.verdict-text{font-size:7px;color:#888;line-height:1.5}
+    .verdict-winner{display:inline-flex;align-items:center;gap:3px;padding:2px 6px;border-radius:2px;font-size:7px;font-weight:700;margin-top:4px}
+    .verdict-winner.serum{background:rgba(234,88,8,0.15);color:#ea5808}.verdict-winner.vital{background:rgba(99,102,241,0.15);color:#6366f1}
+    ::-webkit-scrollbar{width:4px;height:4px}::-webkit-scrollbar-track{background:#333}::-webkit-scrollbar-thumb{background:#555;border-radius:2px}
+    .tab-hint{position:fixed;bottom:8px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.8);color:#888;padding:4px 10px;border-radius:4px;font-size:9px;pointer-events:none;opacity:0;transition:opacity 0.3s;z-index:100}.tab-hint.show{opacity:1}.tab-hint kbd{background:#444;padding:1px 4px;border-radius:2px;font-family:monospace;color:#bbb;border:1px solid #555}
   </style>
 </head>
 <body>
-  <!-- Transport Bar -->
   <div class="transport">
-    <div class="transport-btn">⟲</div>
-    <div class="transport-btn">⟳</div>
-    <div class="transport-divider"></div>
-    <div class="transport-btn">⏹</div>
-    <div class="transport-btn active">▶</div>
-    <div class="transport-btn record">⏺</div>
-    <div class="transport-divider"></div>
-    <div class="transport-display">128.00</div>
-    <div class="transport-label">BPM</div>
-    <div class="transport-divider"></div>
-    <div class="transport-display" style="min-width:30px">4/4</div>
-    <div class="transport-divider"></div>
-    <div class="transport-display" style="min-width:80px">1.  1.  1</div>
-    <div class="transport-spacer"></div>
-    <div style="font-size:9px;color:#666;letter-spacing:0.5px">SOUNDHUB — VST COMPARE</div>
-    <div class="transport-spacer"></div>
-    <div class="transport-label">Key</div>
-    <div class="transport-display" style="min-width:30px">Am</div>
-    <div class="transport-label">MIDI</div>
-    <div class="transport-display" style="min-width:30px">0%</div>
-    <div class="transport-label">CPU</div>
-    <div class="transport-display" style="min-width:30px">14%</div>
+    <div class="t-link">Link</div><div class="t-btn" style="font-size:6px">Tap</div><div class="t-disp">128.00</div><div class="t-sep"></div>
+    <div class="t-disp" style="min-width:14px;font-size:9px">4</div><div class="t-disp" style="min-width:14px;font-size:9px">4</div><div class="t-sep"></div>
+    <div class="t-disp" style="min-width:50px">1. 1. 1</div><div class="t-sep"></div>
+    <div class="t-btn">⏹</div><div class="t-btn on">▶</div><div class="t-btn rec">⏺</div><div class="t-sep"></div><div class="t-lbl">Bar</div><div class="t-sep"></div>
+    <div class="view-toggle"><div class="view-btn active" id="btn-session">|</div><div class="view-btn" id="btn-arrange">≡</div></div><div class="t-sep"></div><div class="t-spacer"></div>
+    <div class="t-info">Key</div><div class="t-disp" style="min-width:30px;font-size:8px">Am</div><div class="t-spacer"></div>
+    <div class="t-info">MIDI</div><div class="t-disp" style="min-width:16px;font-size:8px">0%</div><div class="t-disp" style="min-width:16px;font-size:8px">14%</div>
   </div>
-
-  <div class="app-layout">
-    <!-- Browser Panel -->
+  <div class="app">
     <div class="browser">
-      <div class="browser-search"><input type="text" placeholder="Search (Ctrl+F)"></div>
-      <div class="browser-nav">
-        <div class="browser-section">Collections</div>
-        <div class="browser-item"><span class="icon" style="color:#ff6b6b">●</span> Favorites</div>
-
-        <div class="browser-divider"></div>
-        <div class="browser-section">Instruments</div>
-        <div class="browser-item active"><span class="icon">🎹</span> Serum <span class="count">342</span></div>
-        <div class="browser-item"><span class="icon">🔮</span> Vital <span class="count">218</span></div>
-        <div class="browser-item"><span class="icon">⚡</span> Massive X <span class="count">156</span></div>
-        <div class="browser-item"><span class="icon">🎹</span> Diva <span class="count">98</span></div>
-        <div class="browser-item"><span class="icon">🎨</span> Pigments 5 <span class="count">124</span></div>
-        <div class="browser-item"><span class="icon">🌌</span> Omnisphere <span class="count">87</span></div>
-
-        <div class="browser-divider"></div>
-        <div class="browser-section">Compare</div>
-        <div class="browser-item active"><span class="icon">⚖️</span> Serum vs Vital</div>
-
-        <div class="browser-divider"></div>
-        <div class="browser-section">Places</div>
-        <div class="browser-item"><span class="icon">📁</span> My Instruments</div>
-        <div class="browser-item"><span class="icon">📁</span> Wishlist</div>
+      <div class="br-search"><input type="text" placeholder="Search (Ctrl+F)"></div>
+      <div class="br-nav">
+        <div class="br-sec">Collections</div><div class="br-item"><span class="ic" style="color:#e04040">●</span> Favorites</div>
+        <div class="br-div"></div><div class="br-sec">Instruments</div>
+        <div class="br-item on"><span class="ic">🎹</span> Serum <span class="ct">342</span></div>
+        <div class="br-item"><span class="ic">🔮</span> Vital <span class="ct">218</span></div>
+        <div class="br-item"><span class="ic">⚡</span> Massive X <span class="ct">156</span></div>
+        <div class="br-item"><span class="ic">🎹</span> Diva <span class="ct">98</span></div>
+        <div class="br-item"><span class="ic">🎨</span> Pigments 5 <span class="ct">124</span></div>
+        <div class="br-item"><span class="ic">🌌</span> Omnisphere <span class="ct">87</span></div>
+        <div class="br-div"></div><div class="br-sec">Compare</div>
+        <div class="br-item on"><span class="ic">⚖️</span> Serum vs Vital</div>
+        <div class="br-div"></div><div class="br-sec">Places</div>
+        <div class="br-item"><span class="ic">📁</span> My Instruments</div><div class="br-item"><span class="ic">📁</span> Wishlist</div>
       </div>
     </div>
-
-    <!-- Center -->
     <div class="center">
-      <!-- Session View (A/B comparison tracks) -->
-      <div class="session-view">
-        <div class="session-tracks">
-          <!-- Track: Serum -->
-          <div class="track">
-            <div class="track-header" style="background:rgba(234,88,8,0.08);border-bottom-color:#ea5808">
-              <div class="track-name" style="color:#ea5808">🎹 Serum</div>
-              <div class="track-controls">
-                <div class="track-btn" style="color:#ea5808">A</div>
-                <div class="track-btn" style="color:#4a9eff">S</div>
-                <div class="track-btn" style="color:#eab308">M</div>
-              </div>
-            </div>
-            <div class="clips-column">
-              <div class="clip-slot"><div class="clip clip-green">Dark Bass — Deep</div></div>
-              <div class="clip-slot"><div class="clip clip-green">Neon Lead — Saw</div></div>
-              <div class="clip-slot"><div class="clip clip-green">Celestial Pad</div></div>
-              <div class="clip-slot"><div class="clip clip-green">Tropical Pluck</div></div>
-              <div class="clip-slot"><div class="clip clip-green">Riser FX</div></div>
-              <div class="clip-slot"><div class="clip clip-green">Trance Lead</div></div>
-            </div>
-          </div>
-
-          <!-- Track: Vital -->
-          <div class="track">
-            <div class="track-header" style="background:rgba(99,102,241,0.08);border-bottom-color:#6366f1">
-              <div class="track-name" style="color:#6366f1">🔮 Vital</div>
-              <div class="track-controls">
-                <div class="track-btn" style="color:#6366f1">B</div>
-                <div class="track-btn" style="color:#4a9eff">S</div>
-                <div class="track-btn" style="color:#eab308">M</div>
-              </div>
-            </div>
-            <div class="clips-column">
-              <div class="clip-slot"><div class="clip" style="background:#3730a3;color:#a5b4fc">Digital Bass — Glass</div></div>
-              <div class="clip-slot"><div class="clip" style="background:#3730a3;color:#a5b4fc">Future Lead — Vocal</div></div>
-              <div class="clip-slot"><div class="clip" style="background:#3730a3;color:#a5b4fc">Granular Pad — Cloud</div></div>
-              <div class="clip-slot"><div class="clip" style="background:#3730a3;color:#a5b4fc">Mallet Pluck</div></div>
-              <div class="clip-slot"><div class="clip" style="background:#3730a3;color:#a5b4fc">Sweep FX</div></div>
-              <div class="clip-slot"><div class="clip" style="background:#3730a3;color:#a5b4fc">Arp Sequence</div></div>
-            </div>
-          </div>
-
-          <!-- Track: Serum MIDI -->
-          <div class="track">
-            <div class="track-header">
-              <div class="track-name">Serum MIDI</div>
-              <div class="track-controls">
-                <div class="track-btn" style="color:#4a9eff">S</div>
-                <div class="track-btn" style="color:#eab308">M</div>
-              </div>
-            </div>
-            <div class="clips-column">
-              <div class="clip-slot"><div class="clip clip-orange">C2 Am Bassline</div></div>
-              <div class="clip-slot"><div class="clip clip-orange">C3 Am Melody</div></div>
-              <div class="clip-slot"><div class="clip clip-empty"></div></div>
-              <div class="clip-slot"><div class="clip clip-empty"></div></div>
-              <div class="clip-slot"><div class="clip clip-empty"></div></div>
-              <div class="clip-slot"><div class="clip clip-empty"></div></div>
-            </div>
-          </div>
-
-          <!-- Track: Vital MIDI -->
-          <div class="track">
-            <div class="track-header">
-              <div class="track-name">Vital MIDI</div>
-              <div class="track-controls">
-                <div class="track-btn" style="color:#4a9eff">S</div>
-                <div class="track-btn" style="color:#eab308">M</div>
-              </div>
-            </div>
-            <div class="clips-column">
-              <div class="clip-slot"><div class="clip clip-cyan">C2 Am Bassline</div></div>
-              <div class="clip-slot"><div class="clip clip-cyan">C3 Am Melody</div></div>
-              <div class="clip-slot"><div class="clip clip-empty"></div></div>
-              <div class="clip-slot"><div class="clip clip-empty"></div></div>
-              <div class="clip-slot"><div class="clip clip-empty"></div></div>
-              <div class="clip-slot"><div class="clip clip-empty"></div></div>
-            </div>
-          </div>
-
-          <!-- Track: Main -->
-          <div class="track" style="min-width:120px">
-            <div class="track-header" style="background:#333">
-              <div class="track-name" style="color:#4a9eff">Main</div>
-              <div class="track-controls">
-                <div class="track-btn" style="color:#4a9eff">S</div>
-                <div class="track-btn" style="color:#eab308">M</div>
-              </div>
-            </div>
-            <div class="clips-column">
-              <div class="clip-slot"><div class="clip" style="background:#2d5a3e;color:#a8e6c3;font-size:8px">A: Serum Mix</div></div>
-              <div class="clip-slot"><div class="clip" style="background:#2d3a5e;color:#a8c3e6;font-size:8px">B: Vital Mix</div></div>
-              <div class="clip-slot"><div class="clip" style="background:#4a3a2e;color:#e6c3a8;font-size:8px">A/B Toggle</div></div>
-              <div class="clip-slot"><div class="clip" style="background:#3a2a3e;color:#c3a8e6;font-size:8px">Blended 50/50</div></div>
-              <div class="clip-slot"><div class="clip" style="background:#2a3a3a;color:#a8e6e6;font-size:8px">Final Choice</div></div>
-              <div class="clip-slot"><div class="clip clip-empty"></div></div>
-            </div>
-          </div>
+      <div class="session-view" id="session-view">
+        <div class="tracks">
+          <div class="trk" style="border-bottom:2px solid #ea5808"><div class="trk-hdr" style="background:rgba(234,88,8,0.08)"><div class="trk-top"><div class="trk-name" style="color:#ea5808">🎹 Serum</div><div class="trk-btns"><div class="trk-b" style="color:#ea5808;font-size:5px">A</div><div class="trk-b s">S</div><div class="trk-b m">M</div></div></div></div><div class="clips"><div class="cl-slot"><div class="cl cl-g">Dark Bass — Deep</div></div><div class="cl-slot"><div class="cl cl-g">Neon Lead — Saw</div></div><div class="cl-slot"><div class="cl cl-g">Celestial Pad</div></div><div class="cl-slot"><div class="cl cl-g">Tropical Pluck</div></div><div class="cl-slot"><div class="cl cl-g">Riser FX</div></div><div class="cl-slot"><div class="cl cl-g">Trance Lead</div></div><div class="cl-slot"><div class="cl cl-e"></div></div><div class="cl-slot"><div class="cl cl-e"></div></div></div></div>
+          <div class="trk" style="border-bottom:2px solid #6366f1"><div class="trk-hdr" style="background:rgba(99,102,241,0.08)"><div class="trk-top"><div class="trk-name" style="color:#6366f1">🔮 Vital</div><div class="trk-btns"><div class="trk-b" style="color:#6366f1;font-size:5px">B</div><div class="trk-b s">S</div><div class="trk-b m">M</div></div></div></div><div class="clips"><div class="cl-slot"><div class="cl" style="background:#3730a3;color:#a5b4fc">Digital Bass</div></div><div class="cl-slot"><div class="cl" style="background:#3730a3;color:#a5b4fc">Future Lead</div></div><div class="cl-slot"><div class="cl" style="background:#3730a3;color:#a5b4fc">Granular Pad</div></div><div class="cl-slot"><div class="cl" style="background:#3730a3;color:#a5b4fc">Mallet Pluck</div></div><div class="cl-slot"><div class="cl" style="background:#3730a3;color:#a5b4fc">Sweep FX</div></div><div class="cl-slot"><div class="cl" style="background:#3730a3;color:#a5b4fc">Arp Sequence</div></div><div class="cl-slot"><div class="cl cl-e"></div></div><div class="cl-slot"><div class="cl cl-e"></div></div></div></div>
+          <div class="trk"><div class="trk-hdr"><div class="trk-top"><div class="trk-name">Serum MIDI</div><div class="trk-btns"><div class="trk-b s">S</div><div class="trk-b m">M</div></div></div></div><div class="clips"><div class="cl-slot"><div class="cl cl-o">C2 Am Bassline</div></div><div class="cl-slot"><div class="cl cl-o">C3 Am Melody</div></div><div class="cl-slot"><div class="cl cl-e"></div></div><div class="cl-slot"><div class="cl cl-e"></div></div><div class="cl-slot"><div class="cl cl-e"></div></div><div class="cl-slot"><div class="cl cl-e"></div></div><div class="cl-slot"><div class="cl cl-e"></div></div><div class="cl-slot"><div class="cl cl-e"></div></div></div></div>
+          <div class="trk"><div class="trk-hdr"><div class="trk-top"><div class="trk-name">Vital MIDI</div><div class="trk-btns"><div class="trk-b s">S</div><div class="trk-b m">M</div></div></div></div><div class="clips"><div class="cl-slot"><div class="cl cl-c">C2 Am Bassline</div></div><div class="cl-slot"><div class="cl cl-c">C3 Am Melody</div></div><div class="cl-slot"><div class="cl cl-e"></div></div><div class="cl-slot"><div class="cl cl-e"></div></div><div class="cl-slot"><div class="cl cl-e"></div></div><div class="cl-slot"><div class="cl cl-e"></div></div><div class="cl-slot"><div class="cl cl-e"></div></div><div class="cl-slot"><div class="cl cl-e"></div></div></div></div>
+          <div class="trk" style="min-width:90px"><div class="trk-hdr" style="background:#3a3a5a"><div class="trk-top"><div class="trk-name" style="color:#5ec4e8">Main</div></div></div><div class="clips"><div class="cl-slot"><div class="cl" style="background:#2d5a3e;color:#a8e8c8;font-size:6px">A: Serum Mix</div></div><div class="cl-slot"><div class="cl" style="background:#2d3a5e;color:#a8c3e6;font-size:6px">B: Vital Mix</div></div><div class="cl-slot"><div class="cl" style="background:#4a3a2e;color:#e6c3a8;font-size:6px">A/B Toggle</div></div><div class="cl-slot"><div class="cl" style="background:#3a2a3e;color:#c3a8e6;font-size:6px">Blended 50/50</div></div><div class="cl-slot"><div class="cl" style="background:#2a3a3a;color:#a8e6e6;font-size:6px">Final Choice</div></div><div class="cl-slot"><div class="cl cl-e"></div></div><div class="cl-slot"><div class="cl cl-e"></div></div><div class="cl-slot"><div class="cl cl-e"></div></div></div></div>
+        </div>
+        <div class="scenes"><div class="sc-btn play">▶</div><div class="sc-btn">1</div><div class="sc-btn">2</div><div class="sc-btn">3</div><div class="sc-btn">4</div><div class="sc-btn">5</div><div class="sc-btn">6</div><div class="sc-btn">7</div><div class="sc-btn">8</div></div>
+      </div>
+      <div class="arr-view" id="arr-view">
+        <div class="arr-ruler"><div class="arr-ruler-label"></div><div class="arr-ruler-beats"><div class="arr-beat bar">1</div><div class="arr-beat"></div><div class="arr-beat"></div><div class="arr-beat"></div><div class="arr-beat bar">2</div><div class="arr-beat"></div><div class="arr-beat"></div><div class="arr-beat"></div><div class="arr-beat bar">3</div><div class="arr-beat"></div><div class="arr-beat"></div><div class="arr-beat"></div><div class="arr-beat bar">4</div><div class="arr-beat"></div><div class="arr-beat"></div><div class="arr-beat"></div><div class="arr-beat bar">5</div><div class="arr-beat"></div><div class="arr-beat"></div><div class="arr-beat"></div><div class="arr-beat bar">6</div><div class="arr-beat"></div><div class="arr-beat"></div><div class="arr-beat"></div><div class="arr-beat bar">7</div><div class="arr-beat"></div><div class="arr-beat"></div><div class="arr-beat"></div><div class="arr-beat bar">8</div><div class="arr-beat"></div><div class="arr-beat"></div><div class="arr-beat"></div><div class="arr-beat bar">9</div><div class="arr-beat"></div><div class="arr-beat"></div><div class="arr-beat"></div><div class="arr-beat bar">10</div><div class="arr-beat"></div><div class="arr-beat"></div><div class="arr-beat"></div><div class="arr-beat bar">11</div><div class="arr-beat"></div><div class="arr-beat"></div><div class="arr-beat"></div><div class="arr-beat bar">12</div><div class="arr-beat"></div><div class="arr-beat"></div><div class="arr-beat"></div><div class="arr-beat bar">13</div><div class="arr-beat"></div><div class="arr-beat"></div><div class="arr-beat"></div><div class="arr-beat bar">14</div><div class="arr-beat"></div><div class="arr-beat"></div><div class="arr-beat"></div><div class="arr-beat bar">15</div><div class="arr-beat"></div><div class="arr-beat"></div><div class="arr-beat"></div><div class="arr-beat bar">16</div><div class="arr-beat"></div><div class="arr-beat"></div><div class="arr-beat"></div></div></div>
+        <div class="arr-tracks">
+          <div class="arr-track"><div class="arr-track-hdr" style="background:rgba(234,88,8,0.08)"><div class="arr-track-name" style="color:#ea5808">Serum</div><div class="arr-track-btns"><div class="trk-b" style="color:#ea5808;font-size:5px">A</div><div class="trk-b s">S</div></div></div><div class="arr-track-content"><div class="arr-grid-line" style="left:6.25%"></div><div class="arr-grid-line" style="left:12.5%"></div><div class="arr-grid-line" style="left:18.75%"></div><div class="arr-grid-line" style="left:25%"></div><div class="arr-grid-line" style="left:31.25%"></div><div class="arr-grid-line" style="left:37.5%"></div><div class="arr-grid-line" style="left:43.75%"></div><div class="arr-grid-line" style="left:50%"></div><div class="arr-grid-line" style="left:56.25%"></div><div class="arr-grid-line" style="left:62.5%"></div><div class="arr-grid-line" style="left:68.75%"></div><div class="arr-grid-line" style="left:75%"></div><div class="arr-grid-line" style="left:81.25%"></div><div class="arr-grid-line" style="left:87.5%"></div><div class="arr-grid-line" style="left:93.75%"></div><div class="arr-clip" style="left:0%;width:25%;background:#3d8a5e;color:#b8e8c8">Dark Bass</div><div class="arr-clip" style="left:25%;width:25%;background:#3d8a5e;color:#b8e8c8">Neon Lead</div><div class="arr-clip" style="left:50%;width:25%;background:#3d8a5e;color:#b8e8c8">Celestial</div><div class="arr-clip" style="left:75%;width:25%;background:#3d8a5e;color:#b8e8c8">Tropical</div></div></div>
+          <div class="arr-track"><div class="arr-track-hdr" style="background:rgba(99,102,241,0.08)"><div class="arr-track-name" style="color:#6366f1">Vital</div><div class="arr-track-btns"><div class="trk-b" style="color:#6366f1;font-size:5px">B</div><div class="trk-b s">S</div></div></div><div class="arr-track-content"><div class="arr-grid-line" style="left:6.25%"></div><div class="arr-grid-line" style="left:12.5%"></div><div class="arr-grid-line" style="left:18.75%"></div><div class="arr-grid-line" style="left:25%"></div><div class="arr-grid-line" style="left:31.25%"></div><div class="arr-grid-line" style="left:37.5%"></div><div class="arr-grid-line" style="left:43.75%"></div><div class="arr-grid-line" style="left:50%"></div><div class="arr-grid-line" style="left:56.25%"></div><div class="arr-grid-line" style="left:62.5%"></div><div class="arr-grid-line" style="left:68.75%"></div><div class="arr-grid-line" style="left:75%"></div><div class="arr-grid-line" style="left:81.25%"></div><div class="arr-grid-line" style="left:87.5%"></div><div class="arr-grid-line" style="left:93.75%"></div><div class="arr-clip" style="left:12.5%;width:37.5%;background:#3730a3;color:#a5b4fc">Digital Bass</div><div class="arr-clip" style="left:56.25%;width:25%;background:#3730a3;color:#a5b4fc">Future Lead</div></div></div>
         </div>
       </div>
-
-      <!-- Mixer -->
       <div class="mixer">
-        <div class="mixer-channel">
-          <div class="mixer-label" style="color:#ea5808">Serum</div>
-          <div style="display:flex;gap:4px;align-items:flex-end;height:50px">
-            <div class="mixer-fader-track"><div class="mixer-fader-fill" style="height:70%;background:#ea5808"></div><div class="mixer-fader-knob" style="bottom:calc(70% - 4px);background:#ea5808"></div></div>
-            <div class="mixer-meter"><div class="mixer-meter-fill" style="height:62%;background:#ea5808"></div></div>
-          </div>
-          <div class="mixer-pan" style="color:#ea5808">C</div>
-          <div style="display:flex;gap:2px"><div class="mixer-solo-btn" style="background:#ea5808;color:#fff">S</div><div class="mixer-mute-btn">M</div></div>
-        </div>
-        <div class="mixer-channel">
-          <div class="mixer-label" style="color:#6366f1">Vital</div>
-          <div style="display:flex;gap:4px;align-items:flex-end;height:50px">
-            <div class="mixer-fader-track"><div class="mixer-fader-fill" style="height:65%;background:#6366f1"></div><div class="mixer-fader-knob" style="bottom:calc(65% - 4px);background:#6366f1"></div></div>
-            <div class="mixer-meter"><div class="mixer-meter-fill" style="height:58%;background:#6366f1"></div></div>
-          </div>
-          <div class="mixer-pan" style="color:#6366f1">C</div>
-          <div style="display:flex;gap:2px"><div class="mixer-solo-btn" style="background:#6366f1;color:#fff">S</div><div class="mixer-mute-btn">M</div></div>
-        </div>
-        <div class="mixer-channel">
-          <div class="mixer-label">MIDI A</div>
-          <div style="display:flex;gap:4px;align-items:flex-end;height:50px">
-            <div class="mixer-fader-track"><div class="mixer-fader-fill" style="height:50%"></div><div class="mixer-fader-knob" style="bottom:calc(50% - 4px)"></div></div>
-            <div class="mixer-meter"><div class="mixer-meter-fill" style="height:42%;background:#22c55e"></div></div>
-          </div>
-          <div class="mixer-pan">C</div>
-          <div style="display:flex;gap:2px"><div class="mixer-solo-btn">S</div><div class="mixer-mute-btn">M</div></div>
-        </div>
-        <div class="mixer-channel">
-          <div class="mixer-label">MIDI B</div>
-          <div style="display:flex;gap:4px;align-items:flex-end;height:50px">
-            <div class="mixer-fader-track"><div class="mixer-fader-fill" style="height:50%"></div><div class="mixer-fader-knob" style="bottom:calc(50% - 4px)"></div></div>
-            <div class="mixer-meter"><div class="mixer-meter-fill" style="height:42%;background:#22c55e"></div></div>
-          </div>
-          <div class="mixer-pan">C</div>
-          <div style="display:flex;gap:2px"><div class="mixer-solo-btn">S</div><div class="mixer-mute-btn">M</div></div>
-        </div>
-        <div class="mixer-channel" style="background:#333;border-color:#4a9eff">
-          <div class="mixer-label" style="color:#4a9eff">Main</div>
-          <div style="display:flex;gap:4px;align-items:flex-end;height:50px">
-            <div class="mixer-fader-track"><div class="mixer-fader-fill" style="height:72%;background:#4a9eff"></div><div class="mixer-fader-knob" style="bottom:calc(72% - 4px);background:#4a9eff"></div></div>
-            <div class="mixer-meter"><div class="mixer-meter-fill" style="height:65%;background:#4a9eff"></div></div>
-          </div>
-          <div class="mixer-pan" style="color:#4a9eff">C</div>
-          <div style="display:flex;gap:2px"><div class="mixer-solo-btn" style="background:#4a9eff;color:#fff">S</div><div class="mixer-mute-btn">M</div></div>
-        </div>
+        <div class="mx-ch" style="border-left:2px solid #ea5808"><div class="mx-lbl" style="color:#ea5808">Serum</div><div class="mx-route">MIDI From<br>All Ins<br>All Channels</div><div class="mx-mon"><div class="mx-mon-b">In</div><div class="mx-mon-b on">Auto</div><div class="mx-mon-b">Off</div></div><div class="mx-audio">Audio To<br>Main</div><div class="mx-sends"><div><div class="mx-send" style="transform:rotate(-30deg);border-color:#ea5808"></div><div class="mx-send-lbl">Sends</div></div></div><div class="mx-fader-area"><div class="mx-fader"><div class="mx-fader-fill" style="height:70%;background:#ea5808"></div><div class="mx-fader-knob" style="bottom:calc(70% - 2px);background:#ea5808"></div></div><div class="mx-meter"><div class="mx-meter-fill" style="height:62%;background:#ea5808"></div></div></div><div class="mx-pan" style="transform:rotate(0deg);border-color:#ea5808"></div><div class="mx-pan-lbl" style="color:#ea5808">C</div><div class="mx-sm"><div class="mx-sb" style="background:#ea5808;color:#fff">S</div><div class="mx-mb">M</div></div></div>
+        <div class="mx-ch" style="border-left:2px solid #6366f1"><div class="mx-lbl" style="color:#6366f1">Vital</div><div class="mx-route">MIDI From<br>All Ins<br>All Channels</div><div class="mx-mon"><div class="mx-mon-b">In</div><div class="mx-mon-b on">Auto</div><div class="mx-mon-b">Off</div></div><div class="mx-audio">Audio To<br>Main</div><div class="mx-sends"><div><div class="mx-send" style="transform:rotate(-20deg);border-color:#6366f1"></div><div class="mx-send-lbl">Sends</div></div></div><div class="mx-fader-area"><div class="mx-fader"><div class="mx-fader-fill" style="height:65%;background:#6366f1"></div><div class="mx-fader-knob" style="bottom:calc(65% - 2px);background:#6366f1"></div></div><div class="mx-meter"><div class="mx-meter-fill" style="height:58%;background:#6366f1"></div></div></div><div class="mx-pan" style="transform:rotate(0deg);border-color:#6366f1"></div><div class="mx-pan-lbl" style="color:#6366f1">C</div><div class="mx-sm"><div class="mx-sb" style="background:#6366f1;color:#fff">S</div><div class="mx-mb">M</div></div></div>
+        <div class="mx-ch"><div class="mx-lbl">MIDI A</div><div class="mx-route">Shared<br>MIDI</div><div class="mx-fader-area"><div class="mx-fader"><div class="mx-fader-fill" style="height:50%"></div><div class="mx-fader-knob" style="bottom:calc(50% - 2px)"></div></div><div class="mx-meter"><div class="mx-meter-fill" style="height:42%;background:#22c55e"></div></div></div><div class="mx-pan" style="transform:rotate(0deg)"></div><div class="mx-pan-lbl">C</div><div class="mx-sm"><div class="mx-sb">S</div><div class="mx-mb">M</div></div></div>
+        <div class="mx-ch"><div class="mx-lbl">MIDI B</div><div class="mx-route">Shared<br>MIDI</div><div class="mx-fader-area"><div class="mx-fader"><div class="mx-fader-fill" style="height:50%"></div><div class="mx-fader-knob" style="bottom:calc(50% - 2px)"></div></div><div class="mx-meter"><div class="mx-meter-fill" style="height:42%;background:#22c55e"></div></div></div><div class="mx-pan" style="transform:rotate(0deg)"></div><div class="mx-pan-lbl">C</div><div class="mx-sm"><div class="mx-sb">S</div><div class="mx-mb">M</div></div></div>
+        <div class="mx-ch" style="background:#3a3a5a;min-width:70px"><div class="mx-lbl" style="color:#5ec4e8">Main</div><div class="mx-audio" style="color:#5ec4e8">Cue Out<br>1/2</div><div class="mx-audio">Main Out<br>Main<br>1/2</div><div class="mx-sends"><div><div class="mx-send" style="transform:rotate(-40deg);border-color:#5ec4e8"></div><div class="mx-send-lbl" style="color:#5ec4e8">Sends</div></div></div><div class="mx-fader-area"><div class="mx-fader"><div class="mx-fader-fill" style="height:72%;background:#5ec4e8"></div><div class="mx-fader-knob" style="bottom:calc(72% - 2px);background:#5ec4e8"></div></div><div class="mx-meter"><div class="mx-meter-fill" style="height:65%;background:#5ec4e8"></div></div></div><div class="mx-pan" style="transform:rotate(0deg);border-color:#5ec4e8"></div><div class="mx-pan-lbl" style="color:#5ec4e8">C</div><div class="mx-sm"><div class="mx-sb" style="background:#5ec4e8;color:#333">S</div><div class="mx-mb">M</div></div></div>
       </div>
-
-      <!-- Device Chain -->
-      <div class="device-chain">
-        <div class="device" style="border-color:#ea5808;background:rgba(234,88,8,0.06)">
-          <div class="device-header">
-            <div class="device-name" style="color:#ea5808">🎹 Serum — Side A</div>
-            <div class="device-toggle on" style="background:#ea5808;box-shadow:0 0 4px rgba(234,88,8,0.5)"></div>
-          </div>
-          <div class="device-params">
-            <div class="device-knob"><div class="knob-ring" style="transform:rotate(-15deg);border-color:#ea5808"></div><div class="knob-label">Cutoff</div><div class="knob-value" style="color:#ea5808">2.4 kHz</div></div>
-            <div class="device-knob"><div class="knob-ring" style="transform:rotate(25deg);border-color:#ea5808"></div><div class="knob-label">Res</div><div class="knob-value" style="color:#ea5808">42%</div></div>
-          </div>
-        </div>
-        <div class="device" style="border-color:#6366f1;background:rgba(99,102,241,0.06)">
-          <div class="device-header">
-            <div class="device-name" style="color:#6366f1">🔮 Vital — Side B</div>
-            <div class="device-toggle on" style="background:#6366f1;box-shadow:0 0 4px rgba(99,102,241,0.5)"></div>
-          </div>
-          <div class="device-params">
-            <div class="device-knob"><div class="knob-ring" style="transform:rotate(-20deg);border-color:#6366f1"></div><div class="knob-label">Cutoff</div><div class="knob-value" style="color:#6366f1">1.8 kHz</div></div>
-            <div class="device-knob"><div class="knob-ring" style="transform:rotate(30deg);border-color:#6366f1"></div><div class="knob-label">Res</div><div class="knob-value" style="color:#6366f1">35%</div></div>
-          </div>
-        </div>
-        <div class="device">
-          <div class="device-header">
-            <div class="device-name">🔀 A/B Router</div>
-            <div class="device-toggle on"></div>
-          </div>
-          <div class="device-params">
-            <div class="device-knob"><div class="knob-ring" style="transform:rotate(-90deg)"></div><div class="knob-label">Blend</div><div class="knob-value">50/50</div></div>
-          </div>
-        </div>
+      <div class="detail">
+        <div class="dtl-left"><div class="dtl-clip">A/B Compare</div><div class="dtl-clip-sub">Serum vs Vital · Same MIDI</div><div class="dtl-row"><div class="dtl-lbl">Mode</div><div class="dtl-val" style="min-width:50px">A/B Toggle</div></div><div class="dtl-row"><div class="dtl-lbl">Blend</div><div class="dtl-val" style="min-width:50px">50 / 50</div></div><div class="dtl-row"><div class="dtl-lbl">MIDI</div><div class="dtl-val" style="min-width:50px">Shared</div></div><div class="dtl-row"><div class="dtl-lbl">Signature</div><div class="dtl-val">4</div><div class="dtl-val">4</div></div><div class="dtl-row"><div class="dtl-lbl">BPM</div><div class="dtl-val" style="min-width:30px">128</div></div></div>
+        <div class="midi-grid"><div class="midi-ruler"><div class="midi-beat">1.1.1</div><div class="midi-beat">1.1.2</div><div class="midi-beat">1.1.3</div><div class="midi-beat">1.1.4</div><div class="midi-beat">1.2.1</div><div class="midi-beat">1.2.2</div><div class="midi-beat">1.2.3</div><div class="midi-beat">1.2.4</div><div class="midi-beat">1.3.1</div><div class="midi-beat">1.3.2</div><div class="midi-beat">1.3.3</div><div class="midi-beat">1.3.4</div><div class="midi-beat">1.4.1</div><div class="midi-beat">1.4.2</div><div class="midi-beat">1.4.3</div><div class="midi-beat">1.4.4</div></div><div class="midi-body"><div class="piano"><div class="pkey">C3</div><div class="pkey blk">B2</div><div class="pkey">A#2</div><div class="pkey blk">A2</div><div class="pkey">G#2</div><div class="pkey blk">G2</div><div class="pkey">F#2</div><div class="pkey blk">F2</div><div class="pkey">E2</div><div class="pkey blk">D#2</div><div class="pkey">D2</div><div class="pkey blk">C#2</div><div class="pkey cur">C2</div><div class="pkey blk">B1</div><div class="pkey">A#1</div><div class="pkey blk">A1</div></div><div class="notes-area"><div class="note" style="left:0%;width:48%;top:7px;background:rgba(234,88,8,0.6);border:1px solid #ea5808">A: Serum C2</div><div class="note" style="left:50%;width:48%;top:7px;background:rgba(234,88,8,0.6);border:1px solid #ea5808">A: Serum C2</div><div class="note" style="left:0%;width:48%;top:7px;background:rgba(99,102,241,0.4);border:1px solid #6366f1;opacity:0.5">B: Vital C2</div><div class="note" style="left:50%;width:48%;top:7px;background:rgba(99,102,241,0.4);border:1px solid #6366f1;opacity:0.5">B: Vital C2</div><div class="note" style="left:12.5%;width:25%;top:0;background:#4a9eff">D#2</div><div class="note" style="left:62.5%;width:25%;top:0;background:#4a9eff">D#2</div><div class="note" style="left:6.25%;width:37%;top:14px;background:#22c55e">C+2 chord</div><div class="note" style="left:56.25%;width:37%;top:14px;background:#22c55e">C+2 chord</div></div></div><div class="vel-lane"><div style="font-size:6px;color:#666;position:absolute;left:3px;bottom:1px">127</div><div class="vel-bar" style="height:100%"></div><div class="vel-bar" style="height:85%"></div><div class="vel-bar" style="height:92%"></div><div class="vel-bar" style="height:78%"></div><div class="vel-bar" style="height:88%"></div><div class="vel-bar" style="height:95%"></div><div class="vel-bar" style="height:82%"></div><div class="vel-bar" style="height:90%"></div><div class="vel-bar" style="height:100%"></div><div class="vel-bar" style="height:85%"></div><div class="vel-bar" style="height:72%"></div><div class="vel-bar" style="height:95%"></div><div class="vel-bar" style="height:88%"></div><div class="vel-bar" style="height:78%"></div><div class="vel-bar" style="height:100%"></div><div class="vel-bar" style="height:90%"></div></div><div class="vel-info"><span>Velocity:</span><span style="color:#ea5808">Randomize</span><span style="color:#ea5808">±</span><span style="background:#444;padding:0 2px;border-radius:1px">127</span><span>Deviation 0</span></div></div>
+        <div class="info"><div class="info-title">A/B Compare</div><div class="info-desc">Same MIDI routed to both Serum and Vital. Toggle A/B to hear differences in real-time.</div><div style="margin-top:4px"><div class="info-row"><div class="info-lbl">Side A</div><div class="info-val" style="color:#ea5808">Serum</div></div><div class="info-row"><div class="info-lbl">Side B</div><div class="info-val" style="color:#6366f1">Vital</div></div><div class="info-row"><div class="info-lbl">MIDI</div><div class="info-val">Shared Input</div></div><div class="info-row"><div class="info-lbl">Mode</div><div class="info-val">A/B Toggle</div></div><div class="info-row"><div class="info-lbl">Blend</div><div class="info-val">50 / 50</div></div></div></div>
       </div>
     </div>
-
-    <!-- Compare Panel (right) -->
     <div class="compare-panel">
-      <div class="compare-header">
-        <div class="compare-pill serum">🎹 Serum</div>
-        <div class="compare-vs">VS</div>
-        <div class="compare-pill vital">🔮 Vital</div>
-      </div>
-
-      <div class="compare-tabs">
-        <div class="compare-tab active">Specs</div>
-        <div class="compare-tab">Price</div>
-        <div class="compare-tab">Features</div>
-        <div class="compare-tab">Reviews</div>
-      </div>
-
+      <div class="compare-header"><div class="compare-pill serum">🎹 Serum</div><div class="compare-vs">VS</div><div class="compare-pill vital">🔮 Vital</div></div>
+      <div class="compare-tabs"><div class="compare-tab active">Specs</div><div class="compare-tab">Price</div><div class="compare-tab">Features</div><div class="compare-tab">Reviews</div></div>
       <div class="compare-content">
         <div class="compare-row-header">General</div>
-        <div class="compare-row">
-          <div class="compare-cell-label">Type</div>
-          <div class="compare-cell serum">Wavetable</div>
-          <div class="compare-cell vital">Wavetable</div>
-        </div>
-        <div class="compare-row">
-          <div class="compare-cell-label">Price</div>
-          <div class="compare-cell equal">$189</div>
-          <div class="compare-cell better">Free</div>
-        </div>
-        <div class="compare-row">
-          <div class="compare-cell-label">Platform</div>
-          <div class="compare-cell serum">Mac/Win</div>
-          <div class="compare-cell better">Mac/Win/Linux</div>
-        </div>
-
+        <div class="compare-row"><div class="compare-cell-label">Type</div><div class="compare-cell serum">Wavetable</div><div class="compare-cell vital">Wavetable</div></div>
+        <div class="compare-row"><div class="compare-cell-label">Price</div><div class="compare-cell equal">$189</div><div class="compare-cell better">Free</div></div>
+        <div class="compare-row"><div class="compare-cell-label">Platform</div><div class="compare-cell serum">Mac/Win</div><div class="compare-cell better">Mac/Win/Linux</div></div>
         <div class="compare-row-header">Sound Engine</div>
-        <div class="compare-row">
-          <div class="compare-cell-label">Oscillators</div>
-          <div class="compare-cell better">2 + Sub + Noise</div>
-          <div class="compare-cell equal">3</div>
-        </div>
-        <div class="compare-row">
-          <div class="compare-cell-label">Filters</div>
-          <div class="compare-cell better">Multi-mode</div>
-          <div class="compare-cell equal">Multi-mode</div>
-        </div>
-        <div class="compare-row">
-          <div class="compare-cell-label">LFOs</div>
-          <div class="compare-cell equal">4</div>
-          <div class="compare-cell better">Unlimited</div>
-        </div>
-        <div class="compare-row">
-          <div class="compare-cell-label">Envelopes</div>
-          <div class="compare-cell equal">4</div>
-          <div class="compare-cell better">Unlimited</div>
-        </div>
-        <div class="compare-row">
-          <div class="compare-cell-label">Effects</div>
-          <div class="compare-cell better">10 built-in</div>
-          <div class="compare-cell equal">5 built-in</div>
-        </div>
-
+        <div class="compare-row"><div class="compare-cell-label">Oscillators</div><div class="compare-cell better">2 + Sub + Noise</div><div class="compare-cell equal">3</div></div>
+        <div class="compare-row"><div class="compare-cell-label">Filters</div><div class="compare-cell better">Multi-mode</div><div class="compare-cell equal">Multi-mode</div></div>
+        <div class="compare-row"><div class="compare-cell-label">LFOs</div><div class="compare-cell equal">4</div><div class="compare-cell better">Unlimited</div></div>
+        <div class="compare-row"><div class="compare-cell-label">Envelopes</div><div class="compare-cell equal">4</div><div class="compare-cell better">Unlimited</div></div>
+        <div class="compare-row"><div class="compare-cell-label">Effects</div><div class="compare-cell better">10 built-in</div><div class="compare-cell equal">5 built-in</div></div>
         <div class="compare-row-header">Workflow</div>
-        <div class="compare-row">
-          <div class="compare-cell-label">Wavetable Ed</div>
-          <div class="compare-cell better">Yes</div>
-          <div class="compare-cell equal">No</div>
-        </div>
-        <div class="compare-row">
-          <div class="compare-cell-label">MPE</div>
-          <div class="compare-cell better">Yes</div>
-          <div class="compare-cell better">Yes</div>
-        </div>
-        <div class="compare-row">
-          <div class="compare-cell-label">Preset Browser</div>
-          <div class="compare-cell equal">Basic</div>
-          <div class="compare-cell better">Advanced</div>
-        </div>
-        <div class="compare-row">
-          <div class="compare-cell-label">GUI Scale</div>
-          <div class="compare-cell equal">Fixed</div>
-          <div class="compare-cell better">Scalable</div>
-        </div>
-
+        <div class="compare-row"><div class="compare-cell-label">Wavetable Ed</div><div class="compare-cell better">Yes</div><div class="compare-cell equal">No</div></div>
+        <div class="compare-row"><div class="compare-cell-label">MPE</div><div class="compare-cell better">Yes</div><div class="compare-cell better">Yes</div></div>
+        <div class="compare-row"><div class="compare-cell-label">Preset Browser</div><div class="compare-cell equal">Basic</div><div class="compare-cell better">Advanced</div></div>
+        <div class="compare-row"><div class="compare-cell-label">GUI Scale</div><div class="compare-cell equal">Fixed</div><div class="compare-cell better">Scalable</div></div>
         <div class="compare-row-header">Ecosystem</div>
-        <div class="compare-row">
-          <div class="compare-cell-label">Presets</div>
-          <div class="compare-cell better">342 on SH</div>
-          <div class="compare-cell equal">218 on SH</div>
-        </div>
-        <div class="compare-row">
-          <div class="compare-cell-label">Community</div>
-          <div class="compare-cell better">10+ years</div>
-          <div class="compare-cell equal">3 years</div>
-        </div>
-        <div class="compare-row">
-          <div class="compare-cell-label">Updates</div>
-          <div class="compare-cell better">Free forever</div>
-          <div class="compare-cell equal">Free beta</div>
-        </div>
+        <div class="compare-row"><div class="compare-cell-label">Presets</div><div class="compare-cell better">342 on SH</div><div class="compare-cell equal">218 on SH</div></div>
+        <div class="compare-row"><div class="compare-cell-label">Community</div><div class="compare-cell better">10+ years</div><div class="compare-cell equal">3 years</div></div>
+        <div class="compare-row"><div class="compare-cell-label">Updates</div><div class="compare-cell better">Free forever</div><div class="compare-cell equal">Free beta</div></div>
       </div>
-
-      <!-- Verdict -->
       <div class="verdict">
         <div class="verdict-title">⚖️ Verdict</div>
-        <div class="verdict-text">
-          <strong style="color:#ea5808">Serum</strong> — mature ecosystem, wavetable editor, 10 built-in FX, larger community.
-          <strong style="color:#6366f1">Vital</strong> — free, Linux support, unlimited mod sources, scalable GUI.
-        </div>
+        <div class="verdict-text"><strong style="color:#ea5808">Serum</strong> — mature ecosystem, wavetable editor, 10 FX.<br><strong style="color:#6366f1">Vital</strong> — free, Linux support, unlimited mods, scalable GUI.</div>
         <div class="verdict-winner serum">🏆 Best Value: Vital · Best Ecosystem: Serum</div>
       </div>
     </div>
   </div>
+  <div class="tab-hint" id="tab-hint">Press <kbd>Tab</kbd> to switch between Session and Arrangement View</div>
+  <script>
+    const sv=document.getElementById('session-view'),av=document.getElementById('arr-view'),bs=document.getElementById('btn-session'),ba=document.getElementById('btn-arrange'),th=document.getElementById('tab-hint');let cv='session';
+    function sw(v){cv=v;if(v==='session'){sv.classList.remove('hidden');av.classList.remove('active');bs.classList.add('active');ba.classList.remove('active')}else{sv.classList.add('hidden');av.classList.add('active');bs.classList.remove('active');ba.classList.add('active')}}
+    document.addEventListener('keydown',e=>{if(e.key==='Tab'){e.preventDefault();sw(cv==='session'?'arrangement':'session');th.classList.add('show');setTimeout(()=>th.classList.remove('show'),1500)}});
+    bs.addEventListener('click',()=>sw('session'));ba.addEventListener('click',()=>sw('arrangement'));
+    setTimeout(()=>{th.classList.add('show');setTimeout(()=>th.classList.remove('show'),3000)},1000);
+  </script>
 </body>
 </html>
