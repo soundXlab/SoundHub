@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" 
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     viewBox="0 0 1440 900" 
+     width="1440" 
+     height="900">
+  <foreignObject width="100%" height="100%">
+    <div xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SoundHub — DAO</title>
+<link rel="stylesheet" href="design-system/shared.css">
+<style>
+  body { margin: 0; background: var(--bg-primary); color: var(--text-primary); font-family: 'Inter', system-ui, sans-serif; }
+  .app { display: flex; min-height: 100vh; }
+  .sidebar { width: 240px; background: var(--bg-panel); border-right: 1px solid var(--border-default); padding: 20px 0; flex-shrink: 0; }
+  .sidebar .logo { padding: 0 16px; font-size: 18px; font-weight: 800; color: var(--brand-accent); margin-bottom: 24px; }
+  .sidebar .nav-item { padding: 8px 20px; font-size: 13px; color: var(--text-secondary); cursor: pointer; }
+  .sidebar .nav-item.active { color: var(--brand-primary); background: rgba(139,92,246,0.08); border-radius: 6px; margin: 0 8px; padding: 8px 12px; }
+  .main { flex: 1; padding: 24px; max-width: 900px; }
+  h1 { font-size: 24px; font-weight: 800; margin: 0 0 8px; }
+  .subtitle { font-size: 13px; color: var(--text-secondary); margin: 0 0 20px; }
+  .wallet-card { background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: 12px; padding: 20px; margin-bottom: 20px; display: flex; align-items: center; gap: 40px; }
+  .wallet-stat .label { font-size: 10px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; }
+  .wallet-stat .value { font-size: 22px; font-weight: 800; margin-top: 4px; }
+  .wallet-card .spacer { flex: 1; }
+  .btn { padding: 10px 20px; border-radius: 6px; font-size: 13px; font-weight: 600; border: none; cursor: pointer; }
+  .btn-accent { background: var(--brand-accent); color: white; }
+  .btn-outline { background: var(--bg-elevated); color: var(--text-secondary); border: 1px solid var(--border-default); }
+  .hint { font-size: 11px; color: var(--text-muted); margin-top: 8px; }
+  .section-title { font-size: 10px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+  .proposal { background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: 8px; padding: 12px 16px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; }
+  .proposal .id { font-size: 12px; font-weight: 600; color: var(--brand-primary); }
+  .badge { padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 600; }
+  .badge.active { background: rgba(234,179,8,0.12); color: var(--color-warning); }
+  .badge.succeeded { background: rgba(34,197,94,0.12); color: var(--color-success); }
+  .badge.defeated { background: rgba(239,68,68,0.12); color: var(--color-error); }
+  .badge.executed { background: rgba(59,130,246,0.12); color: var(--color-info); }
+  .badge.voted { background: rgba(34,197,94,0.12); color: var(--color-success); }
+  .proposal .desc { font-size: 12px; color: var(--text-secondary); flex: 1; }
+  .proposal .btn { padding: 4px 12px; font-size: 11px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="sidebar">
+    <div class="logo">🎵 SoundHub</div>
+    <div class="nav-item">📊 Dashboard</div>
+    <div class="nav-item active">🗳 DAO</div>
+    <div class="nav-item">📁 Projects</div>
+    <div class="nav-item">⚙️ Settings</div>
+  </div>
+  <div class="main">
+    <h1>🗳 SoundHub DAO</h1>
+    <p class="subtitle">SND holders govern the platform. Delegate your tokens, then vote on proposals.</p>
+    <div class="wallet-card">
+      <div class="wallet-stat"><div class="label">SND Balance</div><div class="value">12,450.00</div></div>
+      <div class="wallet-stat"><div class="label">Voting Power</div><div class="value" style="color:var(--brand-primary)">12,450.00</div></div>
+      <div class="spacer"></div>
+      <button class="btn btn-accent">🦊 Connect Wallet</button>
+    </div>
+    <div class="hint">To get voting power, hold SND and call <code>snd.delegate(yourAddress)</code> from your wallet.</div>
+    <div style="margin-top:24px">
+      <div class="section-title">Proposals</div>
+      <div class="proposal"><span class="id">#42a3f…</span><span class="badge active">Active</span><span class="desc">Increase staking rewards to 5%</span><button class="btn btn-outline">For</button><button class="btn btn-outline">Against</button></div>
+      <div class="proposal"><span class="id">#41b2e…</span><span class="badge succeeded">Succeeded</span><span class="badge voted">voted</span><span class="desc">Add new audio format support</span></div>
+      <div class="proposal"><span class="id">#40c1d…</span><span class="badge defeated">Defeated</span><span class="desc">Reduce platform fee to 10%</span></div>
+      <div class="proposal"><span class="id">#3f89a…</span><span class="badge executed">Executed</span><span class="badge voted">voted</span><span class="desc">Update governance quorum</span></div>
+    </div>
+  </div>
+</div>
+
+
+</body></html>
+    </div>
+  </foreignObject>
+</svg>

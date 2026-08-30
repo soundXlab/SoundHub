@@ -1,0 +1,566 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" 
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     viewBox="0 0 1440 900" 
+     width="1440" 
+     height="900">
+  <foreignObject width="100%" height="100%">
+    <div xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html><html lang="en"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <title>SoundHub — Projects (DAW Style)</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', -apple-system, sans-serif; background: #0d0d0d; color: #e4e4e7; overflow: hidden; height: 100vh; }
+
+    /* ── Transport Bar ── */
+    .transport-bar {
+      height: 40px; background: #111113; border-bottom: 1px solid #27272a;
+      display: flex; align-items: center; padding: 0 12px; gap: 16px;
+      font-size: 11px; user-select: none;
+    }
+    .transport-logo { font-weight: 800; font-size: 13px; color: #ea5808; letter-spacing: -0.5px; }
+    .transport-logo span { color: #e4e4e7; }
+    .transport-divider { width: 1px; height: 20px; background: #27272a; }
+    .transport-group { display: flex; align-items: center; gap: 6px; }
+    .transport-label { color: #71717a; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .transport-value {
+      background: #0d0d0d; border: 1px solid #27272a; border-radius: 4px;
+      padding: 2px 8px; font-family: 'JetBrains Mono', monospace; font-size: 12px;
+      color: #22c55e; font-weight: 600; min-width: 60px; text-align: center;
+    }
+    .transport-spacer { flex: 1; }
+    .transport-time {
+      font-family: 'JetBrains Mono', monospace; font-size: 18px; font-weight: 700;
+      color: #e4e4e7; letter-spacing: 1px;
+    }
+
+    /* ── Main Layout ── */
+    .app-body { display: flex; height: calc(100vh - 40px); }
+
+    /* ── Left Sidebar ── */
+    .sidebar {
+      width: 240px; background: #111113; border-right: 1px solid #27272a;
+      display: flex; flex-direction: column; user-select: none;
+    }
+    .sidebar-search { padding: 8px; border-bottom: 1px solid #27272a; }
+    .sidebar-search input {
+      width: 100%; background: #0d0d0d; border: 1px solid #27272a; border-radius: 4px;
+      padding: 6px 8px 6px 28px; font-size: 11px; color: #e4e4e7; outline: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: 8px center;
+    }
+    .sidebar-search input::placeholder { color: #52525b; }
+    .sidebar-nav { flex: 1; overflow-y: auto; padding: 4px 0; }
+    .sidebar-section { padding: 8px 12px 4px; font-size: 9px; color: #52525b; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+    .sidebar-item {
+      padding: 6px 12px; font-size: 11px; font-weight: 500; color: #a1a1aa;
+      cursor: pointer; display: flex; align-items: center; gap: 8px;
+      border-left: 2px solid transparent; transition: all 0.1s;
+    }
+    .sidebar-item:hover { color: #e4e4e7; }
+    .sidebar-item.active { color: #ea5808; background: rgba(234,88,8,0.08); border-left-color: #ea5808; }
+    .sidebar-item .icon { width: 16px; text-align: center; }
+
+    /* ── Content Area ── */
+    .content { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
+
+    /* ── Header ── */
+    .page-header {
+      padding: 16px 24px; border-bottom: 1px solid #27272a;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .page-title { font-size: 18px; font-weight: 700; color: #e4e4e7; }
+    .page-title span { color: #71717a; font-weight: 400; font-size: 14px; margin-left: 8px; }
+    .header-actions { display: flex; gap: 8px; }
+    .btn {
+      padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 600;
+      cursor: pointer; border: 1px solid #27272a; transition: all 0.15s;
+    }
+    .btn-primary { background: #ea5808; color: #fff; border-color: #ea5808; }
+    .btn-primary:hover { background: #c2410c; }
+    .btn-secondary { background: #1a1a1a; color: #e4e4e7; }
+    .btn-secondary:hover { background: #27272a; }
+    .btn-ghost { background: transparent; color: #71717a; border-color: transparent; }
+    .btn-ghost:hover { color: #e4e4e7; background: #1a1a1a; }
+
+    /* ── Toolbar ── */
+    .toolbar {
+      padding: 8px 24px; border-bottom: 1px solid #1a1a1a;
+      display: flex; align-items: center; gap: 12px; font-size: 11px;
+    }
+    .toolbar-group { display: flex; align-items: center; gap: 6px; }
+    .toolbar-label { color: #52525b; text-transform: uppercase; letter-spacing: 0.5px; }
+    .filter-chip {
+      padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 500;
+      cursor: pointer; border: 1px solid #27272a; background: #1a1a1a; color: #71717a;
+      transition: all 0.1s;
+    }
+    .filter-chip:hover { color: #e4e4e7; border-color: #3f3f46; }
+    .filter-chip.active { background: rgba(234,88,8,0.15); color: #ea5808; border-color: #ea5808; }
+    .toolbar-spacer { flex: 1; }
+    .view-toggle { display: flex; border: 1px solid #27272a; border-radius: 4px; overflow: hidden; }
+    .view-btn {
+      padding: 4px 8px; font-size: 11px; cursor: pointer; background: #1a1a1a;
+      color: #71717a; border: none; transition: all 0.1s;
+    }
+    .view-btn.active { background: #27272a; color: #e4e4e7; }
+    .view-btn:hover { color: #e4e4e7; }
+
+    /* ── Track List ── */
+    .track-list { flex: 1; overflow-y: auto; padding: 0; }
+    .track-list-header {
+      display: grid; grid-template-columns: 40px 1fr 120px 100px 100px 120px 80px;
+      padding: 8px 24px; font-size: 10px; color: #52525b; text-transform: uppercase;
+      letter-spacing: 0.5px; border-bottom: 1px solid #27272a; background: #111113;
+      position: sticky; top: 0; z-index: 10;
+    }
+    .track-row {
+      display: grid; grid-template-columns: 40px 1fr 120px 100px 100px 120px 80px;
+      padding: 10px 24px; border-bottom: 1px solid #1a1a1a; cursor: pointer;
+      transition: background 0.1s; align-items: center;
+    }
+    .track-row:hover { background: rgba(234,88,8,0.04); }
+    .track-row.selected { background: rgba(234,88,8,0.08); }
+    .track-num { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #52525b; }
+    .track-info { display: flex; align-items: center; gap: 10px; min-width: 0; }
+    .track-color { width: 3px; height: 32px; border-radius: 2px; flex-shrink: 0; }
+    .track-name { font-size: 13px; font-weight: 600; color: #e4e4e7; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .track-daw { font-size: 10px; color: #52525b; margin-left: 8px; flex-shrink: 0; }
+    .track-version {
+      font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #a1a1aa;
+    }
+    .track-status {
+      font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 10px;
+      text-align: center; width: fit-content;
+    }
+    .status-ready { background: rgba(34,197,94,0.15); color: #22c55e; }
+    .status-review { background: rgba(234,179,8,0.15); color: #eab308; }
+    .status-draft { background: rgba(113,113,122,0.15); color: #71717a; }
+    .status-published { background: rgba(59,130,246,0.15); color: #3b82f6; }
+    .track-updated { font-size: 10px; color: #52525b; }
+    .track-storage {
+      font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #71717a;
+    }
+    .track-actions { display: flex; gap: 4px; justify-content: flex-end; }
+    .track-action {
+      width: 24px; height: 24px; border-radius: 4px; display: flex;
+      align-items: center; justify-content: center; font-size: 11px;
+      cursor: pointer; color: #52525b; transition: all 0.1s;
+    }
+    .track-action:hover { background: #27272a; color: #e4e4e7; }
+
+    /* ── Waveform Preview ── */
+    .track-waveform {
+      display: flex; align-items: flex-end; gap: 1px; height: 24px; margin-top: 4px;
+    }
+    .track-waveform span {
+      flex: 1; border-radius: 1px; min-height: 2px;
+    }
+
+    /* ── Bottom Status Bar ── */
+    .status-bar {
+      height: 28px; background: #111113; border-top: 1px solid #27272a;
+      display: flex; align-items: center; padding: 0 16px; gap: 16px;
+      font-size: 10px; color: #52525b;
+    }
+    .status-bar-item { display: flex; align-items: center; gap: 4px; }
+    .status-dot { width: 6px; height: 6px; border-radius: 50%; }
+    .status-dot.green { background: #22c55e; }
+    .status-dot.yellow { background: #eab308; }
+    .status-dot.red { background: #ef4444; }
+    .status-spacer { flex: 1; }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 2px; }
+    ::-webkit-scrollbar-thumb:hover { background: #3f3f46; }
+  </style>
+</head>
+<body>
+
+<!-- ═══ Transport Bar ═══ -->
+<div class="transport-bar">
+  <div class="transport-logo">Sound<span>Hub</span></div>
+  <div class="transport-divider"></div>
+  <div class="transport-group">
+    <span style="font-size:11px;color:#a1a1aa">Projects</span>
+  </div>
+  <div class="transport-spacer"></div>
+  <div class="transport-group">
+    <div class="transport-label">Total</div>
+    <div class="transport-value">12</div>
+  </div>
+  <div class="transport-divider"></div>
+  <div class="transport-group">
+    <div class="transport-label">Storage</div>
+    <div class="transport-value" style="color:#eab308">54.4 GB</div>
+  </div>
+  <div class="transport-divider"></div>
+  <div class="transport-group">
+    <div class="transport-label">Active</div>
+    <div class="transport-value" style="color:#ea5808">7</div>
+  </div>
+</div>
+
+<!-- ═══ App Body ═══ -->
+<div class="app-body">
+
+  <!-- ── Left Sidebar ── -->
+  <div class="sidebar">
+    <div class="sidebar-search">
+      <input type="text" placeholder="Search (Ctrl+F)">
+    </div>
+    <div class="sidebar-nav">
+      <div class="sidebar-section">Navigation</div>
+      <div class="sidebar-item"><span class="icon">🎛️</span> Dashboard</div>
+      <div class="sidebar-item active"><span class="icon">📁</span> Projects</div>
+      <div class="sidebar-item"><span class="icon">🎵</span> Marketplace</div>
+      <div class="sidebar-item"><span class="icon">💬</span> Reviews</div>
+      <div class="sidebar-item"><span class="icon">📤</span> Upload</div>
+      <div class="sidebar-item"><span class="icon">📊</span> Analytics</div>
+      <div class="sidebar-item"><span class="icon">📅</span> Calendar</div>
+      <div class="sidebar-item"><span class="icon">⚙️</span> Settings</div>
+
+      <div class="sidebar-section">Quick Filters</div>
+      <div class="sidebar-item"><span class="icon">🟢</span> Active Projects</div>
+      <div class="sidebar-item"><span class="icon">📦</span> Archived</div>
+      <div class="sidebar-item"><span class="icon">⭐</span> Starred</div>
+      <div class="sidebar-item"><span class="icon">🤝</span> Shared with Me</div>
+    </div>
+  </div>
+
+  <!-- ── Content ── -->
+  <div class="content">
+
+    <!-- Header -->
+    <div class="page-header">
+      <div class="page-title">Projects <span>12 total</span></div>
+      <div class="header-actions">
+        <button class="btn btn-ghost">📥 Import</button>
+        <button class="btn btn-primary">+ New Project</button>
+      </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <div class="toolbar-group">
+        <span class="toolbar-label">Status:</span>
+        <div class="filter-chip active">All</div>
+        <div class="filter-chip">Active</div>
+        <div class="filter-chip">In Review</div>
+        <div class="filter-chip">Published</div>
+        <div class="filter-chip">Archived</div>
+      </div>
+      <div class="toolbar-spacer"></div>
+      <div class="toolbar-group">
+        <span class="toolbar-label">Sort:</span>
+        <select style="background:#1a1a1a;border:1px solid #27272a;border-radius:4px;padding:3px 8px;font-size:11px;color:#a1a1aa">
+          <option>Last updated</option>
+          <option>Name</option>
+          <option>Storage used</option>
+          <option>Version count</option>
+        </select>
+      </div>
+      <div class="view-toggle">
+        <button class="view-btn active">☰</button>
+        <button class="view-btn">⊞</button>
+      </div>
+    </div>
+
+    <!-- Track List Header -->
+    <div class="track-list">
+      <div class="track-list-header">
+        <div>#</div>
+        <div>Project</div>
+        <div>Latest Version</div>
+        <div>Status</div>
+        <div>Updated</div>
+        <div>Storage</div>
+        <div></div>
+      </div>
+
+      <!-- Track 1 -->
+      <div class="track-row selected">
+        <div class="track-num">01</div>
+        <div class="track-info">
+          <div class="track-color" style="background:#ea5808"></div>
+          <div>
+            <div class="track-name">Neon Warehouse</div>
+            <div class="track-waveform">
+              <span style="height:40%;background:#ea5808"></span>
+              <span style="height:70%;background:#ea5808"></span>
+              <span style="height:55%;background:#ea5808"></span>
+              <span style="height:85%;background:#ea5808"></span>
+              <span style="height:60%;background:#ea5808"></span>
+              <span style="height:90%;background:#ea5808"></span>
+              <span style="height:45%;background:#ea5808"></span>
+              <span style="height:75%;background:#ea5808"></span>
+              <span style="height:50%;background:#ea5808"></span>
+              <span style="height:80%;background:#ea5808"></span>
+            </div>
+          </div>
+          <div class="track-daw">Ableton</div>
+        </div>
+        <div class="track-version">v13 — Ready</div>
+        <div><span class="track-status status-ready">● Ready</span></div>
+        <div class="track-updated">30 min ago</div>
+        <div class="track-storage">28.7 MB</div>
+        <div class="track-actions">
+          <div class="track-action">⋯</div>
+        </div>
+      </div>
+
+      <!-- Track 2 -->
+      <div class="track-row">
+        <div class="track-num">02</div>
+        <div class="track-info">
+          <div class="track-color" style="background:#eab308"></div>
+          <div>
+            <div class="track-name">Midnight Run</div>
+            <div class="track-waveform">
+              <span style="height:30%;background:#eab308"></span>
+              <span style="height:60%;background:#eab308"></span>
+              <span style="height:80%;background:#eab308"></span>
+              <span style="height:45%;background:#eab308"></span>
+              <span style="height:90%;background:#eab308"></span>
+              <span style="height:55%;background:#eab308"></span>
+              <span style="height:70%;background:#eab308"></span>
+              <span style="height:40%;background:#eab308"></span>
+              <span style="height:85%;background:#eab308"></span>
+              <span style="height:50%;background:#eab308"></span>
+            </div>
+          </div>
+          <div class="track-daw">FL Studio</div>
+        </div>
+        <div class="track-version">v7 — In Review</div>
+        <div><span class="track-status status-review">● In Review</span></div>
+        <div class="track-updated">2 hours ago</div>
+        <div class="track-storage">15.3 MB</div>
+        <div class="track-actions">
+          <div class="track-action">⋯</div>
+        </div>
+      </div>
+
+      <!-- Track 3 -->
+      <div class="track-row">
+        <div class="track-num">03</div>
+        <div class="track-info">
+          <div class="track-color" style="background:#3b82f6"></div>
+          <div>
+            <div class="track-name">Crystal Echo</div>
+            <div class="track-waveform">
+              <span style="height:25%;background:#3b82f6"></span>
+              <span style="height:50%;background:#3b82f6"></span>
+              <span style="height:35%;background:#3b82f6"></span>
+              <span style="height:60%;background:#3b82f6"></span>
+              <span style="height:40%;background:#3b82f6"></span>
+              <span style="height:55%;background:#3b82f6"></span>
+              <span style="height:30%;background:#3b82f6"></span>
+              <span style="height:45%;background:#3b82f6"></span>
+              <span style="height:20%;background:#3b82f6"></span>
+              <span style="height:50%;background:#3b82f6"></span>
+            </div>
+          </div>
+          <div class="track-daw">Ableton</div>
+        </div>
+        <div class="track-version">v1 — Draft</div>
+        <div><span class="track-status status-draft">● Draft</span></div>
+        <div class="track-updated">1 day ago</div>
+        <div class="track-storage">8.2 MB</div>
+        <div class="track-actions">
+          <div class="track-action">⋯</div>
+        </div>
+      </div>
+
+      <!-- Track 4 -->
+      <div class="track-row">
+        <div class="track-num">04</div>
+        <div class="track-info">
+          <div class="track-color" style="background:#22c55e"></div>
+          <div>
+            <div class="track-name">Summer Drums</div>
+            <div class="track-waveform">
+              <span style="height:55%;background:#22c55e"></span>
+              <span style="height:80%;background:#22c55e"></span>
+              <span style="height:65%;background:#22c55e"></span>
+              <span style="height:90%;background:#22c55e"></span>
+              <span style="height:50%;background:#22c55e"></span>
+              <span style="height:75%;background:#22c55e"></span>
+              <span style="height:60%;background:#22c55e"></span>
+              <span style="height:85%;background:#22c55e"></span>
+              <span style="height:45%;background:#22c55e"></span>
+              <span style="height:70%;background:#22c55e"></span>
+            </div>
+          </div>
+          <div class="track-daw">REAPER</div>
+        </div>
+        <div class="track-version">v5 — Published</div>
+        <div><span class="track-status status-published">● Published</span></div>
+        <div class="track-updated">3 days ago</div>
+        <div class="track-storage">42.1 MB</div>
+        <div class="track-actions">
+          <div class="track-action">⋯</div>
+        </div>
+      </div>
+
+      <!-- Track 5 -->
+      <div class="track-row">
+        <div class="track-num">05</div>
+        <div class="track-info">
+          <div class="track-color" style="background:#ef4444"></div>
+          <div>
+            <div class="track-name">Deep Bass Collection</div>
+            <div class="track-waveform">
+              <span style="height:70%;background:#ef4444"></span>
+              <span style="height:90%;background:#ef4444"></span>
+              <span style="height:75%;background:#ef4444"></span>
+              <span style="height:95%;background:#ef4444"></span>
+              <span style="height:65%;background:#ef4444"></span>
+              <span style="height:85%;background:#ef4444"></span>
+              <span style="height:70%;background:#ef4444"></span>
+              <span style="height:90%;background:#ef4444"></span>
+              <span style="height:60%;background:#ef4444"></span>
+              <span style="height:80%;background:#ef4444"></span>
+            </div>
+          </div>
+          <div class="track-daw">Ableton</div>
+        </div>
+        <div class="track-version">v2 — In Review</div>
+        <div><span class="track-status status-review">● In Review</span></div>
+        <div class="track-updated">5 hours ago</div>
+        <div class="track-storage">18.9 MB</div>
+        <div class="track-actions">
+          <div class="track-action">⋯</div>
+        </div>
+      </div>
+
+      <!-- Track 6 -->
+      <div class="track-row">
+        <div class="track-num">06</div>
+        <div class="track-info">
+          <div class="track-color" style="background:#06b6d4"></div>
+          <div>
+            <div class="track-name">Ambient Textures Vol.2</div>
+            <div class="track-waveform">
+              <span style="height:20%;background:#06b6d4"></span>
+              <span style="height:35%;background:#06b6d4"></span>
+              <span style="height:25%;background:#06b6d4"></span>
+              <span style="height:40%;background:#06b6d4"></span>
+              <span style="height:30%;background:#06b6d4"></span>
+              <span style="height:45%;background:#06b6d4"></span>
+              <span style="height:20%;background:#06b6d4"></span>
+              <span style="height:35%;background:#06b6d4"></span>
+              <span style="height:15%;background:#06b6d4"></span>
+              <span style="height:30%;background:#06b6d4"></span>
+            </div>
+          </div>
+          <div class="track-daw">Cubase</div>
+        </div>
+        <div class="track-version">v8 — Ready</div>
+        <div><span class="track-status status-ready">● Ready</span></div>
+        <div class="track-updated">1 week ago</div>
+        <div class="track-storage">31.5 MB</div>
+        <div class="track-actions">
+          <div class="track-action">⋯</div>
+        </div>
+      </div>
+
+      <!-- Track 7 -->
+      <div class="track-row">
+        <div class="track-num">07</div>
+        <div class="track-info">
+          <div class="track-color" style="background:#f59e0b"></div>
+          <div>
+            <div class="track-name">Vinyl Classics Remix</div>
+            <div class="track-waveform">
+              <span style="height:45%;background:#f59e0b"></span>
+              <span style="height:70%;background:#f59e0b"></span>
+              <span style="height:55%;background:#f59e0b"></span>
+              <span style="height:80%;background:#f59e0b"></span>
+              <span style="height:50%;background:#f59e0b"></span>
+              <span style="height:75%;background:#f59e0b"></span>
+              <span style="height:40%;background:#f59e0b"></span>
+              <span style="height:65%;background:#f59e0b"></span>
+              <span style="height:35%;background:#f59e0b"></span>
+              <span style="height:60%;background:#f59e0b"></span>
+            </div>
+          </div>
+          <div class="track-daw">Logic Pro</div>
+        </div>
+        <div class="track-version">v3 — Draft</div>
+        <div><span class="track-status status-draft">● Draft</span></div>
+        <div class="track-updated">2 weeks ago</div>
+        <div class="track-storage">12.4 MB</div>
+        <div class="track-actions">
+          <div class="track-action">⋯</div>
+        </div>
+      </div>
+
+      <!-- Track 8 -->
+      <div class="track-row">
+        <div class="track-num">08</div>
+        <div class="track-info">
+          <div class="track-color" style="background:#ec4899"></div>
+          <div>
+            <div class="track-name">Pop Vocals Session</div>
+            <div class="track-waveform">
+              <span style="height:60%;background:#ec4899"></span>
+              <span style="height:85%;background:#ec4899"></span>
+              <span style="height:70%;background:#ec4899"></span>
+              <span style="height:95%;background:#ec4899"></span>
+              <span style="height:55%;background:#ec4899"></span>
+              <span style="height:80%;background:#ec4899"></span>
+              <span style="height:65%;background:#ec4899"></span>
+              <span style="height:90%;background:#ec4899"></span>
+              <span style="height:50%;background:#ec4899"></span>
+              <span style="height:75%;background:#ec4899"></span>
+            </div>
+          </div>
+          <div class="track-daw">Ableton</div>
+        </div>
+        <div class="track-version">v11 — Published</div>
+        <div><span class="track-status status-published">● Published</span></div>
+        <div class="track-updated">1 month ago</div>
+        <div class="track-storage">67.8 MB</div>
+        <div class="track-actions">
+          <div class="track-action">⋯</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Status Bar -->
+    <div class="status-bar">
+      <div class="status-bar-item">
+        <div class="status-dot green"></div>
+        <span>12 projects</span>
+      </div>
+      <div class="status-bar-item">
+        <div class="status-dot yellow"></div>
+        <span>3 in review</span>
+      </div>
+      <div class="status-bar-item">
+        <div class="status-dot green"></div>
+        <span>2 published</span>
+      </div>
+      <div class="status-spacer"></div>
+      <div class="status-bar-item">
+        <span>Storage: 54.4 GB / 500 GB</span>
+      </div>
+      <div class="status-bar-item">
+        <span>Last sync: 2 min ago</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+
+</body></html>
+    </div>
+  </foreignObject>
+</svg>

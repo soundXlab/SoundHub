@@ -1,0 +1,369 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 1800" width="1440" height="1800">
+  <defs>
+    <linearGradient id="projGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#8B5CF6;stop-opacity:0.12"/>
+      <stop offset="100%" style="stop-color:#06B6D4;stop-opacity:0.06"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1440" height="1800" fill="#0A0A0B"/>
+
+  <!-- Sidebar -->
+  <rect width="260" height="1800" fill="#111113"/>
+  <line x1="260" y1="0" x2="260" y2="1800" stroke="#1F1F23" stroke-width="1"/>
+  <text x="28" y="38" font-family="Inter, sans-serif" font-size="18" font-weight="800" fill="#FFFFFF">🎵 SoundHub</text>
+
+  <text x="28" y="90" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#52525B" letter-spacing="1">MAIN</text>
+  <text x="44" y="118" font-family="Inter, sans-serif" font-size="14" font-weight="500" fill="#A1A1AA">📊 Dashboard</text>
+  <rect x="16" y="128" width="228" height="36" rx="8" fill="#8B5CF6" opacity="0.12"/>
+  <text x="44" y="151" font-family="Inter, sans-serif" font-size="14" font-weight="600" fill="#8B5CF6">📁 Projects</text>
+  <text x="44" y="188" font-family="Inter, sans-serif" font-size="14" font-weight="500" fill="#A1A1AA">🎵 Sessions</text>
+  <text x="44" y="223" font-family="Inter, sans-serif" font-size="14" font-weight="500" fill="#A1A1AA">🛒 Marketplace</text>
+
+  <line x1="28" y1="250" x2="232" y2="250" stroke="#1F1F23" stroke-width="1"/>
+  <text x="28" y="280" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#52525B" letter-spacing="1">TOOLS</text>
+  <text x="44" y="308" font-family="Inter, sans-serif" font-size="14" font-weight="500" fill="#A1A1AA">⬆️ Upload</text>
+
+  <!-- Sidebar bottom -->
+  <line x1="28" y1="1740" x2="232" y2="1740" stroke="#1F1F23" stroke-width="1"/>
+  <circle cx="44" cy="1768" r="16" fill="#27272A"/>
+  <text x="44" y="1773" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#A1A1AA">V</text>
+  <text x="68" y="1765" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#E4E4E7">Vasyl</text>
+
+  <!-- Main content -->
+  <rect x="260" y="0" width="1180" height="1800" fill="#0A0A0B"/>
+
+  <!-- Top bar -->
+  <rect x="260" y="0" width="1180" height="60" fill="#0A0A0B" opacity="0.95"/>
+  <line x1="260" y1="60" x2="1440" y2="60" stroke="#1F1F23" stroke-width="1"/>
+
+  <!-- Breadcrumb -->
+  <text x="290" y="95" font-family="Inter, sans-serif" font-size="14" fill="#71717A">Projects</text>
+  <text x="370" y="95" font-family="Inter, sans-serif" font-size="14" fill="#52525B">/</text>
+  <text x="390" y="95" font-family="Inter, sans-serif" font-size="14" font-weight="600" fill="#E4E4E7">Neon Bloom</text>
+  <rect x="520" y="82" width="56" height="20" rx="10" fill="#22C55E" opacity="0.12"/>
+  <text x="534" y="97" font-family="Inter, sans-serif" font-size="10" font-weight="700" fill="#22C55E">READY</text>
+
+  <!-- Project header -->
+  <rect x="260" y="110" width="1180" height="180" fill="url(#projGrad)"/>
+  <line x1="260" y1="290" x2="1440" y2="290" stroke="#1F1F23" stroke-width="1"/>
+
+  <text x="290" y="155" font-family="Inter, -apple-system, sans-serif" font-size="32" font-weight="900" fill="#FFFFFF">Neon Bloom</text>
+  <text x="290" y="185" font-family="Inter, sans-serif" font-size="15" fill="#A1A1AA">Synthwave · 128 BPM · F# minor · Ableton Live 12 Suite</text>
+
+  <!-- Author -->
+  <circle cx="302" cy="220" r="14" fill="#27272A"/>
+  <text x="302" y="225" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" font-weight="700" fill="#A1A1AA">V</text>
+  <text x="324" y="225" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#E4E4E7">Vasyl</text>
+  <text x="378" y="225" font-family="Inter, sans-serif" font-size="13" fill="#52525B">·</text>
+  <text x="392" y="225" font-family="Inter, sans-serif" font-size="13" fill="#71717A">Updated 2 hours ago</text>
+  <text x="540" y="225" font-family="Inter, sans-serif" font-size="13" fill="#52525B">·</text>
+  <text x="554" y="225" font-family="Inter, sans-serif" font-size="13" fill="#71717A">12 versions</text>
+  <text x="640" y="225" font-family="Inter, sans-serif" font-size="13" fill="#52525B">·</text>
+  <text x="654" y="225" font-family="Inter, sans-serif" font-size="13" fill="#71717A">4 collaborators</text>
+
+  <!-- Action buttons -->
+  <rect x="1200" y="140" width="110" height="36" rx="8" fill="transparent" stroke="#3F3F46" stroke-width="1"/>
+  <text x="1220" y="163" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#E4E4E7">⬇️ Pull</text>
+  <rect x="1200" y="184" width="110" height="36" rx="8" fill="#8B5CF6"/>
+  <text x="1218" y="208" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#FFFFFF">💬 Review</text>
+
+  <!-- Tabs -->
+  <rect x="290" y="260" width="120" height="32" rx="6" fill="#18181B" stroke="#8B5CF6" stroke-width="1"/>
+  <text x="318" y="282" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#8B5CF6">📦 Files</text>
+  <rect x="420" y="260" width="130" height="32" rx="6" fill="transparent"/>
+  <text x="442" y="282" font-family="Inter, sans-serif" font-size="13" fill="#71717A">🎵 Tracks</text>
+  <rect x="560" y="260" width="140" height="32" rx="6" fill="transparent"/>
+  <text x="580" y="282" font-family="Inter, sans-serif" font-size="13" fill="#71717A">🔌 Plugins</text>
+  <rect x="710" y="260" width="150" height="32" rx="6" fill="transparent"/>
+  <text x="730" y="282" font-family="Inter, sans-serif" font-size="13" fill="#71717A">📁 Samples</text>
+  <rect x="870" y="260" width="120" height="32" rx="6" fill="transparent"/>
+  <text x="894" y="282" font-family="Inter, sans-serif" font-size="13" fill="#71717A">📜 History</text>
+  <rect x="1000" y="260" width="130" height="32" rx="6" fill="transparent"/>
+  <text x="1020" y="282" font-family="Inter, sans-serif" font-size="13" fill="#71717A">💬 Comments</text>
+
+  <!-- ========== FILE TREE ========== -->
+  <text x="290" y="330" font-family="Inter, sans-serif" font-size="14" font-weight="700" fill="#FFFFFF">Project Files</text>
+  <text x="1300" y="330" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="12" fill="#52525B">24 files · 181.3 MB</text>
+
+  <!-- File tree container -->
+  <rect x="290" y="345" width="1060" height="600" rx="12" fill="#111113" stroke="#27272A" stroke-width="1"/>
+
+  <!-- Root folder -->
+  <rect x="310" y="360" width="28" height="28" rx="6" fill="#8B5CF6" opacity="0.12"/>
+  <text x="324" y="380" font-family="Inter, sans-serif" font-size="14">📁</text>
+  <text x="348" y="380" font-family="Inter, sans-serif" font-size="14" font-weight="700" fill="#E4E4E7">Neon_Bloom_v3.2/</text>
+  <text x="520" y="380" font-family="Inter, sans-serif" font-size="12" fill="#52525B">root</text>
+
+  <!-- .als file -->
+  <line x1="324" y1="395" x2="324" y2="415" stroke="#27272A" stroke-width="1"/>
+  <rect x="360" y="395" width="24" height="24" rx="4" fill="#8B5CF6" opacity="0.08"/>
+  <text x="372" y="412" font-family="Inter, sans-serif" font-size="12">🎛️</text>
+  <text x="392" y="412" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#E4E4E7">Neon_Bloom.als</text>
+  <text x="560" y="412" font-family="JetBrains Mono, monospace" font-size="11" fill="#52525B">Ableton Live Set</text>
+  <text x="780" y="412" font-family="JetBrains Mono, monospace" font-size="11" fill="#52525B">24.5 MB</text>
+
+  <!-- Ableton Project Info -->
+  <line x1="324" y1="428" x2="324" y2="448" stroke="#27272A" stroke-width="1"/>
+  <rect x="360" y="428" width="24" height="24" rx="4" fill="#06B6D4" opacity="0.08"/>
+  <text x="372" y="445" font-family="Inter, sans-serif" font-size="12">📋</text>
+  <text x="392" y="445" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#E4E4E7">Ableton Project Info</text>
+  <text x="580" y="445" font-family="JetBrains Mono, monospace" font-size="11" fill="#52525B">XML</text>
+  <text x="780" y="445" font-family="JetBrains Mono, monospace" font-size="11" fill="#52525B">12 KB</text>
+
+  <!-- Collect All and Save -->
+  <line x1="324" y1="458" x2="324" y2="478" stroke="#27272A" stroke-width="1"/>
+  <rect x="360" y="458" width="24" height="24" rx="4" fill="#22C55E" opacity="0.08"/>
+  <text x="372" y="475" font-family="Inter, sans-serif" font-size="12">✅</text>
+  <text x="392" y="475" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#E4E4E7">Collect All and Save</text>
+  <text x="580" y="475" font-family="JetBrains Mono, monospace" font-size="11" fill="#52525B">Enabled</text>
+
+  <!-- Audio folder -->
+  <line x1="324" y1="490" x2="324" y2="510" stroke="#27272A" stroke-width="1"/>
+  <rect x="360" y="490" width="24" height="24" rx="4" fill="#EAB308" opacity="0.08"/>
+  <text x="372" y="507" font-family="Inter, sans-serif" font-size="12">🎵</text>
+  <text x="392" y="507" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#E4E4E7">Samples/</text>
+  <text x="490" y="507" font-family="Inter, sans-serif" font-size="12" fill="#52525B">42 files · 156.8 MB</text>
+
+  <!-- Audio files inside Samples -->
+  <line x1="376" y1="520" x2="376" y2="540" stroke="#27272A" stroke-width="1"/>
+  <line x1="376" y1="540" x2="392" y2="540" stroke="#27272A" stroke-width="1"/>
+  <rect x="396" y="520" width="24" height="24" rx="4" fill="#3F3F46" opacity="0.5"/>
+  <text x="408" y="537" font-family="Inter, sans-serif" font-size="12">🔊</text>
+  <text x="428" y="537" font-family="JetBrains Mono, monospace" font-size="12" fill="#A1A1AA">Kick_Neon_01.wav</text>
+  <text x="620" y="537" font-family="Inter, sans-serif" font-size="11" fill="#52525B">44.1kHz · 24bit · Stereo</text>
+  <text x="820" y="537" font-family="JetBrains Mono, monospace" font-size="11" fill="#52525B">2.4 MB</text>
+
+  <line x1="376" y1="550" x2="376" y2="570" stroke="#27272A" stroke-width="1"/>
+  <line x1="376" y1="570" x2="392" y2="570" stroke="#27272A" stroke-width="1"/>
+  <rect x="396" y="550" width="24" height="24" rx="4" fill="#3F3F46" opacity="0.5"/>
+  <text x="408" y="567" font-family="Inter, sans-serif" font-size="12">🔊</text>
+  <text x="428" y="567" font-family="JetBrains Mono, monospace" font-size="12" fill="#A1A1AA">Kick_Neon_02.wav</text>
+  <text x="620" y="567" font-family="Inter, sans-serif" font-size="11" fill="#52525B">44.1kHz · 24bit · Stereo</text>
+  <text x="820" y="567" font-family="JetBrains Mono, monospace" font-size="11" fill="#52525B">2.1 MB</text>
+
+  <line x1="376" y1="580" x2="376" y2="600" stroke="#27272A" stroke-width="1"/>
+  <line x1="376" y1="600" x2="392" y2="600" stroke="#27272A" stroke-width="1"/>
+  <rect x="396" y="580" width="24" height="24" rx="4" fill="#3F3F46" opacity="0.5"/>
+  <text x="408" y="597" font-family="Inter, sans-serif" font-size="12">🔊</text>
+  <text x="428" y="597" font-family="JetBrains Mono, monospace" font-size="12" fill="#A1A1AA">Bass_Synth_C1.wav</text>
+  <text x="620" y="597" font-family="Inter, sans-serif" font-size="11" fill="#52525B">44.1kHz · 24bit · Mono</text>
+  <text x="820" y="597" font-family="JetBrains Mono, monospace" font-size="11" fill="#52525B">3.8 MB</text>
+
+  <line x1="376" y1="610" x2="376" y2="630" stroke="#27272A" stroke-width="1"/>
+  <line x1="376" y1="630" x2="392" y2="630" stroke="#27272A" stroke-width="1"/>
+  <rect x="396" y="610" width="24" height="24" rx="4" fill="#3F3F46" opacity="0.5"/>
+  <text x="408" y="627" font-family="Inter, sans-serif" font-size="12">🔊</text>
+  <text x="428" y="627" font-family="JetBrains Mono, monospace" font-size="12" fill="#A1A1AA">Synth_Lead_F#4.wav</text>
+  <text x="620" y="627" font-family="Inter, sans-serif" font-size="11" fill="#52525B">44.1kHz · 24bit · Stereo</text>
+  <text x="820" y="627" font-family="JetBrains Mono, monospace" font-size="11" fill="#52525B">5.2 MB</text>
+
+  <line x1="376" y1="640" x2="376" y2="660" stroke="#27272A" stroke-width="1"/>
+  <line x1="376" y1="660" x2="392" y2="660" stroke="#27272A" stroke-width="1"/>
+  <rect x="396" y="640" width="24" height="24" rx="4" fill="#3F3F46" opacity="0.5"/>
+  <text x="408" y="657" font-family="Inter, sans-serif" font-size="12">🔊</text>
+  <text x="428" y="657" font-family="JetBrains Mono, monospace" font-size="12" fill="#A1A1AA">HiHat_Closed_01.wav</text>
+  <text x="620" y="657" font-family="Inter, sans-serif" font-size="11" fill="#52525B">44.1kHz · 24bit · Mono</text>
+  <text x="820" y="657" font-family="JetBrains Mono, monospace" font-size="11" fill="#52525B">0.8 MB</text>
+
+  <!-- Presets folder -->
+  <line x1="324" y1="680" x2="324" y2="700" stroke="#27272A" stroke-width="1"/>
+  <rect x="360" y="680" width="24" height="24" rx="4" fill="#8B5CF6" opacity="0.08"/>
+  <text x="372" y="697" font-family="Inter, sans-serif" font-size="12">🎛️</text>
+  <text x="392" y="697" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#E4E4E7">Presets/</text>
+  <text x="490" y="697" font-family="Inter, sans-serif" font-size="12" fill="#52525B">8 files · 12.4 MB</text>
+
+  <line x1="376" y1="710" x2="376" y2="730" stroke="#27272A" stroke-width="1"/>
+  <line x1="376" y1="730" x2="392" y2="730" stroke="#27272A" stroke-width="1"/>
+  <rect x="396" y="710" width="24" height="24" rx="4" fill="#8B5CF6" opacity="0.08"/>
+  <text x="408" y="727" font-family="Inter, sans-serif" font-size="12">🎛️</text>
+  <text x="428" y="727" font-family="JetBrains Mono, monospace" font-size="12" fill="#A1A1AA">Serum_Neon_Lead.fxp</text>
+  <text x="620" y="727" font-family="Inter, sans-serif" font-size="11" fill="#52525B">Serum Preset</text>
+  <text x="820" y="727" font-family="JetBrains Mono, monospace" font-size="11" fill="#52525B">1.8 MB</text>
+
+  <line x1="376" y1="740" x2="376" y2="760" stroke="#27272A" stroke-width="1"/>
+  <line x1="376" y1="760" x2="392" y2="760" stroke="#27272A" stroke-width="1"/>
+  <rect x="396" y="740" width="24" height="24" rx="4" fill="#8B5CF6" opacity="0.08"/>
+  <text x="408" y="757" font-family="Inter, sans-serif" font-size="12">🎛️</text>
+  <text x="428" y="757" font-family="JetBrains Mono, monospace" font-size="12" fill="#A1A1AA">Massive_Bass_Dark.fxp</text>
+  <text x="620" y="757" font-family="Inter, sans-serif" font-size="11" fill="#52525B">Massive Preset</text>
+  <text x="820" y="757" font-family="JetBrains Mono, monospace" font-size="11" fill="#52525B">2.1 MB</text>
+
+  <!-- Racks folder -->
+  <line x1="324" y1="780" x2="324" y2="800" stroke="#27272A" stroke-width="1"/>
+  <rect x="360" y="780" width="24" height="24" rx="4" fill="#06B6D4" opacity="0.08"/>
+  <text x="372" y="797" font-family="Inter, sans-serif" font-size="12">🎚️</text>
+  <text x="392" y="797" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#E4E4E7">Racks/</text>
+  <text x="470" y="797" font-family="Inter, sans-serif" font-size="12" fill="#52525B">3 files · 4.2 MB</text>
+
+  <line x1="376" y1="810" x2="376" y2="830" stroke="#27272A" stroke-width="1"/>
+  <line x1="376" y1="830" x2="392" y2="830" stroke="#27272A" stroke-width="1"/>
+  <rect x="396" y="810" width="24" height="24" rx="4" fill="#06B6D4" opacity="0.08"/>
+  <text x="408" y="827" font-family="Inter, sans-serif" font-size="12">🎚️</text>
+  <text x="428" y="827" font-family="JetBrains Mono, monospace" font-size="12" fill="#A1A1AA">Drum_Rack_Neon.adv</text>
+  <text x="620" y="827" font-family="Inter, sans-serif" font-size="11" fill="#52525B">Ableton Rack</text>
+  <text x="820" y="827" font-family="JetBrains Mono, monospace" font-size="11" fill="#52525B">1.4 MB</text>
+
+  <!-- Export folder -->
+  <line x1="324" y1="850" x2="324" y2="870" stroke="#27272A" stroke-width="1"/>
+  <rect x="360" y="850" width="24" height="24" rx="4" fill="#22C55E" opacity="0.08"/>
+  <text x="372" y="867" font-family="Inter, sans-serif" font-size="12">💿</text>
+  <text x="392" y="867" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#E4E4E7">Export/</text>
+  <text x="476" y="867" font-family="Inter, sans-serif" font-size="12" fill="#52525B">2 files · 42.6 MB</text>
+
+  <line x1="376" y1="880" x2="376" y2="900" stroke="#27272A" stroke-width="1"/>
+  <line x1="376" y1="900" x2="392" y2="900" stroke="#27272A" stroke-width="1"/>
+  <rect x="396" y="880" width="24" height="24" rx="4" fill="#22C55E" opacity="0.08"/>
+  <text x="408" y="897" font-family="Inter, sans-serif" font-size="12">💿</text>
+  <text x="428" y="897" font-family="JetBrains Mono, monospace" font-size="12" fill="#A1A1AA">Neon_Bloom_Master_v3.2.wav</text>
+  <text x="720" y="897" font-family="Inter, sans-serif" font-size="11" fill="#52525B">WAV · 24bit · 48kHz</text>
+  <text x="900" y="897" font-family="JetBrains Mono, monospace" font-size="11" fill="#52525B">38.4 MB</text>
+
+  <line x1="376" y1="910" x2="376" y2="930" stroke="#27272A" stroke-width="1"/>
+  <line x1="376" y1="930" x2="392" y2="930" stroke="#27272A" stroke-width="1"/>
+  <rect x="396" y="910" width="24" height="24" rx="4" fill="#22C55E" opacity="0.08"/>
+  <text x="408" y="927" font-family="Inter, sans-serif" font-size="12">💿</text>
+  <text x="428" y="927" font-family="JetBrains Mono, monospace" font-size="12" fill="#A1A1AA">Neon_Bloom_Master_v3.2.mp3</text>
+  <text x="720" y="927" font-family="Inter, sans-serif" font-size="11" fill="#52525B">MP3 · 320kbps</text>
+  <text x="900" y="927" font-family="JetBrains Mono, monospace" font-size="11" fill="#52525B">4.2 MB</text>
+
+  <!-- ========== TRACKS SECTION ========== -->
+  <text x="290" y="990" font-family="Inter, sans-serif" font-size="14" font-weight="700" fill="#FFFFFF">Tracks</text>
+  <text x="1300" y="990" text-anchor="end" font-family="Inter, sans-serif" font-size="12" fill="#52525B">8 tracks · 32 bars</text>
+
+  <!-- Track list -->
+  <rect x="290" y="1005" width="1060" height="44" rx="8" fill="#18181B"/>
+  <text x="310" y="1032" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#52525B" letter-spacing="0.5">#</text>
+  <text x="340" y="1032" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#52525B" letter-spacing="0.5">TRACK</text>
+  <text x="540" y="1032" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#52525B" letter-spacing="0.5">TYPE</text>
+  <text x="680" y="1032" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#52525B" letter-spacing="0.5">PLUGIN</text>
+  <text x="860" y="1032" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#52525B" letter-spacing="0.5">BARS</text>
+  <text x="960" y="1032" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#52525B" letter-spacing="0.5">AUDIO</text>
+  <text x="1080" y="1032" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#52525B" letter-spacing="0.5">SIZE</text>
+
+  <!-- Track 1 -->
+  <rect x="290" y="1055" width="1060" height="44" rx="8" fill="#111113" stroke="#27272A" stroke-width="1"/>
+  <text x="316" y="1082" font-family="JetBrains Mono, monospace" font-size="12" fill="#52525B">1</text>
+  <circle cx="340" cy="1077" r="6" fill="#8B5CF6"/>
+  <text x="356" y="1082" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#E4E4E7">Neon Lead</text>
+  <text x="540" y="1082" font-family="Inter, sans-serif" font-size="12" fill="#A1A1AA">MIDI</text>
+  <text x="680" y="1082" font-family="JetBrains Mono, monospace" font-size="12" fill="#8B5CF6">Serum</text>
+  <text x="860" y="1082" font-family="Inter, sans-serif" font-size="12" fill="#71717A">32</text>
+  <text x="960" y="1082" font-family="Inter, sans-serif" font-size="12" fill="#52525B">—</text>
+  <text x="1080" y="1082" font-family="JetBrains Mono, monospace" font-size="12" fill="#52525B">1.8 MB</text>
+
+  <!-- Track 2 -->
+  <rect x="290" y="1105" width="1060" height="44" rx="8" fill="#111113" stroke="#27272A" stroke-width="1"/>
+  <text x="316" y="1132" font-family="JetBrains Mono, monospace" font-size="12" fill="#52525B">2</text>
+  <circle cx="340" cy="1127" r="6" fill="#06B6D4"/>
+  <text x="356" y="1132" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#E4E4E7">Bass Synth</text>
+  <text x="540" y="1132" font-family="Inter, sans-serif" font-size="12" fill="#A1A1AA">MIDI</text>
+  <text x="680" y="1132" font-family="JetBrains Mono, monospace" font-size="12" fill="#06B6D4">Massive</text>
+  <text x="860" y="1132" font-family="Inter, sans-serif" font-size="12" fill="#71717A">32</text>
+  <text x="960" y="1132" font-family="Inter, sans-serif" font-size="12" fill="#52525B">—</text>
+  <text x="1080" y="1132" font-family="JetBrains Mono, monospace" font-size="12" fill="#52525B">2.1 MB</text>
+
+  <!-- Track 3 -->
+  <rect x="290" y="1155" width="1060" height="44" rx="8" fill="#111113" stroke="#27272A" stroke-width="1"/>
+  <text x="316" y="1182" font-family="JetBrains Mono, monospace" font-size="12" fill="#52525B">3</text>
+  <circle cx="340" cy="1177" r="6" fill="#22C55E"/>
+  <text x="356" y="1182" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#E4E4E7">Pad</text>
+  <text x="540" y="1182" font-family="Inter, sans-serif" font-size="12" fill="#A1A1AA">MIDI</text>
+  <text x="680" y="1182" font-family="JetBrains Mono, monospace" font-size="12" fill="#22C55E">Omnisphere</text>
+  <text x="860" y="1182" font-family="Inter, sans-serif" font-size="12" fill="#71717A">32</text>
+  <text x="960" y="1182" font-family="Inter, sans-serif" font-size="12" fill="#52525B">—</text>
+  <text x="1080" y="1182" font-family="JetBrains Mono, monospace" font-size="12" fill="#52525B">3.4 MB</text>
+
+  <!-- Track 4 - Audio -->
+  <rect x="290" y="1205" width="1060" height="44" rx="8" fill="#111113" stroke="#27272A" stroke-width="1"/>
+  <text x="316" y="1232" font-family="JetBrains Mono, monospace" font-size="12" fill="#52525B">4</text>
+  <circle cx="340" cy="1227" r="6" fill="#EAB308"/>
+  <text x="356" y="1232" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#E4E4E7">Drums</text>
+  <text x="540" y="1232" font-family="Inter, sans-serif" font-size="12" fill="#EAB308">Audio</text>
+  <text x="680" y="1232" font-family="JetBrains Mono, monospace" font-size="12" fill="#52525B">—</text>
+  <text x="860" y="1232" font-family="Inter, sans-serif" font-size="12" fill="#71717A">32</text>
+  <text x="960" y="1232" font-family="Inter, sans-serif" font-size="12" fill="#52525B">6 tracks</text>
+  <text x="1080" y="1232" font-family="JetBrains Mono, monospace" font-size="12" fill="#52525B">8.2 MB</text>
+
+  <!-- Track 5 -->
+  <rect x="290" y="1255" width="1060" height="44" rx="8" fill="#111113" stroke="#27272A" stroke-width="1"/>
+  <text x="316" y="1282" font-family="JetBrains Mono, monospace" font-size="12" fill="#52525B">5</text>
+  <circle cx="340" cy="1277" r="6" fill="#EF4444"/>
+  <text x="356" y="1282" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#E4E4E7">Arp Sequence</text>
+  <text x="540" y="1282" font-family="Inter, sans-serif" font-size="12" fill="#A1A1AA">MIDI</text>
+  <text x="680" y="1282" font-family="JetBrains Mono, monospace" font-size="12" fill="#EF4444">Diva</text>
+  <text x="860" y="1282" font-family="Inter, sans-serif" font-size="12" fill="#71717A">16</text>
+  <text x="960" y="1282" font-family="Inter, sans-serif" font-size="12" fill="#52525B">—</text>
+  <text x="1080" y="1282" font-family="JetBrains Mono, monospace" font-size="12" fill="#52525B">0.9 MB</text>
+
+  <!-- Track 6 -->
+  <rect x="290" y="1305" width="1060" height="44" rx="8" fill="#111113" stroke="#27272A" stroke-width="1"/>
+  <text x="316" y="1332" font-family="JetBrains Mono, monospace" font-size="12" fill="#52525B">6</text>
+  <circle cx="340" cy="1327" r="6" fill="#3B82F6"/>
+  <text x="356" y="1332" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#E4E4E7">Chords</text>
+  <text x="540" y="1332" font-family="Inter, sans-serif" font-size="12" fill="#A1A1AA">MIDI</text>
+  <text x="680" y="1332" font-family="JetBrains Mono, monospace" font-size="12" fill="#3B82F6">TAL-U-NO</text>
+  <text x="860" y="1332" font-family="Inter, sans-serif" font-size="12" fill="#71717A">32</text>
+  <text x="960" y="1332" font-family="Inter, sans-serif" font-size="12" fill="#52525B">—</text>
+  <text x="1080" y="1332" font-family="JetBrains Mono, monospace" font-size="12" fill="#52525B">1.2 MB</text>
+
+  <!-- Track 7 - Group -->
+  <rect x="290" y="1355" width="1060" height="44" rx="8" fill="#111113" stroke="#8B5CF6" stroke-width="1" opacity="0.6"/>
+  <text x="316" y="1382" font-family="JetBrains Mono, monospace" font-size="12" fill="#52525B">7</text>
+  <text x="340" y="1382" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#8B5CF6">🥁 Drums Group</text>
+  <text x="540" y="1382" font-family="Inter, sans-serif" font-size="12" fill="#8B5CF6">Group</text>
+  <text x="680" y="1382" font-family="Inter, sans-serif" font-size="12" fill="#52525B">4 tracks</text>
+  <text x="860" y="1382" font-family="Inter, sans-serif" font-size="12" fill="#71717A">32</text>
+  <text x="960" y="1382" font-family="Inter, sans-serif" font-size="12" fill="#52525B">4 tracks</text>
+  <text x="1080" y="1382" font-family="JetBrains Mono, monospace" font-size="12" fill="#52525B">6.4 MB</text>
+
+  <!-- Track 8 - Return -->
+  <rect x="290" y="1405" width="1060" height="44" rx="8" fill="#111113" stroke="#27272A" stroke-width="1"/>
+  <text x="316" y="1432" font-family="JetBrains Mono, monospace" font-size="12" fill="#52525B">R</text>
+  <text x="340" y="1432" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#E4E4E7">Reverb Send</text>
+  <text x="540" y="1432" font-family="Inter, sans-serif" font-size="12" fill="#A1A1AA">Return</text>
+  <text x="680" y="1432" font-family="JetBrains Mono, monospace" font-size="12" fill="#71717A">ValhallaRoom</text>
+  <text x="860" y="1432" font-family="Inter, sans-serif" font-size="12" fill="#71717A">—</text>
+  <text x="960" y="1432" font-family="Inter, sans-serif" font-size="12" fill="#52525B">—</text>
+  <text x="1080" y="1432" font-family="JetBrains Mono, monospace" font-size="12" fill="#52525B">—</text>
+
+  <!-- ========== VERSION HISTORY ========== -->
+  <text x="290" y="1500" font-family="Inter, sans-serif" font-size="14" font-weight="700" fill="#FFFFFF">Version History</text>
+
+  <rect x="290" y="1520" width="1060" height="60" rx="10" fill="#111113" stroke="#8B5CF6" stroke-width="1"/>
+  <rect x="310" y="1535" width="40" height="28" rx="6" fill="#8B5CF6" opacity="0.12"/>
+  <text x="330" y="1555" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="12" font-weight="700" fill="#8B5CF6">v3.2</text>
+  <text x="370" y="1550" font-family="Inter, sans-serif" font-size="14" font-weight="700" fill="#E4E4E7">Added arpeggio sequence</text>
+  <rect x="640" y="1540" width="50" height="18" rx="6" fill="#22C55E" opacity="0.12"/>
+  <text x="652" y="1553" font-family="Inter, sans-serif" font-size="10" font-weight="700" fill="#22C55E">READY</text>
+  <text x="710" y="1555" font-family="Inter, sans-serif" font-size="12" fill="#71717A">2 hours ago</text>
+  <text x="850" y="1555" font-family="Inter, sans-serif" font-size="12" fill="#52525B">by Vasyl</text>
+  <text x="1250" y="1555" font-family="Inter, sans-serif" font-size="12" fill="#8B5CF6">→</text>
+
+  <rect x="290" y="1590" width="1060" height="60" rx="10" fill="#111113" stroke="#27272A" stroke-width="1"/>
+  <rect x="310" y="1605" width="40" height="28" rx="6" fill="#06B6D4" opacity="0.12"/>
+  <text x="330" y="1625" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="12" font-weight="700" fill="#06B6D4">v3.1</text>
+  <text x="370" y="1620" font-family="Inter, sans-serif" font-size="14" font-weight="600" fill="#E4E4E7">Mixed drums and bass</text>
+  <rect x="600" y="1610" width="80" height="18" rx="6" fill="#06B6D4" opacity="0.12"/>
+  <text x="612" y="1623" font-family="Inter, sans-serif" font-size="10" font-weight="700" fill="#06B6D4">APPROVED</text>
+  <text x="710" y="1625" font-family="Inter, sans-serif" font-size="12" fill="#71717A">5 hours ago</text>
+  <text x="850" y="1625" font-family="Inter, sans-serif" font-size="12" fill="#52525B">by Vasyl</text>
+  <text x="1250" y="1625" font-family="Inter, sans-serif" font-size="12" fill="#71717A">→</text>
+
+  <rect x="290" y="1660" width="1060" height="60" rx="10" fill="#111113" stroke="#27272A" stroke-width="1"/>
+  <rect x="310" y="1675" width="40" height="28" rx="6" fill="#3F3F46"/>
+  <text x="330" y="1695" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="12" font-weight="700" fill="#71717A">v3.0</text>
+  <text x="370" y="1690" font-family="Inter, sans-serif" font-size="14" font-weight="600" fill="#E4E4E7">Added synth lead melody</text>
+  <text x="710" y="1695" font-family="Inter, sans-serif" font-size="12" fill="#71717A">1 day ago</text>
+  <text x="850" y="1695" font-family="Inter, sans-serif" font-size="12" fill="#52525B">by Vasyl</text>
+  <text x="1250" y="1695" font-family="Inter, sans-serif" font-size="12" fill="#71717A">→</text>
+
+  <rect x="290" y="1730" width="1060" height="60" rx="10" fill="#111113" stroke="#27272A" stroke-width="1"/>
+  <rect x="310" y="1745" width="40" height="28" rx="6" fill="#3F3F46"/>
+  <text x="330" y="1765" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="12" font-weight="700" fill="#71717A">v2.0</text>
+  <text x="370" y="1760" font-family="Inter, sans-serif" font-size="14" font-weight="600" fill="#E4E4E7">Initial arrangement</text>
+  <text x="710" y="1765" font-family="Inter, sans-serif" font-size="12" fill="#71717A">3 days ago</text>
+  <text x="850" y="1765" font-family="Inter, sans-serif" font-size="12" fill="#52525B">by Vasyl</text>
+  <text x="1250" y="1765" font-family="Inter, sans-serif" font-size="12" fill="#71717A">→</text>
+</svg>

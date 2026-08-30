@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <title>SoundHub — Projects</title>
+  <link rel="stylesheet" href="design-system/shared.css">
+  <style>
+    .projects-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .view-toggle { display: flex; border: 1px solid var(--border-default); border-radius: var(--radius-sm); overflow: hidden; }
+    .view-btn { padding: 6px 10px; font-size: 12px; color: var(--text-muted); cursor: pointer; border-right: 1px solid var(--border-default); }
+    .view-btn:last-child { border-right: none; }
+    .view-btn.active { background: var(--bg-elevated); color: var(--text-primary); }
+    .project-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .project-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .project-card:hover { border-color: var(--border-hover); transform: translateY(-2px); }
+    .project-card-top { display: flex; align-items: start; justify-content: space-between; margin-bottom: 12px; }
+    .project-card-icon { width: 44px; height: 44px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-size: 20px; }
+    .project-card-name { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+    .project-card-daw { font-size: 11px; color: var(--text-muted); font-family: var(--font-mono); }
+    .project-card-stats { display: flex; gap: 16px; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border-default); }
+    .project-card-stat { font-size: 11px; color: var(--text-muted); }
+    .project-card-stat strong { color: var(--text-primary); font-weight: 600; }
+    .project-card-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; }
+    .project-card-time { font-size: 11px; color: var(--text-muted); }
+    .project-card-avatars { display: flex; }
+    .project-card-avatars .av {
+      width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--bg-surface);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 9px; font-weight: 700; color: white; margin-left: -6px;
+    }
+    .project-card-avatars .av:first-child { margin-left: 0; }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-logo"><div class="logo-icon">S</div><div class="logo-text">SoundHub</div></div>
+      <nav class="sidebar-nav">
+        <div class="sidebar-section-label">Main</div>
+        <a class="sidebar-item" href="#"><span class="icon">📊</span> Dashboard</a>
+        <a class="sidebar-item active" href="#"><span class="icon">📁</span> Projects <span class="badge">4</span></a>
+        <a class="sidebar-item" href="#"><span class="icon">🛒</span> Marketplace</a>
+        <a class="sidebar-item" href="#"><span class="icon">⬆️</span> Upload</a>
+        <div class="sidebar-section-label">Workspace</div>
+        <a class="sidebar-item" href="#"><span class="icon">💬</span> Reviews</a>
+        <div class="sidebar-section-label">Account</div>
+        <a class="sidebar-item" href="#"><span class="icon">⚙️</span> Settings</a>
+      </nav>
+      <div class="sidebar-footer"><a class="sidebar-item" href="#"><span class="icon">❓</span> Help</a></div>
+    </aside>
+    <div class="main-content">
+      <header class="topbar">
+        <div class="topbar-search"><span class="search-icon">🔍</span><input type="text" placeholder="Search projects..."></div>
+        <div class="topbar-right"><div class="topbar-icon-btn">🔔<span class="notif-dot"></span></div><div class="topbar-avatar">P</div></div>
+      </header>
+      <div class="page">
+        <div class="projects-header">
+          <div>
+            <h1 class="page-title">Projects</h1>
+            <p class="page-subtitle">4 projects · 32 versions</p>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <div class="view-toggle">
+              <div class="view-btn active">▦ Grid</div>
+              <div class="view-btn">☰ List</div>
+            </div>
+            <button class="btn btn-primary">+ New Project</button>
+          </div>
+        </div>
+
+        <div class="project-grid">
+          <div class="project-card">
+            <div class="project-card-top">
+              <div class="project-card-icon" style="background:rgba(139,92,246,0.12);color:var(--brand-primary)">🎵</div>
+              <span class="badge badge-success">Ready</span>
+            </div>
+            <div class="project-card-name">Neon Warehouse</div>
+            <div class="project-card-daw">Ableton Live 12 · 128 BPM · F#m</div>
+            <div class="project-card-stats">
+              <span class="project-card-stat"><strong>13</strong> versions</span>
+              <span class="project-card-stat"><strong>4</strong> files</span>
+              <span class="project-card-stat"><strong>2</strong> reviews</span>
+            </div>
+            <div class="project-card-footer">
+              <span class="project-card-time">Updated 2h ago</span>
+              <div class="project-card-avatars">
+                <div class="av" style="background:var(--brand-primary)">P</div>
+                <div class="av" style="background:var(--brand-secondary)">S</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="project-card">
+            <div class="project-card-top">
+              <div class="project-card-icon" style="background:rgba(234,179,8,0.12);color:var(--color-warning)">🎵</div>
+              <span class="badge badge-warning">In Review</span>
+            </div>
+            <div class="project-card-name">Midnight Run</div>
+            <div class="project-card-daw">FL Studio 21 · 140 BPM · Dm</div>
+            <div class="project-card-stats">
+              <span class="project-card-stat"><strong>7</strong> versions</span>
+              <span class="project-card-stat"><strong>3</strong> files</span>
+              <span class="project-card-stat"><strong>1</strong> review</span>
+            </div>
+            <div class="project-card-footer">
+              <span class="project-card-time">Updated 1d ago</span>
+              <div class="project-card-avatars">
+                <div class="av" style="background:var(--brand-primary)">P</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="project-card">
+            <div class="project-card-top">
+              <div class="project-card-icon" style="background:rgba(59,130,246,0.12);color:var(--color-info)">🎵</div>
+              <span class="badge badge-muted">Draft</span>
+            </div>
+            <div class="project-card-name">Crystal Echo</div>
+            <div class="project-card-daw">Ableton Live 12 · 90 BPM · Am</div>
+            <div class="project-card-stats">
+              <span class="project-card-stat"><strong>1</strong> version</span>
+              <span class="project-card-stat"><strong>2</strong> files</span>
+              <span class="project-card-stat"><strong>0</strong> reviews</span>
+            </div>
+            <div class="project-card-footer">
+              <span class="project-card-time">Updated 3d ago</span>
+              <div class="project-card-avatars">
+                <div class="av" style="background:var(--brand-primary)">P</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="project-card">
+            <div class="project-card-top">
+              <div class="project-card-icon" style="background:rgba(34,197,94,0.12);color:var(--color-success)">🎵</div>
+              <span class="badge badge-success">Published</span>
+            </div>
+            <div class="project-card-name">Summer Drums</div>
+            <div class="project-card-daw">REAPER · 120 BPM · C</div>
+            <div class="project-card-stats">
+              <span class="project-card-stat"><strong>5</strong> versions</span>
+              <span class="project-card-stat"><strong>6</strong> files</span>
+              <span class="project-card-stat"><strong>3</strong> reviews</span>
+            </div>
+            <div class="project-card-footer">
+              <span class="project-card-time">Updated 5d ago</span>
+              <div class="project-card-avatars">
+                <div class="av" style="background:var(--brand-primary)">P</div>
+                <div class="av" style="background:var(--color-warning)">M</div>
+                <div class="av" style="background:var(--brand-secondary)">S</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

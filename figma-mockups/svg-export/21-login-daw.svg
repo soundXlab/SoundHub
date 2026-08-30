@@ -1,0 +1,362 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" 
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     viewBox="0 0 1440 900" 
+     width="1440" 
+     height="900">
+  <foreignObject width="100%" height="100%">
+    <div xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html><html lang="en"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <title>SoundHub — Login (DAW Style)</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', -apple-system, sans-serif; background: #0d0d0d;
+      color: #e4e4e7; overflow: hidden; height: 100vh;
+      display: flex; flex-direction: column;
+    }
+
+    /* ── Transport Bar ── */
+    .transport-bar {
+      height: 40px; background: #111113; border-bottom: 1px solid #27272a;
+      display: flex; align-items: center; padding: 0 12px; gap: 16px;
+      font-size: 11px; user-select: none;
+    }
+    .transport-logo { font-weight: 800; font-size: 13px; color: #ea5808; letter-spacing: -0.5px; }
+    .transport-logo span { color: #e4e4e7; }
+    .transport-divider { width: 1px; height: 20px; background: #27272a; }
+    .transport-spacer { flex: 1; }
+    .transport-time {
+      font-family: 'JetBrains Mono', monospace; font-size: 18px; font-weight: 700;
+      color: #e4e4e7; letter-spacing: 1px;
+    }
+
+    /* ── Main Layout ── */
+    .login-layout {
+      flex: 1; display: flex; overflow: hidden;
+    }
+
+    /* ── Left Panel — Hero ── */
+    .hero-panel {
+      flex: 1; background: linear-gradient(135deg, #0d0d0d 0%, #1a1025 50%, #0d0d0d 100%);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      position: relative; overflow: hidden;
+    }
+    .hero-panel::before {
+      content: ''; position: absolute; width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(234,88,8,0.15) 0%, transparent 70%);
+      top: 50%; left: 50%; transform: translate(-50%, -50%);
+    }
+    .hero-content { position: relative; z-index: 1; text-align: center; max-width: 400px; }
+
+    /* ── Waveform Visualizer ── */
+    .waveform-visualizer {
+      display: flex; align-items: center; justify-content: center;
+      gap: 4px; height: 120px; margin-bottom: 40px;
+    }
+    .viz-bar {
+      width: 4px; border-radius: 2px; transition: height 0.3s;
+    }
+    .hero-logo {
+      font-size: 48px; font-weight: 800; color: #ea5808;
+      margin-bottom: 8px; letter-spacing: -2px;
+    }
+    .hero-logo span { color: #e4e4e7; }
+    .hero-tagline {
+      font-size: 16px; color: #a1a1aa; line-height: 1.5; margin-bottom: 32px;
+    }
+    .hero-features {
+      display: flex; gap: 24px; justify-content: center;
+    }
+    .hero-feature {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 12px; color: #71717a;
+    }
+    .hero-feature .icon { font-size: 16px; }
+
+    /* ── Right Panel — Form ── */
+    .form-panel {
+      width: 480px; background: #111113; border-left: 1px solid #27272a;
+      display: flex; flex-direction: column; justify-content: center;
+      padding: 48px 40px; overflow-y: auto;
+    }
+    .form-header { margin-bottom: 32px; }
+    .form-title { font-size: 24px; font-weight: 700; color: #e4e4e7; }
+    .form-subtitle { font-size: 13px; color: #71717a; margin-top: 4px; }
+
+    /* ── Tabs ── */
+    .auth-tabs {
+      display: flex; gap: 0; margin-bottom: 24px;
+      background: #0d0d0d; border-radius: 8px; padding: 4px;
+    }
+    .auth-tab {
+      flex: 1; padding: 10px; text-align: center; font-size: 13px;
+      font-weight: 600; color: #71717a; cursor: pointer;
+      border-radius: 6px; transition: all 0.15s;
+    }
+    .auth-tab:hover { color: #e4e4e7; }
+    .auth-tab.active { background: #ea5808; color: #fff; }
+
+    /* ── Form Elements ── */
+    .form-group { margin-bottom: 16px; }
+    .form-label {
+      display: block; font-size: 12px; font-weight: 600; color: #a1a1aa;
+      margin-bottom: 6px;
+    }
+    .form-input {
+      width: 100%; background: #0d0d0d; border: 1px solid #27272a;
+      border-radius: 6px; padding: 10px 12px; font-size: 13px;
+      color: #e4e4e7; outline: none; transition: border-color 0.15s;
+    }
+    .form-input:focus { border-color: #ea5808; }
+    .form-input::placeholder { color: #52525b; }
+    .form-input-icon {
+      position: relative;
+    }
+    .form-input-icon .form-input { padding-left: 36px; }
+    .form-input-icon .icon {
+      position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+      font-size: 14px; color: #52525b;
+    }
+    .form-hint { font-size: 11px; color: #52525b; margin-top: 4px; }
+    .form-error { font-size: 11px; color: #ef4444; margin-top: 4px; }
+
+    .form-row {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .form-checkbox {
+      display: flex; align-items: center; gap: 8px; font-size: 12px; color: #a1a1aa;
+      cursor: pointer;
+    }
+    .form-checkbox input {
+      width: 16px; height: 16px; background: #0d0d0d; border: 1px solid #27272a;
+      border-radius: 4px; cursor: pointer; accent-color: #ea5808;
+    }
+    .form-link {
+      font-size: 12px; color: #ea5808; cursor: pointer; text-decoration: none;
+    }
+    .form-link:hover { text-decoration: underline; }
+
+    /* ── Buttons ── */
+    .btn {
+      width: 100%; padding: 10px 16px; border-radius: 6px; font-size: 13px;
+      font-weight: 600; cursor: pointer; border: 1px solid #27272a;
+      transition: all 0.15s; display: flex; align-items: center;
+      justify-content: center; gap: 8px;
+    }
+    .btn-primary { background: #ea5808; color: #fff; border-color: #ea5808; }
+    .btn-primary:hover { background: #c2410c; }
+    .btn-secondary { background: #0d0d0d; color: #e4e4e7; }
+    .btn-secondary:hover { background: #1a1a1a; }
+    .btn-ghost { background: transparent; color: #71717a; border-color: transparent; }
+    .btn-ghost:hover { color: #e4e4e7; }
+    .btn-social {
+      background: #0d0d0d; color: #e4e4e7; border-color: #27272a;
+    }
+    .btn-social:hover { border-color: #3f3f46; }
+
+    /* ── Divider ── */
+    .divider {
+      display: flex; align-items: center; gap: 12px;
+      margin: 20px 0; font-size: 11px; color: #52525b;
+    }
+    .divider::before, .divider::after {
+      content: ''; flex: 1; height: 1px; background: #27272a;
+    }
+
+    /* ── Wallet Connect ── */
+    .wallet-options { display: flex; gap: 8px; margin-bottom: 16px; }
+    .wallet-btn {
+      flex: 1; padding: 10px; background: #0d0d0d; border: 1px solid #27272a;
+      border-radius: 6px; font-size: 11px; font-weight: 600; color: #a1a1aa;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      gap: 6px; transition: all 0.15s;
+    }
+    .wallet-btn:hover { border-color: #3f3f46; color: #e4e4e7; }
+    .wallet-btn .icon { font-size: 16px; }
+
+    /* ── Footer ── */
+    .form-footer {
+      margin-top: 24px; text-align: center; font-size: 11px; color: #52525b;
+    }
+    .form-footer a { color: #ea5808; text-decoration: none; }
+    .form-footer a:hover { text-decoration: underline; }
+
+    /* ── Device Chain (Bottom) ── */
+    .device-chain {
+      height: 48px; background: #111113; border-top: 1px solid #27272a;
+      display: flex; align-items: center; padding: 0 16px; gap: 8px;
+      font-size: 10px;
+    }
+    .device {
+      padding: 4px 10px; background: #0d0d0d; border: 1px solid #27272a;
+      border-radius: 4px; color: #a1a1aa;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .device .led { width: 6px; height: 6px; border-radius: 50%; background: #27272a; }
+    .device.active .led { background: #22c55e; box-shadow: 0 0 6px rgba(34,197,94,0.5); }
+    .device-chain-spacer { flex: 1; }
+    .device-chain-label {
+      font-size: 9px; color: #52525b; text-transform: uppercase;
+      letter-spacing: 0.5px; font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <!-- Transport Bar -->
+  <div class="transport-bar">
+    <div class="transport-logo">Sound<span>Hub</span></div>
+    <div class="transport-divider"></div>
+    <div class="transport-spacer"></div>
+    <div class="transport-time">AUTHENTICATE</div>
+    <div class="transport-spacer"></div>
+    <div class="transport-divider"></div>
+    <a style="font-size:11px;color:#71717a;cursor:pointer">Help</a>
+    <a style="font-size:11px;color:#71717a;cursor:pointer">Docs</a>
+  </div>
+
+  <!-- Main -->
+  <div class="login-layout">
+    <!-- Left Panel — Hero -->
+    <div class="hero-panel">
+      <div class="hero-content">
+        <!-- Waveform Visualizer -->
+        <div class="waveform-visualizer">
+          <div class="viz-bar" style="height:20px;background:#ea5808;opacity:0.4"></div>
+          <div class="viz-bar" style="height:35px;background:#ea5808;opacity:0.5"></div>
+          <div class="viz-bar" style="height:50px;background:#ea5808;opacity:0.6"></div>
+          <div class="viz-bar" style="height:65px;background:#ea5808;opacity:0.7"></div>
+          <div class="viz-bar" style="height:80px;background:#ea5808;opacity:0.8"></div>
+          <div class="viz-bar" style="height:95px;background:#ea5808;opacity:0.9"></div>
+          <div class="viz-bar" style="height:110px;background:#ea5808"></div>
+          <div class="viz-bar" style="height:95px;background:#ea5808;opacity:0.9"></div>
+          <div class="viz-bar" style="height:80px;background:#ea5808;opacity:0.8"></div>
+          <div class="viz-bar" style="height:65px;background:#ea5808;opacity:0.7"></div>
+          <div class="viz-bar" style="height:50px;background:#ea5808;opacity:0.6"></div>
+          <div class="viz-bar" style="height:35px;background:#ea5808;opacity:0.5"></div>
+          <div class="viz-bar" style="height:20px;background:#ea5808;opacity:0.4"></div>
+          <div class="viz-bar" style="height:10px;background:#ea5808;opacity:0.3"></div>
+          <div class="viz-bar" style="height:25px;background:#ea5808;opacity:0.4"></div>
+          <div class="viz-bar" style="height:40px;background:#ea5808;opacity:0.5"></div>
+          <div class="viz-bar" style="height:55px;background:#ea5808;opacity:0.6"></div>
+          <div class="viz-bar" style="height:70px;background:#ea5808;opacity:0.7"></div>
+          <div class="viz-bar" style="height:85px;background:#ea5808;opacity:0.8"></div>
+          <div class="viz-bar" style="height:100px;background:#ea5808;opacity:0.9"></div>
+          <div class="viz-bar" style="height:110px;background:#ea5808"></div>
+          <div class="viz-bar" style="height:95px;background:#ea5808;opacity:0.9"></div>
+          <div class="viz-bar" style="height:80px;background:#ea5808;opacity:0.8"></div>
+          <div class="viz-bar" style="height:65px;background:#ea5808;opacity:0.7"></div>
+          <div class="viz-bar" style="height:50px;background:#ea5808;opacity:0.6"></div>
+          <div class="viz-bar" style="height:35px;background:#ea5808;opacity:0.5"></div>
+          <div class="viz-bar" style="height:20px;background:#ea5808;opacity:0.4"></div>
+          <div class="viz-bar" style="height:10px;background:#ea5808;opacity:0.3"></div>
+          <div class="viz-bar" style="height:30px;background:#ea5808;opacity:0.4"></div>
+          <div class="viz-bar" style="height:45px;background:#ea5808;opacity:0.5"></div>
+          <div class="viz-bar" style="height:60px;background:#ea5808;opacity:0.6"></div>
+          <div class="viz-bar" style="height:75px;background:#ea5808;opacity:0.7"></div>
+          <div class="viz-bar" style="height:90px;background:#ea5808;opacity:0.8"></div>
+          <div class="viz-bar" style="height:105px;background:#ea5808;opacity:0.9"></div>
+          <div class="viz-bar" style="height:90px;background:#ea5808;opacity:0.8"></div>
+          <div class="viz-bar" style="height:75px;background:#ea5808;opacity:0.7"></div>
+          <div class="viz-bar" style="height:60px;background:#ea5808;opacity:0.6"></div>
+          <div class="viz-bar" style="height:45px;background:#ea5808;opacity:0.5"></div>
+          <div class="viz-bar" style="height:30px;background:#ea5808;opacity:0.4"></div>
+          <div class="viz-bar" style="height:15px;background:#ea5808;opacity:0.3"></div>
+        </div>
+
+        <div class="hero-logo">Sound<span>Hub</span></div>
+        <div class="hero-tagline">
+          The marketplace for music creators.<br>
+          Version, discover, collaborate, and build on sound.
+        </div>
+        <div class="hero-features">
+          <div class="hero-feature"><span class="icon">🎵</span> 256+ Assets</div>
+          <div class="hero-feature"><span class="icon">👥</span> 48 Creators</div>
+          <div class="hero-feature"><span class="icon">📦</span> DAW Integration</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Panel — Form -->
+    <div class="form-panel">
+      <div class="form-header">
+        <div class="form-title">Welcome back</div>
+        <div class="form-subtitle">Sign in to your account to continue</div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="auth-tabs">
+        <div class="auth-tab active">Sign In</div>
+        <div class="auth-tab">Sign Up</div>
+      </div>
+
+      <!-- Wallet Connect -->
+      <div class="wallet-options">
+        <div class="wallet-btn">
+          <span class="icon">🦊</span> MetaMask
+        </div>
+        <div class="wallet-btn">
+          <span class="icon"> wallet</span> WalletConnect
+        </div>
+        <div class="wallet-btn">
+          <span class="icon">👻</span> Phantom
+        </div>
+      </div>
+
+      <div class="divider">or continue with email</div>
+
+      <!-- Email Form -->
+      <form>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <div class="form-input-icon">
+            <span class="icon">📧</span>
+            <input class="form-input" type="email" placeholder="you@example.com">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <div class="form-input-icon">
+            <span class="icon">🔒</span>
+            <input class="form-input" type="password" placeholder="••••••••">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label class="form-checkbox">
+            <input type="checkbox" checked=""> Remember me
+          </label>
+          <a class="form-link">Forgot password?</a>
+        </div>
+
+        <button class="btn btn-primary" type="submit">Sign In</button>
+      </form>
+
+      <div class="form-footer">
+        Don't have an account? <a>Create one</a>
+        <div style="margin-top:12px;color:#3f3f46">
+          By signing in, you agree to our <a>Terms</a> and <a>Privacy Policy</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Device Chain -->
+  <div class="device-chain">
+    <span class="device-chain-label">Status:</span>
+    <div class="device active"><div class="led"></div> API: Online</div>
+    <div class="device"><div class="led"></div> WebSocket: Ready</div>
+    <div class="device"><div class="led"></div> Auth: Waiting</div>
+    <div class="device-chain-spacer"></div>
+    <span class="device-chain-label">Version:</span>
+    <div class="device"><div class="led"></div> v1.0.0</div>
+  </div>
+
+</body></html>
+    </div>
+  </foreignObject>
+</svg>

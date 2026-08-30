@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <title>SoundHub — Share Link Settings</title>
+  <link rel="stylesheet" href="design-system/shared.css">
+  <style>
+    .share-card {
+      background: var(--bg-surface); border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg); padding: 24px; margin-bottom: 16px;
+    }
+    .share-url-box {
+      display: flex; align-items: center; gap: 8px; padding: 10px 14px;
+      background: var(--bg-elevated); border: 1px solid var(--border-default);
+      border-radius: var(--radius-md); margin-bottom: 16px;
+    }
+    .share-url {
+      flex: 1; font-family: var(--font-mono); font-size: 12px; color: var(--text-secondary);
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .share-perm {
+      display: flex; align-items: center; gap: 12px; padding: 12px;
+      background: var(--bg-elevated); border: 1px solid var(--border-default);
+      border-radius: var(--radius-md); margin-bottom: 8px;
+    }
+    .perm-icon { font-size: 20px; }
+    .perm-body { flex: 1; }
+    .perm-name { font-size: 13px; font-weight: 600; }
+    .perm-desc { font-size: 11px; color: var(--text-muted); }
+    .link-list { margin-top: 12px; }
+    .link-item {
+      display: flex; align-items: center; gap: 12px; padding: 10px 14px;
+      border-bottom: 1px solid var(--border-default); font-size: 12px;
+    }
+    .link-item:last-child { border-bottom: none; }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-logo"><div class="logo-icon">S</div><div class="logo-text">SoundHub</div></div>
+      <nav class="sidebar-nav">
+        <div class="sidebar-section-label">Main</div>
+        <a class="sidebar-item" href="#"><span class="icon">📊</span> Dashboard</a>
+        <a class="sidebar-item" href="#"><span class="icon">📁</span> Projects</a>
+        <div class="sidebar-section-label">Workspace</div>
+        <a class="sidebar-item active" href="#"><span class="icon">🔗</span> Share Links</a>
+        <a class="sidebar-item" href="#"><span class="icon">💬</span> Reviews</a>
+        <div class="sidebar-section-label">Account</div>
+        <a class="sidebar-item" href="#"><span class="icon">⚙️</span> Settings</a>
+      </nav>
+    </aside>
+    <div class="main-content">
+      <header class="topbar">
+        <div class="topbar-search"><span class="search-icon">🔍</span><input type="text" placeholder="Search..."></div>
+        <div class="topbar-right"><div class="topbar-icon-btn">🔔<span class="notif-dot"></span></div><div class="topbar-avatar">P</div></div>
+      </header>
+      <div class="page">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
+          <div>
+            <h1 class="page-title" style="margin-bottom:4px">Share Link Settings</h1>
+            <p class="page-subtitle">Manage public links for your projects and assets</p>
+          </div>
+          <button class="btn btn-primary">+ Create Link</button>
+        </div>
+
+        <!-- Active Link -->
+        <div class="share-card" style="border-color:var(--brand-primary)">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+            <span style="font-size:14px;font-weight:700">🔗 Delivery Link — Neon Warehouse</span>
+            <span class="badge badge-purple" style="font-size:10px">ACTIVE</span>
+          </div>
+          <div class="share-url-box">
+            <span class="share-url">https://soundhub.app/d/abc123def456</span>
+            <button class="btn btn-secondary" style="font-size:11px">📋 Copy</button>
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px">
+            <div class="share-perm">
+              <div class="perm-icon">👁️</div>
+              <div class="perm-body">
+                <div class="perm-name">Visibility</div>
+                <div class="perm-desc">Anyone with link</div>
+              </div>
+            </div>
+            <div class="share-perm">
+              <div class="perm-icon">⏰</div>
+              <div class="perm-body">
+                <div class="perm-name">Expires</div>
+                <div class="perm-desc">Sep 15, 2026 (16 days)</div>
+              </div>
+            </div>
+            <div class="share-perm">
+              <div class="perm-icon">📊</div>
+              <div class="perm-body">
+                <div class="perm-name">Views</div>
+                <div class="perm-desc">24 views · 3 downloads</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Link Options -->
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border-default)">
+              <span style="font-size:12px">Allow download</span>
+              <div class="toggle active"></div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border-default)">
+              <span style="font-size:12px">Require email to download</span>
+              <div class="toggle active"></div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border-default)">
+              <span style="font-size:12px">Watermark audio files</span>
+              <div class="toggle"></div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0">
+              <span style="font-size:12px">Track downloads</span>
+              <div class="toggle active"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- All Links -->
+        <h3 style="font-size:14px;font-weight:700;margin-bottom:12px">All Share Links</h3>
+        <div style="background:var(--bg-surface);border:1px solid var(--border-default);border-radius:var(--radius-lg);overflow:hidden">
+          <div class="link-item" style="background:var(--bg-elevated);font-weight:700;color:var(--text-muted);font-size:10px;text-transform:uppercase;letter-spacing:0.5px">
+            <span style="flex:1">Link</span><span style="width:120px">Project</span><span style="width:80px">Views</span><span style="width:100px">Expires</span><span style="width:80px">Status</span><span style="width:40px"></span>
+          </div>
+          <div class="link-item">
+            <span style="flex:1;font-family:var(--font-mono);font-size:11px;color:var(--brand-primary)">/d/abc123def456</span>
+            <span style="width:120px">Neon Warehouse</span>
+            <span style="width:80px">24</span>
+            <span style="width:100px;color:var(--text-muted)">Sep 15</span>
+            <span style="width:80px"><span class="badge badge-purple" style="font-size:9px">Active</span></span>
+            <span style="width:40px"><button class="btn btn-ghost" style="font-size:11px">⋯</button></span>
+          </div>
+          <div class="link-item">
+            <span style="flex:1;font-family:var(--font-mono);font-size:11px;color:var(--text-secondary)">/d/xyz789ghi012</span>
+            <span style="width:120px">Midnight EP</span>
+            <span style="width:80px">156</span>
+            <span style="width:100px;color:var(--text-muted)">Aug 20</span>
+            <span style="width:80px"><span class="badge badge-muted" style="font-size:9px">Expired</span></span>
+            <span style="width:40px"><button class="btn btn-ghost" style="font-size:11px">⋯</button></span>
+          </div>
+          <div class="link-item">
+            <span style="flex:1;font-family:var(--font-mono);font-size:11px;color:var(--text-secondary)">/d/uvw345rst678</span>
+            <span style="width:120px">Summer Album</span>
+            <span style="width:80px">8</span>
+            <span style="width:100px;color:var(--text-muted)">Oct 01</span>
+            <span style="width:80px"><span class="badge badge-purple" style="font-size:9px">Active</span></span>
+            <span style="width:40px"><button class="btn btn-ghost" style="font-size:11px">⋯</button></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

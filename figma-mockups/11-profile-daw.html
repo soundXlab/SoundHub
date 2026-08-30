@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <title>SoundHub — User Profile (DAW Style)</title>
+  <link rel="stylesheet" href="design-system/shared.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', -apple-system, sans-serif; background: #0d0d0d; color: #e4e4e7; overflow-x: hidden; }
+
+    /* ── Transport Bar ── */
+    .transport-bar {
+      height: 40px; background: #111113; border-bottom: 1px solid #27272a;
+      display: flex; align-items: center; padding: 0 12px; gap: 16px;
+      font-size: 11px; user-select: none; position: sticky; top: 0; z-index: 100;
+    }
+    .transport-logo { font-weight: 800; font-size: 13px; color: #ea5808; letter-spacing: -0.5px; }
+    .transport-logo span { color: #e4e4e7; }
+    .transport-divider { width: 1px; height: 20px; background: #27272a; }
+    .transport-group { display: flex; align-items: center; gap: 6px; }
+    .transport-label { color: #71717a; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .transport-value {
+      background: #0d0d0d; border: 1px solid #27272a; border-radius: 4px;
+      padding: 2px 8px; font-family: 'JetBrains Mono', monospace; font-size: 12px;
+      color: #22c55e; font-weight: 600; min-width: 60px; text-align: center;
+    }
+    .transport-spacer { flex: 1; }
+    .transport-time {
+      font-family: 'JetBrains Mono', monospace; font-size: 18px; font-weight: 700;
+      color: #e4e4e7; letter-spacing: 1px;
+    }
+
+    /* ── Main Layout ── */
+    .app-body { display: flex; min-height: calc(100vh - 40px); }
+
+    /* ── Left Sidebar ── */
+    .sidebar {
+      width: 240px; background: #111113; border-right: 1px solid #27272a;
+      display: flex; flex-direction: column; user-select: none; position: sticky; top: 40px; height: calc(100vh - 40px);
+    }
+    .sidebar-search { padding: 8px; border-bottom: 1px solid #27272a; }
+    .sidebar-search input {
+      width: 100%; background: #0d0d0d; border: 1px solid #27272a; border-radius: 4px;
+      padding: 6px 8px 6px 28px; font-size: 11px; color: #e4e4e7; outline: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: 8px center;
+    }
+    .sidebar-search input::placeholder { color: #52525b; }
+    .sidebar-nav { flex: 1; overflow-y: auto; padding: 4px 0; }
+    .sidebar-item {
+      padding: 6px 12px; font-size: 11px; font-weight: 500; color: #a1a1aa;
+      cursor: pointer; display: flex; align-items: center; gap: 8px;
+      transition: color 0.1s; border-left: 2px solid transparent;
+    }
+    .sidebar-item:hover { color: #e4e4e7; }
+    .sidebar-item.active { color: #ea5808; background: rgba(234,88,8,0.08); border-left-color: #ea5808; }
+    .sidebar-item .icon { width: 16px; text-align: center; }
+    .sidebar-section { padding: 8px 12px 4px; font-size: 9px; color: #52525b; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+
+    /* ── Content Area ── */
+    .content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+
+    /* ── Profile Header ── */
+    .profile-header {
+      background: #111113; border-bottom: 1px solid #27272a; padding: 32px 40px;
+      display: flex; gap: 32px; align-items: flex-start;
+    }
+    .profile-avatar {
+      width: 128px; height: 128px; border-radius: 50%; background: linear-gradient(135deg, #ea5808, #06b6d4);
+      display: flex; align-items: center; justify-content: center; font-size: 48px; font-weight: 800;
+      color: #fff; flex-shrink: 0; border: 3px solid #27272a;
+      box-shadow: 0 0 0 3px #0d0d0d, 0 0 0 5px #ea5808;
+    }
+    .profile-info { flex: 1; }
+    .profile-name { font-size: 28px; font-weight: 800; color: #e4e4e7; letter-spacing: -0.5px; }
+    .profile-username { font-size: 16px; color: #71717a; font-weight: 400; margin-left: 8px; }
+    .profile-bio { font-size: 14px; color: #a1a1aa; margin-top: 8px; line-height: 1.6; max-width: 600px; }
+    .profile-meta {
+      display: flex; gap: 16px; margin-top: 12px; font-size: 12px; color: #71717a;
+      flex-wrap: wrap;
+    }
+    .profile-meta-item { display: flex; align-items: center; gap: 4px; }
+    .profile-meta-item .icon { color: #52525b; }
+    .profile-stats {
+      display: flex; gap: 24px; margin-top: 16px;
+    }
+    .profile-stat {
+      text-align: center; padding: 8px 16px; background: #1a1a1a; border: 1px solid #27272a;
+      border-radius: 8px; min-width: 80px;
+    }
+    .profile-stat-value { font-size: 24px; font-weight: 800; color: #e4e4e7; font-family: 'JetBrains Mono', monospace; }
+    .profile-stat-label { font-size: 10px; color: #71717a; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+    .profile-actions { display: flex; gap: 8px; margin-top: 16px; }
+    .btn {
+      padding: 6px 16px; border-radius: 6px; font-size: 12px; font-weight: 600;
+      cursor: pointer; transition: all 0.15s; border: 1px solid #27272a;
+    }
+    .btn-primary { background: #ea5808; color: #fff; border-color: #ea5808; }
+    .btn-primary:hover { background: #c2410c; }
+    .btn-secondary { background: #1a1a1a; color: #e4e4e7; }
+    .btn-secondary:hover { background: #27272a; }
+    .btn-outline { background: transparent; color: #a1a1aa; border-color: #3f3f46; }
+    .btn-outline:hover { color: #e4e4e7; border-color: #71717a; }
+
+    /* ── Contribution Graph (DAW-style) ── */
+    .contribution-section {
+      padding: 24px 40px; border-bottom: 1px solid #27272a;
+    }
+    .section-title {
+      font-size: 14px; font-weight: 700; color: #a1a1aa; margin-bottom: 16px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .section-title .count { color: #71717a; font-weight: 400; }
+    .contribution-grid {
+      display: flex; gap: 3px; overflow-x: auto; padding-bottom: 8px;
+    }
+    .contribution-week { display: flex; flex-direction: column; gap: 3px; }
+    .contribution-day {
+      width: 12px; height: 12px; border-radius: 2px; background: #1a1a1a;
+      border: 1px solid #27272a; cursor: pointer; transition: all 0.1s;
+    }
+    .contribution-day:hover { border-color: #ea5808; }
+    .contribution-day.level-1 { background: rgba(234,88,8,0.2); border-color: rgba(234,88,8,0.3); }
+    .contribution-day.level-2 { background: rgba(234,88,8,0.4); border-color: rgba(234,88,8,0.5); }
+    .contribution-day.level-3 { background: rgba(234,88,8,0.6); border-color: rgba(234,88,8,0.7); }
+    .contribution-day.level-4 { background: #ea5808; border-color: #ea5808; }
+    .contribution-legend {
+      display: flex; align-items: center; gap: 4px; margin-top: 8px; font-size: 10px; color: #52525b;
+    }
+    .contribution-legend .day { width: 12px; height: 12px; border-radius: 2px; }
+
+    /* ── Content Grid ── */
+    .content-grid {
+      display: grid; grid-template-columns: 1fr 320px; gap: 0; flex: 1;
+    }
+    .content-main { padding: 24px 40px; border-right: 1px solid #27272a; }
+    .content-sidebar { padding: 24px; }
+
+    /* ── Pinned Projects ── */
+    .pinned-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;
+    }
+    .project-card {
+      background: #1a1a1a; border: 1px solid #27272a; border-radius: 8px;
+      padding: 16px; cursor: pointer; transition: all 0.15s;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .project-card:hover { border-color: #3f3f46; background: #1f1f1f; }
+    .project-card-header { display: flex; align-items: center; gap: 8px; }
+    .project-card-icon {
+      width: 32px; height: 32px; border-radius: 6px; display: flex; align-items: center;
+      justify-content: center; font-size: 16px; flex-shrink: 0;
+    }
+    .project-card-name { font-size: 13px; font-weight: 700; color: #e4e4e7; }
+    .project-card-visibility {
+      font-size: 10px; color: #52525b; background: #27272a; padding: 1px 6px;
+      border-radius: 10px; margin-left: auto;
+    }
+    .project-card-desc { font-size: 11px; color: #71717a; line-height: 1.5; flex: 1; }
+    .project-card-footer { display: flex; gap: 12px; font-size: 10px; color: #52525b; }
+    .project-card-footer span { display: flex; align-items: center; gap: 4px; }
+    .lang-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+    /* ── Activity Feed ── */
+    .activity-list { display: flex; flex-direction: column; }
+    .activity-item {
+      display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid #1a1a1a;
+    }
+    .activity-item:last-child { border-bottom: none; }
+    .activity-icon {
+      width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center;
+      justify-content: center; font-size: 14px; flex-shrink: 0;
+    }
+    .activity-content { flex: 1; }
+    .activity-text { font-size: 12px; color: #a1a1aa; line-height: 1.5; }
+    .activity-text strong { color: #e4e4e7; font-weight: 600; }
+    .activity-text a { color: #ea5808; text-decoration: none; }
+    .activity-text a:hover { text-decoration: underline; }
+    .activity-time { font-size: 10px; color: #52525b; margin-top: 2px; }
+
+    /* ── Sidebar Cards ── */
+    .sidebar-card {
+      background: #1a1a1a; border: 1px solid #27272a; border-radius: 8px;
+      padding: 16px; margin-bottom: 12px;
+    }
+    .sidebar-card-title { font-size: 12px; font-weight: 700; color: #e4e4e7; margin-bottom: 12px; }
+    .sidebar-card-item {
+      display: flex; align-items: center; gap: 8px; padding: 6px 0;
+      font-size: 11px; color: #a1a1aa;
+    }
+    .sidebar-card-item .icon { color: #52525b; width: 16px; text-align: center; }
+    .sidebar-card-item .value { margin-left: auto; color: #71717a; font-family: 'JetBrains Mono', monospace; }
+
+    /* ── Achievement Badges ── */
+    .badge-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+    .badge {
+      width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center;
+      justify-content: center; font-size: 20px; border: 2px solid #27272a;
+      background: #1a1a1a; cursor: pointer; transition: all 0.15s;
+    }
+    .badge:hover { border-color: #ea5808; transform: scale(1.1); }
+    .badge.gold { border-color: #eab308; background: rgba(234,179,8,0.1); }
+    .badge.silver { border-color: #94a3b8; background: rgba(148,163,184,0.1); }
+    .badge.bronze { border-color: #d97706; background: rgba(217,119,6,0.1); }
+
+    /* ── Bottom Device Chain ── */
+    .device-chain {
+      height: 80px; background: #111113; border-top: 1px solid #27272a;
+      display: flex; align-items: center; padding: 0 16px; gap: 12px;
+      position: sticky; bottom: 0;
+    }
+    .device-chain-label { font-size: 10px; color: #52525b; text-transform: uppercase; letter-spacing: 0.5px; }
+    .quick-stat {
+      display: flex; align-items: center; gap: 6px; padding: 6px 12px;
+      background: #1a1a1a; border: 1px solid #27272a; border-radius: 6px;
+    }
+    .quick-stat-value { font-size: 14px; font-weight: 700; color: #e4e4e7; font-family: 'JetBrains Mono', monospace; }
+    .quick-stat-label { font-size: 9px; color: #52525b; text-transform: uppercase; }
+    .quick-stat-icon { font-size: 16px; }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 2px; }
+    ::-webkit-scrollbar-thumb:hover { background: #3f3f46; }
+  </style>
+</head>
+<body>
+
+<!-- ═══ Transport Bar ═══ -->
+<div class="transport-bar">
+  <div class="transport-logo">Sound<span>Hub</span></div>
+  <div class="transport-divider"></div>
+  <div class="transport-group">
+    <span style="font-size:11px;color:#a1a1aa">Profile</span>
+  </div>
+  <div class="transport-spacer"></div>
+  <div class="transport-group">
+    <div class="transport-label">Projects</div>
+    <div class="transport-value">12</div>
+  </div>
+  <div class="transport-divider"></div>
+  <div class="transport-group">
+    <div class="transport-label">Reputation</div>
+    <div class="transport-value" style="color:#eab308">847</div>
+  </div>
+  <div class="transport-divider"></div>
+  <div class="transport-group">
+    <div class="transport-label">Streak</div>
+    <div class="transport-value" style="color:#ef4444">14d</div>
+  </div>
+</div>
+
+<!-- ═══ App Body ═══ -->
+<div class="app-body">
+
+  <!-- ── Left Sidebar ── -->
+  <div class="sidebar">
+    <div class="sidebar-search">
+      <input type="text" placeholder="Search (Ctrl+F)">
+    </div>
+    <div class="sidebar-nav">
+      <div class="sidebar-section">Navigation</div>
+      <div class="sidebar-item active"><span class="icon">👤</span> Profile</div>
+      <div class="sidebar-item"><span class="icon">📁</span> Projects</div>
+      <div class="sidebar-item"><span class="icon">📦</span> Packages</div>
+      <div class="sidebar-item"><span class="icon">⭐</span> Stars</div>
+      <div class="sidebar-item"><span class="icon">🔔</span> Notifications</div>
+
+      <div class="sidebar-section">Workspace</div>
+      <div class="sidebar-item"><span class="icon">🎛️</span> Dashboard</div>
+      <div class="sidebar-item"><span class="icon">🎵</span> Marketplace</div>
+      <div class="sidebar-item"><span class="icon">💬</span> Reviews</div>
+      <div class="sidebar-item"><span class="icon">📊</span> Analytics</div>
+      <div class="sidebar-item"><span class="icon">📅</span> Calendar</div>
+
+      <div class="sidebar-section">Settings</div>
+      <div class="sidebar-item"><span class="icon">⚙️</span> Settings</div>
+      <div class="sidebar-item"><span class="icon">🔑</span> API Keys</div>
+      <div class="sidebar-item"><span class="icon">💾</span> Storage</div>
+    </div>
+  </div>
+
+  <!-- ── Content ── -->
+  <div class="content">
+
+    <!-- Profile Header -->
+    <div class="profile-header">
+      <div class="profile-avatar">S</div>
+      <div class="profile-info">
+        <div>
+          <span class="profile-name">scatter</span>
+          <span class="profile-username">soundXlab</span>
+        </div>
+        <div class="profile-bio">
+          Building SoundHub — version control for music production. Producer, engineer, and DAW integration nerd. 🎧
+        </div>
+        <div class="profile-meta">
+          <span class="profile-meta-item"><span class="icon">📍</span> Berlin, DE</span>
+          <span class="profile-meta-item"><span class="icon">💼</span> @soundhub</span>
+          <span class="profile-meta-item"><span class="icon">🔗</span> soundhub.app</span>
+          <span class="profile-meta-item"><span class="icon">📅</span> Joined Aug 2026</span>
+        </div>
+        <div class="profile-stats">
+          <div class="profile-stat">
+            <div class="profile-stat-value">50</div>
+            <div class="profile-stat-label">Followers</div>
+          </div>
+          <div class="profile-stat">
+            <div class="profile-stat-value">39</div>
+            <div class="profile-stat-label">Following</div>
+          </div>
+          <div class="profile-stat">
+            <div class="profile-stat-value">12</div>
+            <div class="profile-stat-label">Projects</div>
+          </div>
+          <div class="profile-stat">
+            <div class="profile-stat-value">847</div>
+            <div class="profile-stat-label">Reputation</div>
+          </div>
+        </div>
+        <div class="profile-actions">
+          <button class="btn btn-primary">Follow</button>
+          <button class="btn btn-secondary">💬 Message</button>
+          <button class="btn btn-outline">⋯</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contribution Graph -->
+    <div class="contribution-section">
+      <div class="section-title">
+        Contribution Activity <span class="count">— 847 contributions in the last year</span>
+      </div>
+      <div class="contribution-grid" id="contribGrid"></div>
+      <div class="contribution-legend">
+        Less
+        <div class="day" style="background:#1a1a1a;border:1px solid #27272a"></div>
+        <div class="day" style="background:rgba(234,88,8,0.2)"></div>
+        <div class="day" style="background:rgba(234,88,8,0.4)"></div>
+        <div class="day" style="background:rgba(234,88,8,0.6)"></div>
+        <div class="day" style="background:#ea5808"></div>
+        More
+      </div>
+    </div>
+
+    <!-- Content Grid -->
+    <div class="content-grid">
+
+      <!-- Main Content -->
+      <div class="content-main">
+        <!-- Pinned Projects -->
+        <div class="section-title">Pinned <span class="count">— 6</span></div>
+        <div class="pinned-grid">
+          <div class="project-card">
+            <div class="project-card-header">
+              <div class="project-card-icon" style="background:rgba(234,88,8,0.15)">🎵</div>
+              <span class="project-card-name">SoundHub</span>
+              <span class="project-card-visibility">Public</span>
+            </div>
+            <div class="project-card-desc">Version control and collaboration for music production projects</div>
+            <div class="project-card-footer">
+              <span><span class="lang-dot" style="background:#3572A5"></span> Python</span>
+              <span>⭐ 128</span>
+              <span>🔀 24</span>
+            </div>
+          </div>
+
+          <div class="project-card">
+            <div class="project-card-header">
+              <div class="project-card-icon" style="background:rgba(234,179,8,0.15)">🎹</div>
+              <span class="project-card-name">midnight-run</span>
+              <span class="project-card-visibility">Public</span>
+            </div>
+            <div class="project-card-desc">Deep house EP — 4 tracks, mastered and ready for release</div>
+            <div class="project-card-footer">
+              <span><span class="lang-dot" style="background:#eab308"></span> Ableton</span>
+              <span>⭐ 42</span>
+              <span>🔀 8</span>
+            </div>
+          </div>
+
+          <div class="project-card">
+            <div class="project-card-header">
+              <div class="project-card-icon" style="background:rgba(34,197,94,0.15)">🥁</div>
+              <span class="project-card-name">summer-drums</span>
+              <span class="project-card-visibility">Public</span>
+            </div>
+            <div class="project-card-desc">Drum sample library — 200+ one-shots, royalty-free</div>
+            <div class="project-card-footer">
+              <span><span class="lang-dot" style="background:#22c55e"></span> Samples</span>
+              <span>⭐ 89</span>
+              <span>🔀 15</span>
+            </div>
+          </div>
+
+          <div class="project-card">
+            <div class="project-card-header">
+              <div class="project-card-icon" style="background:rgba(59,130,246,0.15)">🔮</div>
+              <span class="project-card-name">crystal-echo</span>
+              <span class="project-card-visibility">Private</span>
+            </div>
+            <div class="project-card-desc">Ambient textures and soundscapes for film scoring</div>
+            <div class="project-card-footer">
+              <span><span class="lang-dot" style="background:#3b82f6"></span> REAPER</span>
+              <span>⭐ 12</span>
+              <span>🔀 3</span>
+            </div>
+          </div>
+
+          <div class="project-card">
+            <div class="project-card-header">
+              <div class="project-card-icon" style="background:rgba(239,68,68,0.15)">🎛️</div>
+              <span class="project-card-name">mix-template</span>
+              <span class="project-card-visibility">Public</span>
+            </div>
+            <div class="project-card-desc">FL Studio mixing template with stock plugins only</div>
+            <div class="project-card-footer">
+              <span><span class="lang-dot" style="background:#ef4444"></span> FL Studio</span>
+              <span>⭐ 56</span>
+              <span>🔀 11</span>
+            </div>
+          </div>
+
+          <div class="project-card">
+            <div class="project-card-header">
+              <div class="project-card-icon" style="background:rgba(6,182,212,0.15)">📦</div>
+              <span class="project-card-name">sample-pack-v3</span>
+              <span class="project-card-visibility">Public</span>
+            </div>
+            <div class="project-card-desc">Curated sample pack — loops, stems, and presets</div>
+            <div class="project-card-footer">
+              <span><span class="lang-dot" style="background:#06b6d4"></span> Multi</span>
+              <span>⭐ 203</span>
+              <span>🔀 47</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Activity Feed -->
+        <div style="margin-top:32px">
+          <div class="section-title">Recent Activity <span class="count">— last 30 days</span></div>
+          <div class="activity-list">
+            <div class="activity-item">
+              <div class="activity-icon" style="background:rgba(34,197,94,0.15);color:#22c55e">✓</div>
+              <div class="activity-content">
+                <div class="activity-text"><strong>Approved</strong> v13 of <a href="#">Neon Warehouse</a></div>
+                <div class="activity-time">30 minutes ago</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon" style="background:rgba(234,88,8,0.15);color:#ea5808">📤</div>
+              <div class="activity-content">
+                <div class="activity-text"><strong>Uploaded</strong> v13 to <a href="#">Neon Warehouse</a> — "Final master with limiter"</div>
+                <div class="activity-time">2 hours ago</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon" style="background:rgba(59,130,246,0.15);color:#3b82f6">💬</div>
+              <div class="activity-content">
+                <div class="activity-text"><strong>Commented</strong> on <a href="#">Midnight Run</a> v7 — "Bass needs more sub"</div>
+                <div class="activity-time">5 hours ago</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon" style="background:rgba(234,179,8,0.15);color:#eab308">⭐</div>
+              <div class="activity-content">
+                <div class="activity-text"><strong>Starred</strong> <a href="#">audio-separation-model</a> by @demucs-team</div>
+                <div class="activity-time">1 day ago</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon" style="background:rgba(239,68,68,0.15);color:#ef4444">📦</div>
+              <div class="activity-content">
+                <div class="activity-text"><strong>Published</strong> <a href="#">sample-pack-v3</a> to Marketplace — $4.99</div>
+                <div class="activity-time">2 days ago</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon" style="background:rgba(6,182,212,0.15);color:#06b6d4">🔀</div>
+              <div class="activity-content">
+                <div class="activity-text"><strong>Merged</strong> branch <code>feature/limiter</code> into <a href="#">Neon Warehouse</a></div>
+                <div class="activity-time">3 days ago</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Sidebar -->
+      <div class="content-sidebar">
+        <!-- Achievements -->
+        <div class="sidebar-card">
+          <div class="sidebar-card-title">Achievements</div>
+          <div class="badge-grid">
+            <div class="badge gold" title="First Release">🏆</div>
+            <div class="badge gold" title="100 Stars">⭐</div>
+            <div class="badge silver" title="50 Reviews">💬</div>
+            <div class="badge silver" title="10 Projects">📁</div>
+            <div class="badge bronze" title="Early Adopter">🎒</div>
+            <div class="badge bronze" title="Community Helper">🤝</div>
+          </div>
+        </div>
+
+        <!-- Organizations -->
+        <div class="sidebar-card">
+          <div class="sidebar-card-title">Organizations</div>
+          <div class="sidebar-card-item">
+            <span class="icon">🎵</span> SoundHub Team
+            <span class="value">Admin</span>
+          </div>
+          <div class="sidebar-card-item">
+            <span class="icon">🎧</span> Berlin Producers
+            <span class="value">Member</span>
+          </div>
+        </div>
+
+        <!-- Badges -->
+        <div class="sidebar-card">
+          <div class="sidebar-card-title">Badges</div>
+          <div class="sidebar-card-item">
+            <span class="icon">🏅</span> Top Contributor
+            <span class="value">2026</span>
+          </div>
+          <div class="sidebar-card-item">
+            <span class="icon">🎯</span> QC Expert
+            <span class="value">Level 3</span>
+          </div>
+          <div class="sidebar-card-item">
+            <span class="icon">🔊</span> Mix Engineer
+            <span class="value">Level 2</span>
+          </div>
+        </div>
+
+        <!-- Readme -->
+        <div class="sidebar-card">
+          <div class="sidebar-card-title">About</div>
+          <div style="font-size:11px;color:#a1a1aa;line-height:1.6">
+            <p>🎧 Producer & Engineer based in Berlin</p>
+            <p style="margin-top:8px">Building <a href="#" style="color:#ea5808;text-decoration:none">@soundhub</a> — version control for music production.</p>
+            <p style="margin-top:8px">Previously: Ableton, Native Instruments, Splice</p>
+            <p style="margin-top:8px;font-size:10px;color:#52525b">🔊 <a href="#" style="color:#ea5808;text-decoration:none">soundcloud.com/scatter</a></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ Bottom Quick Stats ═══ -->
+<div class="device-chain">
+  <span class="device-chain-label">Quick Stats</span>
+  <div class="quick-stat">
+    <span class="quick-stat-icon">📁</span>
+    <div>
+      <div class="quick-stat-value">12</div>
+      <div class="quick-stat-label">Projects</div>
+    </div>
+  </div>
+  <div class="quick-stat">
+    <span class="quick-stat-icon">📦</span>
+    <div>
+      <div class="quick-stat-value">847</div>
+      <div class="quick-stat-label">Reputation</div>
+    </div>
+  </div>
+  <div class="quick-stat">
+    <span class="quick-stat-icon">⭐</span>
+    <div>
+      <div class="quick-stat-value">530</div>
+      <div class="quick-stat-label">Stars Received</div>
+    </div>
+  </div>
+  <div class="quick-stat">
+    <span class="quick-stat-icon">💬</span>
+    <div>
+      <div class="quick-stat-value">156</div>
+      <div class="quick-stat-label">Reviews</div>
+    </div>
+  </div>
+  <div class="quick-stat">
+    <span class="quick-stat-icon">📤</span>
+    <div>
+      <div class="quick-stat-value">2.4k</div>
+      <div class="quick-stat-label">Downloads</div>
+    </div>
+  </div>
+  <div class="quick-stat">
+    <span class="quick-stat-icon">🔥</span>
+    <div>
+      <div class="quick-stat-value">14d</div>
+      <div class="quick-stat-label">Streak</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Generate contribution grid
+const grid = document.getElementById('contribGrid');
+const levels = [0, 0, 0, 1, 1, 2, 2, 3, 3, 4];
+for (let w = 0; w < 52; w++) {
+  const week = document.createElement('div');
+  week.className = 'contribution-week';
+  for (let d = 0; d < 7; d++) {
+    const day = document.createElement('div');
+    day.className = 'contribution-day';
+    if (Math.random() > 0.3) {
+      const level = levels[Math.floor(Math.random() * levels.length)];
+      if (level > 0) day.classList.add('level-' + level);
+    }
+    week.appendChild(day);
+  }
+  grid.appendChild(week);
+}
+</script>
+
+</body>
+</html>

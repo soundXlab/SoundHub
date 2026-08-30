@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" 
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     viewBox="0 0 1440 900" 
+     width="1440" 
+     height="900">
+  <foreignObject width="100%" height="100%">
+    <div xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SoundHub — Calendar</title>
+<link rel="stylesheet" href="design-system/shared.css">
+<style>
+  body { margin: 0; background: var(--bg-primary); color: var(--text-primary); font-family: 'Inter', system-ui, sans-serif; }
+  .app { display: flex; min-height: 100vh; }
+  .sidebar { width: 240px; background: var(--bg-panel); border-right: 1px solid var(--border-default); padding: 20px 0; flex-shrink: 0; }
+  .sidebar .logo { padding: 0 16px; font-size: 18px; font-weight: 800; color: var(--brand-accent); margin-bottom: 24px; }
+  .sidebar .nav-item { padding: 8px 20px; font-size: 13px; color: var(--text-secondary); cursor: pointer; }
+  .sidebar .nav-item.active { color: var(--brand-primary); background: rgba(139,92,246,0.08); border-radius: 6px; margin: 0 8px; padding: 8px 12px; }
+  .main { flex: 1; padding: 24px; }
+  .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+  .topbar h1 { font-size: 24px; font-weight: 800; }
+  .cal-nav { display: flex; align-items: center; gap: 8px; }
+  .cal-nav button { background: var(--bg-elevated); border: 1px solid var(--border-default); color: var(--text-primary); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; }
+  .cal-nav .month { font-size: 16px; font-weight: 600; min-width: 160px; text-align: center; }
+  .content { display: grid; grid-template-columns: 1fr 260px; gap: 16px; }
+  .calendar-grid { background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: 12px; padding: 16px; }
+  .day-headers { display: grid; grid-template-columns: repeat(7, 1fr); border-bottom: 1px solid var(--border-default); padding-bottom: 8px; margin-bottom: 8px; }
+  .day-headers div { text-align: center; font-size: 10px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  .days { display: grid; grid-template-columns: repeat(7, 1fr); }
+  .day-cell { min-height: 90px; padding: 4px; border-right: 1px solid var(--border-default); border-bottom: 1px solid var(--border-default); }
+  .day-cell:nth-child(7n) { border-right: none; }
+  .day-cell.today { background: rgba(139,92,246,0.06); }
+  .day-num { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; margin-bottom: 4px; }
+  .day-cell.today .day-num { background: rgba(139,92,246,0.15); color: var(--brand-primary); font-weight: 700; }
+  .event-dot { display: inline-flex; align-items: center; gap: 3px; padding: 1px 4px; border-radius: 2px; font-size: 9px; margin-bottom: 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .event-dot.upload { background: rgba(139,92,246,0.12); color: var(--brand-primary); }
+  .event-dot.review { background: rgba(234,179,8,0.12); color: var(--color-warning); }
+  .event-dot.approval { background: rgba(34,197,94,0.12); color: var(--color-success); }
+  .event-dot.deadline { background: rgba(239,68,68,0.12); color: var(--color-error); }
+  .sidebar-card { background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: 12px; padding: 16px; margin-bottom: 12px; }
+  .sidebar-card h3 { font-size: 10px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; margin: 0 0 12px; }
+  .upcoming-item { display: flex; align-items: center; gap: 8px; padding: 8px; border-radius: 6px; margin-bottom: 4px; background: var(--bg-elevated); }
+  .upcoming-item .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .upcoming-item .label { font-size: 12px; }
+  .upcoming-item .date { font-size: 10px; color: var(--text-muted); }
+  .legend { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 12px; }
+  .legend-item { display: flex; align-items: center; gap: 4px; font-size: 10px; color: var(--text-muted); }
+  .legend-item .dot { width: 6px; height: 6px; border-radius: 2px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="sidebar">
+    <div class="logo">🎵 SoundHub</div>
+    <div class="nav-item">📊 Dashboard</div>
+    <div class="nav-item active">📅 Calendar</div>
+    <div class="nav-item">📁 Projects</div>
+    <div class="nav-item">🛒 Marketplace</div>
+    <div class="nav-item">⚙️ Settings</div>
+  </div>
+  <div class="main">
+    <div class="topbar">
+      <h1>📅 Calendar</h1>
+      <div class="cal-nav">
+        <button>Today</button>
+        <button>‹</button>
+        <div class="month">August 2026</div>
+        <button>›</button>
+      </div>
+    </div>
+    <div class="content">
+      <div>
+        <div class="calendar-grid">
+          <div class="day-headers"><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div><div>Sun</div></div>
+          <div class="days" id="calDays"><div class="day-cell"></div><div class="day-cell"></div><div class="day-cell"></div><div class="day-cell"></div><div class="day-cell"></div><div class="day-cell"><div class="day-num">1</div></div><div class="day-cell"><div class="day-num">2</div></div><div class="day-cell"><div class="day-num">3</div></div><div class="day-cell"><div class="day-num">4</div></div><div class="day-cell"><div class="day-num">5</div><div class="event-dot upload">📤 Upload</div></div><div class="day-cell"><div class="day-num">6</div></div><div class="day-cell"><div class="day-num">7</div></div><div class="day-cell"><div class="day-num">8</div></div><div class="day-cell"><div class="day-num">9</div></div><div class="day-cell"><div class="day-num">10</div></div><div class="day-cell"><div class="day-num">11</div></div><div class="day-cell"><div class="day-num">12</div><div class="event-dot upload">📤 Upload</div></div><div class="day-cell"><div class="day-num">13</div></div><div class="day-cell"><div class="day-num">14</div></div><div class="day-cell"><div class="day-num">15</div><div class="event-dot review">💬 Review</div><div class="event-dot approval">✅ Approved</div></div><div class="day-cell"><div class="day-num">16</div></div><div class="day-cell"><div class="day-num">17</div></div><div class="day-cell"><div class="day-num">18</div></div><div class="day-cell"><div class="day-num">19</div></div><div class="day-cell"><div class="day-num">20</div><div class="event-dot upload">📤 Upload</div></div><div class="day-cell"><div class="day-num">21</div></div><div class="day-cell"><div class="day-num">22</div></div><div class="day-cell"><div class="day-num">23</div></div><div class="day-cell"><div class="day-num">24</div></div><div class="day-cell"><div class="day-num">25</div></div><div class="day-cell"><div class="day-num">26</div></div><div class="day-cell"><div class="day-num">27</div></div><div class="day-cell"><div class="day-num">28</div><div class="event-dot deadline">🔴 Deadline</div></div><div class="day-cell today"><div class="day-num">29</div><div class="event-dot review">💬 Review</div></div><div class="day-cell"><div class="day-num">30</div></div></div>
+        </div>
+        <div class="legend">
+          <div class="legend-item"><div class="dot" style="background:var(--brand-primary)"></div>Upload</div>
+          <div class="legend-item"><div class="dot" style="background:var(--color-warning)"></div>Review</div>
+          <div class="legend-item"><div class="dot" style="background:var(--color-success)"></div>Approval</div>
+          <div class="legend-item"><div class="dot" style="background:var(--color-error)"></div>Deadline</div>
+        </div>
+      </div>
+      <div>
+        <div class="sidebar-card">
+          <h3>This Month</h3>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div><div style="font-size:22px;font-weight:700">8</div><div style="font-size:11px;color:var(--text-muted)">Events</div></div>
+            <div><div style="font-size:22px;font-weight:700;color:var(--color-warning)">2</div><div style="font-size:11px;color:var(--text-muted)">Deadlines</div></div>
+          </div>
+        </div>
+        <div class="sidebar-card">
+          <h3>Upcoming</h3>
+          <div class="upcoming-item"><div class="dot" style="background:var(--color-warning)"></div><div><div class="label">Review due — Midnight EP</div><div class="date">Aug 30</div></div></div>
+          <div class="upcoming-item"><div class="dot" style="background:var(--brand-primary)"></div><div><div class="label">Upload v3 — Summer Vibes</div><div class="date">Sep 1</div></div></div>
+          <div class="upcoming-item"><div class="dot" style="background:var(--color-error)"></div><div><div class="label">Deadline — LoFi Beats</div><div class="date">Sep 5</div></div></div>
+          <div class="upcoming-item"><div class="dot" style="background:var(--color-success)"></div><div><div class="label">Release — Cinematic Score</div><div class="date">Sep 10</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+const calDays = document.getElementById('calDays');
+const events = {5:['upload'],12:['upload'],15:['review','approval'],20:['upload'],28:['deadline'],29:['review']};
+const aug1 = 5; // Saturday
+for(let i=0;i<35;i++){
+  const col=i%7, row=Math.floor(i/7);
+  const dayNum=i-aug1+1;
+  const cell=document.createElement('div');
+  cell.className='day-cell'+(dayNum===29?' today':'');
+  if(dayNum>=1&&dayNum<=31){
+    cell.innerHTML=`<div class="day-num">${dayNum}</div>`;
+    if(events[dayNum]) events[dayNum].forEach(e=>{
+      const d=document.createElement('div');
+      d.className='event-dot '+e;
+      d.textContent=e==='upload'?'📤 Upload':e==='review'?'💬 Review':e==='approval'?'✅ Approved':'🔴 Deadline';
+      cell.appendChild(d);
+    });
+  }
+  calDays.appendChild(cell);
+}
+</script>
+
+
+</body></html>
+    </div>
+  </foreignObject>
+</svg>

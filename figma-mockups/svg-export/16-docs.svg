@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" 
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     viewBox="0 0 1440 1613" 
+     width="1440" 
+     height="1613">
+  <foreignObject width="100%" height="100%">
+    <div xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html><html lang="en"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <title>SoundHub — Docs</title>
+  <link rel="stylesheet" href="design-system/shared.css">
+  <style>
+    .docs-layout { display: flex; }
+    .docs-nav { width: 260px; border-right: 1px solid var(--border-default); padding: 20px 0; position: fixed; top: var(--topbar-height); bottom: 0; overflow-y: auto; }
+    .docs-nav-group { margin-bottom: 16px; }
+    .docs-nav-label { font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; padding: 8px 20px; }
+    .docs-nav-item { display: block; padding: 6px 20px 6px 24px; font-size: 13px; color: var(--text-secondary); text-decoration: none; transition: all 0.15s; border-left: 2px solid transparent; }
+    .docs-nav-item:hover { color: var(--text-primary); background: var(--bg-hover); }
+    .docs-nav-item.active { color: var(--brand-primary); border-left-color: var(--brand-primary); background: rgba(139,92,246,0.05); font-weight: 500; }
+    .docs-content { flex: 1; margin-left: 260px; max-width: 780px; padding: 40px 48px; }
+    .docs-content h1 { font-size: 32px; font-weight: 800; margin-bottom: 16px; letter-spacing: -0.3px; }
+    .docs-content h2 { font-size: 22px; font-weight: 700; margin: 32px 0 12px; padding-top: 16px; border-top: 1px solid var(--border-default); }
+    .docs-content h3 { font-size: 16px; font-weight: 700; margin: 24px 0 8px; }
+    .docs-content p { font-size: 14px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 12px; }
+    .docs-content code { font-family: var(--font-mono); font-size: 12px; background: var(--bg-elevated); padding: 2px 6px; border-radius: 4px; color: var(--brand-primary); }
+    .docs-content pre { background: var(--bg-elevated); border: 1px solid var(--border-default); border-radius: var(--radius-md); padding: 16px 20px; margin: 12px 0; overflow-x: auto; font-family: var(--font-mono); font-size: 12px; color: var(--text-secondary); line-height: 1.6; }
+    .docs-content ul { padding-left: 20px; margin: 8px 0; }
+    .docs-content li { font-size: 14px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 4px; }
+    .docs-content .callout { padding: 16px 20px; border-radius: var(--radius-md); margin: 16px 0; font-size: 13px; line-height: 1.6; }
+    .docs-content .callout.info { background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.2); color: var(--color-info); }
+    .docs-content .callout.tip { background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.2); color: var(--color-success); }
+    .docs-content .callout.warning { background: rgba(234,179,8,0.08); border: 1px solid rgba(234,179,8,0.2); color: var(--color-warning); }
+    .docs-content table { width: 100%; border-collapse: collapse; margin: 12px 0; }
+    .docs-content th, .docs-content td { text-align: left; padding: 10px 14px; border: 1px solid var(--border-default); font-size: 13px; }
+    .docs-content th { background: var(--bg-elevated); font-weight: 600; color: var(--text-primary); }
+    .docs-content td { color: var(--text-secondary); }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-logo"><div class="logo-icon">S</div><div class="logo-text">SoundHub</div></div>
+      <nav class="sidebar-nav">
+        <div class="sidebar-section-label">Main</div>
+        <a class="sidebar-item" href="#"><span class="icon">📊</span> Dashboard</a>
+        <a class="sidebar-item" href="#"><span class="icon">📁</span> Projects</a>
+        <div class="sidebar-section-label">Help</div>
+        <a class="sidebar-item active" href="#"><span class="icon">📖</span> Documentation</a>
+        <a class="sidebar-item" href="#"><span class="icon">❓</span> FAQ</a>
+        <div class="sidebar-section-label">Account</div>
+        <a class="sidebar-item" href="#"><span class="icon">⚙️</span> Settings</a>
+      </nav>
+      <div class="sidebar-footer"><a class="sidebar-item" href="#"><span class="icon">💬</span> Contact support</a></div>
+    </aside>
+    <div class="main-content">
+      <header class="topbar">
+        <div style="font-size:14px;font-weight:600">Documentation</div>
+        <div class="topbar-right"><div class="topbar-avatar">P</div></div>
+      </header>
+      <div class="docs-layout">
+        <!-- Docs Nav -->
+        <nav class="docs-nav">
+          <div class="docs-nav-group">
+            <div class="docs-nav-label">Getting Started</div>
+            <a class="docs-nav-item active" href="#">Introduction</a>
+            <a class="docs-nav-item" href="#">Quick Start</a>
+            <a class="docs-nav-item" href="#">Installation</a>
+          </div>
+          <div class="docs-nav-group">
+            <div class="docs-nav-label">Core Concepts</div>
+            <a class="docs-nav-item" href="#">Projects &amp; Versions</a>
+            <a class="docs-nav-item" href="#">Reviews &amp; Feedback</a>
+            <a class="docs-nav-item" href="#">Audio CI</a>
+            <a class="docs-nav-item" href="#">Branching</a>
+          </div>
+          <div class="docs-nav-group">
+            <div class="docs-nav-label">Integrations</div>
+            <a class="docs-nav-item" href="#">Max for Live</a>
+            <a class="docs-nav-item" href="#">REAPER Plugin</a>
+            <a class="docs-nav-item" href="#">CLI (snd)</a>
+            <a class="docs-nav-item" href="#">API Reference</a>
+          </div>
+          <div class="docs-nav-group">
+            <div class="docs-nav-label">Marketplace</div>
+            <a class="docs-nav-item" href="#">Publishing Assets</a>
+            <a class="docs-nav-item" href="#">Licensing</a>
+            <a class="docs-nav-item" href="#">Pricing &amp; Revenue</a>
+          </div>
+          <div class="docs-nav-group">
+            <div class="docs-nav-label">Advanced</div>
+            <a class="docs-nav-item" href="#">Smart Contracts</a>
+            <a class="docs-nav-item" href="#">Webhooks</a>
+            <a class="docs-nav-item" href="#">Custom Themes</a>
+          </div>
+        </nav>
+
+        <!-- Content -->
+        <div class="docs-content">
+          <h1>Introduction to SoundHub</h1>
+          <p>SoundHub is a collaborative cloud workspace for music producers, sound engineers, and labels. It combines version control, review workflows, audio analysis, and marketplace publishing into one platform.</p>
+
+          <div class="callout info">
+            💡 <strong>New to SoundHub?</strong> Start with the <a href="#" style="color:var(--color-info)">Quick Start guide</a> to create your first project in under 2 minutes.
+          </div>
+
+          <h2>Key Features</h2>
+          <ul>
+            <li><strong>Version Control</strong> — Git-like branching for audio. Upload versions, create branches, and compare changes.</li>
+            <li><strong>Review Workflows</strong> — Request feedback, leave timestamped comments, and approve/request changes.</li>
+            <li><strong>Audio CI</strong> — Automated loudness, waveform, and metadata checks on every upload.</li>
+            <li><strong>Marketplace</strong> — Publish and sell your audio assets. Royalty-free licensing built in.</li>
+            <li><strong>DAW Integration</strong> — Max for Live, REAPER, and FL Studio plugins for seamless workflow.</li>
+          </ul>
+
+          <h2>How It Works</h2>
+          <h3>1. Create a Project</h3>
+          <p>Start by creating a project and uploading your DAW file or stems. SoundHub supports Ableton Live (.als), FL Studio (.flp), REAPER (.rpp), and standard audio formats.</p>
+          <pre>snd project create "My New Track"
+snd upload ./my-project.als</pre>
+
+          <h3>2. Upload Versions</h3>
+          <p>Each time you make changes, upload a new version. SoundHub tracks the full history and generates waveforms, loudness analysis, and metadata automatically.</p>
+
+          <h3>3. Request Review</h3>
+          <p>Share a review link with collaborators. They can listen, leave timestamped comments, and approve or request changes — all without creating an account.</p>
+
+          <div class="callout tip">
+            ✅ <strong>Pro tip:</strong> Use the share link to get feedback from clients who don't have a SoundHub account. They can comment and approve directly in their browser.
+          </div>
+
+          <h2>Quick Reference</h2>
+          <table>
+            <thead><tr><th>Action</th><th>CLI Command</th><th>Shortcut</th></tr></thead>
+            <tbody>
+              <tr><td>Create project</td><td><code>snd project create</code></td><td>Ctrl+N</td></tr>
+              <tr><td>Upload version</td><td><code>snd upload</code></td><td>Ctrl+U</td></tr>
+              <tr><td>Request review</td><td><code>snd review request</code></td><td>Ctrl+R</td></tr>
+              <tr><td>Compare versions</td><td><code>snd compare v12 v13</code></td><td>Ctrl+D</td></tr>
+            </tbody>
+          </table>
+
+          <div class="callout warning">
+            ⚠️ <strong>Important:</strong> SoundHub requires authentication for all project operations. Public share links are read-only by default.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+</body></html>
+    </div>
+  </foreignObject>
+</svg>

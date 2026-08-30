@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <title>SoundHub — Upload (DAW Style)</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', -apple-system, sans-serif; background: #0d0d0d; color: #e4e4e7; overflow: hidden; height: 100vh; }
+
+    /* ── Transport Bar ── */
+    .transport-bar {
+      height: 40px; background: #111113; border-bottom: 1px solid #27272a;
+      display: flex; align-items: center; padding: 0 12px; gap: 16px;
+      font-size: 11px; user-select: none;
+    }
+    .transport-logo { font-weight: 800; font-size: 13px; color: #ea5808; letter-spacing: -0.5px; }
+    .transport-logo span { color: #e4e4e7; }
+    .transport-divider { width: 1px; height: 20px; background: #27272a; }
+    .transport-group { display: flex; align-items: center; gap: 6px; }
+    .transport-label { color: #71717a; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .transport-value {
+      background: #0d0d0d; border: 1px solid #27272a; border-radius: 4px;
+      padding: 2px 8px; font-family: 'JetBrains Mono', monospace; font-size: 12px;
+      color: #22c55e; font-weight: 600; min-width: 60px; text-align: center;
+    }
+    .transport-spacer { flex: 1; }
+    .transport-time {
+      font-family: 'JetBrains Mono', monospace; font-size: 18px; font-weight: 700;
+      color: #e4e4e7; letter-spacing: 1px;
+    }
+
+    /* ── Main Layout ── */
+    .app-body { display: flex; height: calc(100vh - 40px); }
+
+    /* ── Left Sidebar ── */
+    .sidebar {
+      width: 240px; background: #111113; border-right: 1px solid #27272a;
+      display: flex; flex-direction: column; user-select: none;
+    }
+    .sidebar-search { padding: 8px; border-bottom: 1px solid #27272a; }
+    .sidebar-search input {
+      width: 100%; background: #0d0d0d; border: 1px solid #27272a; border-radius: 4px;
+      padding: 6px 8px 6px 28px; font-size: 11px; color: #e4e4e7; outline: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: 8px center;
+    }
+    .sidebar-search input::placeholder { color: #52525b; }
+    .sidebar-nav { flex: 1; overflow-y: auto; padding: 4px 0; }
+    .sidebar-section { padding: 8px 12px 4px; font-size: 9px; color: #52525b; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+    .sidebar-item {
+      padding: 6px 12px; font-size: 11px; font-weight: 500; color: #a1a1aa;
+      cursor: pointer; display: flex; align-items: center; gap: 8px;
+      border-left: 2px solid transparent; transition: all 0.1s;
+    }
+    .sidebar-item:hover { color: #e4e4e7; }
+    .sidebar-item.active { color: #ea5808; background: rgba(234,88,8,0.08); border-left-color: #ea5808; }
+    .sidebar-item .icon { width: 16px; text-align: center; }
+
+    /* ── Content Area ── */
+    .content { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
+
+    /* ── Header ── */
+    .page-header {
+      padding: 16px 24px; border-bottom: 1px solid #27272a;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .page-title { font-size: 18px; font-weight: 700; color: #e4e4e7; }
+    .page-title span { color: #71717a; font-weight: 400; font-size: 14px; margin-left: 8px; }
+    .header-actions { display: flex; gap: 8px; }
+    .btn {
+      padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 600;
+      cursor: pointer; border: 1px solid #27272a; transition: all 0.15s;
+    }
+    .btn-primary { background: #ea5808; color: #fff; border-color: #ea5808; }
+    .btn-primary:hover { background: #c2410c; }
+    .btn-secondary { background: #1a1a1a; color: #e4e4e7; }
+    .btn-secondary:hover { background: #27272a; }
+    .btn-ghost { background: transparent; color: #71717a; border-color: transparent; }
+    .btn-ghost:hover { color: #e4e4e7; background: #1a1a1a; }
+    .btn-success { background: #22c55e; color: #fff; border-color: #22c55e; }
+
+    /* ── Upload Layout ── */
+    .upload-layout { display: flex; flex: 1; overflow: hidden; }
+
+    /* ── Upload Main ── */
+    .upload-main { flex: 1; overflow-y: auto; padding: 24px; }
+
+    /* ── Drop Zone ── */
+    .drop-zone {
+      border: 2px dashed #27272a; border-radius: 12px; padding: 48px;
+      text-align: center; cursor: pointer; transition: all 0.2s;
+      margin-bottom: 24px;
+    }
+    .drop-zone:hover { border-color: #ea5808; background: rgba(234,88,8,0.04); }
+    .drop-zone.dragover { border-color: #ea5808; background: rgba(234,88,8,0.08); }
+    .drop-zone-icon { font-size: 48px; margin-bottom: 16px; }
+    .drop-zone-title { font-size: 16px; font-weight: 700; color: #e4e4e7; margin-bottom: 8px; }
+    .drop-zone-subtitle { font-size: 13px; color: #71717a; margin-bottom: 16px; }
+    .drop-zone-formats {
+      display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;
+    }
+    .format-badge {
+      padding: 4px 10px; background: #1a1a1a; border: 1px solid #27272a;
+      border-radius: 4px; font-size: 10px; font-weight: 600; color: #a1a1aa;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* ── File Queue ── */
+    .file-queue { margin-bottom: 24px; }
+    .file-queue-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .file-queue-title { font-size: 14px; font-weight: 700; color: #e4e4e7; }
+    .file-list { display: flex; flex-direction: column; gap: 8px; }
+    .file-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px; background: #111113; border: 1px solid #27272a;
+      border-radius: 8px;
+    }
+    .file-icon {
+      width: 40px; height: 40px; background: #1a1a1a; border-radius: 6px;
+      display: flex; align-items: center; justify-content: center; font-size: 18px;
+    }
+    .file-info { flex: 1; min-width: 0; }
+    .file-name {
+      font-size: 12px; font-weight: 600; color: #e4e4e7;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .file-meta { font-size: 10px; color: #71717a; margin-top: 2px; }
+    .file-progress {
+      width: 120px; height: 4px; background: #27272a; border-radius: 2px;
+      overflow: hidden;
+    }
+    .file-progress-fill { height: 100%; border-radius: 2px; }
+    .file-status {
+      padding: 3px 8px; border-radius: 4px; font-size: 10px;
+      font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
+      flex-shrink: 0;
+    }
+    .status-processing { background: rgba(234,179,8,0.12); color: #eab308; }
+    .status-complete { background: rgba(34,197,94,0.12); color: #22c55e; }
+    .status-queued { background: #1a1a1a; color: #71717a; }
+    .status-error { background: rgba(239,68,68,0.12); color: #ef4444; }
+    .file-actions { display: flex; gap: 4px; }
+    .file-action {
+      width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;
+      background: transparent; border: 1px solid transparent; border-radius: 4px;
+      font-size: 11px; color: #52525b; cursor: pointer;
+    }
+    .file-action:hover { border-color: #27272a; color: #a1a1aa; }
+
+    /* ── Metadata Form ── */
+    .metadata-form {
+      background: #111113; border: 1px solid #27272a; border-radius: 8px;
+      padding: 20px;
+    }
+    .metadata-title {
+      font-size: 14px; font-weight: 700; color: #e4e4e7; margin-bottom: 16px;
+    }
+    .form-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+    }
+    .form-group { display: flex; flex-direction: column; }
+    .form-group.full { grid-column: 1 / -1; }
+    .form-label {
+      font-size: 11px; font-weight: 600; color: #a1a1aa; margin-bottom: 6px;
+    }
+    .form-input {
+      background: #0d0d0d; border: 1px solid #27272a; border-radius: 6px;
+      padding: 8px 12px; font-size: 12px; color: #e4e4e7; outline: none;
+      transition: border-color 0.15s;
+    }
+    .form-input:focus { border-color: #ea5808; }
+    .form-input::placeholder { color: #52525b; }
+    .form-select {
+      background: #0d0d0d; border: 1px solid #27272a; border-radius: 6px;
+      padding: 8px 12px; font-size: 12px; color: #e4e4e7; outline: none;
+      cursor: pointer; appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 10px center;
+    }
+    .form-textarea {
+      background: #0d0d0d; border: 1px solid #27272a; border-radius: 6px;
+      padding: 8px 12px; font-size: 12px; color: #e4e4e7; outline: none;
+      resize: vertical; min-height: 80px; font-family: inherit;
+      transition: border-color 0.15s;
+    }
+    .form-textarea:focus { border-color: #ea5808; }
+    .form-textarea::placeholder { color: #52525b; }
+    .form-hint { font-size: 10px; color: #52525b; margin-top: 4px; }
+    .tag-input {
+      display: flex; gap: 6px; flex-wrap: wrap; padding: 8px;
+      background: #0d0d0d; border: 1px solid #27272a; border-radius: 6px;
+      min-height: 36px;
+    }
+    .tag-item {
+      display: flex; align-items: center; gap: 4px;
+      padding: 2px 8px; background: rgba(234,88,8,0.12); border: 1px solid rgba(234,88,8,0.3);
+      border-radius: 4px; font-size: 10px; color: #ea5808;
+    }
+    .tag-item .remove { cursor: pointer; opacity: 0.6; }
+    .tag-item .remove:hover { opacity: 1; }
+    .tag-input input {
+      flex: 1; min-width: 80px; background: transparent; border: none;
+      font-size: 12px; color: #e4e4e7; outline: none;
+    }
+    .tag-input input::placeholder { color: #52525b; }
+
+    /* ── Right Panel ── */
+    .right-panel {
+      width: 320px; background: #111113; border-left: 1px solid #27272a;
+      display: flex; flex-direction: column; user-select: none; overflow-y: auto;
+    }
+    .panel-section { padding: 16px; border-bottom: 1px solid #27272a; }
+    .panel-section-title {
+      font-size: 9px; color: #52525b; text-transform: uppercase;
+      letter-spacing: 1px; font-weight: 700; margin-bottom: 10px;
+    }
+    .panel-stat {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 6px 0; font-size: 12px;
+    }
+    .panel-stat-label { color: #71717a; }
+    .panel-stat-value { color: #e4e4e7; font-family: 'JetBrains Mono', monospace; font-weight: 600; }
+
+    /* ── Processing Steps ── */
+    .process-steps { display: flex; flex-direction: column; gap: 8px; }
+    .process-step {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px; background: #0d0d0d; border: 1px solid #27272a;
+      border-radius: 6px;
+    }
+    .process-step.active { border-color: #ea5808; background: rgba(234,88,8,0.04); }
+    .process-step.done { border-color: #22c55e; }
+    .step-icon {
+      width: 28px; height: 28px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; flex-shrink: 0;
+    }
+    .step-icon.pending { background: #1a1a1a; color: #52525b; }
+    .step-icon.active { background: rgba(234,88,8,0.2); color: #ea5808; }
+    .step-icon.done { background: rgba(34,197,94,0.2); color: #22c55e; }
+    .step-info { flex: 1; }
+    .step-title { font-size: 11px; font-weight: 600; color: #e4e4e7; }
+    .step-desc { font-size: 10px; color: #52525b; margin-top: 2px; }
+    .step-status { font-size: 10px; font-weight: 600; }
+    .step-status.active { color: #ea5808; }
+    .step-status.done { color: #22c55e; }
+
+    /* ── Storage Meter ── */
+    .storage-meter {
+      width: 100%; height: 8px; background: #27272a; border-radius: 4px;
+      overflow: hidden; margin-top: 8px;
+    }
+    .storage-fill { height: 100%; border-radius: 4px; }
+
+    /* ── Checklist ── */
+    .checklist { display: flex; flex-direction: column; gap: 6px; }
+    .check-item {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 11px; color: #a1a1aa;
+    }
+    .check-icon { font-size: 12px; }
+    .check-icon.pass { color: #22c55e; }
+    .check-icon.fail { color: #ef4444; }
+    .check-icon.warn { color: #eab308; }
+
+    /* ── Device Chain (Bottom) ── */
+    .device-chain {
+      height: 60px; background: #111113; border-top: 1px solid #27272a;
+      display: flex; align-items: center; padding: 0 16px; gap: 8px;
+    }
+    .device {
+      padding: 6px 12px; background: #0d0d0d; border: 1px solid #27272a;
+      border-radius: 4px; font-size: 10px; color: #a1a1aa;
+      display: flex; align-items: center; gap: 6px; cursor: pointer;
+      transition: all 0.1s;
+    }
+    .device:hover { border-color: #3f3f46; color: #e4e4e7; }
+    .device.active { border-color: #ea5808; color: #ea5808; background: rgba(234,88,8,0.08); }
+    .device .led { width: 6px; height: 6px; border-radius: 50%; background: #27272a; }
+    .device.active .led { background: #22c55e; box-shadow: 0 0 6px rgba(34,197,94,0.5); }
+    .device-chain-spacer { flex: 1; }
+    .device-chain-label {
+      font-size: 9px; color: #52525b; text-transform: uppercase;
+      letter-spacing: 0.5px; font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <!-- Transport Bar -->
+  <div class="transport-bar">
+    <div class="transport-logo">Sound<span>Hub</span></div>
+    <div class="transport-divider"></div>
+    <div class="transport-group">
+      <span class="transport-label">Files</span>
+      <div class="transport-value">3</div>
+    </div>
+    <div class="transport-group">
+      <span class="transport-label">Total Size</span>
+      <div class="transport-value">12.4 GB</div>
+    </div>
+    <div class="transport-group">
+      <span class="transport-label">Progress</span>
+      <div class="transport-value" style="color:#eab308">67%</div>
+    </div>
+    <div class="transport-spacer"></div>
+    <div class="transport-time">UPLOAD</div>
+    <div class="transport-divider"></div>
+    <div class="transport-group">
+      <span class="transport-label">Queue</span>
+      <div class="transport-value">2 left</div>
+    </div>
+  </div>
+
+  <div class="app-body">
+    <!-- Left Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-search">
+        <input type="text" placeholder="Search projects...">
+      </div>
+      <div class="sidebar-nav">
+        <div class="sidebar-section">Main</div>
+        <div class="sidebar-item"><span class="icon">📊</span> Dashboard</div>
+        <div class="sidebar-item"><span class="icon">📁</span> Projects</div>
+        <div class="sidebar-item"><span class="icon">🛒</span> Marketplace</div>
+        <div class="sidebar-item active"><span class="icon">⬆️</span> Upload</div>
+        <div class="sidebar-section">Workspace</div>
+        <div class="sidebar-item"><span class="icon">💬</span> Reviews</div>
+        <div class="sidebar-item"><span class="icon">📋</span> Sessions</div>
+        <div class="sidebar-section">Account</div>
+        <div class="sidebar-item"><span class="icon">⚙️</span> Settings</div>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+      <!-- Page Header -->
+      <div class="page-header">
+        <div class="page-title">Upload Asset</div>
+        <div class="header-actions">
+          <button class="btn btn-ghost">↩ Cancel All</button>
+          <button class="btn btn-secondary">💾 Save Draft</button>
+          <button class="btn btn-primary">🚀 Publish All</button>
+        </div>
+      </div>
+
+      <!-- Upload Layout -->
+      <div class="upload-layout">
+        <!-- Upload Main -->
+        <div class="upload-main">
+          <!-- Drop Zone -->
+          <div class="drop-zone">
+            <div class="drop-zone-icon">📁</div>
+            <div class="drop-zone-title">Drag & drop your files here</div>
+            <div class="drop-zone-subtitle">or click to browse · Max 2GB per file</div>
+            <div class="drop-zone-formats">
+              <span class="format-badge">WAV</span>
+              <span class="format-badge">FLAC</span>
+              <span class="format-badge">MP3</span>
+              <span class="format-badge">AIFF</span>
+              <span class="format-badge">ALP</span>
+              <span class="format-badge">CPR</span>
+              <span class="format-badge">FLP</span>
+              <span class="format-badge">RPP</span>
+            </div>
+          </div>
+
+          <!-- File Queue -->
+          <div class="file-queue">
+            <div class="file-queue-header">
+              <div class="file-queue-title">Upload Queue (3 files)</div>
+              <button class="btn btn-ghost" style="font-size:11px">+ Add More</button>
+            </div>
+            <div class="file-list">
+              <!-- File 1 - Complete -->
+              <div class="file-item">
+                <div class="file-icon">🎵</div>
+                <div class="file-info">
+                  <div class="file-name">neon-warehouse-master-v3.2.wav</div>
+                  <div class="file-meta">WAV 24bit · 48 kHz · 4.1 GB</div>
+                </div>
+                <div class="file-progress">
+                  <div class="file-progress-fill" style="width:100%;background:#22c55e"></div>
+                </div>
+                <div class="file-status status-complete">Complete</div>
+                <div class="file-actions">
+                  <div class="file-action">👁</div>
+                  <div class="file-action">✕</div>
+                </div>
+              </div>
+
+              <!-- File 2 - Processing -->
+              <div class="file-item">
+                <div class="file-icon">🎵</div>
+                <div class="file-info">
+                  <div class="file-name">midnight-run-vocal-mix-v2.1.wav</div>
+                  <div class="file-meta">WAV 24bit · 44.1 kHz · 3.2 GB</div>
+                </div>
+                <div class="file-progress">
+                  <div class="file-progress-fill" style="width:67%;background:#eab308"></div>
+                </div>
+                <div class="file-status status-processing">Processing</div>
+                <div class="file-actions">
+                  <div class="file-action">⏸</div>
+                  <div class="file-action">✕</div>
+                </div>
+              </div>
+
+              <!-- File 3 - Queued -->
+              <div class="file-item">
+                <div class="file-icon">🎵</div>
+                <div class="file-info">
+                  <div class="file-name">summer-drums-stems-v4.0.zip</div>
+                  <div class="file-meta">ZIP · 5.1 GB · 24 stems</div>
+                </div>
+                <div class="file-progress">
+                  <div class="file-progress-fill" style="width:0%;background:#71717a"></div>
+                </div>
+                <div class="file-status status-queued">Queued</div>
+                <div class="file-actions">
+                  <div class="file-action">▲</div>
+                  <div class="file-action">▼</div>
+                  <div class="file-action">✕</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Metadata Form -->
+          <div class="metadata-form">
+            <div class="metadata-title">Asset Metadata</div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">Asset Name *</label>
+                <input class="form-input" type="text" value="Neon Warehouse — Master v3.2">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Category *</label>
+                <select class="form-select">
+                  <option>Loops</option>
+                  <option selected>One-Shots</option>
+                  <option>Presets</option>
+                  <option>Project Files</option>
+                  <option>Stems</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Genre *</label>
+                <select class="form-select">
+                  <option>Hip-Hop</option>
+                  <option selected>Lo-Fi</option>
+                  <option>Electronic</option>
+                  <option>Ambient</option>
+                  <option>Rock</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">BPM</label>
+                <input class="form-input" type="text" value="128">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Key</label>
+                <select class="form-select">
+                  <option>Am</option>
+                  <option>Cm</option>
+                  <option>Dm</option>
+                  <option>Em</option>
+                  <option>Fm</option>
+                  <option>Gm</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Price</label>
+                <input class="form-input" type="text" value="$4.99">
+              </div>
+              <div class="form-group full">
+                <label class="form-label">Description *</label>
+                <textarea class="form-textarea" rows="3">Premium lo-fi drum collection featuring 128 carefully crafted samples. From dusty vinyl kicks to crispy hi-hats.</textarea>
+              </div>
+              <div class="form-group full">
+                <label class="form-label">Tags</label>
+                <div class="tag-input">
+                  <div class="tag-item">lo-fi <span class="remove">×</span></div>
+                  <div class="tag-item">drums <span class="remove">×</span></div>
+                  <div class="tag-item">chill <span class="remove">×</span></div>
+                  <input type="text" placeholder="Add tag...">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Panel -->
+        <div class="right-panel">
+          <!-- Processing Steps -->
+          <div class="panel-section">
+            <div class="panel-section-title">Processing Pipeline</div>
+            <div class="process-steps">
+              <div class="process-step done">
+                <div class="step-icon done">✓</div>
+                <div class="step-info">
+                  <div class="step-title">Upload</div>
+                  <div class="step-desc">File transferred</div>
+                </div>
+                <div class="step-status done">Done</div>
+              </div>
+              <div class="process-step done">
+                <div class="step-icon done">✓</div>
+                <div class="step-info">
+                  <div class="step-title">Validate</div>
+                  <div class="step-desc">Format check</div>
+                </div>
+                <div class="step-status done">Done</div>
+              </div>
+              <div class="process-step active">
+                <div class="step-icon active">⟳</div>
+                <div class="step-info">
+                  <div class="step-title">Analyze</div>
+                  <div class="step-desc">BPM, Key, Loudness</div>
+                </div>
+                <div class="step-status active">67%</div>
+              </div>
+              <div class="process-step">
+                <div class="step-icon pending">4</div>
+                <div class="step-info">
+                  <div class="step-title">Waveform</div>
+                  <div class="step-desc">Generate preview</div>
+                </div>
+              </div>
+              <div class="process-step">
+                <div class="step-icon pending">5</div>
+                <div class="step-info">
+                  <div class="step-title">Watermark</div>
+                  <div class="step-desc">Apply protection</div>
+                </div>
+              </div>
+              <div class="process-step">
+                <div class="step-icon pending">6</div>
+                <div class="step-info">
+                  <div class="step-title">QC Check</div>
+                  <div class="step-desc">Quality control</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Storage -->
+          <div class="panel-section">
+            <div class="panel-section-title">Storage</div>
+            <div class="panel-stat">
+              <span class="panel-stat-label">Used</span>
+              <span class="panel-stat-value">6.4 GB</span>
+            </div>
+            <div class="panel-stat">
+              <span class="panel-stat-label">Available</span>
+              <span class="panel-stat-value" style="color:#22c55e">3.6 GB</span>
+            </div>
+            <div class="storage-meter">
+              <div class="storage-fill" style="width:64%;background:linear-gradient(90deg,#22c55e,#eab308)"></div>
+            </div>
+            <div class="form-hint">64% of 10 GB used</div>
+          </div>
+
+          <!-- QC Checklist -->
+          <div class="panel-section">
+            <div class="panel-section-title">QC Checklist</div>
+            <div class="checklist">
+              <div class="check-item">
+                <span class="check-icon pass">✓</span> Valid audio format
+              </div>
+              <div class="check-item">
+                <span class="check-icon pass">✓</span> Sample rate ≥ 44.1 kHz
+              </div>
+              <div class="check-item">
+                <span class="check-icon pass">✓</span> Bit depth ≥ 16 bit
+              </div>
+              <div class="check-item">
+                <span class="check-icon warn">⚠</span> Loudness within target
+              </div>
+              <div class="check-item">
+                <span class="check-icon fail">✕</span> No clipping detected
+              </div>
+              <div class="check-item">
+                <span class="check-icon pass">✓</span> Metadata complete
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Actions -->
+          <div class="panel-section">
+            <div class="panel-section-title">Quick Actions</div>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <button class="btn btn-secondary" style="width:100%;justify-content:flex-start;font-size:11px">🔄 Re-analyze All</button>
+              <button class="btn btn-secondary" style="width:100%;justify-content:flex-start;font-size:11px">📊 View QC Report</button>
+              <button class="btn btn-secondary" style="width:100%;justify-content:flex-start;font-size:11px">🎵 Preview All</button>
+              <button class="btn btn-secondary" style="width:100%;justify-content:flex-start;font-size:11px">📋 Copy Metadata</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Device Chain -->
+      <div class="device-chain">
+        <span class="device-chain-label">Pipeline:</span>
+        <div class="device"><div class="led" style="background:#22c55e;box-shadow:0 0 6px rgba(34,197,94,0.5)"></div> Upload ✓</div>
+        <div class="device"><div class="led" style="background:#22c55e;box-shadow:0 0 6px rgba(34,197,94,0.5)"></div> Validate ✓</div>
+        <div class="device active"><div class="led"></div> ⟳ Analyze</div>
+        <div class="device"><div class="led"></div> Waveform</div>
+        <div class="device"><div class="led"></div> Watermark</div>
+        <div class="device"><div class="led"></div> QC Check</div>
+        <div class="device-chain-spacer"></div>
+        <span class="device-chain-label">ETA:</span>
+        <div class="device"><div class="led"></div> ~2 min</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

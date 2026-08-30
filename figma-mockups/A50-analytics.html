@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SoundHub — Analytics</title>
+<link rel="stylesheet" href="design-system/shared.css">
+<style>
+  body { margin: 0; background: var(--bg-primary); color: var(--text-primary); font-family: 'Inter', system-ui, sans-serif; }
+  .app { display: flex; min-height: 100vh; }
+  .sidebar { width: 240px; background: var(--bg-panel); border-right: 1px solid var(--border-default); padding: 20px 0; flex-shrink: 0; }
+  .sidebar .logo { padding: 0 16px; font-size: 18px; font-weight: 800; color: var(--brand-accent); margin-bottom: 24px; }
+  .sidebar .nav-item { padding: 8px 20px; font-size: 13px; color: var(--text-secondary); cursor: pointer; }
+  .sidebar .nav-item.active { color: var(--brand-primary); background: rgba(139,92,246,0.08); border-radius: 6px; margin: 0 8px; padding: 8px 12px; }
+  .main { flex: 1; padding: 24px; }
+  .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+  .topbar h1 { font-size: 24px; font-weight: 800; }
+  .topbar .meta { font-size: 12px; color: var(--text-muted); }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+  .stat-card { background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: 12px; padding: 16px; }
+  .stat-card .label { font-size: 10px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  .stat-card .value { font-size: 28px; font-weight: 800; margin-top: 4px; }
+  .stat-card .change { font-size: 11px; margin-top: 6px; }
+  .stat-card .change.positive { color: var(--color-success); }
+  .section { background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+  .section-title { font-size: 10px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+  .waveform { display: flex; align-items: center; gap: 1px; height: 60px; background: var(--bg-elevated); border-radius: 6px; padding: 8px; }
+  .waveform .bar { flex: 1; background: var(--brand-primary); border-radius: 1px; opacity: 0.85; }
+  .meter { margin-bottom: 8px; }
+  .meter .meter-header { display: flex; justify-content: space-between; margin-bottom: 3px; }
+  .meter .meter-label { font-size: 11px; color: var(--text-muted); }
+  .meter .meter-value { font-size: 12px; font-weight: 600; }
+  .meter .meter-bar { height: 6px; background: var(--bg-elevated); border-radius: 3px; overflow: hidden; }
+  .meter .meter-fill { height: 100%; border-radius: 3px; }
+  .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .chart-bars { display: flex; align-items: flex-end; gap: 4px; height: 80px; }
+  .chart-bars .bar { flex: 1; background: var(--brand-primary); border-radius: 3px 3px 0 0; opacity: 0.8; }
+  .chart-bars .bar-label { font-size: 10px; color: var(--text-muted); text-align: center; margin-top: 4px; }
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; padding: 8px 12px; font-size: 10px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border-default); }
+  td { padding: 8px 12px; font-size: 13px; border-bottom: 1px solid var(--border-default); }
+  td a { color: var(--brand-primary); text-decoration: none; }
+  .badge { padding: 2px 6px; border-radius: 3px; font-size: 10px; font-weight: 600; text-transform: uppercase; }
+  .badge.success { background: rgba(34,197,94,0.12); color: var(--color-success); }
+  .badge.warning { background: rgba(234,179,8,0.12); color: var(--color-warning); }
+  .format-badge { padding: 1px 4px; border-radius: 2px; font-size: 11px; font-weight: 700; text-transform: uppercase; }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="sidebar">
+    <div class="logo">🎵 SoundHub</div>
+    <div class="nav-item">📊 Dashboard</div>
+    <div class="nav-item active">📈 Analytics</div>
+    <div class="nav-item">📁 Projects</div>
+    <div class="nav-item">🛒 Marketplace</div>
+    <div class="nav-item">💬 Reviews</div>
+    <div class="nav-item">⚙️ Settings</div>
+  </div>
+  <div class="main">
+    <div class="topbar">
+      <h1>Analytics</h1>
+      <div class="meta">Last updated: 2 min ago</div>
+    </div>
+    <div class="stats">
+      <div class="stat-card"><div class="label">Projects</div><div class="value">12</div><div class="change positive">+3 this month</div></div>
+      <div class="stat-card"><div class="label">Reviews</div><div class="value">8</div><div class="change" style="color:var(--color-warning)">5 open</div></div>
+      <div class="stat-card"><div class="label">Versions</div><div class="value">47</div><div class="change positive">3.9 avg/session</div></div>
+      <div class="stat-card"><div class="label">Duration</div><div class="value">4:32</div><div class="change positive">12 tracks total</div></div>
+    </div>
+    <div class="section">
+      <div class="section-title">Audio Metrics</div>
+      <div style="display:grid;grid-template-columns:1fr 280px;gap:12px">
+        <div>
+          <div style="font-size:12px;font-weight:600;margin-bottom:8px">Waveforms</div>
+          <div class="waveform" id="wf1"></div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:4px">WAV · Midnight Sessions — v3 · 4:32 · 48.2 MB</div>
+          <div class="waveform" id="wf2" style="margin-top:8px"></div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:4px">MP3 · Summer Vibes — v2 · 3:45 · 8.1 MB</div>
+        </div>
+        <div>
+          <div style="font-size:12px;font-weight:600;margin-bottom:8px">Loudness</div>
+          <div class="meter"><div class="meter-header"><span class="meter-label">Integrated LUFS</span><span class="meter-value" style="color:var(--color-success)">-14.2 LUFS</span></div><div class="meter-bar"><div class="meter-fill" style="width:70%;background:var(--color-success)"></div></div></div>
+          <div class="meter"><div class="meter-header"><span class="meter-label">Short-term LUFS</span><span class="meter-value" style="color:var(--color-warning)">-11.8 LUFS</span></div><div class="meter-bar"><div class="meter-fill" style="width:80%;background:var(--color-warning)"></div></div></div>
+          <div class="meter"><div class="meter-header"><span class="meter-label">True Peak</span><span class="meter-value" style="color:var(--color-warning)">-1.2 dBTP</span></div><div class="meter-bar"><div class="meter-fill" style="width:85%;background:var(--color-warning)"></div></div></div>
+          <div style="font-size:12px;font-weight:600;margin:12px 0 8px">Formats</div>
+          <div style="display:flex;gap:8px"><span class="format-badge" style="background:rgba(34,197,94,0.12);color:var(--color-success)">WAV 28</span><span class="format-badge" style="background:rgba(59,130,246,0.12);color:var(--color-info)">MP3 12</span><span class="format-badge" style="background:rgba(139,92,246,0.12);color:var(--brand-primary)">FLAC 7</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="charts-grid">
+      <div class="section"><div class="section-title">Projects Created</div><div class="chart-bars" id="chart1"></div><div style="font-size:20px;font-weight:700;margin-top:8px">12</div><div style="font-size:11px;color:var(--text-muted)">total projects</div></div>
+      <div class="section"><div class="section-title">Reviews Created</div><div class="chart-bars" id="chart2"></div><div style="font-size:20px;font-weight:700;margin-top:8px">8</div><div style="font-size:11px;color:var(--text-muted)">total sessions</div></div>
+    </div>
+    <div class="section">
+      <div class="section-title">Projects</div>
+      <table><thead><tr><th>Name</th><th>Owner</th><th>Branch</th><th>Updated</th></tr></thead>
+      <tbody>
+        <tr><td><a href="#">Midnight Sessions EP</a></td><td style="color:var(--text-muted)">@demo</td><td style="color:var(--text-muted)">main</td><td style="color:var(--text-muted)">Aug 28</td></tr>
+        <tr><td><a href="#">Summer Vibes LP</a></td><td style="color:var(--text-muted)">@demo</td><td style="color:var(--text-muted)">main</td><td style="color:var(--text-muted)">Aug 25</td></tr>
+        <tr><td><a href="#">LoFi Beats Vol.3</a></td><td style="color:var(--text-muted)">@demo</td><td style="color:var(--text-muted)">dev</td><td style="color:var(--text-muted)">Aug 20</td></tr>
+      </tbody></table>
+    </div>
+  </div>
+</div>
+<script>
+// Generate waveform bars
+function fillWaveform(id, count) { const c=document.getElementById(id); for(let i=0;i<count;i++){const b=document.createElement('div');b.className='bar';b.style.height=(10+Math.random()*90)+'%';c.appendChild(b)} }
+fillWaveform('wf1',120); fillWaveform('wf2',120);
+// Chart bars
+function fillChart(id,vals,labels) { const c=document.getElementById(id); vals.forEach((v,i)=>{const wrap=document.createElement('div');wrap.style.cssText='flex:1;display:flex;flex-direction:column;align-items:center';const bar=document.createElement('div');bar.style.cssText='width:100%;background:var(--brand-primary);border-radius:3px 3px 0 0;opacity:0.8';bar.style.height=v*10+'px';const lbl=document.createElement('div');lbl.className='bar-label';lbl.textContent=labels[i];wrap.appendChild(bar);wrap.appendChild(lbl);c.appendChild(wrap)}); }
+fillChart('chart1',[2,4,3,6,5,8],['Mar','Apr','May','Jun','Jul','Aug']);
+fillChart('chart2',[1,3,2,4,3,5],['Mar','Apr','May','Jun','Jul','Aug']);
+</script>
+</body>
+</html>

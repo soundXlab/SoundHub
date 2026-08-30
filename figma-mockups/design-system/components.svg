@@ -1,0 +1,184 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 1200" width="1400" height="1200">
+  <rect width="1400" height="1200" fill="#0A0A0B"/>
+  
+  <!-- Title -->
+  <text x="40" y="50" font-family="Inter, sans-serif" font-size="32" font-weight="800" fill="#FFFFFF">Design System — Components</text>
+  <text x="40" y="80" font-family="Inter, sans-serif" font-size="14" fill="#71717A">Reusable UI Elements</text>
+  
+  <!-- BUTTONS -->
+  <text x="40" y="130" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#52525B" letter-spacing="1">BUTTONS</text>
+  
+  <!-- Primary -->
+  <rect x="40" y="150" width="160" height="48" rx="12" fill="#8B5CF6"/>
+  <text x="120" y="180" text-anchor="middle" font-family="Inter, sans-serif" font-size="14" font-weight="700" fill="#FFFFFF">Primary</text>
+  <text x="40" y="215" font-family="Inter, sans-serif" font-size="11" fill="#52525B">variant="primary"</text>
+  
+  <!-- Secondary -->
+  <rect x="220" y="150" width="160" height="48" rx="12" fill="transparent" stroke="#3F3F46" stroke-width="1.5"/>
+  <text x="300" y="180" text-anchor="middle" font-family="Inter, sans-serif" font-size="14" font-weight="600" fill="#E4E4E7">Secondary</text>
+  <text x="220" y="215" font-family="Inter, sans-serif" font-size="11" fill="#52525B">variant="secondary"</text>
+  
+  <!-- Ghost -->
+  <rect x="400" y="150" width="160" height="48" rx="12" fill="transparent"/>
+  <text x="480" y="180" text-anchor="middle" font-family="Inter, sans-serif" font-size="14" font-weight="600" fill="#A1A1AA">Ghost</text>
+  <text x="400" y="215" font-family="Inter, sans-serif" font-size="11" fill="#52525B">variant="ghost"</text>
+  
+  <!-- Danger -->
+  <rect x="580" y="150" width="160" height="48" rx="12" fill="#EF4444" opacity="0.12" stroke="#EF4444" stroke-width="1"/>
+  <text x="660" y="180" text-anchor="middle" font-family="Inter, sans-serif" font-size="14" font-weight="600" fill="#EF4444">Danger</text>
+  <text x="580" y="215" font-family="Inter, sans-serif" font-size="11" fill="#52525B">variant="danger"</text>
+  
+  <!-- Success -->
+  <rect x="760" y="150" width="160" height="48" rx="12" fill="#22C55E"/>
+  <text x="840" y="180" text-anchor="middle" font-family="Inter, sans-serif" font-size="14" font-weight="700" fill="#FFFFFF">Success</text>
+  <text x="760" y="215" font-family="Inter, sans-serif" font-size="11" fill="#52525B">variant="success"</text>
+  
+  <!-- Button Sizes -->
+  <text x="40" y="260" font-family="Inter, sans-serif" font-size="11" font-weight="600" fill="#71717A">SIZES</text>
+  
+  <rect x="40" y="275" width="100" height="32" rx="8" fill="#8B5CF6"/>
+  <text x="90" y="296" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#FFFFFF">Small</text>
+  
+  <rect x="160" y="270" width="120" height="40" rx="10" fill="#8B5CF6"/>
+  <text x="220" y="296" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#FFFFFF">Medium</text>
+  
+  <rect x="300" y="265" width="140" height="48" rx="12" fill="#8B5CF6"/>
+  <text x="370" y="296" text-anchor="middle" font-family="Inter, sans-serif" font-size="14" font-weight="700" fill="#FFFFFF">Large</text>
+  
+  <!-- INPUTS -->
+  <text x="40" y="350" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#52525B" letter-spacing="1">INPUTS</text>
+  
+  <!-- Text Input -->
+  <rect x="40" y="370" width="300" height="60" rx="12" fill="#111113" stroke="#27272A" stroke-width="1"/>
+  <text x="60" y="392" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#A1A1AA">Label</text>
+  <rect x="60" y="400" width="260" height="36" rx="8" fill="#0A0A0B" stroke="#27272A" stroke-width="1"/>
+  <text x="76" y="424" font-family="Inter, sans-serif" font-size="14" fill="#52525B">Placeholder...</text>
+  
+  <!-- Input with value -->
+  <rect x="360" y="370" width="300" height="60" rx="12" fill="#111113" stroke="#27272A" stroke-width="1"/>
+  <text x="380" y="392" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#A1A1AA">Username</text>
+  <rect x="380" y="400" width="260" height="36" rx="8" fill="#0A0A0B" stroke="#8B5CF6" stroke-width="1.5"/>
+  <text x="396" y="424" font-family="Inter, sans-serif" font-size="14" fill="#E4E4E7">vasyl_producer</text>
+  
+  <!-- Input with error -->
+  <rect x="680" y="370" width="300" height="70" rx="12" fill="#111113" stroke="#27272A" stroke-width="1"/>
+  <text x="700" y="392" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#A1A1AA">Email</text>
+  <rect x="700" y="400" width="260" height="36" rx="8" fill="#0A0A0B" stroke="#EF4444" stroke-width="1.5"/>
+  <text x="716" y="424" font-family="Inter, sans-serif" font-size="14" fill="#EF4444">invalid@email</text>
+  <text x="700" y="452" font-family="Inter, sans-serif" font-size="11" fill="#EF4444">Invalid email address</text>
+  
+  <!-- Input with icon -->
+  <rect x="1000" y="370" width="300" height="60" rx="12" fill="#111113" stroke="#27272A" stroke-width="1"/>
+  <text x="1020" y="392" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#A1A1AA">Search</text>
+  <rect x="1020" y="400" width="260" height="36" rx="8" fill="#0A0A0B" stroke="#27272A" stroke-width="1"/>
+  <text x="1036" y="414" font-family="Inter, sans-serif" font-size="14" fill="#52525B">🔍</text>
+  <text x="1056" y="424" font-family="Inter, sans-serif" font-size="14" fill="#52525B">Search projects...</text>
+  
+  <!-- CARDS -->
+  <text x="40" y="480" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#52525B" letter-spacing="1">CARDS</text>
+  
+  <!-- Default Card -->
+  <rect x="40" y="500" width="300" height="180" rx="16" fill="#111113" stroke="#27272A" stroke-width="1"/>
+  <text x="60" y="530" font-family="Inter, sans-serif" font-size="16" font-weight="700" fill="#FFFFFF">Default Card</text>
+  <text x="60" y="555" font-family="Inter, sans-serif" font-size="14" fill="#A1A1AA">Standard card with border and padding.</text>
+  <rect x="60" y="580" width="80" height="32" rx="8" fill="#8B5CF6"/>
+  <text x="100" y="601" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#FFFFFF">Action</text>
+  
+  <!-- Elevated Card -->
+  <rect x="360" y="500" width="300" height="180" rx="16" fill="#1A1A1E" stroke="#3F3F46" stroke-width="1"/>
+  <text x="380" y="530" font-family="Inter, sans-serif" font-size="16" font-weight="700" fill="#FFFFFF">Elevated Card</text>
+  <text x="380" y="555" font-family="Inter, sans-serif" font-size="14" fill="#A1A1AA">Card with higher elevation for focus.</text>
+  <rect x="380" y="580" width="80" height="32" rx="8" fill="#06B6D4"/>
+  <text x="420" y="601" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#FFFFFF">Action</text>
+  
+  <!-- Interactive Card -->
+  <rect x="680" y="500" width="300" height="180" rx="16" fill="#111113" stroke="#8B5CF6" stroke-width="1.5"/>
+  <text x="700" y="530" font-family="Inter, sans-serif" font-size="16" font-weight="700" fill="#FFFFFF">Interactive Card</text>
+  <text x="700" y="555" font-family="Inter, sans-serif" font-size="14" fill="#A1A1AA">Selected/active state with accent border.</text>
+  <rect x="700" y="580" width="80" height="32" rx="8" fill="#22C55E"/>
+  <text x="740" y="601" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#FFFFFF">Action</text>
+  
+  <!-- BADGES -->
+  <text x="40" y="720" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#52525B" letter-spacing="1">BADGES</text>
+  
+  <rect x="40" y="740" width="70" height="28" rx="14" fill="#22C55E" opacity="0.12"/>
+  <text x="75" y="759" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#22C55E">Ready</text>
+  
+  <rect x="130" y="740" width="80" height="28" rx="14" fill="#EAB308" opacity="0.12"/>
+  <text x="170" y="759" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#EAB308">Review</text>
+  
+  <rect x="230" y="740" width="60" height="28" rx="14" fill="#EF4444" opacity="0.12"/>
+  <text x="260" y="759" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#EF4444">Draft</text>
+  
+  <rect x="310" y="740" width="90" height="28" rx="14" fill="#3B82F6" opacity="0.12"/>
+  <text x="355" y="759" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#3B82F6">Processing</text>
+  
+  <rect x="420" y="740" width="80" height="28" rx="14" fill="#8B5CF6" opacity="0.12"/>
+  <text x="460" y="759" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#8B5CF6">Published</text>
+  
+  <rect x="520" y="740" width="70" height="28" rx="14" fill="#06B6D4" opacity="0.12"/>
+  <text x="555" y="759" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#06B6D4">v3.2</text>
+  
+  <!-- AVATARS -->
+  <text x="40" y="810" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#52525B" letter-spacing="1">AVATARS</text>
+  
+  <circle cx="70" cy="845" r="24" fill="#8B5CF6"/>
+  <text x="70" y="851" text-anchor="middle" font-family="Inter, sans-serif" font-size="16" font-weight="800" fill="#FFFFFF">V</text>
+  
+  <circle cx="130" cy="845" r="24" fill="#06B6D4"/>
+  <text x="130" y="851" text-anchor="middle" font-family="Inter, sans-serif" font-size="16" font-weight="800" fill="#FFFFFF">A</text>
+  
+  <circle cx="190" cy="845" r="24" fill="#22C55E"/>
+  <text x="190" y="851" text-anchor="middle" font-family="Inter, sans-serif" font-size="16" font-weight="800" fill="#FFFFFF">M</text>
+  
+  <circle cx="250" cy="845" r="24" fill="#EAB308"/>
+  <text x="250" y="851" text-anchor="middle" font-family="Inter, sans-serif" font-size="16" font-weight="800" fill="#000000">K</text>
+  
+  <circle cx="310" cy="845" r="24" fill="#EF4444"/>
+  <text x="310" y="851" text-anchor="middle" font-family="Inter, sans-serif" font-size="16" font-weight="800" fill="#FFFFFF">D</text>
+  
+  <circle cx="370" cy="845" r="24" fill="#3F3F46"/>
+  <text x="370" y="851" text-anchor="middle" font-family="Inter, sans-serif" font-size="16" font-weight="800" fill="#71717A">?</text>
+  
+  <!-- TOGGLES -->
+  <text x="40" y="910" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#52525B" letter-spacing="1">TOGGLES</text>
+  
+  <!-- Toggle ON -->
+  <rect x="40" y="930" width="48" height="28" rx="14" fill="#8B5CF6"/>
+  <circle cx="72" cy="944" r="10" fill="#FFFFFF"/>
+  
+  <text x="100" y="950" font-family="Inter, sans-serif" font-size="13" fill="#E4E4E7">Enabled</text>
+  
+  <!-- Toggle OFF -->
+  <rect x="200" y="930" width="48" height="28" rx="14" fill="#3F3F46"/>
+  <circle cx="224" cy="944" r="10" fill="#71717A"/>
+  
+  <text x="260" y="950" font-family="Inter, sans-serif" font-size="13" fill="#A1A1AA">Disabled</text>
+  
+  <!-- TABS -->
+  <text x="40" y="1000" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#52525B" letter-spacing="1">TABS</text>
+  
+  <rect x="40" y="1020" width="100" height="36" rx="8" fill="#8B5CF6" opacity="0.12"/>
+  <text x="90" y="1043" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#8B5CF6">Active</text>
+  
+  <rect x="150" y="1020" width="100" height="36" rx="8" fill="transparent"/>
+  <text x="200" y="1043" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="#71717A">Inactive</text>
+  
+  <rect x="260" y="1020" width="100" height="36" rx="8" fill="transparent"/>
+  <text x="310" y="1043" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="#71717A">Disabled</text>
+  
+  <!-- PROGRESS -->
+  <text x="40" y="1090" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#52525B" letter-spacing="1">PROGRESS</text>
+  
+  <rect x="40" y="1110" width="400" height="8" rx="4" fill="#27272A"/>
+  <rect x="40" y="1110" width="160" height="8" rx="4" fill="#8B5CF6"/>
+  <text x="450" y="1120" font-family="JetBrains Mono, monospace" font-size="11" fill="#71717A">40%</text>
+  
+  <rect x="40" y="1130" width="400" height="8" rx="4" fill="#27272A"/>
+  <rect x="40" y="1130" width="280" height="8" rx="4" fill="#22C55E"/>
+  <text x="450" y="1140" font-family="JetBrains Mono, monospace" font-size="11" fill="#71717A">70%</text>
+  
+  <rect x="40" y="1150" width="400" height="8" rx="4" fill="#27272A"/>
+  <rect x="40" y="1150" width="400" height="8" rx="4" fill="#EAB308"/>
+  <text x="450" y="1160" font-family="JetBrains Mono, monospace" font-size="11" fill="#71717A">100%</text>
+</svg>

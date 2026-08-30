@@ -1,0 +1,128 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" width="1440" height="900">
+  <rect width="1440" height="900" fill="#0A0A0B"/>
+
+  <!-- Sidebar -->
+  <rect width="260" height="900" fill="#111113"/>
+  <line x1="260" y1="0" x2="260" y2="900" stroke="#1F1F23" stroke-width="1"/>
+  <text x="28" y="38" font-family="Inter, sans-serif" font-size="18" font-weight="800" fill="#FFFFFF">🎵 SoundHub</text>
+
+  <text x="28" y="90" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#52525B" letter-spacing="1">MAIN</text>
+  <text x="44" y="118" font-family="Inter, sans-serif" font-size="14" font-weight="500" fill="#A1A1AA">📊 Dashboard</text>
+  <text x="44" y="153" font-family="Inter, sans-serif" font-size="14" font-weight="500" fill="#A1A1AA">📁 Projects</text>
+  <text x="44" y="188" font-family="Inter, sans-serif" font-size="14" font-weight="500" fill="#A1A1AA">🎵 Sessions</text>
+  <text x="44" y="223" font-family="Inter, sans-serif" font-size="14" font-weight="500" fill="#A1A1AA">🛒 Marketplace</text>
+
+  <line x1="28" y1="250" x2="232" y2="250" stroke="#1F1F23" stroke-width="1"/>
+  <text x="28" y="280" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#52525B" letter-spacing="1">TOOLS</text>
+  <rect x="16" y="290" width="228" height="36" rx="8" fill="#8B5CF6" opacity="0.12"/>
+  <text x="44" y="313" font-family="Inter, sans-serif" font-size="14" font-weight="600" fill="#8B5CF6">⬆️ Upload</text>
+  <text x="44" y="348" font-family="Inter, sans-serif" font-size="14" font-weight="500" fill="#A1A1AA">📈 Analytics</text>
+  <text x="44" y="383" font-family="Inter, sans-serif" font-size="14" font-weight="500" fill="#A1A1AA">⚙️ Settings</text>
+
+  <!-- Main content -->
+  <rect x="260" y="0" width="1180" height="900" fill="#0A0A0B"/>
+
+  <!-- Top bar -->
+  <rect x="260" y="0" width="1180" height="60" fill="#0A0A0B" opacity="0.95"/>
+  <line x1="260" y1="60" x2="1440" y2="60" stroke="#1F1F23" stroke-width="1"/>
+
+  <!-- Page title -->
+  <text x="290" y="100" font-family="Inter, -apple-system, sans-serif" font-size="28" font-weight="800" fill="#FFFFFF">Upload Project</text>
+  <text x="290" y="124" font-family="Inter, sans-serif" font-size="14" fill="#71717A">Push your DAW project to SoundHub for version control and review</text>
+
+  <!-- Drag & Drop zone -->
+  <rect x="290" y="150" width="700" height="200" rx="16" fill="#111113" stroke="#8B5CF6" stroke-width="2" stroke-dasharray="8 4"/>
+  <!-- Upload icon -->
+  <circle cx="640" cy="220" r="40" fill="#8B5CF6" opacity="0.12"/>
+  <text x="640" y="232" text-anchor="middle" font-family="Inter, sans-serif" font-size="28">⬆️</text>
+  <text x="640" y="290" text-anchor="middle" font-family="Inter, sans-serif" font-size="18" font-weight="700" fill="#FFFFFF">Drop your project here</text>
+  <text x="640" y="315" text-anchor="middle" font-family="Inter, sans-serif" font-size="14" fill="#71717A">or click to browse · .als, .rpp, .flp, .cpr, .Logicx, .zip</text>
+  <text x="640" y="340" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#52525B">Max 500MB per project</text>
+
+  <!-- Recent uploads sidebar -->
+  <rect x="1020" y="150" width="330" height="200" rx="12" fill="#111113" stroke="#27272A" stroke-width="1"/>
+  <text x="1040" y="180" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#71717A">RECENT UPLOADS</text>
+
+  <rect x="1040" y="195" width="290" height="40" rx="8" fill="#18181B" stroke="#27272A" stroke-width="1"/>
+  <text x="1058" y="220" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#E4E4E7">Neon Bloom v3.2</text>
+  <text x="1270" y="220" font-family="Inter, sans-serif" font-size="11" fill="#22C55E">✓ Success</text>
+
+  <rect x="1040" y="242" width="290" height="40" rx="8" fill="#18181B" stroke="#27272A" stroke-width="1"/>
+  <text x="1058" y="267" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#E4E4E7">Midnight Drive v2.1</text>
+  <text x="1270" y="267" font-family="Inter, sans-serif" font-size="11" fill="#22C55E">✓ Success</text>
+
+  <rect x="1040" y="289" width="290" height="40" rx="8" fill="#18181B" stroke="#27272A" stroke-width="1"/>
+  <text x="1058" y="314" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#E4E4E7">Solar Wind v1.0</text>
+  <text x="1270" y="314" font-family="Inter, sans-serif" font-size="11" fill="#EAB308">⏳ Processing</text>
+
+  <!-- Project metadata form -->
+  <text x="290" y="390" font-family="Inter, sans-serif" font-size="16" font-weight="700" fill="#FFFFFF">Project Details</text>
+
+  <rect x="290" y="410" width="340" height="80" rx="12" fill="#111113" stroke="#27272A" stroke-width="1"/>
+  <text x="310" y="435" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#A1A1AA">Project Name</text>
+  <rect x="310" y="445" width="300" height="32" rx="8" fill="#18181B" stroke="#27272A" stroke-width="1"/>
+  <text x="326" y="467" font-family="Inter, sans-serif" font-size="14" fill="#E4E4E7">Neon Bloom</text>
+
+  <rect x="650" y="410" width="340" height="80" rx="12" fill="#111113" stroke="#27272A" stroke-width="1"/>
+  <text x="670" y="435" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#A1A1AA">DAW</text>
+  <rect x="670" y="445" width="300" height="32" rx="8" fill="#18181B" stroke="#27272A" stroke-width="1"/>
+  <text x="686" y="467" font-family="Inter, sans-serif" font-size="14" fill="#E4E4E7">Ableton Live 12</text>
+
+  <rect x="1010" y="410" width="340" height="80" rx="12" fill="#111113" stroke="#27272A" stroke-width="1"/>
+  <text x="1030" y="435" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#A1A1AA">BPM</text>
+  <rect x="1030" y="445" width="300" height="32" rx="8" fill="#18181B" stroke="#27272A" stroke-width="1"/>
+  <text x="1046" y="467" font-family="Inter, sans-serif" font-size="14" fill="#E4E4E7">128</text>
+
+  <rect x="290" y="500" width="340" height="80" rx="12" fill="#111113" stroke="#27272A" stroke-width="1"/>
+  <text x="310" y="525" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#A1A1AA">Key</text>
+  <rect x="310" y="535" width="300" height="32" rx="8" fill="#18181B" stroke="#27272A" stroke-width="1"/>
+  <text x="326" y="557" font-family="Inter, sans-serif" font-size="14" fill="#E4E4E7">F# minor</text>
+
+  <rect x="650" y="500" width="340" height="80" rx="12" fill="#111113" stroke="#27272A" stroke-width="1"/>
+  <text x="670" y="525" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#A1A1AA">Genre</text>
+  <rect x="670" y="535" width="300" height="32" rx="8" fill="#18181B" stroke="#27272A" stroke-width="1"/>
+  <text x="686" y="557" font-family="Inter, sans-serif" font-size="14" fill="#E4E4E7">Electronic</text>
+
+  <rect x="1010" y="500" width="340" height="80" rx="12" fill="#111113" stroke="#27272A" stroke-width="1"/>
+  <text x="1030" y="525" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#A1A1AA">Visibility</text>
+  <rect x="1030" y="535" width="300" height="32" rx="8" fill="#18181B" stroke="#27272A" stroke-width="1"/>
+  <text x="1046" y="557" font-family="Inter, sans-serif" font-size="14" fill="#E4E4E7">🔒 Private</text>
+
+  <!-- Description -->
+  <rect x="290" y="590" width="1060" height="100" rx="12" fill="#111113" stroke="#27272A" stroke-width="1"/>
+  <text x="310" y="615" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#A1A1AA">Description</text>
+  <rect x="310" y="625" width="1020" height="50" rx="8" fill="#18181B" stroke="#27272A" stroke-width="1"/>
+  <text x="326" y="655" font-family="Inter, sans-serif" font-size="14" fill="#E4E4E7">Synthwave track with retro vibes. Featuring arpeggiated synths and driving drums.</text>
+
+  <!-- Tags -->
+  <text x="290" y="720" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#A1A1AA">Tags</text>
+  <rect x="290" y="730" width="60" height="28" rx="8" fill="#8B5CF6" opacity="0.12"/>
+  <text x="306" y="749" font-family="Inter, sans-serif" font-size="12" fill="#8B5CF6">synthwave</text>
+  <rect x="360" y="730" width="48" height="28" rx="8" fill="#8B5CF6" opacity="0.12"/>
+  <text x="374" y="749" font-family="Inter, sans-serif" font-size="12" fill="#8B5CF6">retro</text>
+  <rect x="418" y="730" width="72" height="28" rx="8" fill="#8B5CF6" opacity="0.12"/>
+  <text x="434" y="749" font-family="Inter, sans-serif" font-size="12" fill="#8B5CF6">electronic</text>
+  <rect x="500" y="730" width="60" height="28" rx="8" fill="#8B5CF6" opacity="0.12"/>
+  <text x="516" y="749" font-family="Inter, sans-serif" font-size="12" fill="#8B5CF6">+ Add tag</text>
+
+  <!-- File list -->
+  <text x="290" y="790" font-family="Inter, sans-serif" font-size="16" font-weight="700" fill="#FFFFFF">Files</text>
+
+  <rect x="290" y="810" width="1060" height="48" rx="10" fill="#111113" stroke="#27272A" stroke-width="1"/>
+  <text x="318" y="840" font-family="Inter, sans-serif" font-size="14" fill="#E4E4E7">📁 Neon_Bloom_v3.2.als</text>
+  <text x="600" y="840" font-family="Inter, sans-serif" font-size="12" fill="#71717A">Ableton Live Set</text>
+  <text x="800" y="840" font-family="Inter, sans-serif" font-size="12" fill="#71717A">24.5 MB</text>
+  <text x="950" y="840" font-family="Inter, sans-serif" font-size="12" fill="#22C55E">✓ Uploaded</text>
+  <text x="1310" y="840" font-family="Inter, sans-serif" font-size="12" fill="#EF4444">✕</text>
+
+  <rect x="290" y="865" width="1060" height="48" rx="10" fill="#111113" stroke="#27272A" stroke-width="1"/>
+  <text x="318" y="895" font-family="Inter, sans-serif" font-size="14" fill="#E4E4E7">📁 Samples/</text>
+  <text x="600" y="895" font-family="Inter, sans-serif" font-size="12" fill="#71717A">42 files</text>
+  <text x="800" y="895" font-family="Inter, sans-serif" font-size="12" fill="#71717A">156.8 MB</text>
+  <text x="950" y="895" font-family="Inter, sans-serif" font-size="12" fill="#22C55E">✓ Uploaded</text>
+  <text x="1310" y="895" font-family="Inter, sans-serif" font-size="12" fill="#EF4444">✕</text>
+
+  <!-- Push button -->
+  <rect x="1130" y="810" width="140" height="48" rx="12" fill="#8B5CF6"/>
+  <text x="1162" y="840" font-family="Inter, sans-serif" font-size="15" font-weight="700" fill="#FFFFFF">🚀 Push v3.2</text>
+</svg>

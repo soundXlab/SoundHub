@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <title>SoundHub — Project Overview</title>
+  <link rel="stylesheet" href="design-system/shared.css">
+  <style>
+    .project-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+    .project-icon-lg { width: 56px; height: 56px; border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; font-size: 26px; }
+    .project-meta-row { display: flex; gap: 24px; margin-top: 8px; }
+    .project-meta-item { font-size: 12px; color: var(--text-secondary); display: flex; align-items: center; gap: 6px; }
+    .overview-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .overview-card { background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: var(--radius-lg); }
+    .overview-card-header { padding: 16px 20px; border-bottom: 1px solid var(--border-default); display: flex; align-items: center; justify-content: space-between; }
+    .overview-card-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); }
+    .overview-card-body { padding: 16px 20px; }
+    .file-row-sm { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border-default); font-size: 12px; }
+    .file-row-sm:last-child { border-bottom: none; }
+    .collab-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; }
+    .collab-avatar { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: white; }
+    .release-badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-logo"><div class="logo-icon">S</div><div class="logo-text">SoundHub</div></div>
+      <nav class="sidebar-nav">
+        <div class="sidebar-section-label">Main</div>
+        <a class="sidebar-item" href="#"><span class="icon">📊</span> Dashboard</a>
+        <a class="sidebar-item active" href="#"><span class="icon">📁</span> Projects</a>
+        <a class="sidebar-item" href="#"><span class="icon">🛒</span> Marketplace</a>
+        <div class="sidebar-section-label">Workspace</div>
+        <a class="sidebar-item" href="#"><span class="icon">💬</span> Reviews</a>
+        <div class="sidebar-section-label">Account</div>
+        <a class="sidebar-item" href="#"><span class="icon">⚙️</span> Settings</a>
+      </nav>
+      <div class="sidebar-footer"><a class="sidebar-item" href="#"><span class="icon">❓</span> Help</a></div>
+    </aside>
+    <div class="main-content">
+      <header class="topbar">
+        <div style="display:flex;align-items:center;gap:12px">
+          <a href="#" style="color:var(--text-muted);text-decoration:none;font-size:13px">← Projects</a>
+          <span style="color:var(--text-muted)">/</span>
+          <span style="font-size:14px;font-weight:600">Neon Warehouse</span>
+          <span class="badge badge-success">Ready</span>
+        </div>
+        <div class="topbar-right">
+          <button class="btn btn-secondary btn-sm">🔗 Share</button>
+          <button class="btn btn-primary btn-sm">⬆️ Upload</button>
+          <div class="topbar-avatar">P</div>
+        </div>
+      </header>
+      <div class="page">
+        <!-- Project Header -->
+        <div class="project-header">
+          <div class="project-icon-lg" style="background:rgba(139,92,246,0.12);color:var(--brand-primary)">🎵</div>
+          <div style="flex:1">
+            <h1 class="page-title" style="margin-bottom:0">Neon Warehouse</h1>
+            <div class="project-meta-row">
+              <span class="project-meta-item">Ableton Live 12</span>
+              <span class="project-meta-item">128 BPM · F# minor</span>
+              <span class="project-meta-item">13 versions</span>
+              <span class="project-meta-item">Updated 2h ago</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+          <div class="tab active">Overview</div>
+          <div class="tab">Versions</div>
+          <div class="tab">Files</div>
+          <div class="tab">Reviews</div>
+          <div class="tab">Audio CI</div>
+          <div class="tab">Settings</div>
+        </div>
+
+        <div class="overview-grid">
+          <!-- Latest Version -->
+          <div class="overview-card" style="grid-column: span 2">
+            <div class="overview-card-header">
+              <span class="overview-card-title">Latest Version — v13</span>
+              <div style="display:flex;gap:8px">
+                <button class="btn btn-ghost btn-sm">▶ Listen</button>
+                <button class="btn btn-primary btn-sm">Start Review</button>
+              </div>
+            </div>
+            <div class="overview-card-body">
+              <div class="waveform-canvas" style="background:var(--bg-elevated);border-radius:var(--radius-md);height:72px">
+                <svg viewBox="0 0 900 72" preserveAspectRatio="none" style="width:100%;height:100%">
+                  <defs><linearGradient id="wg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#8B5CF6" stop-opacity="0.7"/><stop offset="100%" stop-color="#06B6D4" stop-opacity="0.3"/></linearGradient></defs>
+                  <path d="M0,36 Q30,15 60,36 Q90,57 120,36 Q150,10 180,36 Q210,62 240,36 Q270,18 300,36 Q330,54 360,36 Q390,12 420,36 Q450,60 480,36 Q510,18 540,36 Q570,54 600,36 Q630,12 660,36 Q690,60 720,36 Q750,18 780,36 Q810,54 840,36 Q870,12 900,36" fill="none" stroke="url(#wg)" stroke-width="2"/>
+                </svg>
+              </div>
+              <div style="display:flex;gap:24px;margin-top:12px">
+                <div><span style="font-size:10px;color:var(--text-muted);text-transform:uppercase">Duration</span><div style="font-size:14px;font-weight:600;font-family:var(--font-mono)">3:42</div></div>
+                <div><span style="font-size:10px;color:var(--text-muted);text-transform:uppercase">Size</span><div style="font-size:14px;font-weight:600;font-family:var(--font-mono)">28.7 MB</div></div>
+                <div><span style="font-size:10px;color:var(--text-muted);text-transform:uppercase">Format</span><div style="font-size:14px;font-weight:600;font-family:var(--font-mono)">WAV 24bit</div></div>
+                <div><span style="font-size:10px;color:var(--text-muted);text-transform:uppercase">Sample Rate</span><div style="font-size:14px;font-weight:600;font-family:var(--font-mono)">44.1 kHz</div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Version History -->
+          <div class="overview-card">
+            <div class="overview-card-header">
+              <span class="overview-card-title">Version History</span>
+              <a href="#" class="btn btn-ghost btn-sm">View all →</a>
+            </div>
+            <div class="overview-card-body">
+              <div class="timeline">
+                <div class="timeline-item"><div class="timeline-dot active"></div><div class="timeline-line"></div><div class="timeline-content"><div class="timeline-title">v13 — Ready for review</div><div class="timeline-meta">2h ago · Producer</div></div></div>
+                <div class="timeline-item"><div class="timeline-dot success"></div><div class="timeline-line"></div><div class="timeline-content"><div class="timeline-title">v12 — Approved</div><div class="timeline-meta">1d ago · Sarah</div></div></div>
+                <div class="timeline-item"><div class="timeline-dot warning"></div><div class="timeline-content"><div class="timeline-title">v11 — Changes requested</div><div class="timeline-meta">2d ago · Alex</div></div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Files Summary -->
+          <div class="overview-card">
+            <div class="overview-card-header">
+              <span class="overview-card-title">Files (4)</span>
+              <a href="#" class="btn btn-ghost btn-sm">View all →</a>
+            </div>
+            <div class="overview-card-body">
+              <div class="file-row-sm"><span>🎵</span><span style="flex:1;font-weight:500">mixdown.wav</span><span style="color:var(--text-muted);font-family:var(--font-mono)">28.7 MB</span></div>
+              <div class="file-row-sm"><span>🎵</span><span style="flex:1;font-weight:500">drums.wav</span><span style="color:var(--text-muted);font-family:var(--font-mono)">12.4 MB</span></div>
+              <div class="file-row-sm"><span>🎵</span><span style="flex:1;font-weight:500">bass.wav</span><span style="color:var(--text-muted);font-family:var(--font-mono)">8.2 MB</span></div>
+              <div class="file-row-sm"><span>🎵</span><span style="flex:1;font-weight:500">synth.wav</span><span style="color:var(--text-muted);font-family:var(--font-mono)">5.1 MB</span></div>
+            </div>
+          </div>
+
+          <!-- Collaborators -->
+          <div class="overview-card">
+            <div class="overview-card-header">
+              <span class="overview-card-title">Collaborators</span>
+              <button class="btn btn-ghost btn-sm">+ Invite</button>
+            </div>
+            <div class="overview-card-body">
+              <div class="collab-row">
+                <div class="collab-avatar" style="background:var(--brand-primary)">P</div>
+                <div style="flex:1"><div style="font-size:13px;font-weight:600">Producer</div><div style="font-size:11px;color:var(--text-muted)">Owner</div></div>
+                <span class="badge badge-purple" style="font-size:9px">owner</span>
+              </div>
+              <div class="collab-row">
+                <div class="collab-avatar" style="background:var(--brand-secondary)">S</div>
+                <div style="flex:1"><div style="font-size:13px;font-weight:600">Sarah</div><div style="font-size:11px;color:var(--text-muted)">Reviewer</div></div>
+                <span class="badge badge-info" style="font-size:9px">reviewer</span>
+              </div>
+              <div class="collab-row">
+                <div class="collab-avatar" style="background:var(--color-warning)">A</div>
+                <div style="flex:1"><div style="font-size:13px;font-weight:600">Alex</div><div style="font-size:11px;color:var(--text-muted)">Reviewer</div></div>
+                <span class="badge badge-info" style="font-size:9px">reviewer</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Release Status -->
+          <div class="overview-card" style="grid-column: span 2">
+            <div class="overview-card-header">
+              <span class="overview-card-title">Release Status</span>
+            </div>
+            <div class="overview-card-body" style="display:flex;gap:16px">
+              <div class="release-badge" style="background:rgba(34,197,94,0.12);color:var(--color-success)">✅ Versioning: Active</div>
+              <div class="release-badge" style="background:rgba(234,179,8,0.12);color:var(--color-warning)">⏳ Review: 1 pending</div>
+              <div class="release-badge" style="background:rgba(139,92,246,0.12);color:var(--brand-primary)">📦 Release: Not started</div>
+              <div class="release-badge" style="background:var(--bg-elevated);color:var(--text-secondary)">🔗 Share: Active</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

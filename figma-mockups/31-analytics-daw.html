@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <title>SoundHub — Analytics (DAW Style)</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', -apple-system, sans-serif; background: #0d0d0d; color: #e4e4e7; overflow: hidden; height: 100vh; }
+
+    /* ── Transport Bar ── */
+    .transport-bar {
+      height: 40px; background: #111113; border-bottom: 1px solid #27272a;
+      display: flex; align-items: center; padding: 0 12px; gap: 16px;
+      font-size: 11px; user-select: none;
+    }
+    .transport-logo { font-weight: 800; font-size: 13px; color: #ea5808; letter-spacing: -0.5px; }
+    .transport-logo span { color: #e4e4e7; }
+    .transport-divider { width: 1px; height: 20px; background: #27272a; }
+    .transport-group { display: flex; align-items: center; gap: 6px; }
+    .transport-label { color: #71717a; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .transport-value {
+      background: #0d0d0d; border: 1px solid #27272a; border-radius: 4px;
+      padding: 2px 8px; font-family: 'JetBrains Mono', monospace; font-size: 12px;
+      color: #22c55e; font-weight: 600; min-width: 60px; text-align: center;
+    }
+    .transport-spacer { flex: 1; }
+    .transport-time {
+      font-family: 'JetBrains Mono', monospace; font-size: 18px; font-weight: 700;
+      color: #e4e4e7; letter-spacing: 1px;
+    }
+
+    /* ── Main Layout ── */
+    .app-body { display: flex; height: calc(100vh - 40px); }
+
+    /* ── Left Sidebar ── */
+    .sidebar {
+      width: 240px; background: #111113; border-right: 1px solid #27272a;
+      display: flex; flex-direction: column; user-select: none;
+    }
+    .sidebar-search { padding: 8px; border-bottom: 1px solid #27272a; }
+    .sidebar-search input {
+      width: 100%; background: #0d0d0d; border: 1px solid #27272a; border-radius: 4px;
+      padding: 6px 8px 6px 28px; font-size: 11px; color: #e4e4e7; outline: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: 8px center;
+    }
+    .sidebar-search input::placeholder { color: #52525b; }
+    .sidebar-nav { flex: 1; overflow-y: auto; padding: 4px 0; }
+    .sidebar-section { padding: 8px 12px 4px; font-size: 9px; color: #52525b; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+    .sidebar-item {
+      padding: 6px 12px; font-size: 11px; font-weight: 500; color: #a1a1aa;
+      cursor: pointer; display: flex; align-items: center; gap: 8px;
+      border-left: 2px solid transparent; transition: all 0.1s;
+    }
+    .sidebar-item:hover { color: #e4e4e7; }
+    .sidebar-item.active { color: #ea5808; background: rgba(234,88,8,0.08); border-left-color: #ea5808; }
+    .sidebar-item .icon { width: 16px; text-align: center; }
+
+    /* ── Content Area ── */
+    .content { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
+
+    /* ── Header ── */
+    .page-header {
+      padding: 16px 24px; border-bottom: 1px solid #27272a;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .page-title { font-size: 18px; font-weight: 700; color: #e4e4e7; }
+    .page-title span { color: #71717a; font-weight: 400; font-size: 14px; margin-left: 8px; }
+    .header-actions { display: flex; gap: 8px; }
+    .btn {
+      padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 600;
+      cursor: pointer; border: 1px solid #27272a; transition: all 0.15s;
+    }
+    .btn-primary { background: #ea5808; color: #fff; border-color: #ea5808; }
+    .btn-primary:hover { background: #c2410c; }
+    .btn-secondary { background: #1a1a1a; color: #e4e4e7; }
+    .btn-secondary:hover { background: #27272a; }
+    .btn-ghost { background: transparent; color: #71717a; border-color: transparent; }
+    .btn-ghost:hover { color: #e4e4e7; background: #1a1a1a; }
+
+    /* ── Filter Bar ── */
+    .filter-bar {
+      display: flex; gap: 12px; padding: 12px 24px; border-bottom: 1px solid #27272a;
+      align-items: center;
+    }
+    .filter-chip {
+      padding: 6px 12px; background: #1a1a1a; border: 1px solid #27272a;
+      border-radius: 20px; font-size: 11px; font-weight: 500; color: #a1a1aa;
+      cursor: pointer; transition: all 0.1s; white-space: nowrap;
+    }
+    .filter-chip:hover { border-color: #3f3f46; color: #e4e4e7; }
+    .filter-chip.active { background: rgba(234,88,8,0.12); border-color: #ea5808; color: #ea5808; }
+
+    /* ── Analytics Grid ── */
+    .analytics-content {
+      flex: 1; overflow-y: auto; padding: 20px 24px;
+    }
+
+    /* ── Quick Stats ── */
+    .quick-stats {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+      margin-bottom: 20px;
+    }
+    .stat-card {
+      background: #111113; border: 1px solid #27272a; border-radius: 8px;
+      padding: 16px; position: relative; overflow: hidden;
+    }
+    .stat-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0;
+      height: 3px;
+    }
+    .stat-card.orange::before { background: #ea5808; }
+    .stat-card.green::before { background: #22c55e; }
+    .stat-card.blue::before { background: #3b82f6; }
+    .stat-card.yellow::before { background: #eab308; }
+    .stat-label { font-size: 10px; color: #71717a; text-transform: uppercase; letter-spacing: 0.5px; }
+    .stat-value {
+      font-size: 24px; font-weight: 700; color: #e4e4e7;
+      font-family: 'JetBrains Mono', monospace; margin-top: 4px;
+    }
+    .stat-change {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 2px 6px; border-radius: 4px; font-size: 10px;
+      font-weight: 600; margin-top: 8px;
+    }
+    .stat-change.up { background: rgba(34,197,94,0.12); color: #22c55e; }
+    .stat-change.down { background: rgba(239,68,68,0.12); color: #ef4444; }
+
+    /* ── Charts Grid ── */
+    .charts-grid {
+      display: grid; grid-template-columns: 2fr 1fr; gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    /* ── Panel ── */
+    .panel {
+      background: #111113; border: 1px solid #27272a; border-radius: 8px;
+      overflow: hidden;
+    }
+    .panel-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 16px; border-bottom: 1px solid #27272a;
+    }
+    .panel-title { font-size: 13px; font-weight: 700; color: #e4e4e7; }
+    .panel-subtitle { font-size: 10px; color: #52525b; }
+    .panel-body { padding: 16px; }
+
+    /* ── Chart Placeholder ── */
+    .chart-placeholder {
+      height: 200px; background: #0d0d0d; border: 1px solid #27272a;
+      border-radius: 6px; display: flex; align-items: flex-end;
+      padding: 12px; gap: 3px; position: relative;
+    }
+    .chart-bar { flex: 1; border-radius: 2px 2px 0 0; }
+    .chart-line {
+      position: absolute; left: 12px; right: 12px; height: 2px;
+      background: rgba(234,88,8,0.3); top: 60px;
+    }
+
+    /* ── Donut Chart ── */
+    .donut-chart {
+      width: 160px; height: 160px; border-radius: 50%; margin: 0 auto;
+      background: conic-gradient(
+        #ea5808 0deg 126deg,
+        #22c55e 126deg 216deg,
+        #3b82f6 216deg 288deg,
+        #eab308 288deg 324deg,
+        #71717a 324deg 360deg
+      );
+      position: relative;
+    }
+    .donut-chart::after {
+      content: ''; position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%); width: 100px; height: 100px;
+      background: #111113; border-radius: 50%;
+    }
+    .donut-center {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      text-align: center; z-index: 1;
+    }
+    .donut-value { font-size: 20px; font-weight: 700; color: #e4e4e7; font-family: 'JetBrains Mono', monospace; }
+    .donut-label { font-size: 10px; color: #71717a; }
+    .donut-legend {
+      display: flex; flex-direction: column; gap: 8px; margin-top: 16px;
+    }
+    .legend-item {
+      display: flex; align-items: center; gap: 8px; font-size: 11px;
+    }
+    .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .legend-label { flex: 1; color: #a1a1aa; }
+    .legend-value { color: #e4e4e7; font-family: 'JetBrains Mono', monospace; font-weight: 600; }
+
+    /* ── Table Grid ── */
+    .table-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    /* ── Data Table ── */
+    .data-table { width: 100%; border-collapse: collapse; }
+    .data-table th {
+      text-align: left; padding: 8px; font-size: 10px; font-weight: 600;
+      color: #52525b; text-transform: uppercase; letter-spacing: 0.5px;
+      border-bottom: 1px solid #27272a;
+    }
+    .data-table td {
+      padding: 10px 8px; font-size: 11px; color: #a1a1aa;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    .data-table tr:hover td { background: rgba(255,255,255,0.02); }
+    .asset-cell {
+      display: flex; align-items: center; gap: 10px;
+    }
+    .asset-icon {
+      width: 28px; height: 28px; border-radius: 4px;
+      display: flex; align-items: center; justify-content: center; font-size: 12px;
+    }
+    .asset-name { font-weight: 600; color: #e4e4e7; }
+
+    /* ── Mini Chart ── */
+    .mini-chart {
+      display: flex; align-items: flex-end; gap: 2px; height: 24px;
+    }
+    .mini-bar { flex: 1; border-radius: 1px; }
+
+    /* ── Device Chain (Bottom) ── */
+    .device-chain {
+      height: 60px; background: #111113; border-top: 1px solid #27272a;
+      display: flex; align-items: center; padding: 0 16px; gap: 8px;
+    }
+    .device {
+      padding: 6px 12px; background: #0d0d0d; border: 1px solid #27272a;
+      border-radius: 4px; font-size: 10px; color: #a1a1aa;
+      display: flex; align-items: center; gap: 6px; cursor: pointer;
+      transition: all 0.1s;
+    }
+    .device:hover { border-color: #3f3f46; color: #e4e4e7; }
+    .device.active { border-color: #ea5808; color: #ea5808; background: rgba(234,88,8,0.08); }
+    .device .led { width: 6px; height: 6px; border-radius: 50%; background: #27272a; }
+    .device.active .led { background: #22c55e; box-shadow: 0 0 6px rgba(34,197,94,0.5); }
+    .device-chain-spacer { flex: 1; }
+    .device-chain-label {
+      font-size: 9px; color: #52525b; text-transform: uppercase;
+      letter-spacing: 0.5px; font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <!-- Transport Bar -->
+  <div class="transport-bar">
+    <div class="transport-logo">Sound<span>Hub</span></div>
+    <div class="transport-divider"></div>
+    <div class="transport-group">
+      <span class="transport-label">Period</span>
+      <div class="transport-value">30 days</div>
+    </div>
+    <div class="transport-group">
+      <span class="transport-label">Revenue</span>
+      <div class="transport-value">$12.4K</div>
+    </div>
+    <div class="transport-group">
+      <span class="transport-label">Growth</span>
+      <div class="transport-value" style="color:#22c55e">+18%</div>
+    </div>
+    <div class="transport-spacer"></div>
+    <div class="transport-time">ANALYTICS</div>
+    <div class="transport-divider"></div>
+    <div class="transport-group">
+      <span class="transport-label">Updated</span>
+      <div class="transport-value">2m ago</div>
+    </div>
+  </div>
+
+  <div class="app-body">
+    <!-- Left Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-search">
+        <input type="text" placeholder="Search analytics...">
+      </div>
+      <div class="sidebar-nav">
+        <div class="sidebar-section">Main</div>
+        <div class="sidebar-item"><span class="icon">📊</span> Dashboard</div>
+        <div class="sidebar-item"><span class="icon">📁</span> Projects</div>
+        <div class="sidebar-item"><span class="icon">🛒</span> Marketplace</div>
+        <div class="sidebar-section">Workspace</div>
+        <div class="sidebar-item"><span class="icon">💬</span> Reviews</div>
+        <div class="sidebar-item"><span class="icon">📋</span> Sessions</div>
+        <div class="sidebar-section">Account</div>
+        <div class="sidebar-item"><span class="icon">⚙️</span> Settings</div>
+        <div class="sidebar-item active"><span class="icon">📈</span> Analytics</div>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+      <!-- Page Header -->
+      <div class="page-header">
+        <div class="page-title">Analytics <span>Last 30 days</span></div>
+        <div class="header-actions">
+          <button class="btn btn-ghost">📥 Export CSV</button>
+          <button class="btn btn-secondary">🔄 Refresh</button>
+          <button class="btn btn-primary">📅 Date Range</button>
+        </div>
+      </div>
+
+      <!-- Filter Bar -->
+      <div class="filter-bar">
+        <div class="filter-chip active">All Time</div>
+        <div class="filter-chip">7 Days</div>
+        <div class="filter-chip">30 Days</div>
+        <div class="filter-chip">90 Days</div>
+        <div class="filter-chip">1 Year</div>
+        <div style="flex:1"></div>
+        <div class="filter-chip">📥 Downloads</div>
+        <div class="filter-chip">💰 Revenue</div>
+        <div class="filter-chip">👥 Users</div>
+      </div>
+
+      <!-- Analytics Content -->
+      <div class="analytics-content">
+        <!-- Quick Stats -->
+        <div class="quick-stats">
+          <div class="stat-card orange">
+            <div class="stat-label">Total Downloads</div>
+            <div class="stat-value">45.2K</div>
+            <div class="stat-change up">↑ +12% vs last month</div>
+          </div>
+          <div class="stat-card green">
+            <div class="stat-label">Revenue</div>
+            <div class="stat-value">$12.4K</div>
+            <div class="stat-change up">↑ +18% vs last month</div>
+          </div>
+          <div class="stat-card blue">
+            <div class="stat-label">Unique Users</div>
+            <div class="stat-value">3,847</div>
+            <div class="stat-change up">↑ +8% vs last month</div>
+          </div>
+          <div class="stat-card yellow">
+            <div class="stat-label">Avg. Rating</div>
+            <div class="stat-value">4.7</div>
+            <div class="stat-change up">↑ +0.2 vs last month</div>
+          </div>
+        </div>
+
+        <!-- Charts Grid -->
+        <div class="charts-grid">
+          <!-- Downloads Chart -->
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <div class="panel-title">Downloads Over Time</div>
+                <div class="panel-subtitle">Daily downloads for the last 30 days</div>
+              </div>
+            </div>
+            <div class="panel-body">
+              <div class="chart-placeholder">
+                <div class="chart-line"></div>
+                <div class="chart-bar" style="height:30%;background:#ea5808"></div>
+                <div class="chart-bar" style="height:45%;background:#ea5808"></div>
+                <div class="chart-bar" style="height:35%;background:#ea5808"></div>
+                <div class="chart-bar" style="height:60%;background:#ea5808"></div>
+                <div class="chart-bar" style="height:50%;background:#ea5808"></div>
+                <div class="chart-bar" style="height:70%;background:#ea5808"></div>
+                <div class="chart-bar" style="height:55%;background:#ea5808"></div>
+                <div class="chart-bar" style="height:80%;background:#ea5808"></div>
+                <div class="chart-bar" style="height:65%;background:#ea5808"></div>
+                <div class="chart-bar" style="height:90%;background:#ea5808"></div>
+                <div class="chart-bar" style="height:75%;background:#ea5808"></div>
+                <div class="chart-bar" style="height:85%;background:#ea5808"></div>
+                <div class="chart-bar" style="height:95%;background:#ea5808"></div>
+                <div class="chart-bar" style="height:70%;background:#ea5808"></div>
+                <div class="chart-bar" style="height:80%;background:#ea5808"></div>
+                <div class="chart-bar" style="height:60%;background:#ea5808"></div>
+                <div class="chart-bar" style="height:75%;background:#ea5808"></div>
+                <div class="chart-bar" style="height:85%;background:#ea5808"></div>
+                <div class="chart-bar" style="height:90%;background:#ea5808"></div>
+                <div class="chart-bar" style="height:100%;background:#ea5808"></div>
+                <div class="chart-bar" style="height:85%;background:#ea5808"></div>
+                <div class="chart-bar" style="height:90%;background:#ea5808"></div>
+                <div class="chart-bar" style="height:95%;background:#ea5808"></div>
+                <div class="chart-bar" style="height:80%;background:#ea5808"></div>
+                <div class="chart-bar" style="height:85%;background:#ea5808"></div>
+                <div class="chart-bar" style="height:75%;background:#ea5808"></div>
+                <div class="chart-bar" style="height:80%;background:#ea5808"></div>
+                <div class="chart-bar" style="height:90%;background:#ea5808"></div>
+                <div class="chart-bar" style="height:85%;background:#ea5808"></div>
+                <div class="chart-bar" style="height:95%;background:#ea5808"></div>
+              </div>
+              <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:10px;color:#52525b">
+                <span>Aug 1</span><span>Aug 10</span><span>Aug 20</span><span>Aug 30</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Category Donut -->
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <div class="panel-title">By Category</div>
+                <div class="panel-subtitle">Download distribution</div>
+              </div>
+            </div>
+            <div class="panel-body">
+              <div class="donut-chart">
+                <div class="donut-center">
+                  <div class="donut-value">45.2K</div>
+                  <div class="donut-label">Total</div>
+                </div>
+              </div>
+              <div class="donut-legend">
+                <div class="legend-item">
+                  <div class="legend-dot" style="background:#ea5808"></div>
+                  <span class="legend-label">Loops</span>
+                  <span class="legend-value">35%</span>
+                </div>
+                <div class="legend-item">
+                  <div class="legend-dot" style="background:#22c55e"></div>
+                  <span class="legend-label">One-Shots</span>
+                  <span class="legend-value">25%</span>
+                </div>
+                <div class="legend-item">
+                  <div class="legend-dot" style="background:#3b82f6"></div>
+                  <span class="legend-label">Presets</span>
+                  <span class="legend-value">20%</span>
+                </div>
+                <div class="legend-item">
+                  <div class="legend-dot" style="background:#eab308"></div>
+                  <span class="legend-label">Project Files</span>
+                  <span class="legend-value">10%</span>
+                </div>
+                <div class="legend-item">
+                  <div class="legend-dot" style="background:#71717a"></div>
+                  <span class="legend-label">Other</span>
+                  <span class="legend-value">10%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Table Grid -->
+        <div class="table-grid">
+          <!-- Top Assets -->
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <div class="panel-title">Top Assets</div>
+                <div class="panel-subtitle">By downloads</div>
+              </div>
+              <button class="btn btn-ghost" style="font-size:11px">View All →</button>
+            </div>
+            <div class="panel-body" style="padding:0">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Asset</th>
+                    <th>Downloads</th>
+                    <th>Revenue</th>
+                    <th>Trend</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <div class="asset-cell">
+                        <div class="asset-icon" style="background:rgba(234,88,8,0.12)">🎵</div>
+                        <div class="asset-name">Lo-Fi Drums</div>
+                      </div>
+                    </td>
+                    <td style="font-family:'JetBrains Mono',monospace">1,247</td>
+                    <td style="color:#22c55e;font-family:'JetBrains Mono',monospace">$2,147</td>
+                    <td>
+                      <div class="mini-chart">
+                        <div class="mini-bar" style="height:40%;background:#22c55e"></div>
+                        <div class="mini-bar" style="height:60%;background:#22c55e"></div>
+                        <div class="mini-bar" style="height:50%;background:#22c55e"></div>
+                        <div class="mini-bar" style="height:80%;background:#22c55e"></div>
+                        <div class="mini-bar" style="height:70%;background:#22c55e"></div>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="asset-cell">
+                        <div class="asset-icon" style="background:rgba(34,197,94,0.12)">🎵</div>
+                        <div class="asset-name">808 Bass Kit</div>
+                      </div>
+                    </td>
+                    <td style="font-family:'JetBrains Mono',monospace">892</td>
+                    <td style="color:#22c55e;font-family:'JetBrains Mono',monospace">$1,847</td>
+                    <td>
+                      <div class="mini-chart">
+                        <div class="mini-bar" style="height:50%;background:#22c55e"></div>
+                        <div class="mini-bar" style="height:65%;background:#22c55e"></div>
+                        <div class="mini-bar" style="height:55%;background:#22c55e"></div>
+                        <div class="mini-bar" style="height:75%;background:#22c55e"></div>
+                        <div class="mini-bar" style="height:85%;background:#22c55e"></div>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="asset-cell">
+                        <div class="asset-icon" style="background:rgba(59,130,246,0.12)">🎵</div>
+                        <div class="asset-name">Ambient Pads</div>
+                      </div>
+                    </td>
+                    <td style="font-family:'JetBrains Mono',monospace">654</td>
+                    <td style="color:#22c55e;font-family:'JetBrains Mono',monospace">$987</td>
+                    <td>
+                      <div class="mini-chart">
+                        <div class="mini-bar" style="height:60%;background:#22c55e"></div>
+                        <div class="mini-bar" style="height:50%;background:#22c55e"></div>
+                        <div class="mini-bar" style="height:70%;background:#22c55e"></div>
+                        <div class="mini-bar" style="height:60%;background:#22c55e"></div>
+                        <div class="mini-bar" style="height:75%;background:#22c55e"></div>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="asset-cell">
+                        <div class="asset-icon" style="background:rgba(234,179,8,0.12)">🎵</div>
+                        <div class="asset-name">Vinyl Classics</div>
+                      </div>
+                    </td>
+                    <td style="font-family:'JetBrains Mono',monospace">432</td>
+                    <td style="color:#22c55e;font-family:'JetBrains Mono',monospace">$864</td>
+                    <td>
+                      <div class="mini-chart">
+                        <div class="mini-bar" style="height:30%;background:#22c55e"></div>
+                        <div class="mini-bar" style="height:45%;background:#22c55e"></div>
+                        <div class="mini-bar" style="height:40%;background:#22c55e"></div>
+                        <div class="mini-bar" style="height:55%;background:#22c55e"></div>
+                        <div class="mini-bar" style="height:50%;background:#22c55e"></div>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Top Users -->
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <div class="panel-title">Top Users</div>
+                <div class="panel-subtitle">By activity</div>
+              </div>
+              <button class="btn btn-ghost" style="font-size:11px">View All →</button>
+            </div>
+            <div class="panel-body" style="padding:0">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>User</th>
+                    <th>Downloads</th>
+                    <th>Revenue</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <div class="asset-cell">
+                        <div class="asset-icon" style="background:#ea5808;border-radius:50%">P</div>
+                        <div class="asset-name">@producer1</div>
+                      </div>
+                    </td>
+                    <td style="font-family:'JetBrains Mono',monospace">1,247</td>
+                    <td style="color:#22c55e;font-family:'JetBrains Mono',monospace">$2,147</td>
+                    <td><span style="padding:2px 6px;background:rgba(34,197,94,0.12);color:#22c55e;border-radius:4px;font-size:9px;font-weight:600">ACTIVE</span></td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="asset-cell">
+                        <div class="asset-icon" style="background:#22c55e;border-radius:50%">R</div>
+                        <div class="asset-name">@reviewer</div>
+                      </div>
+                    </td>
+                    <td style="font-family:'JetBrains Mono',monospace">892</td>
+                    <td style="color:#22c55e;font-family:'JetBrains Mono',monospace">$1,847</td>
+                    <td><span style="padding:2px 6px;background:rgba(34,197,94,0.12);color:#22c55e;border-radius:4px;font-size:9px;font-weight:600">ACTIVE</span></td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="asset-cell">
+                        <div class="asset-icon" style="background:#3b82f6;border-radius:50%">M</div>
+                        <div class="asset-name">@mixmaster</div>
+                      </div>
+                    </td>
+                    <td style="font-family:'JetBrains Mono',monospace">654</td>
+                    <td style="color:#22c55e;font-family:'JetBrains Mono',monospace">$987</td>
+                    <td><span style="padding:2px 6px;background:rgba(34,197,94,0.12);color:#22c55e;border-radius:4px;font-size:9px;font-weight:600">ACTIVE</span></td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="asset-cell">
+                        <div class="asset-icon" style="background:#eab308;border-radius:50%">A</div>
+                        <div class="asset-name">@audioguy</div>
+                      </div>
+                    </td>
+                    <td style="font-family:'JetBrains Mono',monospace">432</td>
+                    <td style="color:#22c55e;font-family:'JetBrains Mono',monospace">$864</td>
+                    <td><span style="padding:2px 6px;background:#1a1a1a;color:#71717a;border-radius:4px;font-size:9px;font-weight:600">IDLE</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Device Chain -->
+      <div class="device-chain">
+        <span class="device-chain-label">Data Source:</span>
+        <div class="device active"><div class="led"></div> Analytics API</div>
+        <div class="device"><div class="led"></div> Database</div>
+        <div class="device"><div class="led"></div> Cache</div>
+        <div class="device-chain-spacer"></div>
+        <span class="device-chain-label">Last refresh:</span>
+        <div class="device"><div class="led"></div> 2 min ago</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

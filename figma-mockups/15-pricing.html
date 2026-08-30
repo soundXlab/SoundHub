@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <title>SoundHub — Pricing</title>
+  <link rel="stylesheet" href="design-system/shared.css">
+  <style>
+    body { display: flex; flex-direction: column; align-items: center; }
+    .pricing-hero { text-align: center; padding: 60px 40px 40px; max-width: 640px; }
+    .pricing-hero h1 { font-size: 40px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 12px; }
+    .pricing-hero p { font-size: 16px; color: var(--text-secondary); line-height: 1.6; }
+    .pricing-toggle { display: flex; align-items: center; gap: 12px; margin-bottom: 40px; }
+    .pricing-toggle span { font-size: 13px; color: var(--text-muted); }
+    .pricing-toggle span.active { color: var(--text-primary); font-weight: 600; }
+    .toggle-switch { width: 44px; height: 24px; background: var(--brand-primary); border-radius: 12px; position: relative; cursor: pointer; }
+    .toggle-switch::after { content: ''; position: absolute; top: 3px; right: 3px; width: 18px; height: 18px; background: white; border-radius: 50%; }
+    .pricing-grid { display: flex; gap: 24px; max-width: 1100px; padding: 0 40px 80px; }
+    .pricing-card {
+      flex: 1;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-xl);
+      padding: 32px;
+      display: flex; flex-direction: column;
+    }
+    .pricing-card.featured {
+      border-color: var(--brand-primary);
+      background: linear-gradient(180deg, rgba(139,92,246,0.08) 0%, var(--bg-surface) 40%);
+    }
+    .pricing-card .plan-name { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+    .pricing-card .plan-desc { font-size: 13px; color: var(--text-secondary); margin-bottom: 20px; }
+    .pricing-card .plan-price { font-size: 40px; font-weight: 800; margin-bottom: 4px; }
+    .pricing-card .plan-period { font-size: 13px; color: var(--text-muted); margin-bottom: 24px; }
+    .pricing-card .plan-features { list-style: none; margin-bottom: 24px; flex: 1; }
+    .pricing-card .plan-features li {
+      padding: 8px 0;
+      font-size: 13px;
+      color: var(--text-secondary);
+      display: flex; align-items: center; gap: 10px;
+      border-bottom: 1px solid var(--border-default);
+    }
+    .pricing-card .plan-features li:last-child { border-bottom: none; }
+    .pricing-card .plan-features li .check { color: var(--color-success); font-weight: 700; }
+    .popular-badge {
+      display: inline-flex;
+      padding: 4px 12px;
+      background: var(--brand-primary);
+      color: white;
+      border-radius: 12px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+    }
+    .pricing-nav { display: flex; align-items: center; gap: 24px; padding: 16px 40px; border-bottom: 1px solid var(--border-default); width: 100%; }
+    .pricing-nav .logo { font-size: 18px; font-weight: 800; color: var(--brand-accent); }
+    .pricing-nav .spacer { flex: 1; }
+    .pricing-nav a { font-size: 13px; color: var(--text-secondary); text-decoration: none; }
+    .pricing-nav a:hover { color: var(--text-primary); }
+    .faq-section { max-width: 700px; padding: 0 40px 80px; }
+    .faq-title { font-size: 24px; font-weight: 700; text-align: center; margin-bottom: 32px; }
+    .faq-item { border-bottom: 1px solid var(--border-default); padding: 16px 0; }
+    .faq-q { font-size: 14px; font-weight: 600; cursor: pointer; display: flex; justify-content: space-between; }
+    .faq-a { font-size: 13px; color: var(--text-secondary); margin-top: 8px; line-height: 1.6; }
+  </style>
+</head>
+<body>
+  <nav class="pricing-nav">
+    <span class="logo">🎵 SoundHub</span>
+    <span class="spacer"></span>
+    <a href="#">Features</a>
+    <a href="#">Docs</a>
+    <a href="#" style="font-weight:600;color:var(--text-primary)">Pricing</a>
+    <a href="#">Sign in</a>
+    <button class="btn btn-primary btn-sm">Get Started</button>
+  </nav>
+
+  <div class="pricing-hero">
+    <h1>Simple, transparent pricing</h1>
+    <p>Start free, upgrade when you need more. No hidden fees, cancel anytime.</p>
+  </div>
+
+  <div class="pricing-toggle">
+    <span class="active">Monthly</span>
+    <div class="toggle-switch"></div>
+    <span>Annual <span class="badge badge-success" style="font-size:9px;margin-left:4px">Save 20%</span></span>
+  </div>
+
+  <div class="pricing-grid">
+    <!-- Free -->
+    <div class="pricing-card">
+      <div class="plan-name">Free</div>
+      <div class="plan-desc">For getting started with personal projects</div>
+      <div class="plan-price">$0</div>
+      <div class="plan-period">Free forever</div>
+      <ul class="plan-features">
+        <li><span class="check">✓</span> 3 projects</li>
+        <li><span class="check">✓</span> 1 GB storage</li>
+        <li><span class="check">✓</span> 5 collaborators</li>
+        <li><span class="check">✓</span> Basic versioning</li>
+        <li><span class="check">✓</span> Audio CI (basic)</li>
+        <li><span class="check">✓</span> Public share links</li>
+      </ul>
+      <button class="btn btn-secondary" style="width:100%;justify-content:center">Get started free</button>
+    </div>
+
+    <!-- Pro -->
+    <div class="pricing-card featured">
+      <div class="popular-badge">Most Popular</div>
+      <div class="plan-name">Pro</div>
+      <div class="plan-desc">For serious producers and small studios</div>
+      <div class="plan-price">$19<span style="font-size:16px;font-weight:400;color:var(--text-muted)">/mo</span></div>
+      <div class="plan-period">Billed monthly · $15/mo billed annually</div>
+      <ul class="plan-features">
+        <li><span class="check">✓</span> Unlimited projects</li>
+        <li><span class="check">✓</span> 50 GB storage</li>
+        <li><span class="check">✓</span> 20 collaborators</li>
+        <li><span class="check">✓</span> Advanced versioning & branching</li>
+        <li><span class="check">✓</span> Full Audio CI</li>
+        <li><span class="check">✓</span> A/B comparison</li>
+        <li><span class="check">✓</span> Marketplace listing</li>
+        <li><span class="check">✓</span> Priority support</li>
+      </ul>
+      <button class="btn btn-primary" style="width:100%;justify-content:center">Start 14-day trial</button>
+    </div>
+
+    <!-- Studio -->
+    <div class="pricing-card">
+      <div class="plan-name">Studio</div>
+      <div class="plan-desc">For labels and professional studios</div>
+      <div class="plan-price">$49<span style="font-size:16px;font-weight:400;color:var(--text-muted)">/mo</span></div>
+      <div class="plan-period">Billed monthly · $39/mo billed annually</div>
+      <ul class="plan-features">
+        <li><span class="check">✓</span> Everything in Pro</li>
+        <li><span class="check">✓</span> 500 GB storage</li>
+        <li><span class="check">✓</span> Unlimited collaborators</li>
+        <li><span class="check">✓</span> Custom branding</li>
+        <li><span class="check">✓</span> API access</li>
+        <li><span class="check">✓</span> DAW integration (Max4Live, REAPER)</li>
+        <li><span class="check">✓</span> Webhook notifications</li>
+        <li><span class="check">✓</span> Dedicated support</li>
+      </ul>
+      <button class="btn btn-secondary" style="width:100%;justify-content:center">Contact sales</button>
+    </div>
+  </div>
+
+  <!-- FAQ -->
+  <div class="faq-section">
+    <div class="faq-title">Frequently Asked Questions</div>
+    <div class="faq-item">
+      <div class="faq-q">Can I switch plans later? <span>▾</span></div>
+      <div class="faq-a">Yes! You can upgrade or downgrade at any time. Changes take effect immediately, and we'll prorate the difference.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">What payment methods do you accept? <span>▾</span></div>
+      <div class="faq-a">We accept all major credit cards, MetaMask wallet, and bank transfers for Studio plans.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Is there a free trial for Pro? <span>▾</span></div>
+      <div class="faq-a">Yes! Pro comes with a 14-day free trial. No credit card required to start.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Do I keep my files if I downgrade? <span>▾</span></div>
+      <div class="faq-a">Yes, all your files remain accessible. You just won't be able to upload new ones beyond your plan's storage limit.</div>
+    </div>
+  </div>
+</body>
+</html>

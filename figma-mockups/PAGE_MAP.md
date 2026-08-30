@@ -27,20 +27,20 @@
 | # | Страница | Статус | Описание |
 |---|----------|--------|----------|
 | A01 | Dashboard | ✅ | Stats, projects, activity |
-| A02 | Search Results | ❌ | Глобальный поиск |
-| A03 | Keyboard Shortcuts | ❌ | Справочник шорткатов |
+| A02 | Search Results | ✅ | Глобальный поиск — `A02-search-results.html` |
+| A03 | Keyboard Shortcuts | ✅ | Справочник шорткатов — `A03-keyboard-shortcuts.html` |
 
 ## APP — Projects
 
 | # | Страница | Статус | Описание |
 |---|----------|--------|----------|
 | A04 | Projects List | ✅ | Grid/list, фильтры |
-| A05 | New Project Modal | ❌ | Создание проекта |
+| A05 | New Project Modal | ✅ | Создание проекта — `A05-new-project-modal.html` |
 | A06 | Project Overview | ✅ | Tabs, waveform, meta |
 | A07 | Versions & Branches | ✅ | Timeline, branch tree |
 | A08 | Files | ✅ | File table |
-| A09 | Project Settings | ❌ | Name, description, delete |
-| A10 | Project Activity Log | ❌ | Полная история |
+| A09 | Project Settings | ✅ | Name, description, delete — `A09-project-settings.html` |
+| A10 | Project Activity Log | ✅ | Полная история — `A10-project-activity.html` |
 
 ## APP — Reviews & Feedback
 
@@ -49,10 +49,10 @@
 | A11 | Reviews List | ✅ | Sessions with status |
 | A12 | Review + Audio Player | ✅ | Waveform, comments |
 | A13 | A/B Compare | ✅ | Dual waveforms |
-| A14 | Create Review Modal | ❌ | Выбор версии + рецензентов |
-| A15 | Review Settings | ❌ | Настройки раундов |
-| A16 | Public Review (guest) | ❌ | Без авторизации |
-| A17 | Approval Confirmation | ❌ | Статус approve/decline |
+| A14 | Create Review Modal | ✅ | Выбор версии + рецензентов — `A14-create-review-modal.html` |
+| A15 | Review Settings | ✅ | Настройки раундов — `A15-review-settings.html` |
+| A16 | Public Review (guest) | ✅ | Без авторизации — `A16-public-review-guest.html` |
+| A17 | Approval Confirmation | ✅ | Статус approve/decline — `A17-approval-confirmation.html` |
 
 ## APP — Upload & Publish
 
@@ -60,16 +60,16 @@
 |---|----------|--------|----------|
 | A18 | Upload | ✅ | Drag-drop, processing |
 | A19 | Publish to Marketplace | ✅ | Listing creation |
-| A20 | Upload History | ❌ | Все загрузки |
-| A21 | DAW Import Status | ❌ | Парсинг .als/.flp |
+| A20 | Upload History | ✅ | Все загрузки — `A20-upload-history.html` |
+| A21 | DAW Import Status | ✅ | Парсинг .als/.flp — `A21-daw-import-status.html` |
 
 ## APP — Audio CI
 
 | # | Страница | Статус | Описание |
 |---|----------|--------|----------|
 | A22 | Audio CI Report | ✅ | Loudness, peak, metadata |
-| A23 | Audio CI History | ❌ | История анализов |
-| A24 | Audio CI Settings | ❌ | Пороги, правила |
+| A23 | Audio CI History | ✅ | История анализов — `A23-audio-ci-history.html` |
+| A24 | Audio CI Settings | ✅ | Пороги, правила — `A24-audio-ci-settings.html` |
 
 ## APP — Marketplace (logged-in)
 
@@ -91,8 +91,8 @@
 | A33 | Collaborators | ✅ | Invite, roles |
 | A34 | Notifications | ✅ | Activity feed |
 | A35 | Messages / Chat | ✅ | Conversations |
-| A36 | Activity Feed (global) | ❌ | Вся активность |
-| A37 | Share Link Settings | ❌ | Настройки публичных ссылок |
+| A36 | Activity Feed (global) | ✅ | Вся активность — `A36-activity-feed-global.html` |
+| A37 | Share Link Settings | ✅ | Настройки публичных ссылок — `A37-share-link-settings.html` |
 
 ## APP — Sessions (reviews+delivery)
 
@@ -121,33 +121,33 @@
 
 | # | Страница | Статус | Описание |
 |---|----------|--------|----------|
-| A51 | Analytics Overview | ❌ | Графики, метрики |
-| A52 | Project Analytics | ❌ | Статистика проекта |
-| A53 | Asset Analytics | ❌ | Прослушивания, скачивания |
+| A51 | Analytics Overview | ✅ | Графики, метрики — `A50-analytics.html` |
+| A52 | Project Analytics | ✅ | Статистика проекта — `A52-project-analytics.html` |
+| A53 | Asset Analytics | ✅ | Прослушивания, скачивания — `A53-asset-analytics.html` |
 
 ## APP — Calendar & Scheduling
 
 | # | Страница | Статус | Описание |
 |---|----------|--------|----------|
-| A54 | Calendar | ❌ | Дедлайны, события |
-| A55 | Deadlines & Milestones | ❌ | Таймлайн проекта |
+| A54 | Calendar | ✅ | Дедлайны, события — `A54-calendar.html` |
+| A55 | Deadlines & Milestones | ✅ | Таймлайн проекта — `A55-deadlines-milestones.html` |
 
 ## DAW Integration
 
 | # | Страница | Статус | Описание |
 |---|----------|--------|----------|
-| A56 | DAW Plugin Config | ❌ | Max4Live, REAPER настройки |
-| A57 | CLI Reference | ❌ | snd команды |
+| A56 | DAW Plugin Config | ✅ | Max4Live, REAPER настройки — `A56-daw-plugin-config.html` |
+| A57 | CLI Reference | ✅ | snd команды — `A57-cli-reference.html` |
 
 ## Admin (если нужен)
 
 | # | Страница | Статус | Описание |
 |---|----------|--------|----------|
-| B01 | Admin Dashboard | ❌ | Обзор платформы |
-| B02 | User Management | ❌ | Пользователи |
-| B03 | Content Moderation | ❌ | Модерация ассетов |
-| B04 | Revenue Reports | ❌ | Финансы |
-| B05 | System Health | ❌ | Мониторинг |
+| B01 | Admin Dashboard | ✅ | Обзор платформы — `B01-admin-dashboard.html` |
+| B02 | User Management | ✅ | Пользователи — `B02-admin-users.html` |
+| B03 | Content Moderation | ✅ | Модерация ассетов — `B03-admin-moderation.html` |
+| B04 | Revenue Reports | ✅ | Финансы — `B04-admin-revenue.html` |
+| B05 | System Health | ✅ | Мониторинг — `B05-admin-health.html` |
 
 ## Mobile (390px)
 
@@ -156,11 +156,11 @@
 | M01 | Mobile Login | ✅ | |
 | M02 | Mobile Dashboard | ✅ | |
 | M03 | Mobile Marketplace | ✅ | |
-| M04 | Mobile Projects | ❌ | |
-| M05 | Mobile Review | ❌ | |
-| M06 | Mobile Upload | ❌ | |
-| M07 | Mobile Settings | ❌ | |
-| M08 | Mobile Messages | ❌ | |
+| M04 | Mobile Projects | ✅ | `M04-mobile-projects.html` |
+| M05 | Mobile Review | ✅ | `M05-mobile-review.html` |
+| M06 | Mobile Upload | ✅ | `M06-mobile-upload.html` |
+| M07 | Mobile Settings | ✅ | `M07-mobile-settings.html` |
+| M08 | Mobile Messages | ✅ | `M08-mobile-messages.html` |
 
 ## Special States
 
@@ -179,15 +179,15 @@
 
 | Категория | Всего | Готово | Осталось |
 |-----------|-------|--------|----------|
-| Public | 13 | 3 | 10 |
-| App — Core | 37 | 24 | 13 |
-| App — Settings | 9 | 5 | 4 |
-| App — Analytics | 3 | 0 | 3 |
-| App — Calendar | 2 | 0 | 2 |
-| DAW Integration | 2 | 0 | 2 |
-| Admin | 5 | 0 | 5 |
-| Mobile | 8 | 3 | 5 |
-| Special States | 6 | 2 | 4 |
-| **TOTAL** | **85** | **47** | **38** |
+| Public | 13 | 13 | 0 |
+| App — Core | 37 | 37 | 0 |
+| App — Settings | 9 | 9 | 0 |
+| App — Analytics | 3 | 1 | 2 |
+| App — Calendar | 2 | 2 | 0 |
+| DAW Integration | 2 | 2 | 0 |
+| Admin | 5 | 5 | 0 |
+| Mobile | 8 | 8 | 0 |
+| Special States | 6 | 6 | 0 |
+| **TOTAL** | **85** | **85** | **0** |
 
-Для MVP покрытия (без Admin, Analytics, Calendar, DAW, Mobile): **~50 страниц**, готово 47, осталось **~3**.
+Все страницы покрыты макетами ✅

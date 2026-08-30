@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <title>SoundHub — Mobile Mockups</title>
+  <link rel="stylesheet" href="design-system/shared.css">
+  <style>
+    body { background: var(--bg-primary); }
+    .mobile-grid {
+      display: flex;
+      gap: 32px;
+      padding: 40px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .mobile-frame {
+      width: 390px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: var(--shadow-lg);
+    }
+    .mobile-frame-label {
+      padding: 8px 16px;
+      background: var(--bg-elevated);
+      border-bottom: 1px solid var(--border-default);
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      text-align: center;
+    }
+    .mobile-screen {
+      width: 390px;
+      min-height: 693px;
+      background: var(--bg-primary);
+      position: relative;
+      overflow-y: auto;
+    }
+    .mobile-topbar {
+      height: 48px;
+      background: var(--bg-panel);
+      border-bottom: 1px solid var(--border-default);
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .mobile-topbar .logo {
+      font-size: 16px;
+      font-weight: 800;
+    }
+    .mobile-topbar .spacer { flex: 1; }
+    .mobile-topbar .icon-btn {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+    .mobile-content { padding: 16px; }
+    .mobile-nav {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 390px;
+      height: 56px;
+      background: var(--bg-panel);
+      border-top: 1px solid var(--border-default);
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      z-index: 20;
+    }
+    .mobile-nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      font-size: 9px;
+      color: var(--text-muted);
+    }
+    .mobile-nav-item.active { color: var(--brand-primary); }
+    .mobile-nav-item .nav-icon { font-size: 18px; }
+    /* Card styles for mobile */
+    .m-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      padding: 14px;
+      margin-bottom: 10px;
+    }
+    .m-stat-row {
+      display: flex; gap: 8px; margin-bottom: 12px;
+    }
+    .m-stat {
+      flex: 1;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      padding: 10px;
+      text-align: center;
+    }
+    .m-stat .val { font-size: 18px; font-weight: 800; }
+    .m-stat .lbl { font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    .m-project-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border-default);
+    }
+    .m-project-row:last-child { border-bottom: none; }
+    .m-project-icon {
+      width: 36px; height: 36px;
+      border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+    .m-filter-bar {
+      display: flex; gap: 6px;
+      overflow-x: auto;
+      padding: 0 0 8px;
+      margin-bottom: 12px;
+    }
+    .m-filter-chip {
+      flex-shrink: 0;
+      padding: 5px 10px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-default);
+      border-radius: 16px;
+      font-size: 11px;
+      color: var(--text-secondary);
+      white-space: nowrap;
+    }
+    .m-asset-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+    .m-asset-waveform {
+      height: 60px;
+      background: var(--bg-elevated);
+      display: flex;
+      align-items: end;
+      padding: 0 12px 10px;
+      gap: 2px;
+    }
+    .m-asset-body { padding: 10px 14px; }
+    h1.page-title {
+      font-size: 28px; font-weight: 800;
+      color: var(--text-primary); text-align: center;
+      padding: 40px 0 0; letter-spacing: -0.5px;
+    }
+    p.page-subtitle {
+      font-size: 14px; color: var(--text-secondary);
+      text-align: center; padding: 8px 0 24px;
+    }
+    /* Comment in mobile */
+    .m-comment {
+      display: flex; gap: 8px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border-default);
+    }
+    .m-comment-avatar {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; font-weight: 700; color: white;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+<body>
+  <h1 class="page-title">Mobile Views</h1>
+  <p class="page-subtitle">390px — iPhone 14 Pro dimensions</p>
+
+  <div class="mobile-grid">
+    <!-- Mobile Login -->
+    <div class="mobile-frame">
+      <div class="mobile-frame-label">Login</div>
+      <div class="mobile-screen" style="display:flex;align-items:center;justify-content:center;background:var(--bg-primary)">
+        <div style="width:100%;padding:24px;text-align:center">
+          <div style="width:56px;height:56px;background:var(--brand-gradient);border-radius:14px;display:inline-flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;color:white;margin-bottom:20px">S</div>
+          <h1 style="font-size:22px;font-weight:800;margin-bottom:4px">SoundHub</h1>
+          <p style="font-size:13px;color:var(--text-secondary);margin-bottom:28px">Sign in to your account</p>
+          <div style="display:flex;flex-direction:column;gap:12px;text-align:left">
+            <div class="form-group">
+              <label class="form-label">Email or Username</label>
+              <input class="form-input" placeholder="demo" value="demo">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Password</label>
+              <input class="form-input" type="password" placeholder="••••••••" value="••••••••">
+            </div>
+            <button class="btn btn-primary" style="width:100%;justify-content:center;padding:12px">Sign In</button>
+            <div style="display:flex;align-items:center;gap:12px;font-size:12px;color:var(--text-muted)">
+              <div style="flex:1;height:1px;background:var(--border-default)"></div>
+              or
+              <div style="flex:1;height:1px;background:var(--border-default)"></div>
+            </div>
+            <button class="btn" style="width:100%;justify-content:center;padding:12px;background:var(--bg-elevated);border:1px solid #F6851B;color:#F6851B;font-weight:600">🦊 Sign in with Wallet</button>
+            <p style="text-align:center;font-size:12px;color:var(--text-muted);margin-top:8px">Don't have an account? <span style="color:var(--brand-primary)">Create one</span></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Dashboard -->
+    <div class="mobile-frame">
+      <div class="mobile-frame-label">Dashboard</div>
+      <div class="mobile-screen">
+        <div class="mobile-topbar">
+          <span class="logo">🎵 SoundHub</span>
+          <span class="spacer"></span>
+          <span class="icon-btn">🔔</span>
+          <span class="icon-btn" style="width:28px;height:28px;border-radius:50%;background:var(--brand-gradient);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:white">P</span>
+        </div>
+        <div class="mobile-content">
+          <div style="margin-bottom:16px">
+            <h2 style="font-size:18px;font-weight:700">Welcome back 👋</h2>
+            <p style="font-size:12px;color:var(--text-secondary)">3 active projects, 2 pending reviews</p>
+          </div>
+          <div class="m-stat-row">
+            <div class="m-stat"><div class="val">12</div><div class="lbl">Projects</div></div>
+            <div class="m-stat"><div class="val">5</div><div class="lbl">Reviews</div></div>
+            <div class="m-stat"><div class="val">48</div><div class="lbl">Assets</div></div>
+          </div>
+          <div style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px">Recent Projects</div>
+          <div class="m-card" style="padding:0">
+            <div class="m-project-row" style="padding:10px 14px">
+              <div class="m-project-icon" style="background:rgba(139,92,246,0.12);color:var(--brand-primary)">🎵</div>
+              <div style="flex:1"><div style="font-size:13px;font-weight:600">Neon Warehouse</div><div style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono)">v13 · 128 BPM</div></div>
+              <span class="badge badge-success" style="font-size:9px">Ready</span>
+            </div>
+            <div class="m-project-row" style="padding:10px 14px">
+              <div class="m-project-icon" style="background:rgba(234,179,8,0.12);color:var(--color-warning)">🎵</div>
+              <div style="flex:1"><div style="font-size:13px;font-weight:600">Midnight Run</div><div style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono)">v7 · 140 BPM</div></div>
+              <span class="badge badge-warning" style="font-size:9px">Review</span>
+            </div>
+            <div class="m-project-row" style="padding:10px 14px;border-bottom:none">
+              <div class="m-project-icon" style="background:rgba(59,130,246,0.12);color:var(--color-info)">🎵</div>
+              <div style="flex:1"><div style="font-size:13px;font-weight:600">Crystal Echo</div><div style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono)">v1 · 90 BPM</div></div>
+              <span class="badge badge-muted" style="font-size:9px">Draft</span>
+            </div>
+          </div>
+        </div>
+        <div class="mobile-nav">
+          <div class="mobile-nav-item active"><span class="nav-icon">📊</span>Home</div>
+          <div class="mobile-nav-item"><span class="nav-icon">📁</span>Projects</div>
+          <div class="mobile-nav-item"><span class="nav-icon">🛒</span>Shop</div>
+          <div class="mobile-nav-item"><span class="nav-icon">💬</span>Reviews</div>
+          <div class="mobile-nav-item"><span class="nav-icon">👤</span>Profile</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Marketplace -->
+    <div class="mobile-frame">
+      <div class="mobile-frame-label">Marketplace</div>
+      <div class="mobile-screen">
+        <div class="mobile-topbar">
+          <span class="logo">🎵 SoundHub</span>
+          <span class="spacer"></span>
+          <span class="icon-btn">🔍</span>
+        </div>
+        <div class="mobile-content">
+          <h2 style="font-size:18px;font-weight:700;margin-bottom:12px">Marketplace</h2>
+          <input class="form-input" placeholder="🔍 Search assets..." style="width:100%;margin-bottom:12px">
+          <div class="m-filter-bar">
+            <div class="m-filter-chip" style="background:rgba(139,92,246,0.12);border-color:var(--brand-primary);color:var(--brand-primary)">All</div>
+            <div class="m-filter-chip">Lo-fi</div>
+            <div class="m-filter-chip">Drums</div>
+            <div class="m-filter-chip">Synth</div>
+            <div class="m-filter-chip">Bass</div>
+            <div class="m-filter-chip">Free</div>
+          </div>
+          <!-- Asset Cards -->
+          <div class="m-asset-card">
+            <div class="m-asset-waveform">
+              <div style="flex:1;background:var(--brand-primary);height:40%;border-radius:1px;opacity:0.5"></div>
+              <div style="flex:1;background:var(--brand-primary);height:70%;border-radius:1px;opacity:0.5"></div>
+              <div style="flex:1;background:var(--brand-primary);height:50%;border-radius:1px;opacity:0.5"></div>
+              <div style="flex:1;background:var(--brand-primary);height:85%;border-radius:1px;opacity:0.5"></div>
+              <div style="flex:1;background:var(--brand-primary);height:60%;border-radius:1px;opacity:0.5"></div>
+              <div style="flex:1;background:var(--brand-primary);height:45%;border-radius:1px;opacity:0.5"></div>
+              <div style="flex:1;background:var(--brand-primary);height:75%;border-radius:1px;opacity:0.5"></div>
+              <div style="flex:1;background:var(--brand-primary);height:55%;border-radius:1px;opacity:0.5"></div>
+            </div>
+            <div class="m-asset-body">
+              <div style="display:flex;justify-content:space-between;align-items:start">
+                <div>
+                  <div style="font-size:13px;font-weight:600">Lo-Fi Drums Pack</div>
+                  <div style="font-size:10px;color:var(--text-muted)">by @producer1 · WAV 24bit</div>
+                </div>
+                <div style="font-size:14px;font-weight:700;color:var(--color-success)">Free</div>
+              </div>
+              <div style="display:flex;gap:4px;margin-top:6px">
+                <span class="badge badge-purple" style="font-size:9px">lo-fi</span>
+                <span class="badge badge-muted" style="font-size:9px">drums</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+                <span style="font-size:11px;color:var(--color-warning)">★ 4.8 (124)</span>
+                <button class="btn btn-primary btn-sm">Download</button>
+              </div>
+            </div>
+          </div>
+          <div class="m-asset-card">
+            <div class="m-asset-waveform">
+              <div style="flex:1;background:var(--brand-secondary);height:30%;border-radius:1px;opacity:0.5"></div>
+              <div style="flex:1;background:var(--brand-secondary);height:60%;border-radius:1px;opacity:0.5"></div>
+              <div style="flex:1;background:var(--brand-secondary);height:45%;border-radius:1px;opacity:0.5"></div>
+              <div style="flex:1;background:var(--brand-secondary);height:80%;border-radius:1px;opacity:0.5"></div>
+              <div style="flex:1;background:var(--brand-secondary);height:55%;border-radius:1px;opacity:0.5"></div>
+              <div style="flex:1;background:var(--brand-secondary);height:65%;border-radius:1px;opacity:0.5"></div>
+              <div style="flex:1;background:var(--brand-secondary);height:40%;border-radius:1px;opacity:0.5"></div>
+              <div style="flex:1;background:var(--brand-secondary);height:50%;border-radius:1px;opacity:0.5"></div>
+            </div>
+            <div class="m-asset-body">
+              <div style="display:flex;justify-content:space-between;align-items:start">
+                <div>
+                  <div style="font-size:13px;font-weight:600">Ambient Pad Textures</div>
+                  <div style="font-size:10px;color:var(--text-muted)">by @soundartist · WAV 16bit</div>
+                </div>
+                <div style="font-size:14px;font-weight:700;color:var(--brand-accent)">$4.99</div>
+              </div>
+              <div style="display:flex;gap:4px;margin-top:6px">
+                <span class="badge badge-purple" style="font-size:9px">ambient</span>
+                <span class="badge badge-muted" style="font-size:9px">pads</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+                <span style="font-size:11px;color:var(--color-warning)">★ 4.6 (87)</span>
+                <button class="btn btn-primary btn-sm">Buy $4.99</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="mobile-nav">
+          <div class="mobile-nav-item"><span class="nav-icon">📊</span>Home</div>
+          <div class="mobile-nav-item"><span class="nav-icon">📁</span>Projects</div>
+          <div class="mobile-nav-item active"><span class="nav-icon">🛒</span>Shop</div>
+          <div class="mobile-nav-item"><span class="nav-icon">💬</span>Reviews</div>
+          <div class="mobile-nav-item"><span class="nav-icon">👤</span>Profile</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" 
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     viewBox="0 0 1440 1069" 
+     width="1440" 
+     height="1069">
+  <foreignObject width="100%" height="100%">
+    <div xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html><html lang="en"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <title>SoundHub — Upload</title>
+  <link rel="stylesheet" href="design-system/shared.css">
+  <style>
+    .upload-layout {
+      display: grid; grid-template-columns: 1fr 380px; gap: 24px;
+    }
+    .upload-form-card { background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: var(--radius-lg); }
+    .upload-form-body { padding: 24px; }
+    .file-list { margin-top: 16px; }
+    .file-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 16px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      margin-bottom: 8px;
+    }
+    .file-icon {
+      width: 36px; height: 36px;
+      background: rgba(139,92,246,0.12);
+      border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+    }
+    .file-info { flex: 1; }
+    .file-name { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+    .file-meta { font-size: 11px; color: var(--text-muted); font-family: var(--font-mono); }
+    .file-status { font-size: 11px; }
+    .processing-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      position: sticky; top: 20px;
+    }
+    .processing-card .card-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border-default);
+    }
+    .step-progress {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border-default);
+    }
+    .step-progress:last-child { border-bottom: none; }
+    .step-num {
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700;
+      flex-shrink: 0;
+    }
+    .step-num.done { background: var(--color-success); color: white; }
+    .step-num.active { background: var(--brand-primary); color: white; animation: pulse 1.5s infinite; }
+    .step-num.pending { background: var(--bg-elevated); color: var(--text-muted); border: 1px solid var(--border-default); }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
+    .step-info { flex: 1; }
+    .step-title { font-size: 13px; font-weight: 500; color: var(--text-primary); }
+    .step-detail { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .overall-progress {
+      padding: 16px 20px;
+      border-top: 1px solid var(--border-default);
+    }
+    .progress-label {
+      display: flex; justify-content: space-between;
+      font-size: 12px; margin-bottom: 8px;
+    }
+    .visibility-options {
+      display: flex; gap: 8px; margin-top: 4px;
+    }
+    .vis-option {
+      flex: 1; padding: 10px;
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-sm);
+      text-align: center;
+      font-size: 12px; font-weight: 500;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .vis-option.active {
+      border-color: var(--brand-primary);
+      background: rgba(139,92,246,0.08);
+      color: var(--brand-primary);
+    }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-logo"><div class="logo-icon">S</div><div class="logo-text">SoundHub</div></div>
+      <nav class="sidebar-nav">
+        <div class="sidebar-section-label">Main</div>
+        <a class="sidebar-item" href="#"><span class="icon">📊</span> Dashboard</a>
+        <a class="sidebar-item" href="#"><span class="icon">📁</span> Projects</a>
+        <a class="sidebar-item" href="#"><span class="icon">🛒</span> Marketplace</a>
+        <a class="sidebar-item active" href="#"><span class="icon">⬆️</span> Upload</a>
+        <div class="sidebar-section-label">Workspace</div>
+        <a class="sidebar-item" href="#"><span class="icon">💬</span> Reviews</a>
+        <div class="sidebar-section-label">Account</div>
+        <a class="sidebar-item" href="#"><span class="icon">⚙️</span> Settings</a>
+      </nav>
+      <div class="sidebar-footer"><a class="sidebar-item" href="#"><span class="icon">❓</span> Help</a></div>
+    </aside>
+    <div class="main-content">
+      <header class="topbar">
+        <div style="font-size:14px;font-weight:600">Upload Project</div>
+        <div class="topbar-right"><div class="topbar-avatar">P</div></div>
+      </header>
+      <div class="page">
+        <div class="upload-layout">
+          <!-- Left: Upload Form -->
+          <div>
+            <!-- Drop Zone -->
+            <div class="upload-form-card" style="margin-bottom:20px">
+              <div class="upload-form-body">
+                <div class="upload-zone">
+                  <div class="upload-icon">📁</div>
+                  <div class="upload-text">Drag &amp; drop your DAW project or stems here</div>
+                  <div class="upload-subtext">Supported: .als, .flp, .cpr, .rpp, .LogicX, .wav, .aiff, .flac</div>
+                  <button class="btn btn-secondary" style="margin-top:16px">Browse files</button>
+                </div>
+
+                <div class="file-list">
+                  <div class="file-item">
+                    <div class="file-icon">🎵</div>
+                    <div class="file-info">
+                      <div class="file-name">neon_warehouse_mixdown.wav</div>
+                      <div class="file-meta">WAV · 24bit · 44.1kHz · Stereo · 28.7 MB</div>
+                    </div>
+                    <span class="badge badge-success">Uploaded</span>
+                  </div>
+                  <div class="file-item">
+                    <div class="file-icon">🎵</div>
+                    <div class="file-info">
+                      <div class="file-name">neon_warehouse_stems.zip</div>
+                      <div class="file-meta">ZIP · 4 tracks · 124.3 MB</div>
+                    </div>
+                    <span class="badge badge-success">Uploaded</span>
+                  </div>
+                  <div class="file-item">
+                    <div class="file-icon">📋</div>
+                    <div class="file-info">
+                      <div class="file-name">neon_warehouse.als</div>
+                      <div class="file-meta">Ableton Live 12 · 3.2 MB</div>
+                    </div>
+                    <span class="badge badge-success">Parsed</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Project Details -->
+            <div class="upload-form-card">
+              <div class="upload-form-body">
+                <h3 style="font-size:14px;font-weight:600;margin-bottom:16px">Project Details</h3>
+                <div style="display:flex;flex-direction:column;gap:16px">
+                  <div class="form-group">
+                    <label class="form-label">Project Name</label>
+                    <input class="form-input" value="Neon Warehouse" placeholder="Enter project name">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <input class="form-input" value="First single from EP — deep house meets lo-fi" placeholder="Describe your project">
+                  </div>
+                  <div class="grid-3">
+                    <div class="form-group">
+                      <label class="form-label">Genre</label>
+                      <select class="form-select"><option>Electronic</option></select>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">BPM</label>
+                      <input class="form-input" value="128">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Key</label>
+                      <input class="form-input" value="F# minor">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Visibility</label>
+                    <div class="visibility-options">
+                      <div class="vis-option active">🔒 Private</div>
+                      <div class="vis-option">🌐 Public</div>
+                      <div class="vis-option">🔗 Unlisted</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Processing Status -->
+          <div class="processing-card">
+            <div class="card-header">
+              <span class="card-title">Processing Status</span>
+              <span class="badge badge-warning">In Progress</span>
+            </div>
+            <div class="step-progress">
+              <div class="step-num done">✓</div>
+              <div class="step-info">
+                <div class="step-title">Uploading files</div>
+                <div class="step-detail">Complete — 156.2 MB</div>
+              </div>
+            </div>
+            <div class="step-progress">
+              <div class="step-num done">✓</div>
+              <div class="step-info">
+                <div class="step-title">Verifying hash</div>
+                <div class="step-detail">SHA-256 verified</div>
+              </div>
+            </div>
+            <div class="step-progress">
+              <div class="step-num active">3</div>
+              <div class="step-info">
+                <div class="step-title">Parsing DAW file</div>
+                <div class="step-detail">Analyzing project structure...</div>
+              </div>
+            </div>
+            <div class="step-progress">
+              <div class="step-num pending">4</div>
+              <div class="step-info">
+                <div class="step-title">Generating waveform</div>
+                <div class="step-detail">Queued</div>
+              </div>
+            </div>
+            <div class="step-progress">
+              <div class="step-num pending">5</div>
+              <div class="step-info">
+                <div class="step-title">Audio checks</div>
+                <div class="step-detail">Queued</div>
+              </div>
+            </div>
+            <div class="overall-progress">
+              <div class="progress-label">
+                <span style="color:var(--text-secondary)">Overall progress</span>
+                <span style="color:var(--brand-primary);font-weight:600">45%</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" style="width:45%"></div>
+              </div>
+              <div style="margin-top:12px;font-size:12px;color:var(--text-muted);text-align:center">
+                You can leave this page. We'll notify you when it's ready.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+</body></html>
+    </div>
+  </foreignObject>
+</svg>

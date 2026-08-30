@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <title>SoundHub — Review Settings</title>
+  <link rel="stylesheet" href="design-system/shared.css">
+  <style>
+    .settings-section {
+      background: var(--bg-surface); border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg); padding: 24px; margin-bottom: 16px;
+    }
+    .settings-section-title { font-size: 15px; font-weight: 700; margin-bottom: 16px; }
+    .setting-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 0; border-bottom: 1px solid var(--border-default);
+    }
+    .setting-row:last-child { border-bottom: none; }
+    .setting-label { font-size: 13px; font-weight: 600; }
+    .setting-desc { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .toggle {
+      width: 40px; height: 22px; border-radius: 11px; background: var(--bg-elevated);
+      border: 1px solid var(--border-default); position: relative; cursor: pointer;
+    }
+    .toggle.active { background: var(--brand-primary); border-color: var(--brand-primary); }
+    .toggle::after {
+      content: ''; position: absolute; width: 16px; height: 16px;
+      border-radius: 50%; background: #fff; top: 2px; left: 2px; transition: all 0.15s;
+    }
+    .toggle.active::after { left: 20px; }
+    .threshold-bar {
+      display: flex; align-items: center; gap: 8px;
+    }
+    .threshold-input {
+      width: 60px; padding: 6px 10px; background: var(--bg-elevated);
+      border: 1px solid var(--border-default); border-radius: var(--radius-sm);
+      font-size: 12px; font-family: var(--font-mono); text-align: center;
+      color: var(--text-primary);
+    }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-logo"><div class="logo-icon">S</div><div class="logo-text">SoundHub</div></div>
+      <nav class="sidebar-nav">
+        <div class="sidebar-section-label">Main</div>
+        <a class="sidebar-item" href="#"><span class="icon">📊</span> Dashboard</a>
+        <a class="sidebar-item" href="#"><span class="icon">📁</span> Projects</a>
+        <a class="sidebar-section-label">Workspace</div>
+        <a class="sidebar-item active" href="#"><span class="icon">💬</span> Reviews</a>
+        <a class="sidebar-item" href="#"><span class="icon">📋</span> Sessions</a>
+        <div class="sidebar-section-label">Account</div>
+        <a class="sidebar-item" href="#"><span class="icon">⚙️</span> Settings</a>
+      </nav>
+    </aside>
+    <div class="main-content">
+      <header class="topbar">
+        <div class="topbar-search"><span class="search-icon">🔍</span><input type="text" placeholder="Search..."></div>
+        <div class="topbar-right"><div class="topbar-icon-btn">🔔<span class="notif-dot"></span></div><div class="topbar-avatar">P</div></div>
+      </header>
+      <div class="page">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
+          <div>
+            <h1 class="page-title" style="margin-bottom:4px">Review Settings</h1>
+            <p class="page-subtitle">Configure review sessions, rounds, and approval rules</p>
+          </div>
+          <button class="btn btn-primary">💾 Save Changes</button>
+        </div>
+
+        <div class="settings-section">
+          <div class="settings-section-title">Review Rounds</div>
+          <div class="setting-row">
+            <div><div class="setting-label">Default max rounds</div><div class="setting-desc">Number of review rounds before auto-close</div></div>
+            <select class="form-select" style="width:120px"><option>1</option><option>2</option><option selected>3</option><option>5</option><option>Unlimited</option></select>
+          </div>
+          <div class="setting-row">
+            <div><div class="setting-label">Require approval each round</div><div class="setting-desc">All reviewers must approve before advancing</div></div>
+            <div class="toggle active"></div>
+          </div>
+          <div class="setting-row">
+            <div><div class="setting-label">Auto-close on deadline</div><div class="setting-desc">Automatically close session when deadline passes</div></div>
+            <div class="toggle active"></div>
+          </div>
+          <div class="setting-row">
+            <div><div class="setting-label">Default deadline</div><div class="setting-desc">Auto-set deadline for new sessions</div></div>
+            <select class="form-select" style="width:140px"><option>No deadline</option><option>3 days</option><option selected>7 days</option><option>14 days</option><option>30 days</option></select>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <div class="settings-section-title">Comments & Feedback</div>
+          <div class="setting-row">
+            <div><div class="setting-label">Timestamped comments</div><div class="setting-desc">Allow reviewers to pin comments to specific timestamps</div></div>
+            <div class="toggle active"></div>
+          </div>
+          <div class="setting-row">
+            <div><div class="setting-label">Anonymous feedback</div><div class="setting-desc">Hide reviewer identities from each other</div></div>
+            <div class="toggle"></div>
+          </div>
+          <div class="setting-row">
+            <div><div class="setting-label">Require comment on decline</div><div class="setting-desc">Reviewers must explain when declining a version</div></div>
+            <div class="toggle active"></div>
+          </div>
+          <div class="setting-row">
+            <div><div class="setting-label">Minimum comments per round</div><div class="setting-desc">Require at least N comments before approval</div></div>
+            <input class="threshold-input" type="number" value="2" min="0" max="20">
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <div class="settings-section-title">Permissions</div>
+          <div class="setting-row">
+            <div><div class="setting-label">Who can create sessions</div><div class="setting-desc">Control who can start review sessions</div></div>
+            <select class="form-select" style="width:180px"><option selected>Project owner</option><option>Owner & collaborators</option><option>Anyone with access</option></select>
+          </div>
+          <div class="setting-row">
+            <div><div class="setting-label">Who can approve versions</div><div class="setting-desc">Control who has approval power</div></div>
+            <select class="form-select" style="width:180px"><option selected>Project owner only</option><option>Designated reviewers</option><option>All participants</option></select>
+          </div>
+          <div class="setting-row">
+            <div><div class="setting-label">Allow version upload in review</div><div class="setting-desc">Let creators upload new versions during active review</div></div>
+            <div class="toggle active"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

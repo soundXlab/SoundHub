@@ -1,0 +1,616 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" 
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     viewBox="0 0 1440 900" 
+     width="1440" 
+     height="900">
+  <foreignObject width="100%" height="100%">
+    <div xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html><html lang="en"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <title>SoundHub — Dashboard v2 (DAW Style)</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', -apple-system, sans-serif; background: #0d0d0d; color: #e4e4e7; overflow: hidden; height: 100vh; }
+
+    /* ── Transport Bar ── */
+    .transport-bar {
+      height: 40px; background: #111113; border-bottom: 1px solid #27272a;
+      display: flex; align-items: center; padding: 0 12px; gap: 16px;
+      font-size: 11px; user-select: none;
+    }
+    .transport-logo { font-weight: 800; font-size: 13px; color: #ea5808; letter-spacing: -0.5px; }
+    .transport-logo span { color: #e4e4e7; }
+    .transport-divider { width: 1px; height: 20px; background: #27272a; }
+    .transport-group { display: flex; align-items: center; gap: 6px; }
+    .transport-label { color: #71717a; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .transport-value {
+      background: #0d0d0d; border: 1px solid #27272a; border-radius: 4px;
+      padding: 2px 8px; font-family: 'JetBrains Mono', monospace; font-size: 12px;
+      color: #22c55e; font-weight: 600; min-width: 60px; text-align: center;
+    }
+    .transport-spacer { flex: 1; }
+    .transport-time {
+      font-family: 'JetBrains Mono', monospace; font-size: 18px; font-weight: 700;
+      color: #e4e4e7; letter-spacing: 1px;
+    }
+
+    /* ── Main Layout ── */
+    .app-body { display: flex; height: calc(100vh - 40px); }
+
+    /* ── Left Sidebar ── */
+    .sidebar {
+      width: 240px; background: #111113; border-right: 1px solid #27272a;
+      display: flex; flex-direction: column; user-select: none;
+    }
+    .sidebar-search { padding: 8px; border-bottom: 1px solid #27272a; }
+    .sidebar-search input {
+      width: 100%; background: #0d0d0d; border: 1px solid #27272a; border-radius: 4px;
+      padding: 6px 8px 6px 28px; font-size: 11px; color: #e4e4e7; outline: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: 8px center;
+    }
+    .sidebar-search input::placeholder { color: #52525b; }
+    .sidebar-nav { flex: 1; overflow-y: auto; padding: 4px 0; }
+    .sidebar-section { padding: 8px 12px 4px; font-size: 9px; color: #52525b; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+    .sidebar-item {
+      padding: 6px 12px; font-size: 11px; font-weight: 500; color: #a1a1aa;
+      cursor: pointer; display: flex; align-items: center; gap: 8px;
+      border-left: 2px solid transparent; transition: all 0.1s;
+    }
+    .sidebar-item:hover { color: #e4e4e7; }
+    .sidebar-item.active { color: #ea5808; background: rgba(234,88,8,0.08); border-left-color: #ea5808; }
+    .sidebar-item .icon { width: 16px; text-align: center; }
+    .sidebar-badge {
+      margin-left: auto; background: #ea5808; color: #fff;
+      font-size: 9px; padding: 1px 5px; border-radius: 8px;
+    }
+
+    /* ── Content Area ── */
+    .content { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
+
+    /* ── Header ── */
+    .page-header {
+      padding: 16px 24px; border-bottom: 1px solid #27272a;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .page-title { font-size: 18px; font-weight: 700; color: #e4e4e7; }
+    .page-title span { color: #71717a; font-weight: 400; font-size: 14px; margin-left: 8px; }
+    .header-actions { display: flex; gap: 8px; }
+    .btn {
+      padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 600;
+      cursor: pointer; border: 1px solid #27272a; transition: all 0.15s;
+    }
+    .btn-primary { background: #ea5808; color: #fff; border-color: #ea5808; }
+    .btn-primary:hover { background: #c2410c; }
+    .btn-secondary { background: #1a1a1a; color: #e4e4e7; }
+    .btn-secondary:hover { background: #27272a; }
+    .btn-ghost { background: transparent; color: #71717a; border-color: transparent; }
+    .btn-ghost:hover { color: #e4e4e7; background: #1a1a1a; }
+
+    /* ── Dashboard Grid ── */
+    .dashboard-content {
+      flex: 1; overflow-y: auto; padding: 20px 24px;
+    }
+
+    /* ── Quick Stats ── */
+    .quick-stats {
+      display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px;
+      margin-bottom: 20px;
+    }
+    .stat-card {
+      background: #111113; border: 1px solid #27272a; border-radius: 8px;
+      padding: 16px; position: relative; overflow: hidden;
+    }
+    .stat-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0;
+      height: 3px;
+    }
+    .stat-card.orange::before { background: #ea5808; }
+    .stat-card.green::before { background: #22c55e; }
+    .stat-card.blue::before { background: #3b82f6; }
+    .stat-card.yellow::before { background: #eab308; }
+    .stat-card.purple::before { background: #a855f7; }
+    .stat-label { font-size: 10px; color: #71717a; text-transform: uppercase; letter-spacing: 0.5px; }
+    .stat-value {
+      font-size: 24px; font-weight: 700; color: #e4e4e7;
+      font-family: 'JetBrains Mono', monospace; margin-top: 4px;
+    }
+    .stat-change {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 2px 6px; border-radius: 4px; font-size: 10px;
+      font-weight: 600; margin-top: 8px;
+    }
+    .stat-change.up { background: rgba(34,197,94,0.12); color: #22c55e; }
+    .stat-change.down { background: rgba(239,68,68,0.12); color: #ef4444; }
+
+    /* ── Main Grid ── */
+    .main-grid {
+      display: grid; grid-template-columns: 2fr 1fr; gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    /* ── Projects Panel ── */
+    .panel {
+      background: #111113; border: 1px solid #27272a; border-radius: 8px;
+      overflow: hidden;
+    }
+    .panel-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 16px; border-bottom: 1px solid #27272a;
+    }
+    .panel-title { font-size: 13px; font-weight: 700; color: #e4e4e7; }
+    .panel-subtitle { font-size: 10px; color: #52525b; }
+    .panel-body { padding: 12px 16px; }
+
+    /* ── Project Item ── */
+    .project-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px; background: #0d0d0d; border: 1px solid #27272a;
+      border-radius: 6px; margin-bottom: 8px; cursor: pointer;
+      transition: all 0.15s;
+    }
+    .project-item:hover { border-color: #3f3f46; }
+    .project-item:last-child { margin-bottom: 0; }
+    .project-icon {
+      width: 40px; height: 40px; border-radius: 6px;
+      display: flex; align-items: center; justify-content: center; font-size: 18px;
+    }
+    .project-info { flex: 1; min-width: 0; }
+    .project-name { font-size: 12px; font-weight: 600; color: #e4e4e7; }
+    .project-meta { font-size: 10px; color: #71717a; margin-top: 2px; }
+    .project-status {
+      padding: 3px 8px; border-radius: 4px; font-size: 10px;
+      font-weight: 600; text-transform: uppercase; flex-shrink: 0;
+    }
+    .status-ready { background: rgba(34,197,94,0.12); color: #22c55e; }
+    .status-review { background: rgba(234,179,8,0.12); color: #eab308; }
+    .status-draft { background: #1a1a1a; color: #71717a; }
+    .status-released { background: rgba(59,130,246,0.12); color: #3b82f6; }
+    .project-waveform {
+      display: flex; align-items: flex-end; gap: 1px; height: 24px; width: 80px;
+    }
+    .mini-bar { flex: 1; border-radius: 1px; }
+
+    /* ── Activity Panel ── */
+    .activity-list { display: flex; flex-direction: column; gap: 10px; }
+    .activity-item {
+      display: flex; gap: 10px; font-size: 11px;
+    }
+    .activity-avatar {
+      width: 28px; height: 28px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; font-weight: 700; color: #fff; flex-shrink: 0;
+    }
+    .activity-content { flex: 1; }
+    .activity-text { color: #a1a1aa; }
+    .activity-text strong { color: #e4e4e7; font-weight: 600; }
+    .activity-time { font-size: 10px; color: #52525b; margin-top: 2px; }
+
+    /* ── Bottom Grid ── */
+    .bottom-grid {
+      display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px;
+    }
+
+    /* ── Chart Placeholder ── */
+    .chart-placeholder {
+      height: 120px; background: #0d0d0d; border: 1px solid #27272a;
+      border-radius: 6px; display: flex; align-items: flex-end;
+      padding: 12px; gap: 4px;
+    }
+    .chart-bar {
+      flex: 1; border-radius: 2px 2px 0 0; transition: height 0.3s;
+    }
+
+    /* ── Recent Files ── */
+    .file-list { display: flex; flex-direction: column; gap: 6px; }
+    .file-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px; background: #0d0d0d; border: 1px solid #27272a;
+      border-radius: 4px; font-size: 11px;
+    }
+    .file-icon { font-size: 14px; }
+    .file-name { flex: 1; color: #a1a1aa; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .file-size { color: #52525b; font-family: 'JetBrains Mono', monospace; font-size: 10px; }
+
+    /* ── Quick Actions ── */
+    .quick-actions { display: flex; flex-direction: column; gap: 6px; }
+    .quick-action {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px; background: #0d0d0d; border: 1px solid #27272a;
+      border-radius: 6px; cursor: pointer; transition: all 0.15s;
+    }
+    .quick-action:hover { border-color: #3f3f46; }
+    .quick-action-icon {
+      width: 32px; height: 32px; background: #1a1a1a; border-radius: 6px;
+      display: flex; align-items: center; justify-content: center; font-size: 14px;
+    }
+    .quick-action-title { font-size: 11px; font-weight: 600; color: #e4e4e7; }
+    .quick-action-desc { font-size: 10px; color: #52525b; }
+
+    /* ── Device Chain (Bottom) ── */
+    .device-chain {
+      height: 60px; background: #111113; border-top: 1px solid #27272a;
+      display: flex; align-items: center; padding: 0 16px; gap: 8px;
+    }
+    .device {
+      padding: 6px 12px; background: #0d0d0d; border: 1px solid #27272a;
+      border-radius: 4px; font-size: 10px; color: #a1a1aa;
+      display: flex; align-items: center; gap: 6px; cursor: pointer;
+      transition: all 0.1s;
+    }
+    .device:hover { border-color: #3f3f46; color: #e4e4e7; }
+    .device.active { border-color: #ea5808; color: #ea5808; background: rgba(234,88,8,0.08); }
+    .device .led { width: 6px; height: 6px; border-radius: 50%; background: #27272a; }
+    .device.active .led { background: #22c55e; box-shadow: 0 0 6px rgba(34,197,94,0.5); }
+    .device-chain-spacer { flex: 1; }
+    .device-chain-label {
+      font-size: 9px; color: #52525b; text-transform: uppercase;
+      letter-spacing: 0.5px; font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <!-- Transport Bar -->
+  <div class="transport-bar">
+    <div class="transport-logo">Sound<span>Hub</span></div>
+    <div class="transport-divider"></div>
+    <div class="transport-group">
+      <span class="transport-label">Projects</span>
+      <div class="transport-value">12</div>
+    </div>
+    <div class="transport-group">
+      <span class="transport-label">Versions</span>
+      <div class="transport-value">847</div>
+    </div>
+    <div class="transport-group">
+      <span class="transport-label">Storage</span>
+      <div class="transport-value">2.3 GB</div>
+    </div>
+    <div class="transport-spacer"></div>
+    <div class="transport-time">DASHBOARD</div>
+    <div class="transport-divider"></div>
+    <div class="transport-group">
+      <span class="transport-label">CPU</span>
+      <div class="transport-value">12%</div>
+    </div>
+    <div class="transport-group">
+      <span class="transport-label">RAM</span>
+      <div class="transport-value">4.2 GB</div>
+    </div>
+  </div>
+
+  <div class="app-body">
+    <!-- Left Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-search">
+        <input type="text" placeholder="Search projects...">
+      </div>
+      <div class="sidebar-nav">
+        <div class="sidebar-section">Main</div>
+        <div class="sidebar-item active"><span class="icon">📊</span> Dashboard</div>
+        <div class="sidebar-item"><span class="icon">📁</span> Projects <span class="sidebar-badge">12</span></div>
+        <div class="sidebar-item"><span class="icon">🛒</span> Marketplace</div>
+        <div class="sidebar-item"><span class="icon">⬆️</span> Upload</div>
+        <div class="sidebar-section">Workspace</div>
+        <div class="sidebar-item"><span class="icon">💬</span> Reviews <span class="sidebar-badge">8</span></div>
+        <div class="sidebar-item"><span class="icon">📋</span> Sessions <span class="sidebar-badge">3</span></div>
+        <div class="sidebar-item"><span class="icon">🔔</span> Notifications <span style="margin-left:auto;background:#ea5808;color:#fff;font-size:9px;padding:1px 5px;border-radius:8px">5</span></div>
+        <div class="sidebar-section">Account</div>
+        <div class="sidebar-item"><span class="icon">⚙️</span> Settings</div>
+        <div class="sidebar-item"><span class="icon">📊</span> Analytics</div>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+      <!-- Page Header -->
+      <div class="page-header">
+        <div class="page-title">Good evening, scatter <span>👋</span></div>
+        <div class="header-actions">
+          <button class="btn btn-ghost">📥 Import</button>
+          <button class="btn btn-ghost">📋 Templates</button>
+          <button class="btn btn-primary">+ New Project</button>
+        </div>
+      </div>
+
+      <!-- Dashboard Content -->
+      <div class="dashboard-content">
+        <!-- Quick Stats -->
+        <div class="quick-stats">
+          <div class="stat-card orange">
+            <div class="stat-label">Projects</div>
+            <div class="stat-value">12</div>
+            <div class="stat-change up">↑ +2 this week</div>
+          </div>
+          <div class="stat-card green">
+            <div class="stat-label">Downloads</div>
+            <div class="stat-value">12.4K</div>
+            <div class="stat-change up">↑ +847 this month</div>
+          </div>
+          <div class="stat-card blue">
+            <div class="stat-label">Reviews</div>
+            <div class="stat-value">8</div>
+            <div class="stat-change down">↓ 3 pending</div>
+          </div>
+          <div class="stat-card yellow">
+            <div class="stat-label">Revenue</div>
+            <div class="stat-value">$2.1K</div>
+            <div class="stat-change up">↑ +$340 this month</div>
+          </div>
+          <div class="stat-card purple">
+            <div class="stat-label">Streak</div>
+            <div class="stat-value">14d</div>
+            <div class="stat-change up">🔥 Personal best!</div>
+          </div>
+        </div>
+
+        <!-- Main Grid -->
+        <div class="main-grid">
+          <!-- Recent Projects -->
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <div class="panel-title">Recent Projects</div>
+                <div class="panel-subtitle">Last 7 days</div>
+              </div>
+              <button class="btn btn-ghost" style="font-size:11px">View All →</button>
+            </div>
+            <div class="panel-body">
+              <div class="project-item">
+                <div class="project-icon" style="background:linear-gradient(135deg,rgba(234,88,8,0.2),rgba(59,130,246,0.2))">🎵</div>
+                <div class="project-info">
+                  <div class="project-name">Neon Warehouse</div>
+                  <div class="project-meta">v3.2 · Master · 4.1 GB</div>
+                </div>
+                <div class="project-waveform">
+                  <div class="mini-bar" style="height:60%;background:#ea5808"></div>
+                  <div class="mini-bar" style="height:80%;background:#ea5808"></div>
+                  <div class="mini-bar" style="height:45%;background:#ea5808"></div>
+                  <div class="mini-bar" style="height:90%;background:#ea5808"></div>
+                  <div class="mini-bar" style="height:70%;background:#ea5808"></div>
+                  <div class="mini-bar" style="height:55%;background:#ea5808"></div>
+                  <div class="mini-bar" style="height:85%;background:#ea5808"></div>
+                  <div class="mini-bar" style="height:40%;background:#ea5808"></div>
+                  <div class="mini-bar" style="height:75%;background:#ea5808"></div>
+                  <div class="mini-bar" style="height:65%;background:#ea5808"></div>
+                </div>
+                <div class="project-status status-ready">Ready</div>
+              </div>
+
+              <div class="project-item">
+                <div class="project-icon" style="background:linear-gradient(135deg,rgba(34,197,94,0.2),rgba(6,182,212,0.2))">🎵</div>
+                <div class="project-info">
+                  <div class="project-name">Midnight Run</div>
+                  <div class="project-meta">v2.1 · Vocal Mix · 1.8 GB</div>
+                </div>
+                <div class="project-waveform">
+                  <div class="mini-bar" style="height:30%;background:#22c55e"></div>
+                  <div class="mini-bar" style="height:50%;background:#22c55e"></div>
+                  <div class="mini-bar" style="height:70%;background:#22c55e"></div>
+                  <div class="mini-bar" style="height:45%;background:#22c55e"></div>
+                  <div class="mini-bar" style="height:80%;background:#22c55e"></div>
+                  <div class="mini-bar" style="height:55%;background:#22c55e"></div>
+                  <div class="mini-bar" style="height:65%;background:#22c55e"></div>
+                  <div class="mini-bar" style="height:40%;background:#22c55e"></div>
+                  <div class="mini-bar" style="height:75%;background:#22c55e"></div>
+                  <div class="mini-bar" style="height:35%;background:#22c55e"></div>
+                </div>
+                <div class="project-status status-review">In Review</div>
+              </div>
+
+              <div class="project-item">
+                <div class="project-icon" style="background:linear-gradient(135deg,rgba(234,179,8,0.2),rgba(234,88,8,0.2))">🎵</div>
+                <div class="project-info">
+                  <div class="project-name">Crystal Echo</div>
+                  <div class="project-meta">v1.0 · Draft · 950 MB</div>
+                </div>
+                <div class="project-waveform">
+                  <div class="mini-bar" style="height:50%;background:#eab308"></div>
+                  <div class="mini-bar" style="height:70%;background:#eab308"></div>
+                  <div class="mini-bar" style="height:40%;background:#eab308"></div>
+                  <div class="mini-bar" style="height:60%;background:#eab308"></div>
+                  <div class="mini-bar" style="height:80%;background:#eab308"></div>
+                  <div class="mini-bar" style="height:55%;background:#eab308"></div>
+                  <div class="mini-bar" style="height:65%;background:#eab308"></div>
+                  <div class="mini-bar" style="height:45%;background:#eab308"></div>
+                  <div class="mini-bar" style="height:75%;background:#eab308"></div>
+                  <div class="mini-bar" style="height:50%;background:#eab308"></div>
+                </div>
+                <div class="project-status status-draft">Draft</div>
+              </div>
+
+              <div class="project-item">
+                <div class="project-icon" style="background:linear-gradient(135deg,rgba(59,130,246,0.2),rgba(139,92,246,0.2))">🎵</div>
+                <div class="project-info">
+                  <div class="project-name">Summer Drums</div>
+                  <div class="project-meta">v4.0 · Released · 3.2 GB</div>
+                </div>
+                <div class="project-waveform">
+                  <div class="mini-bar" style="height:90%;background:#3b82f6"></div>
+                  <div class="mini-bar" style="height:95%;background:#3b82f6"></div>
+                  <div class="mini-bar" style="height:85%;background:#3b82f6"></div>
+                  <div class="mini-bar" style="height:100%;background:#3b82f6"></div>
+                  <div class="mini-bar" style="height:80%;background:#3b82f6"></div>
+                  <div class="mini-bar" style="height:95%;background:#3b82f6"></div>
+                  <div class="mini-bar" style="height:90%;background:#3b82f6"></div>
+                  <div class="mini-bar" style="height:100%;background:#3b82f6"></div>
+                  <div class="mini-bar" style="height:85%;background:#3b82f6"></div>
+                  <div class="mini-bar" style="height:90%;background:#3b82f6"></div>
+                </div>
+                <div class="project-status status-released">Released</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Activity Panel -->
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <div class="panel-title">Activity</div>
+                <div class="panel-subtitle">Today</div>
+              </div>
+            </div>
+            <div class="panel-body">
+              <div class="activity-list">
+                <div class="activity-item">
+                  <div class="activity-avatar" style="background:#22c55e">R</div>
+                  <div class="activity-content">
+                    <div class="activity-text"><strong>@reviewer</strong> approved <strong>Summer Drums</strong></div>
+                    <div class="activity-time">15 min ago</div>
+                  </div>
+                </div>
+                <div class="activity-item">
+                  <div class="activity-avatar" style="background:#eab308">A</div>
+                  <div class="activity-content">
+                    <div class="activity-text"><strong>@audioguy</strong> commented on <strong>Neon Warehouse</strong></div>
+                    <div class="activity-time">45 min ago</div>
+                  </div>
+                </div>
+                <div class="activity-item">
+                  <div class="activity-avatar" style="background:#ea5808">P</div>
+                  <div class="activity-content">
+                    <div class="activity-text"><strong>@producer1</strong> uploaded <strong>v3.2</strong> to Neon Warehouse</div>
+                    <div class="activity-time">2 hours ago</div>
+                  </div>
+                </div>
+                <div class="activity-item">
+                  <div class="activity-avatar" style="background:#3b82f6">M</div>
+                  <div class="activity-content">
+                    <div class="activity-text"><strong>@mixmaster</strong> started session on <strong>Midnight Run</strong></div>
+                    <div class="activity-time">3 hours ago</div>
+                  </div>
+                </div>
+                <div class="activity-item">
+                  <div class="activity-avatar" style="background:#a855f7">L</div>
+                  <div class="activity-content">
+                    <div class="activity-text"><strong>@lofimaster</strong> published <strong>Chillhop Beats</strong></div>
+                    <div class="activity-time">5 hours ago</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom Grid -->
+        <div class="bottom-grid">
+          <!-- Downloads Chart -->
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <div class="panel-title">Downloads</div>
+                <div class="panel-subtitle">Last 7 days</div>
+              </div>
+            </div>
+            <div class="panel-body">
+              <div class="chart-placeholder">
+                <div class="chart-bar" style="height:40%;background:#ea5808"></div>
+                <div class="chart-bar" style="height:60%;background:#ea5808"></div>
+                <div class="chart-bar" style="height:45%;background:#ea5808"></div>
+                <div class="chart-bar" style="height:80%;background:#ea5808"></div>
+                <div class="chart-bar" style="height:55%;background:#ea5808"></div>
+                <div class="chart-bar" style="height:70%;background:#ea5808"></div>
+                <div class="chart-bar" style="height:90%;background:#ea5808"></div>
+              </div>
+              <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:10px;color:#52525b">
+                <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Files -->
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <div class="panel-title">Recent Files</div>
+                <div class="panel-subtitle">Last 24 hours</div>
+              </div>
+            </div>
+            <div class="panel-body">
+              <div class="file-list">
+                <div class="file-item">
+                  <span class="file-icon">🎵</span>
+                  <span class="file-name">neon-warehouse-master.wav</span>
+                  <span class="file-size">4.1 GB</span>
+                </div>
+                <div class="file-item">
+                  <span class="file-icon">🎵</span>
+                  <span class="file-name">midnight-run-vocal.wav</span>
+                  <span class="file-size">1.8 GB</span>
+                </div>
+                <div class="file-item">
+                  <span class="file-icon">🎵</span>
+                  <span class="file-name">summer-drums-stems.zip</span>
+                  <span class="file-size">3.2 GB</span>
+                </div>
+                <div class="file-item">
+                  <span class="file-icon">🎵</span>
+                  <span class="file-name">crystal-echo-draft.wav</span>
+                  <span class="file-size">950 MB</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Actions -->
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <div class="panel-title">Quick Actions</div>
+              </div>
+            </div>
+            <div class="panel-body">
+              <div class="quick-actions">
+                <div class="quick-action">
+                  <div class="quick-action-icon">📁</div>
+                  <div>
+                    <div class="quick-action-title">New Project</div>
+                    <div class="quick-action-desc">Start from scratch</div>
+                  </div>
+                </div>
+                <div class="quick-action">
+                  <div class="quick-action-icon">⬆️</div>
+                  <div>
+                    <div class="quick-action-title">Upload Asset</div>
+                    <div class="quick-action-desc">Add to marketplace</div>
+                  </div>
+                </div>
+                <div class="quick-action">
+                  <div class="quick-action-icon">💬</div>
+                  <div>
+                    <div class="quick-action-title">Start Review</div>
+                    <div class="quick-action-desc">Get feedback</div>
+                  </div>
+                </div>
+                <div class="quick-action">
+                  <div class="quick-action-icon">📦</div>
+                  <div>
+                    <div class="quick-action-title">Release Package</div>
+                    <div class="quick-action-desc">Publish to platforms</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Device Chain -->
+      <div class="device-chain">
+        <span class="device-chain-label">System:</span>
+        <div class="device active"><div class="led"></div> CPU: 12%</div>
+        <div class="device active"><div class="led"></div> RAM: 4.2 GB</div>
+        <div class="device"><div class="led"></div> Disk: 2.3 / 10 GB</div>
+        <div class="device-chain-spacer"></div>
+        <span class="device-chain-label">Last sync:</span>
+        <div class="device"><div class="led"></div> 2 min ago</div>
+      </div>
+    </div>
+  </div>
+
+</body></html>
+    </div>
+  </foreignObject>
+</svg>

@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <title>SoundHub — A/B Compare</title>
+  <link rel="stylesheet" href="design-system/shared.css">
+  <style>
+    .compare-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 24px;
+    }
+    .compare-versions {
+      display: flex; gap: 16px;
+    }
+    .version-panel {
+      flex: 1;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+    .version-panel-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border-default);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .version-label {
+      font-size: 14px; font-weight: 700;
+    }
+    .version-label.a { color: var(--brand-primary); }
+    .version-label.b { color: var(--brand-secondary); }
+    .version-stats {
+      display: flex; gap: 20px;
+      padding: 16px 20px;
+      border-top: 1px solid var(--border-default);
+    }
+    .stat-item {
+      display: flex; flex-direction: column; gap: 2px;
+    }
+    .stat-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    .stat-value { font-size: 14px; font-weight: 600; font-family: var(--font-mono); }
+    .crossfade-section {
+      padding: 20px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      margin-top: 16px;
+    }
+    .crossfade-slider {
+      display: flex; align-items: center; gap: 16px;
+      margin-top: 12px;
+    }
+    .slider-track {
+      flex: 1; height: 6px;
+      background: var(--border-default);
+      border-radius: 3px;
+      position: relative;
+    }
+    .slider-fill {
+      position: absolute; left: 0; top: 0; bottom: 0;
+      width: 50%;
+      border-radius: 3px;
+    }
+    .slider-fill.a { background: var(--brand-primary); }
+    .slider-fill.b { background: var(--brand-secondary); margin-left: 50%; }
+    .slider-thumb {
+      position: absolute;
+      top: 50%; transform: translate(-50%, -50%);
+      width: 16px; height: 16px;
+      background: white;
+      border-radius: 50%;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
+    .diff-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 11px; font-weight: 600;
+      font-family: var(--font-mono);
+    }
+    .diff-badge.positive { background: rgba(34,197,94,0.12); color: var(--color-success); }
+    .diff-badge.negative { background: rgba(239,68,68,0.12); color: var(--color-error); }
+    .diff-badge.neutral { background: var(--bg-elevated); color: var(--text-secondary); }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-logo"><div class="logo-icon">S</div><div class="logo-text">SoundHub</div></div>
+      <nav class="sidebar-nav">
+        <div class="sidebar-section-label">Main</div>
+        <a class="sidebar-item" href="#"><span class="icon">📊</span> Dashboard</a>
+        <a class="sidebar-item" href="#"><span class="icon">📁</span> Projects</a>
+        <a class="sidebar-item" href="#"><span class="icon">🛒</span> Marketplace</a>
+        <div class="sidebar-section-label">Workspace</div>
+        <a class="sidebar-item active" href="#"><span class="icon">💬</span> Reviews</a>
+        <a class="sidebar-item" href="#"><span class="icon">📋</span> Sessions</a>
+        <div class="sidebar-section-label">Account</div>
+        <a class="sidebar-item" href="#"><span class="icon">⚙️</span> Settings</a>
+      </nav>
+      <div class="sidebar-footer"><a class="sidebar-item" href="#"><span class="icon">❓</span> Help</a></div>
+    </aside>
+    <div class="main-content">
+      <header class="topbar">
+        <div style="display:flex;align-items:center;gap:12px">
+          <a href="#" style="color:var(--text-muted);text-decoration:none;font-size:13px">← Review v13</a>
+          <span style="color:var(--text-muted)">/</span>
+          <span style="font-size:14px;font-weight:600">A/B Compare</span>
+        </div>
+        <div class="topbar-right"><div class="topbar-avatar">P</div></div>
+      </header>
+      <div class="page">
+        <div class="compare-header">
+          <div>
+            <h1 class="page-title">A/B Version Compare</h1>
+            <p class="page-subtitle">Neon Warehouse · v12 vs v13</p>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-ghost">← Back to Review</button>
+            <button class="btn btn-primary">Download Both</button>
+          </div>
+        </div>
+
+        <div class="compare-versions">
+          <!-- Version A -->
+          <div class="version-panel">
+            <div class="version-panel-header">
+              <div class="version-label a">A: v12</div>
+              <span class="badge badge-success">Approved</span>
+            </div>
+            <div class="card-body">
+              <div class="waveform-controls">
+                <div class="waveform-play-btn" style="background:var(--brand-primary)">▶</div>
+                <span class="waveform-time">0:00</span>
+                <div class="waveform-progress"><div class="waveform-progress-fill" style="width:42%"></div></div>
+                <span class="waveform-time">3:42</span>
+              </div>
+              <div class="waveform-canvas" style="background:var(--bg-elevated);border-radius:var(--radius-md);padding:8px">
+                <svg viewBox="0 0 500 80" preserveAspectRatio="none" style="width:100%;height:64px">
+                  <defs><linearGradient id="wgA" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#8B5CF6" stop-opacity="0.8"/><stop offset="100%" stop-color="#8B5CF6" stop-opacity="0.2"/></linearGradient></defs>
+                  <path d="M0,40 Q25,20 50,40 Q75,60 100,40 Q125,15 150,40 Q175,65 200,40 Q225,25 250,40 Q275,55 300,40 Q325,10 350,40 Q375,70 400,40 Q425,20 450,40 Q475,60 500,40" fill="none" stroke="url(#wgA)" stroke-width="2"/>
+                </svg>
+              </div>
+            </div>
+            <div class="version-stats">
+              <div class="stat-item"><span class="stat-label">LUFS</span><span class="stat-value" style="color:var(--brand-primary)">-14.5</span></div>
+              <div class="stat-item"><span class="stat-label">True Peak</span><span class="stat-value">-0.8 dBFS</span></div>
+              <div class="stat-item"><span class="stat-label">Duration</span><span class="stat-value">3:42</span></div>
+              <div class="stat-item"><span class="stat-label">Size</span><span class="stat-value">28.7 MB</span></div>
+            </div>
+          </div>
+
+          <!-- Version B -->
+          <div class="version-panel">
+            <div class="version-panel-header">
+              <div class="version-label b">B: v13</div>
+              <span class="badge badge-warning">In Review</span>
+            </div>
+            <div class="card-body">
+              <div class="waveform-controls">
+                <div class="waveform-play-btn" style="background:var(--brand-secondary)">▶</div>
+                <span class="waveform-time">0:00</span>
+                <div class="waveform-progress"><div class="waveform-progress-fill" style="width:42%;background:var(--brand-secondary)"></div></div>
+                <span class="waveform-time">3:42</span>
+              </div>
+              <div class="waveform-canvas" style="background:var(--bg-elevated);border-radius:var(--radius-md);padding:8px">
+                <svg viewBox="0 0 500 80" preserveAspectRatio="none" style="width:100%;height:64px">
+                  <defs><linearGradient id="wgB" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#06B6D4" stop-opacity="0.8"/><stop offset="100%" stop-color="#06B6D4" stop-opacity="0.2"/></linearGradient></defs>
+                  <path d="M0,40 Q25,15 50,40 Q75,65 100,40 Q125,10 150,40 Q175,70 200,40 Q225,20 250,40 Q275,60 300,40 Q325,15 350,40 Q375,65 400,40 Q425,25 450,40 Q475,55 500,40" fill="none" stroke="url(#wgB)" stroke-width="2"/>
+                </svg>
+              </div>
+            </div>
+            <div class="version-stats">
+              <div class="stat-item"><span class="stat-label">LUFS</span><span class="stat-value" style="color:var(--brand-secondary)">-14.2</span></div>
+              <div class="stat-item"><span class="stat-label">True Peak</span><span class="stat-value">-1.2 dBFS</span></div>
+              <div class="stat-item"><span class="stat-label">Duration</span><span class="stat-value">3:42</span></div>
+              <div class="stat-item"><span class="stat-label">Size</span><span class="stat-value">29.1 MB</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Crossfade Control -->
+        <div class="crossfade-section">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div style="font-size:14px;font-weight:600">Crossfade</div>
+            <div style="display:flex;gap:16px">
+              <div class="diff-badge neutral">Δ LUFS: <span class="diff-badge positive" style="margin-left:4px">+0.3 dB</span></div>
+              <div class="diff-badge neutral">Δ Peak: <span class="diff-badge negative" style="margin-left:4px">-0.4 dB</span></div>
+            </div>
+          </div>
+          <div class="crossfade-slider">
+            <span style="font-size:12px;font-weight:600;color:var(--brand-primary)">A: v12</span>
+            <div class="slider-track">
+              <div class="slider-fill a"></div>
+              <div class="slider-thumb" style="left:50%"></div>
+            </div>
+            <span style="font-size:12px;font-weight:600;color:var(--brand-secondary)">B: v13</span>
+          </div>
+          <div style="text-align:center;margin-top:8px;font-size:11px;color:var(--text-muted)">
+            Play to hear the transition between versions
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,378 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 3200" width="1440" height="3200">
+  <defs>
+    <linearGradient id="heroGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8B5CF6;stop-opacity:0.15"/>
+      <stop offset="100%" style="stop-color:#06B6D4;stop-opacity:0.08"/>
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#8B5CF6"/>
+      <stop offset="100%" style="stop-color:#06B6D4"/>
+    </linearGradient>
+    <linearGradient id="waveGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#8B5CF6;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#06B6D4;stop-opacity:0.6"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="40" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1440" height="3200" fill="#0A0A0B"/>
+
+  <!-- Navigation Bar -->
+  <rect width="1440" height="64" fill="#0A0A0B" opacity="0.95"/>
+  <line x1="0" y1="64" x2="1440" y2="64" stroke="#1F1F23" stroke-width="1"/>
+  <!-- Logo -->
+  <text x="48" y="40" font-family="Inter, -apple-system, sans-serif" font-size="20" font-weight="800" fill="#FFFFFF">🎵 SoundHub</text>
+  <!-- Nav links -->
+  <text x="620" y="40" font-family="Inter, sans-serif" font-size="14" font-weight="500" fill="#A1A1AA">Features</text>
+  <text x="720" y="40" font-family="Inter, sans-serif" font-size="14" font-weight="500" fill="#A1A1AA">Pricing</text>
+  <text x="810" y="40" font-family="Inter, sans-serif" font-size="14" font-weight="500" fill="#A1A1AA">Docs</text>
+  <text x="890" y="40" font-family="Inter, sans-serif" font-size="14" font-weight="500" fill="#A1A1AA">Blog</text>
+  <!-- CTA buttons -->
+  <rect x="1120" y="20" width="120" height="36" rx="8" fill="none" stroke="#3F3F46" stroke-width="1"/>
+  <text x="1155" y="43" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#E4E4E7">Sign in</text>
+  <rect x="1260" y="20" width="140" height="36" rx="8" fill="#8B5CF6"/>
+  <text x="1285" y="43" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#FFFFFF">Start Free →</text>
+
+  <!-- Hero Section -->
+  <rect x="0" y="64" width="1440" height="700" fill="url(#heroGrad)"/>
+  <!-- Glow orb -->
+  <circle cx="720" cy="300" r="300" fill="#8B5CF6" opacity="0.06" filter="url(#glow)"/>
+  <circle cx="900" cy="400" r="250" fill="#06B6D4" opacity="0.04" filter="url(#glow)"/>
+
+  <!-- Hero text -->
+  <text x="720" y="260" text-anchor="middle" font-family="Inter, sans-serif" font-size="14" font-weight="600" fill="#8B5CF6" letter-spacing="2">VERSION CONTROL FOR MUSIC</text>
+  <text x="720" y="340" text-anchor="middle" font-family="Inter, -apple-system, sans-serif" font-size="64" font-weight="900" fill="#FFFFFF" letter-spacing="-2">Stop sending ZIPs.</text>
+  <text x="720" y="410" text-anchor="middle" font-family="Inter, -apple-system, sans-serif" font-size="64" font-weight="900" fill="#FFFFFF" letter-spacing="-2">Start pushing tracks.</text>
+  <text x="720" y="470" text-anchor="middle" font-family="Inter, sans-serif" font-size="20" font-weight="400" fill="#A1A1AA" letter-spacing="-0.2">Push from Ableton, REAPER, FL Studio. Review with timestamped notes.</text>
+  <text x="720" y="500" text-anchor="middle" font-family="Inter, sans-serif" font-size="20" font-weight="400" fill="#A1A1AA">Compare versions with smart diffs. Approve masters — all in one place.</text>
+
+  <!-- CTA buttons -->
+  <rect x="600" y="540" width="240" height="52" rx="12" fill="#8B5CF6"/>
+  <text x="645" y="572" font-family="Inter, sans-serif" font-size="16" font-weight="700" fill="#FFFFFF">Get Started Free</text>
+  <text x="800" y="572" font-family="Inter, sans-serif" font-size="16" fill="#FFFFFF">→</text>
+  <rect x="860" y="540" width="180" height="52" rx="12" fill="none" stroke="#3F3F46" stroke-width="1.5"/>
+  <text x="900" y="572" font-family="Inter, sans-serif" font-size="16" font-weight="600" fill="#E4E4E7">Watch Demo</text>
+
+  <!-- Hero UI Mockup -->
+  <rect x="160" y="640" width="1120" height="400" rx="16" fill="#111113" stroke="#27272A" stroke-width="1"/>
+  <!-- Window chrome -->
+  <rect x="160" y="640" width="1120" height="40" rx="16" fill="#18181B"/>
+  <rect x="160" y="664" width="1120" height="16" fill="#18181B"/>
+  <circle cx="186" y="658" r="6" fill="#EF4444"/>
+  <circle cx="208" cy="658" r="6" fill="#EAB308"/>
+  <circle cx="230" cy="658" r="6" fill="#22C55E"/>
+  <text x="720" y="666" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="500" fill="#71717A">Neon Bloom v3.2 — Review Session</text>
+
+  <!-- Sidebar -->
+  <rect x="160" y="680" width="220" height="360" fill="#141416"/>
+  <line x1="380" y1="680" x2="380" y2="1040" stroke="#27272A" stroke-width="1"/>
+  <text x="180" y="710" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#52525B" letter-spacing="1">PROJECTS</text>
+  <rect x="175" y="720" width="190" height="32" rx="6" fill="#8B5CF6" opacity="0.12"/>
+  <text x="195" y="741" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#8B5CF6">♪ Neon Bloom</text>
+  <text x="195" y="775" font-family="Inter, sans-serif" font-size="13" font-weight="500" fill="#A1A1AA">♪ Midnight Drive</text>
+  <text x="195" y="805" font-family="Inter, sans-serif" font-size="13" font-weight="500" fill="#A1A1AA">♪ Solar Wind</text>
+  <text x="195" y="835" font-family="Inter, sans-serif" font-size="13" font-weight="500" fill="#A1A1AA">♪ Urban Pulse</text>
+
+  <!-- Main content area - Waveform -->
+  <rect x="400" y="690" width="860" height="200" rx="12" fill="#18181B" stroke="#27272A" stroke-width="1"/>
+  <!-- Waveform bars -->
+  <g transform="translate(420, 720)">
+    <rect x="0" y="60" width="4" height="40" rx="2" fill="#3F3F46"/>
+    <rect x="8" y="45" width="4" height="70" rx="2" fill="#3F3F46"/>
+    <rect x="16" y="30" width="4" height="100" rx="2" fill="#3F3F46"/>
+    <rect x="24" y="40" width="4" height="80" rx="2" fill="#3F3F46"/>
+    <rect x="32" y="20" width="4" height="120" rx="2" fill="#3F3F46"/>
+    <rect x="40" y="10" width="4" height="140" rx="2" fill="url(#waveGrad)"/>
+    <rect x="48" y="5" width="4" height="150" rx="2" fill="url(#waveGrad)"/>
+    <rect x="56" y="15" width="4" height="130" rx="2" fill="url(#waveGrad)"/>
+    <rect x="64" y="8" width="4" height="144" rx="2" fill="url(#waveGrad)"/>
+    <rect x="72" y="25" width="4" height="110" rx="2" fill="#3F3F46"/>
+    <rect x="80" y="35" width="4" height="90" rx="2" fill="#3F3F46"/>
+    <rect x="88" y="20" width="4" height="120" rx="2" fill="url(#waveGrad)"/>
+    <rect x="96" y="30" width="4" height="100" rx="2" fill="#3F3F46"/>
+    <rect x="104" y="45" width="4" height="70" rx="2" fill="#3F3F46"/>
+    <rect x="112" y="55" width="4" height="50" rx="2" fill="#3F3F46"/>
+    <rect x="120" y="40" width="4" height="80" rx="2" fill="#3F3F46"/>
+    <rect x="128" y="25" width="4" height="110" rx="2" fill="url(#waveGrad)"/>
+    <rect x="136" y="15" width="4" height="130" rx="2" fill="url(#waveGrad)"/>
+    <rect x="144" y="5" width="4" height="150" rx="2" fill="url(#waveGrad)"/>
+    <rect x="152" y="10" width="4" height="140" rx="2" fill="url(#waveGrad)"/>
+    <rect x="160" y="20" width="4" height="120" rx="2" fill="url(#waveGrad)"/>
+    <rect x="168" y="30" width="4" height="100" rx="2" fill="#3F3F46"/>
+    <rect x="176" y="40" width="4" height="80" rx="2" fill="#3F3F46"/>
+    <rect x="184" y="50" width="4" height="60" rx="2" fill="#3F3F46"/>
+    <rect x="192" y="35" width="4" height="90" rx="2" fill="#3F3F46"/>
+    <rect x="200" y="25" width="4" height="110" rx="2" fill="url(#waveGrad)"/>
+    <rect x="208" y="15" width="4" height="130" rx="2" fill="url(#waveGrad)"/>
+    <rect x="216" y="8" width="4" height="144" rx="2" fill="url(#waveGrad)"/>
+    <rect x="224" y="12" width="4" height="136" rx="2" fill="url(#waveGrad)"/>
+    <rect x="232" y="22" width="4" height="116" rx="2" fill="url(#waveGrad)"/>
+    <rect x="240" y="32" width="4" height="96" rx="2" fill="#3F3F46"/>
+    <rect x="248" y="42" width="4" height="76" rx="2" fill="#3F3F46"/>
+    <rect x="256" y="52" width="4" height="56" rx="2" fill="#3F3F46"/>
+    <rect x="264" y="38" width="4" height="84" rx="2" fill="#3F3F46"/>
+    <rect x="272" y="28" width="4" height="104" rx="2" fill="url(#waveGrad)"/>
+    <rect x="280" y="18" width="4" height="124" rx="2" fill="url(#waveGrad)"/>
+    <rect x="288" y="10" width="4" height="140" rx="2" fill="url(#waveGrad)"/>
+    <rect x="296" y="15" width="4" height="130" rx="2" fill="url(#waveGrad)"/>
+    <rect x="304" y="25" width="4" height="110" rx="2" fill="#3F3F46"/>
+    <rect x="312" y="35" width="4" height="90" rx="2" fill="#3F3F46"/>
+    <rect x="320" y="48" width="4" height="64" rx="2" fill="#3F3F46"/>
+    <rect x="328" y="38" width="4" height="84" rx="2" fill="#3F3F46"/>
+    <rect x="336" y="28" width="4" height="104" rx="2" fill="url(#waveGrad)"/>
+    <rect x="344" y="18" width="4" height="124" rx="2" fill="url(#waveGrad)"/>
+    <rect x="352" y="8" width="4" height="144" rx="2" fill="url(#waveGrad)"/>
+    <rect x="360" y="12" width="4" height="136" rx="2" fill="url(#waveGrad)"/>
+    <rect x="368" y="22" width="4" height="116" rx="2" fill="url(#waveGrad)"/>
+    <rect x="376" y="32" width="4" height="96" rx="2" fill="#3F3F46"/>
+    <rect x="384" y="42" width="4" height="76" rx="2" fill="#3F3F46"/>
+    <rect x="392" y="55" width="4" height="50" rx="2" fill="#3F3F46"/>
+    <rect x="400" y="60" width="4" height="40" rx="2" fill="#3F3F46"/>
+    <rect x="408" y="65" width="4" height="30" rx="2" fill="#3F3F46"/>
+    <rect x="416" y="55" width="4" height="50" rx="2" fill="#3F3F46"/>
+    <rect x="424" y="45" width="4" height="70" rx="2" fill="#3F3F46"/>
+    <rect x="432" y="35" width="4" height="90" rx="2" fill="#3F3F46"/>
+    <rect x="440" y="25" width="4" height="110" rx="2" fill="url(#waveGrad)"/>
+    <rect x="448" y="15" width="4" height="130" rx="2" fill="url(#waveGrad)"/>
+    <rect x="456" y="8" width="4" height="144" rx="2" fill="url(#waveGrad)"/>
+    <rect x="464" y="5" width="4" height="150" rx="2" fill="url(#waveGrad)"/>
+    <rect x="472" y="10" width="4" height="140" rx="2" fill="url(#waveGrad)"/>
+    <rect x="480" y="18" width="4" height="124" rx="2" fill="url(#waveGrad)"/>
+    <rect x="488" y="28" width="4" height="104" rx="2" fill="#3F3F46"/>
+    <rect x="496" y="38" width="4" height="84" rx="2" fill="#3F3F46"/>
+    <rect x="504" y="50" width="4" height="60" rx="2" fill="#3F3F46"/>
+    <rect x="512" y="58" width="4" height="44" rx="2" fill="#3F3F46"/>
+    <rect x="520" y="48" width="4" height="64" rx="2" fill="#3F3F46"/>
+    <rect x="528" y="38" width="4" height="84" rx="2" fill="#3F3F46"/>
+    <rect x="536" y="28" width="4" height="104" rx="2" fill="url(#waveGrad)"/>
+    <rect x="544" y="18" width="4" height="124" rx="2" fill="url(#waveGrad)"/>
+    <rect x="552" y="10" width="4" height="140" rx="2" fill="url(#waveGrad)"/>
+    <rect x="560" y="15" width="4" height="130" rx="2" fill="url(#waveGrad)"/>
+    <rect x="568" y="25" width="4" height="110" rx="2" fill="url(#waveGrad)"/>
+    <rect x="576" y="35" width="4" height="90" rx="2" fill="#3F3F46"/>
+    <rect x="584" y="48" width="4" height="64" rx="2" fill="#3F3F46"/>
+    <rect x="592" y="58" width="4" height="44" rx="2" fill="#3F3F46"/>
+    <rect x="600" y="65" width="4" height="30" rx="2" fill="#3F3F46"/>
+    <rect x="608" y="60" width="4" height="40" rx="2" fill="#3F3F46"/>
+    <rect x="616" y="50" width="4" height="60" rx="2" fill="#3F3F46"/>
+    <rect x="624" y="40" width="4" height="80" rx="2" fill="#3F3F46"/>
+    <rect x="632" y="30" width="4" height="100" rx="2" fill="url(#waveGrad)"/>
+    <rect x="640" y="20" width="4" height="120" rx="2" fill="url(#waveGrad)"/>
+    <rect x="648" y="10" width="4" height="140" rx="2" fill="url(#waveGrad)"/>
+    <rect x="656" y="5" width="4" height="150" rx="2" fill="url(#waveGrad)"/>
+    <rect x="664" y="8" width="4" height="144" rx="2" fill="url(#waveGrad)"/>
+    <rect x="672" y="18" width="4" height="124" rx="2" fill="url(#waveGrad)"/>
+    <rect x="680" y="28" width="4" height="104" rx="2" fill="#3F3F46"/>
+    <rect x="688" y="40" width="4" height="80" rx="2" fill="#3F3F46"/>
+    <rect x="696" y="52" width="4" height="56" rx="2" fill="#3F3F46"/>
+    <rect x="704" y="62" width="4" height="36" rx="2" fill="#3F3F46"/>
+    <rect x="712" y="55" width="4" height="50" rx="2" fill="#3F3F46"/>
+    <rect x="720" y="45" width="4" height="70" rx="2" fill="#3F3F46"/>
+    <rect x="728" y="35" width="4" height="90" rx="2" fill="#3F3F46"/>
+    <rect x="736" y="25" width="4" height="110" rx="2" fill="url(#waveGrad)"/>
+    <rect x="744" y="15" width="4" height="130" rx="2" fill="url(#waveGrad)"/>
+    <rect x="752" y="8" width="4" height="144" rx="2" fill="url(#waveGrad)"/>
+    <rect x="760" y="5" width="4" height="150" rx="2" fill="url(#waveGrad)"/>
+    <rect x="768" y="10" width="4" height="140" rx="2" fill="url(#waveGrad)"/>
+    <rect x="776" y="20" width="4" height="120" rx="2" fill="url(#waveGrad)"/>
+    <rect x="784" y="30" width="4" height="100" rx="2" fill="#3F3F46"/>
+    <rect x="792" y="42" width="4" height="76" rx="2" fill="#3F3F46"/>
+  </g>
+  <!-- Playhead -->
+  <line x1="520" y1="700" x2="520" y2="870" stroke="#8B5CF6" stroke-width="2"/>
+  <!-- Comment pin -->
+  <circle cx="520" cy="700" r="8" fill="#8B5CF6"/>
+  <text x="520" y="704" text-anchor="middle" font-family="Inter, sans-serif" font-size="8" font-weight="700" fill="#FFFFFF">💬</text>
+
+  <!-- Comments panel -->
+  <text x="410" y="910" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#52525B" letter-spacing="1">COMMENTS</text>
+  <!-- Comment 1 -->
+  <circle cx="422" cy="935" r="14" fill="#27272A"/>
+  <text x="422" y="939" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" font-weight="700" fill="#A1A1AA">A</text>
+  <text x="444" y="931" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#E4E4E7">Alex</text>
+  <text x="484" y="931" font-family="Inter, sans-serif" font-size="11" fill="#52525B">2:34</text>
+  <text x="444" y="950" font-family="Inter, sans-serif" font-size="13" fill="#A1A1AA">The kick pattern here needs more</text>
+  <text x="444" y="968" font-family="Inter, sans-serif" font-size="13" fill="#A1A1AA">attack. Maybe layer with a transient shaper?</text>
+
+  <!-- Comment 2 -->
+  <circle cx="422" cy="1000" r="14" fill="#27272A"/>
+  <text x="422" y="1004" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" font-weight="700" fill="#A1A1AA">M</text>
+  <text x="444" y="996" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#E4E4E7">Maya</text>
+  <text x="488" y="996" font-family="Inter, sans-serif" font-size="11" fill="#52525B">1:12</text>
+  <text x="444" y="1015" font-family="Inter, sans-serif" font-size="13" fill="#A1A1AA">Love the synth pad! Can we automate</text>
+  <text x="444" y="1033" font-family="Inter, sans-serif" font-size="13" fill="#A1A1AA">the filter cutoff here?</text>
+
+  <!-- Status bar -->
+  <rect x="400" y="1040" width="860" height="1" fill="#27272A"/>
+
+  <!-- ========== SECTION: Features ========== -->
+  <rect x="0" y="1080" width="1440" height="900" fill="#0A0A0B"/>
+  <text x="720" y="1160" text-anchor="middle" font-family="Inter, sans-serif" font-size="14" font-weight="600" fill="#8B5CF6" letter-spacing="2">FEATURES</text>
+  <text x="720" y="1210" text-anchor="middle" font-family="Inter, -apple-system, sans-serif" font-size="44" font-weight="900" fill="#FFFFFF" letter-spacing="-1">Everything you need</text>
+  <text x="720" y="1250" text-anchor="middle" font-family="Inter, sans-serif" font-size="18" fill="#A1A1AA">Built for producers who take their craft seriously</text>
+
+  <!-- Feature cards -->
+  <!-- Card 1 -->
+  <rect x="120" y="1310" width="380" height="260" rx="16" fill="#111113" stroke="#27272A" stroke-width="1"/>
+  <rect x="148" y="1338" width="48" height="48" rx="12" fill="#8B5CF6" opacity="0.12"/>
+  <text x="172" y="1370" font-family="Inter, sans-serif" font-size="22">🚀</text>
+  <text x="210" y="1370" font-family="Inter, sans-serif" font-size="18" font-weight="700" fill="#FFFFFF">Push from DAW</text>
+  <text x="148" y="1410" font-family="Inter, sans-serif" font-size="14" fill="#A1A1AA">One-click push from Ableton, REAPER,</text>
+  <text x="148" y="1432" font-family="Inter, sans-serif" font-size="14" fill="#A1A1AA">FL Studio, Cubase, and Logic Pro.</text>
+  <text x="148" y="1454" font-family="Inter, sans-serif" font-size="14" fill="#A1A1AA">No more email attachments or USB drives.</text>
+  <!-- Mini waveform -->
+  <g transform="translate(148, 1490)">
+    <rect x="0" y="12" width="3" height="16" rx="1" fill="#3F3F46"/>
+    <rect x="6" y="6" width="3" height="28" rx="1" fill="#8B5CF6" opacity="0.4"/>
+    <rect x="12" y="2" width="3" height="36" rx="1" fill="#8B5CF6" opacity="0.6"/>
+    <rect x="18" y="8" width="3" height="24" rx="1" fill="#8B5CF6" opacity="0.4"/>
+    <rect x="24" y="14" width="3" height="12" rx="1" fill="#3F3F46"/>
+    <rect x="30" y="10" width="3" height="20" rx="1" fill="#8B5CF6" opacity="0.4"/>
+    <rect x="36" y="4" width="3" height="32" rx="1" fill="#8B5CF6" opacity="0.6"/>
+    <rect x="42" y="0" width="3" height="40" rx="1" fill="#8B5CF6"/>
+    <rect x="48" y="6" width="3" height="28" rx="1" fill="#8B5CF6" opacity="0.6"/>
+    <rect x="54" y="12" width="3" height="16" rx="1" fill="#3F3F46"/>
+    <rect x="60" y="8" width="3" height="24" rx="1" fill="#8B5CF6" opacity="0.4"/>
+    <rect x="66" y="2" width="3" height="36" rx="1" fill="#8B5CF6" opacity="0.6"/>
+    <rect x="72" y="6" width="3" height="28" rx="1" fill="#8B5CF6" opacity="0.4"/>
+    <rect x="78" y="14" width="3" height="12" rx="1" fill="#3F3F46"/>
+  </g>
+
+  <!-- Card 2 -->
+  <rect x="530" y="1310" width="380" height="260" rx="16" fill="#111113" stroke="#27272A" stroke-width="1"/>
+  <rect x="558" y="1338" width="48" height="48" rx="12" fill="#06B6D4" opacity="0.12"/>
+  <text x="582" y="1370" font-family="Inter, sans-serif" font-size="22">💬</text>
+  <text x="620" y="1370" font-family="Inter, sans-serif" font-size="18" font-weight="700" fill="#FFFFFF">Timestamped Review</text>
+  <text x="558" y="1410" font-family="Inter, sans-serif" font-size="14" fill="#A1A1AA">Drop comments at exact timestamps.</text>
+  <text x="558" y="1432" font-family="Inter, sans-serif" font-size="14" fill="#A1A1AA">Like frame.io, but for music. Pin notes</text>
+  <text x="558" y="1454" font-family="Inter, sans-serif" font-size="14" fill="#A1A1AA">to bars, resolve issues, track decisions.</text>
+  <!-- Comment bubbles -->
+  <rect x="558" y="1490" width="180" height="48" rx="10" fill="#18181B" stroke="#27272A" stroke-width="1"/>
+  <text x="572" y="1512" font-family="Inter, sans-serif" font-size="10" font-weight="700" fill="#06B6D4">0:45</text>
+  <text x="608" y="1512" font-family="Inter, sans-serif" font-size="12" fill="#A1A1AA">More reverb here</text>
+  <rect x="558" y="1548" width="220" height="48" rx="10" fill="#18181B" stroke="#27272A" stroke-width="1"/>
+  <text x="572" y="1570" font-family="Inter, sans-serif" font-size="10" font-weight="700" fill="#06B6D4">2:34</text>
+  <text x="608" y="1570" font-family="Inter, sans-serif" font-size="12" fill="#A1A1AA">Kick needs more punch</text>
+
+  <!-- Card 3 -->
+  <rect x="940" y="1310" width="380" height="260" rx="16" fill="#111113" stroke="#27272A" stroke-width="1"/>
+  <rect x="968" y="1338" width="48" height="48" rx="12" fill="#22C55E" opacity="0.12"/>
+  <text x="992" y="1370" font-family="Inter, sans-serif" font-size="22">🔍</text>
+  <text x="1030" y="1370" font-family="Inter, sans-serif" font-size="18" font-weight="700" fill="#FFFFFF">Smart Diff</text>
+  <text x="968" y="1410" font-family="Inter, sans-serif" font-size="14" fill="#A1A1AA">See exactly what changed between</text>
+  <text x="968" y="1432" font-family="Inter, sans-serif" font-size="14" fill="#A1A1AA">versions: tracks, plugins, BPM, tempo</text>
+  <text x="968" y="1454" font-family="Inter, sans-serif" font-size="14" fill="#A1A1AA">changes — visualized as a smart diff.</text>
+  <!-- Diff mockup -->
+  <rect x="968" y="1490" width="300" height="40" rx="8" fill="#18181B" stroke="#22C55E" stroke-width="1" opacity="0.3"/>
+  <text x="982" y="1515" font-family="JetBrains Mono, monospace" font-size="11" fill="#22C55E">+ Track: "Neon Lead" (v3.2)</text>
+  <rect x="968" y="1540" width="300" height="40" rx="8" fill="#18181B" stroke="#EF4444" stroke-width="1" opacity="0.3"/>
+  <text x="982" y="1565" font-family="JetBrains Mono, monospace" font-size="11" fill="#EF4444">- Plugin: ValhallaRoom (v3.1)</text>
+
+  <!-- Feature row 2 -->
+  <!-- Card 4 -->
+  <rect x="120" y="1620" width="380" height="220" rx="16" fill="#111113" stroke="#27272A" stroke-width="1"/>
+  <rect x="148" y="1648" width="48" height="48" rx="12" fill="#EAB308" opacity="0.12"/>
+  <text x="172" y="1680" font-family="Inter, sans-serif" font-size="22">⚡</text>
+  <text x="210" y="1680" font-family="Inter, sans-serif" font-size="18" font-weight="700" fill="#FFFFFF">Web3 Ready</text>
+  <text x="148" y="1720" font-family="Inter, sans-serif" font-size="14" fill="#A1A1AA">On-chain timestamps, USDC payments,</text>
+  <text x="148" y="1742" font-family="Inter, sans-serif" font-size="14" fill="#A1A1AA">smart contracts for splits and royalties.</text>
+
+  <!-- Card 5 -->
+  <rect x="530" y="1620" width="380" height="220" rx="16" fill="#111113" stroke="#27272A" stroke-width="1"/>
+  <rect x="558" y="1648" width="48" height="48" rx="12" fill="#EF4444" opacity="0.12"/>
+  <text x="582" y="1680" font-family="Inter, sans-serif" font-size="22">🌍</text>
+  <text x="620" y="1680" font-family="Inter, sans-serif" font-size="18" font-weight="700" fill="#FFFFFF">Marketplace</text>
+  <text x="558" y="1720" font-family="Inter, sans-serif" font-size="14" fill="#A1A1AA">Sell samples, loops, presets, and stems.</text>
+  <text x="558" y="1742" font-family="Inter, sans-serif" font-size="14" fill="#A1A1AA">Built-in licensing and royalty tracking.</text>
+
+  <!-- Card 6 -->
+  <rect x="940" y="1620" width="380" height="220" rx="16" fill="#111113" stroke="#27272A" stroke-width="1"/>
+  <rect x="968" y="1648" width="48" height="48" rx="12" fill="#3B82F6" opacity="0.12"/>
+  <text x="992" y="1680" font-family="Inter, sans-serif" font-size="22">🔗</text>
+  <text x="1030" y="1680" font-family="Inter, sans-serif" font-size="18" font-weight="700" fill="#FFFFFF">CLI &amp; Plugins</text>
+  <text x="968" y="1720" font-family="Inter, sans-serif" font-size="14" fill="#A1A1AA">snd push / snd pull from terminal.</text>
+  <text x="968" y="1742" font-family="Inter, sans-serif" font-size="14" fill="#A1A1AA">Max for Live, REAPER scripts included.</text>
+
+  <!-- ========== SECTION: How It Works ========== -->
+  <rect x="0" y="2000" width="1440" height="600" fill="#111113"/>
+  <text x="720" y="2080" text-anchor="middle" font-family="Inter, sans-serif" font-size="14" font-weight="600" fill="#8B5CF6" letter-spacing="2">HOW IT WORKS</text>
+  <text x="720" y="2130" text-anchor="middle" font-family="Inter, -apple-system, sans-serif" font-size="44" font-weight="900" fill="#FFFFFF" letter-spacing="-1">Three steps to better music</text>
+
+  <!-- Step 1 -->
+  <rect x="160" y="2180" width="340" height="300" rx="16" fill="#0A0A0B" stroke="#27272A" stroke-width="1"/>
+  <text x="200" y="2230" font-family="Inter, sans-serif" font-size="48" font-weight="900" fill="#8B5CF6" opacity="0.3">01</text>
+  <text x="200" y="2280" font-family="Inter, sans-serif" font-size="20" font-weight="700" fill="#FFFFFF">Push your project</text>
+  <text x="200" y="2310" font-family="Inter, sans-serif" font-size="14" fill="#A1A1AA">Hit save in your DAW or run</text>
+  <text x="200" y="2332" font-family="Inter, sans-serif" font-size="14" fill="#A1A1AA">snd push. Your project is</text>
+  <text x="200" y="2354" font-family="Inter, sans-serif" font-size="14" fill="#A1A1AA">versioned and stored safely.</text>
+  <!-- Terminal mockup -->
+  <rect x="200" y="2380" width="260" height="48" rx="8" fill="#18181B" stroke="#27272A" stroke-width="1"/>
+  <text x="216" y="2410" font-family="JetBrains Mono, monospace" font-size="12" fill="#22C55E">$</text>
+  <text x="232" y="2410" font-family="JetBrains Mono, monospace" font-size="12" fill="#A1A1AA">snd push --project neon-bloom</text>
+
+  <!-- Step 2 -->
+  <rect x="550" y="2180" width="340" height="300" rx="16" fill="#0A0A0B" stroke="#27272A" stroke-width="1"/>
+  <text x="590" y="2230" font-family="Inter, sans-serif" font-size="48" font-weight="900" fill="#06B6D4" opacity="0.3">02</text>
+  <text x="590" y="2280" font-family="Inter, sans-serif" font-size="20" font-weight="700" fill="#FFFFFF">Review together</text>
+  <text x="590" y="2310" font-family="Inter, sans-serif" font-size="14" fill="#A1A1AA">Share a review link. Your team</text>
+  <text x="590" y="2332" font-family="Inter, sans-serif" font-size="14" fill="#A1A1AA">drops timestamped comments</text>
+  <text x="590" y="2354" font-family="Inter, sans-serif" font-size="14" fill="#A1A1AA">right on the waveform.</text>
+  <!-- Comment mockup -->
+  <rect x="590" y="2380" width="260" height="48" rx="8" fill="#18181B" stroke="#06B6D4" stroke-width="1" opacity="0.5"/>
+  <text x="606" y="2400" font-family="Inter, sans-serif" font-size="10" font-weight="700" fill="#06B6D4">1:23</text>
+  <text x="638" y="2400" font-family="Inter, sans-serif" font-size="12" fill="#A1A1AA">"Love the bridge!"</text>
+  <text x="606" y="2420" font-family="Inter, sans-serif" font-size="10" fill="#52525B">Maya · Producer</text>
+
+  <!-- Step 3 -->
+  <rect x="940" y="2180" width="340" height="300" rx="16" fill="#0A0A0B" stroke="#27272A" stroke-width="1"/>
+  <text x="980" y="2230" font-family="Inter, sans-serif" font-size="48" font-weight="900" fill="#22C55E" opacity="0.3">03</text>
+  <text x="980" y="2280" font-family="Inter, sans-serif" font-size="20" font-weight="700" fill="#FFFFFF">Ship the master</text>
+  <text x="980" y="2310" font-family="Inter, sans-serif" font-size="14" fill="#A1A1AA">Compare versions, approve the</text>
+  <text x="980" y="2332" font-family="Inter, sans-serif" font-size="14" fill="#A1A1AA">final mix, and publish to the</text>
+  <text x="980" y="2354" font-family="Inter, sans-serif" font-size="14" fill="#A1A1AA">marketplace — all on-chain.</text>
+  <!-- Approved badge -->
+  <rect x="980" y="2380" width="120" height="32" rx="8" fill="#22C55E" opacity="0.12"/>
+  <text x="1005" y="2401" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#22C55E">✓ Approved</text>
+
+  <!-- ========== SECTION: CTA ========== -->
+  <rect x="0" y="2620" width="1440" height="580" fill="#0A0A0B"/>
+  <!-- Glow -->
+  <circle cx="720" cy="2850" r="350" fill="#8B5CF6" opacity="0.05" filter="url(#glow)"/>
+
+  <text x="720" y="2800" text-anchor="middle" font-family="Inter, -apple-system, sans-serif" font-size="52" font-weight="900" fill="#FFFFFF" letter-spacing="-1">Ready to level up?</text>
+  <text x="720" y="2850" text-anchor="middle" font-family="Inter, sans-serif" font-size="18" fill="#A1A1AA">Join 2,000+ producers already using SoundHub</text>
+
+  <!-- Email signup -->
+  <rect x="460" y="2890" width="400" height="52" rx="12" fill="#18181B" stroke="#3F3F46" stroke-width="1"/>
+  <text x="484" y="2922" font-family="Inter, sans-serif" font-size="15" fill="#52525B">Enter your email</text>
+  <rect x="780" y="2898" width="100" height="36" rx="8" fill="#8B5CF6"/>
+  <text x="804" y="2921" font-family="Inter, sans-serif" font-size="14" font-weight="700" fill="#FFFFFF">Get Access</text>
+
+  <!-- Social proof -->
+  <text x="720" y="2980" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" fill="#52525B">Free for indie producers · No credit card required</text>
+
+  <!-- ========== FOOTER ========== -->
+  <rect x="0" y="3080" width="1440" height="120" fill="#0A0A0B"/>
+  <line x1="0" y1="3080" x2="1440" y2="3080" stroke="#1F1F23" stroke-width="1"/>
+  <text x="48" y="3120" font-family="Inter, sans-serif" font-size="14" font-weight="700" fill="#52525B">🎵 SoundHub</text>
+  <text x="48" y="3150" font-family="Inter, sans-serif" font-size="12" fill="#3F3F46">Version control for music projects</text>
+  <!-- Footer links -->
+  <text x="400" y="3120" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#71717A">Product</text>
+  <text x="400" y="3145" font-family="Inter, sans-serif" font-size="12" fill="#52525B">Features</text>
+  <text x="400" y="3165" font-family="Inter, sans-serif" font-size="12" fill="#52525B">Pricing</text>
+  <text x="400" y="3185" font-family="Inter, sans-serif" font-size="12" fill="#52525B">Docs</text>
+  <text x="540" y="3120" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#71717A">Community</text>
+  <text x="540" y="3145" font-family="Inter, sans-serif" font-size="12" fill="#52525B">Discord</text>
+  <text x="540" y="3165" font-family="Inter, sans-serif" font-size="12" fill="#52525B">Twitter</text>
+  <text x="540" y="3185" font-family="Inter, sans-serif" font-size="12" fill="#52525B">GitHub</text>
+  <text x="680" y="3120" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#71717A">Company</text>
+  <text x="680" y="3145" font-family="Inter, sans-serif" font-size="12" fill="#52525B">About</text>
+  <text x="680" y="3165" font-family="Inter, sans-serif" font-size="12" fill="#52525B">Blog</text>
+  <text x="680" y="3185" font-family="Inter, sans-serif" font-size="12" fill="#52525B">Careers</text>
+  <!-- Copyright -->
+  <text x="1350" y="3185" text-anchor="end" font-family="Inter, sans-serif" font-size="12" fill="#3F3F46">© 2026 SoundHub</text>
+</svg>

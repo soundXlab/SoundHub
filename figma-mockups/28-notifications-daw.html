@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <title>SoundHub — Notifications (DAW Style)</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', -apple-system, sans-serif; background: #0d0d0d; color: #e4e4e7; overflow: hidden; height: 100vh; }
+
+    /* ── Transport Bar ── */
+    .transport-bar {
+      height: 40px; background: #111113; border-bottom: 1px solid #27272a;
+      display: flex; align-items: center; padding: 0 12px; gap: 16px;
+      font-size: 11px; user-select: none;
+    }
+    .transport-logo { font-weight: 800; font-size: 13px; color: #ea5808; letter-spacing: -0.5px; }
+    .transport-logo span { color: #e4e4e7; }
+    .transport-divider { width: 1px; height: 20px; background: #27272a; }
+    .transport-group { display: flex; align-items: center; gap: 6px; }
+    .transport-label { color: #71717a; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .transport-value {
+      background: #0d0d0d; border: 1px solid #27272a; border-radius: 4px;
+      padding: 2px 8px; font-family: 'JetBrains Mono', monospace; font-size: 12px;
+      color: #22c55e; font-weight: 600; min-width: 60px; text-align: center;
+    }
+    .transport-spacer { flex: 1; }
+    .transport-time {
+      font-family: 'JetBrains Mono', monospace; font-size: 18px; font-weight: 700;
+      color: #e4e4e7; letter-spacing: 1px;
+    }
+
+    /* ── Main Layout ── */
+    .app-body { display: flex; height: calc(100vh - 40px); }
+
+    /* ── Left Sidebar ── */
+    .sidebar {
+      width: 240px; background: #111113; border-right: 1px solid #27272a;
+      display: flex; flex-direction: column; user-select: none;
+    }
+    .sidebar-search { padding: 8px; border-bottom: 1px solid #27272a; }
+    .sidebar-search input {
+      width: 100%; background: #0d0d0d; border: 1px solid #27272a; border-radius: 4px;
+      padding: 6px 8px 6px 28px; font-size: 11px; color: #e4e4e7; outline: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: 8px center;
+    }
+    .sidebar-search input::placeholder { color: #52525b; }
+    .sidebar-nav { flex: 1; overflow-y: auto; padding: 4px 0; }
+    .sidebar-section { padding: 8px 12px 4px; font-size: 9px; color: #52525b; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+    .sidebar-item {
+      padding: 6px 12px; font-size: 11px; font-weight: 500; color: #a1a1aa;
+      cursor: pointer; display: flex; align-items: center; gap: 8px;
+      border-left: 2px solid transparent; transition: all 0.1s;
+    }
+    .sidebar-item:hover { color: #e4e4e7; }
+    .sidebar-item.active { color: #ea5808; background: rgba(234,88,8,0.08); border-left-color: #ea5808; }
+    .sidebar-item .icon { width: 16px; text-align: center; }
+    .sidebar-badge {
+      margin-left: auto; background: #ea5808; color: #fff;
+      font-size: 9px; padding: 1px 5px; border-radius: 8px;
+    }
+
+    /* ── Content Area ── */
+    .content { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
+
+    /* ── Header ── */
+    .page-header {
+      padding: 16px 24px; border-bottom: 1px solid #27272a;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .page-title { font-size: 18px; font-weight: 700; color: #e4e4e7; }
+    .page-title span { color: #71717a; font-weight: 400; font-size: 14px; margin-left: 8px; }
+    .header-actions { display: flex; gap: 8px; }
+    .btn {
+      padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 600;
+      cursor: pointer; border: 1px solid #27272a; transition: all 0.15s;
+    }
+    .btn-primary { background: #ea5808; color: #fff; border-color: #ea5808; }
+    .btn-primary:hover { background: #c2410c; }
+    .btn-secondary { background: #1a1a1a; color: #e4e4e7; }
+    .btn-secondary:hover { background: #27272a; }
+    .btn-ghost { background: transparent; color: #71717a; border-color: transparent; }
+    .btn-ghost:hover { color: #e4e4e7; background: #1a1a1a; }
+
+    /* ── Filter Tabs ── */
+    .filter-tabs {
+      display: flex; gap: 0; border-bottom: 1px solid #27272a; padding: 0 24px;
+      background: #111113;
+    }
+    .filter-tab {
+      padding: 10px 16px; font-size: 12px; font-weight: 500; color: #71717a;
+      cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.1s;
+    }
+    .filter-tab:hover { color: #e4e4e7; }
+    .filter-tab.active { color: #ea5808; border-bottom-color: #ea5808; }
+    .filter-tab .count {
+      background: #27272a; color: #a1a1aa; font-size: 10px; padding: 1px 6px;
+      border-radius: 10px; margin-left: 4px;
+    }
+    .filter-tab.active .count { background: rgba(234,88,8,0.2); color: #ea5808; }
+
+    /* ── Notifications List ── */
+    .notifications-container { flex: 1; overflow-y: auto; padding: 16px 24px; }
+    .notification-group { margin-bottom: 24px; }
+    .notification-group-title {
+      font-size: 11px; font-weight: 700; color: #52525b; text-transform: uppercase;
+      letter-spacing: 0.5px; margin-bottom: 12px;
+    }
+    .notification-item {
+      display: flex; gap: 12px; padding: 14px; background: #111113;
+      border: 1px solid #27272a; border-radius: 8px; margin-bottom: 8px;
+      cursor: pointer; transition: all 0.15s;
+    }
+    .notification-item:hover { border-color: #3f3f46; }
+    .notification-item.unread { border-left: 3px solid #ea5808; background: rgba(234,88,8,0.04); }
+    .notification-avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700; color: #fff; flex-shrink: 0;
+    }
+    .notification-content { flex: 1; min-width: 0; }
+    .notification-header {
+      display: flex; align-items: center; gap: 8px; margin-bottom: 4px;
+    }
+    .notification-author { font-size: 12px; font-weight: 600; color: #e4e4e7; }
+    .notification-action { font-size: 12px; color: #a1a1aa; }
+    .notification-target { font-size: 12px; font-weight: 600; color: #ea5808; }
+    .notification-body { font-size: 12px; color: #71717a; line-height: 1.5; }
+    .notification-meta {
+      display: flex; align-items: center; gap: 12px; margin-top: 8px;
+      font-size: 10px; color: #52525b;
+    }
+    .notification-meta-item {
+      display: flex; align-items: center; gap: 4px;
+    }
+    .notification-timestamp {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 2px 6px; background: rgba(234,88,8,0.1); border-radius: 3px;
+      font-size: 10px; color: #ea5808; font-family: 'JetBrains Mono', monospace;
+    }
+    .notification-actions { display: flex; gap: 6px; margin-top: 8px; }
+    .notification-action-btn {
+      padding: 4px 10px; background: #0d0d0d; border: 1px solid #27272a;
+      border-radius: 4px; font-size: 10px; font-weight: 600; color: #a1a1aa;
+      cursor: pointer; transition: all 0.1s;
+    }
+    .notification-action-btn:hover { border-color: #3f3f46; color: #e4e4e7; }
+    .notification-action-btn.primary { background: #ea5808; border-color: #ea5808; color: #fff; }
+    .notification-action-btn.primary:hover { background: #c2410c; }
+    .notification-dot {
+      width: 8px; height: 8px; border-radius: 50%; background: #ea5808;
+      flex-shrink: 0; margin-top: 4px;
+    }
+
+    /* ── Right Panel ── */
+    .right-panel {
+      width: 280px; background: #111113; border-left: 1px solid #27272a;
+      display: flex; flex-direction: column; user-select: none; overflow-y: auto;
+    }
+    .panel-section { padding: 16px; border-bottom: 1px solid #27272a; }
+    .panel-section-title {
+      font-size: 9px; color: #52525b; text-transform: uppercase;
+      letter-spacing: 1px; font-weight: 700; margin-bottom: 10px;
+    }
+    .panel-stat {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 6px 0; font-size: 12px;
+    }
+    .panel-stat-label { color: #71717a; }
+    .panel-stat-value { color: #e4e4e7; font-family: 'JetBrains Mono', monospace; font-weight: 600; }
+
+    /* ── Notification Preferences ── */
+    .pref-list { display: flex; flex-direction: column; gap: 4px; }
+    .pref-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px; background: #0d0d0d; border-radius: 4px; font-size: 11px;
+    }
+    .pref-label { color: #a1a1aa; }
+    .toggle {
+      width: 32px; height: 18px; background: #27272a; border-radius: 9px;
+      position: relative; cursor: pointer; transition: background 0.2s;
+    }
+    .toggle.on { background: #ea5808; }
+    .toggle::after {
+      content: ''; position: absolute; width: 14px; height: 14px;
+      background: #fff; border-radius: 50%; top: 2px; left: 2px;
+      transition: transform 0.2s;
+    }
+    .toggle.on::after { transform: translateX(14px); }
+
+    /* ── Recent Activity ── */
+    .activity-list { display: flex; flex-direction: column; gap: 10px; }
+    .activity-item {
+      display: flex; gap: 10px; font-size: 11px;
+    }
+    .activity-avatar {
+      width: 24px; height: 24px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 9px; font-weight: 700; color: #fff; flex-shrink: 0;
+    }
+    .activity-content { flex: 1; }
+    .activity-text { color: #a1a1aa; }
+    .activity-text strong { color: #e4e4e7; font-weight: 600; }
+    .activity-time { font-size: 10px; color: #52525b; margin-top: 2px; }
+
+    /* ── Device Chain (Bottom) ── */
+    .device-chain {
+      height: 60px; background: #111113; border-top: 1px solid #27272a;
+      display: flex; align-items: center; padding: 0 16px; gap: 8px;
+    }
+    .device {
+      padding: 6px 12px; background: #0d0d0d; border: 1px solid #27272a;
+      border-radius: 4px; font-size: 10px; color: #a1a1aa;
+      display: flex; align-items: center; gap: 6px; cursor: pointer;
+      transition: all 0.1s;
+    }
+    .device:hover { border-color: #3f3f46; color: #e4e4e7; }
+    .device.active { border-color: #ea5808; color: #ea5808; background: rgba(234,88,8,0.08); }
+    .device .led { width: 6px; height: 6px; border-radius: 50%; background: #27272a; }
+    .device.active .led { background: #22c55e; box-shadow: 0 0 6px rgba(34,197,94,0.5); }
+    .device-chain-spacer { flex: 1; }
+    .device-chain-label {
+      font-size: 9px; color: #52525b; text-transform: uppercase;
+      letter-spacing: 0.5px; font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <!-- Transport Bar -->
+  <div class="transport-bar">
+    <div class="transport-logo">Sound<span>Hub</span></div>
+    <div class="transport-divider"></div>
+    <div class="transport-group">
+      <span class="transport-label">Unread</span>
+      <div class="transport-value" style="color:#ea5808">5</div>
+    </div>
+    <div class="transport-group">
+      <span class="transport-label">Today</span>
+      <div class="transport-value">12</div>
+    </div>
+    <div class="transport-group">
+      <span class="transport-label">This Week</span>
+      <div class="transport-value">47</div>
+    </div>
+    <div class="transport-spacer"></div>
+    <div class="transport-time">NOTIFICATIONS</div>
+    <div class="transport-divider"></div>
+    <div class="transport-group">
+      <span class="transport-label">All Time</span>
+      <div class="transport-value">234</div>
+    </div>
+  </div>
+
+  <div class="app-body">
+    <!-- Left Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-search">
+        <input type="text" placeholder="Search notifications...">
+      </div>
+      <div class="sidebar-nav">
+        <div class="sidebar-section">Main</div>
+        <div class="sidebar-item"><span class="icon">📊</span> Dashboard</div>
+        <div class="sidebar-item"><span class="icon">📁</span> Projects</div>
+        <div class="sidebar-item"><span class="icon">🛒</span> Marketplace</div>
+        <div class="sidebar-section">Workspace</div>
+        <div class="sidebar-item"><span class="icon">💬</span> Reviews</div>
+        <div class="sidebar-item"><span class="icon">📋</span> Sessions</div>
+        <div class="sidebar-item active"><span class="icon">🔔</span> Notifications <span class="sidebar-badge">5</span></div>
+        <div class="sidebar-section">Account</div>
+        <div class="sidebar-item"><span class="icon">⚙️</span> Settings</div>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+      <!-- Page Header -->
+      <div class="page-header">
+        <div class="page-title">Notifications <span>5 unread</span></div>
+        <div class="header-actions">
+          <button class="btn btn-ghost">✓ Mark all as read</button>
+          <button class="btn btn-secondary">⚙️ Preferences</button>
+        </div>
+      </div>
+
+      <!-- Filter Tabs -->
+      <div class="filter-tabs">
+        <div class="filter-tab active">All <span class="count">47</span></div>
+        <div class="filter-tab">Reviews <span class="count">12</span></div>
+        <div class="filter-tab">Comments <span class="count">18</span></div>
+        <div class="filter-tab">Downloads <span class="count">8</span></div>
+        <div class="filter-tab">System <span class="count">9</span></div>
+      </div>
+
+      <!-- Notifications List -->
+      <div class="notifications-container">
+        <!-- Today -->
+        <div class="notification-group">
+          <div class="notification-group-title">Today</div>
+
+          <!-- Notification 1 - Unread -->
+          <div class="notification-item unread">
+            <div class="notification-dot"></div>
+            <div class="notification-avatar" style="background:#22c55e">R</div>
+            <div class="notification-content">
+              <div class="notification-header">
+                <span class="notification-author">@reviewer</span>
+                <span class="notification-action">approved</span>
+                <span class="notification-target">Summer Drums</span>
+              </div>
+              <div class="notification-body">All stems approved. Ready for release package generation.</div>
+              <div class="notification-meta">
+                <div class="notification-meta-item">📋 Review #47</div>
+                <div class="notification-meta-item">⏱ 15 min ago</div>
+              </div>
+              <div class="notification-actions">
+                <button class="notification-action-btn primary">View Review</button>
+                <button class="notification-action-btn">Dismiss</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Notification 2 - Unread -->
+          <div class="notification-item unread">
+            <div class="notification-dot"></div>
+            <div class="notification-avatar" style="background:#eab308">A</div>
+            <div class="notification-content">
+              <div class="notification-header">
+                <span class="notification-author">@audioguy</span>
+                <span class="notification-action">commented on</span>
+                <span class="notification-target">Neon Warehouse</span>
+              </div>
+              <div class="notification-body">Dynamic range is a bit low at 8.1 LU. Consider backing off the limiter on the bridge section?</div>
+              <div class="notification-timestamp">⏱ 2:48</div>
+              <div class="notification-meta">
+                <div class="notification-meta-item">💬 Comment</div>
+                <div class="notification-meta-item">⏱ 45 min ago</div>
+              </div>
+              <div class="notification-actions">
+                <button class="notification-action-btn primary">Reply</button>
+                <button class="notification-action-btn">View Thread</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Notification 3 - Unread -->
+          <div class="notification-item unread">
+            <div class="notification-dot"></div>
+            <div class="notification-avatar" style="background:#ea5808">P</div>
+            <div class="notification-content">
+              <div class="notification-header">
+                <span class="notification-author">@producer1</span>
+                <span class="notification-action">uploaded</span>
+                <span class="notification-target">v3.2</span>
+                <span class="notification-action">to Neon Warehouse</span>
+              </div>
+              <div class="notification-body">New version uploaded: Master v3.2 with updated loudness normalization.</div>
+              <div class="notification-meta">
+                <div class="notification-meta-item">📁 Version</div>
+                <div class="notification-meta-item">⏱ 2 hours ago</div>
+              </div>
+              <div class="notification-actions">
+                <button class="notification-action-btn primary">View Version</button>
+                <button class="notification-action-btn">Download</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Notification 4 - Unread -->
+          <div class="notification-item unread">
+            <div class="notification-dot"></div>
+            <div class="notification-avatar" style="background:#3b82f6">M</div>
+            <div class="notification-content">
+              <div class="notification-header">
+                <span class="notification-author">@mixmaster</span>
+                <span class="notification-action">started session on</span>
+                <span class="notification-target">Midnight Run</span>
+              </div>
+              <div class="notification-body">New review session created for vocal mix v2.1. You have been added as a reviewer.</div>
+              <div class="notification-meta">
+                <div class="notification-meta-item">📋 Session #12</div>
+                <div class="notification-meta-item">⏱ 3 hours ago</div>
+              </div>
+              <div class="notification-actions">
+                <button class="notification-action-btn primary">Join Session</button>
+                <button class="notification-action-btn">View Details</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Notification 5 - Unread -->
+          <div class="notification-item unread">
+            <div class="notification-dot"></div>
+            <div class="notification-avatar" style="background:#a855f7">L</div>
+            <div class="notification-content">
+              <div class="notification-header">
+                <span class="notification-author">@lofimaster</span>
+                <span class="notification-action">published</span>
+                <span class="notification-target">Chillhop Beats</span>
+                <span class="notification-action">on Marketplace</span>
+              </div>
+              <div class="notification-body">New sample pack available: 128 chillhop loops and one-shots.</div>
+              <div class="notification-meta">
+                <div class="notification-meta-item">🛒 Marketplace</div>
+                <div class="notification-meta-item">⏱ 5 hours ago</div>
+              </div>
+              <div class="notification-actions">
+                <button class="notification-action-btn primary">View Asset</button>
+                <button class="notification-action-btn">❤️ Save</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Yesterday -->
+        <div class="notification-group">
+          <div class="notification-group-title">Yesterday</div>
+
+          <!-- Notification 6 -->
+          <div class="notification-item">
+            <div class="notification-avatar" style="background:#22c55e">S</div>
+            <div class="notification-content">
+              <div class="notification-header">
+                <span class="notification-author">@soundartist</span>
+                <span class="notification-action">purchased</span>
+                <span class="notification-target">808 Bass Kit</span>
+              </div>
+              <div class="notification-body">Your asset was purchased! $9.99 earned.</div>
+              <div class="notification-meta">
+                <div class="notification-meta-item">💰 Sale</div>
+                <div class="notification-meta-item">⏱ Yesterday</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Notification 7 -->
+          <div class="notification-item">
+            <div class="notification-avatar" style="background:#ea5808">S</div>
+            <div class="notification-content">
+              <div class="notification-header">
+                <span class="notification-author">System</span>
+                <span class="notification-action">QC check passed for</span>
+                <span class="notification-target">Neon Warehouse v3.2</span>
+              </div>
+              <div class="notification-body">All quality checks passed. Loudness: -14.2 LUFS, True Peak: -1.2 dBTP.</div>
+              <div class="notification-meta">
+                <div class="notification-meta-item">✅ QC</div>
+                <div class="notification-meta-item">⏱ Yesterday</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Notification 8 -->
+          <div class="notification-item">
+            <div class="notification-avatar" style="background:#ef4444">E</div>
+            <div class="notification-content">
+              <div class="notification-header">
+                <span class="notification-author">@engineer</span>
+                <span class="notification-action">rejected</span>
+                <span class="notification-target">Crystal Echo stems</span>
+              </div>
+              <div class="notification-body">Stems need re-recording. Timing issues on tracks 3-5.</div>
+              <div class="notification-meta">
+                <div class="notification-meta-item">📋 Review #45</div>
+                <div class="notification-meta-item">⏱ Yesterday</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- This Week -->
+        <div class="notification-group">
+          <div class="notification-group-title">This Week</div>
+
+          <!-- Notification 9 -->
+          <div class="notification-item">
+            <div class="notification-avatar" style="background:#eab308">B</div>
+            <div class="notification-content">
+              <div class="notification-header">
+                <span class="notification-author">System</span>
+                <span class="notification-action">Storage warning:</span>
+                <span class="notification-target">8.2 GB / 10 GB used</span>
+              </div>
+              <div class="notification-body">Consider upgrading your plan or removing unused files.</div>
+              <div class="notification-meta">
+                <div class="notification-meta-item">💾 Storage</div>
+                <div class="notification-meta-item">⏱ 3 days ago</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Notification 10 -->
+          <div class="notification-item">
+            <div class="notification-avatar" style="background:#3b82f6">W</div>
+            <div class="notification-content">
+              <div class="notification-header">
+                <span class="notification-author">System</span>
+                <span class="notification-action">Weekly summary:</span>
+                <span class="notification-target">12 downloads, $340 earned</span>
+              </div>
+              <div class="notification-body">Your assets were downloaded 12 times this week. Total revenue: $340.</div>
+              <div class="notification-meta">
+                <div class="notification-meta-item">📊 Analytics</div>
+                <div class="notification-meta-item">⏱ 5 days ago</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Device Chain -->
+      <div class="device-chain">
+        <span class="device-chain-label">Filters:</span>
+        <div class="device active"><div class="led"></div> All</div>
+        <div class="device"><div class="led"></div> Reviews</div>
+        <div class="device"><div class="led"></div> Comments</div>
+        <div class="device"><div class="led"></div> Downloads</div>
+        <div class="device"><div class="led"></div> System</div>
+        <div class="device-chain-spacer"></div>
+        <span class="device-chain-label">Last checked:</span>
+        <div class="device"><div class="led"></div> 2 min ago</div>
+      </div>
+    </div>
+
+    <!-- Right Panel -->
+    <div class="right-panel">
+      <!-- Stats -->
+      <div class="panel-section">
+        <div class="panel-section-title">Notification Stats</div>
+        <div class="panel-stat">
+          <span class="panel-stat-label">Unread</span>
+          <span class="panel-stat-value" style="color:#ea5808">5</span>
+        </div>
+        <div class="panel-stat">
+          <span class="panel-stat-label">Today</span>
+          <span class="panel-stat-value">12</span>
+        </div>
+        <div class="panel-stat">
+          <span class="panel-stat-label">This Week</span>
+          <span class="panel-stat-value">47</span>
+        </div>
+        <div class="panel-stat">
+          <span class="panel-stat-label">All Time</span>
+          <span class="panel-stat-value">234</span>
+        </div>
+      </div>
+
+      <!-- Preferences -->
+      <div class="panel-section">
+        <div class="panel-section-title">Quick Preferences</div>
+        <div class="pref-list">
+          <div class="pref-item">
+            <span class="pref-label">Review Comments</span>
+            <div class="toggle on"></div>
+          </div>
+          <div class="pref-item">
+            <span class="pref-label">Review Approved</span>
+            <div class="toggle on"></div>
+          </div>
+          <div class="pref-item">
+            <span class="pref-label">Review Rejected</span>
+            <div class="toggle on"></div>
+          </div>
+          <div class="pref-item">
+            <span class="pref-label">Downloads</span>
+            <div class="toggle on"></div>
+          </div>
+          <div class="pref-item">
+            <span class="pref-label">Marketplace</span>
+            <div class="toggle"></div>
+          </div>
+          <div class="pref-item">
+            <span class="pref-label">System Alerts</span>
+            <div class="toggle on"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Activity -->
+      <div class="panel-section">
+        <div class="panel-section-title">Recent Activity</div>
+        <div class="activity-list">
+          <div class="activity-item">
+            <div class="activity-avatar" style="background:#22c55e">R</div>
+            <div class="activity-content">
+              <div class="activity-text"><strong>@reviewer</strong> approved Summer Drums</div>
+              <div class="activity-time">15 min ago</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-avatar" style="background:#eab308">A</div>
+            <div class="activity-content">
+              <div class="activity-text"><strong>@audioguy</strong> commented on Neon Warehouse</div>
+              <div class="activity-time">45 min ago</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-avatar" style="background:#ea5808">P</div>
+            <div class="activity-content">
+              <div class="activity-text"><strong>@producer1</strong> uploaded v3.2</div>
+              <div class="activity-time">2 hours ago</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-avatar" style="background:#3b82f6">M</div>
+            <div class="activity-content">
+              <div class="activity-text"><strong>@mixmaster</strong> started session</div>
+              <div class="activity-time">3 hours ago</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

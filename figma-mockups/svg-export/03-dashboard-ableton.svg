@@ -1,0 +1,911 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" 
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     viewBox="0 0 1440 1060" 
+     width="1440" 
+     height="1060">
+  <foreignObject width="100%" height="100%">
+    <div xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html><html lang="en"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <title>SoundHub — Dashboard (DAW Style)</title>
+  <link rel="stylesheet" href="design-system/shared.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', -apple-system, sans-serif; background: #1a1a1a; color: #e4e4e7; overflow: hidden; height: 100vh; }
+
+    /* ── Top Transport Bar ── */
+    .transport-bar {
+      height: 40px; background: #111113; border-bottom: 1px solid #27272a;
+      display: flex; align-items: center; padding: 0 12px; gap: 16px;
+      font-size: 11px; user-select: none;
+    }
+    .transport-logo { font-weight: 800; font-size: 13px; color: #8b5cf6; letter-spacing: -0.5px; margin-right: 8px; }
+    .transport-logo span { color: #e4e4e7; }
+    .transport-divider { width: 1px; height: 20px; background: #27272a; }
+    .transport-group { display: flex; align-items: center; gap: 6px; }
+    .transport-label { color: #71717a; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .transport-value { 
+      background: #0d0d0d; border: 1px solid #27272a; border-radius: 4px;
+      padding: 2px 8px; font-family: 'JetBrains Mono', monospace; font-size: 12px;
+      color: #22c55e; font-weight: 600; min-width: 60px; text-align: center;
+    }
+    .transport-value.bpm { color: #8b5cf6; min-width: 50px; }
+    .transport-btn {
+      width: 28px; height: 28px; border-radius: 4px; border: 1px solid #27272a;
+      background: #1a1a1a; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 12px; transition: all 0.1s;
+    }
+    .transport-btn:hover { background: #27272a; border-color: #3f3f46; }
+    .transport-btn.record { color: #ef4444; }
+    .transport-btn.play { color: #22c55e; }
+    .transport-spacer { flex: 1; }
+    .transport-right { display: flex; align-items: center; gap: 8px; }
+    .transport-time {
+      font-family: 'JetBrains Mono', monospace; font-size: 18px; font-weight: 700;
+      color: #e4e4e7; letter-spacing: 1px;
+    }
+
+    /* ── Main Layout ── */
+    .app-body { display: flex; height: calc(100vh - 40px); }
+
+    /* ── Left Browser ── */
+    .browser {
+      width: 240px; background: #111113; border-right: 1px solid #27272a;
+      display: flex; flex-direction: column; user-select: none;
+    }
+    .browser-search {
+      padding: 8px; border-bottom: 1px solid #27272a;
+    }
+    .browser-search input {
+      width: 100%; background: #0d0d0d; border: 1px solid #27272a; border-radius: 4px;
+      padding: 6px 8px 6px 28px; font-size: 11px; color: #e4e4e7; outline: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: 8px center;
+    }
+    .browser-search input::placeholder { color: #52525b; }
+    .browser-categories { flex: 1; overflow-y: auto; padding: 4px 0; }
+    .browser-cat {
+      padding: 5px 12px; font-size: 11px; font-weight: 600; color: #a1a1aa;
+      cursor: pointer; display: flex; align-items: center; gap: 6px;
+      transition: color 0.1s;
+    }
+    .browser-cat:hover { color: #e4e4e7; }
+    .browser-cat.active { color: #8b5cf6; background: rgba(139,92,246,0.08); }
+    .browser-cat .arrow { font-size: 8px; transition: transform 0.15s; }
+    .browser-cat.active .arrow { transform: rotate(90deg); }
+    .browser-sub { padding-left: 28px; }
+    .browser-sub-item {
+      padding: 3px 12px 3px 0; font-size: 11px; color: #71717a;
+      cursor: pointer; display: flex; align-items: center; gap: 6px;
+      transition: color 0.1s;
+    }
+    .browser-sub-item:hover { color: #e4e4e7; }
+    .browser-sub-item.selected { color: #e4e4e7; background: rgba(139,92,246,0.1); border-radius: 3px; }
+    .browser-sub-item .dot { width: 4px; height: 4px; border-radius: 50%; background: #3f3f46; flex-shrink: 0; }
+    .browser-sub-item.selected .dot { background: #8b5cf6; }
+    .browser-footer {
+      padding: 8px 12px; border-top: 1px solid #27272a;
+      font-size: 10px; color: #52525b;
+    }
+
+    /* ── Center: Main Workspace ── */
+    .workspace { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+
+    /* Track Headers Row */
+    .track-headers {
+      display: flex; height: 32px; background: #111113; border-bottom: 1px solid #27272a;
+    }
+    .track-header {
+      flex: 1; min-width: 0; padding: 0 8px; display: flex; align-items: center;
+      gap: 6px; border-right: 1px solid #1a1a1a; font-size: 11px; font-weight: 600;
+      position: relative;
+    }
+    .track-header .track-color {
+      width: 3px; height: 16px; border-radius: 2px; flex-shrink: 0;
+    }
+    .track-header .track-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .track-header .track-type { font-size: 9px; color: #52525b; font-weight: 400; margin-left: auto; }
+
+    /* Clip Grid */
+    .clip-grid {
+      flex: 1; display: flex; background: #0d0d0d; overflow: hidden;
+    }
+    .clip-track {
+      flex: 1; min-width: 0; border-right: 1px solid #1a1a1a;
+      display: flex; flex-direction: column;
+    }
+    .clip-slot {
+      flex: 1; border-bottom: 1px solid #1a1a1a; position: relative;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: background 0.1s;
+    }
+    .clip-slot:hover { background: rgba(139,92,246,0.05); }
+    .clip-slot.has-clip {
+      margin: 2px 4px; border-radius: 4px; border: none;
+    }
+    .clip-slot .clip-content {
+      width: calc(100% - 8px); height: calc(100% - 4px); border-radius: 3px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 2px; font-size: 9px; font-weight: 600; overflow: hidden;
+    }
+    .clip-slot .clip-waveform {
+      width: 80%; height: 16px; display: flex; align-items: flex-end; gap: 1px;
+    }
+    .clip-slot .clip-waveform span {
+      flex: 1; border-radius: 1px; min-height: 2px;
+    }
+    .clip-empty { color: #27272a; font-size: 16px; }
+
+    /* Mixer Strip */
+    .mixer-strip {
+      width: 100%; height: 140px; background: #111113; border-top: 1px solid #27272a;
+      display: flex; flex-direction: column; align-items: center; padding: 6px 0;
+      gap: 4px;
+    }
+    .mixer-label { font-size: 8px; color: #52525b; text-transform: uppercase; letter-spacing: 0.5px; }
+    .mixer-fader-track {
+      width: 4px; height: 50px; background: #27272a; border-radius: 2px;
+      position: relative;
+    }
+    .mixer-fader-fill {
+      position: absolute; bottom: 0; width: 100%; border-radius: 2px;
+    }
+    .mixer-fader-knob {
+      width: 14px; height: 8px; background: #e4e4e7; border-radius: 2px;
+      position: absolute; left: -5px; cursor: ns-resize;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+    }
+    .mixer-pan {
+      width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid #3f3f46;
+      background: #1a1a1a; position: relative;
+    }
+    .mixer-pan::after {
+      content: ''; position: absolute; top: 3px; left: 50%; width: 1.5px; height: 5px;
+      background: #e4e4e7; transform: translateX(-50%); border-radius: 1px;
+    }
+    .mixer-sends { display: flex; gap: 4px; }
+    .mixer-send {
+      width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid #3f3f46;
+      background: #1a1a1a; position: relative;
+    }
+    .mixer-send::after {
+      content: ''; position: absolute; top: 2px; left: 50%; width: 1px; height: 4px;
+      border-radius: 1px; transform: translateX(-50%);
+    }
+    .mixer-send.a::after { background: #8b5cf6; transform: translateX(-50%) rotate(-30deg); }
+    .mixer-send.b::after { background: #06b6d4; transform: translateX(-50%) rotate(20deg); }
+    .mixer-db { font-size: 8px; font-family: 'JetBrains Mono', monospace; color: #71717a; }
+    .mixer-transport { display: flex; gap: 3px; }
+    .mixer-transport-btn {
+      width: 16px; height: 12px; border-radius: 2px; border: 1px solid #3f3f46;
+      background: #1a1a1a; font-size: 7px; display: flex; align-items: center;
+      justify-content: center; cursor: pointer;
+    }
+    .mixer-transport-btn.arm { color: #ef4444; border-color: #ef4444; }
+    .mixer-transport-btn.solo { color: #3b82f6; border-color: #3b82f6; }
+    .mixer-transport-btn.mute { color: #eab308; border-color: #eab308; }
+    .mixer-meter {
+      display: flex; gap: 1px; height: 40px; align-items: flex-end;
+    }
+    .mixer-meter-bar {
+      width: 3px; border-radius: 1px; transition: height 0.3s;
+    }
+
+    /* ── Right Panel (Info) ── */
+    .info-panel {
+      width: 260px; background: #111113; border-left: 1px solid #27272a;
+      display: flex; flex-direction: column; user-select: none;
+    }
+    .info-panel-header {
+      padding: 10px 12px; border-bottom: 1px solid #27272a;
+      font-size: 11px; font-weight: 700; color: #a1a1aa;
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .info-panel-content { flex: 1; overflow-y: auto; padding: 12px; }
+    .info-card {
+      background: #1a1a1a; border: 1px solid #27272a; border-radius: 6px;
+      padding: 12px; margin-bottom: 8px;
+    }
+    .info-card-title { font-size: 12px; font-weight: 700; color: #e4e4e7; margin-bottom: 6px; }
+    .info-card-text { font-size: 10px; color: #71717a; line-height: 1.5; }
+    .info-card-link { color: #8b5cf6; text-decoration: none; font-size: 10px; }
+
+    /* ── Bottom Device Chain ── */
+    .device-chain {
+      height: 160px; background: #111113; border-top: 1px solid #27272a;
+      display: flex; flex-direction: column;
+    }
+    .device-chain-header {
+      height: 24px; display: flex; align-items: center; padding: 0 12px;
+      border-bottom: 1px solid #1a1a1a; gap: 8px;
+    }
+    .device-chain-header span {
+      font-size: 10px; color: #52525b; text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .device-chain-header .device-name {
+      color: #a1a1aa; font-weight: 600; text-transform: none; letter-spacing: 0;
+    }
+    .device-chain-body { flex: 1; display: flex; overflow-x: auto; padding: 8px; gap: 6px; }
+    .device {
+      min-width: 180px; background: #1a1a1a; border: 1px solid #27272a;
+      border-radius: 6px; display: flex; flex-direction: column; overflow: hidden;
+      flex-shrink: 0;
+    }
+    .device.active { border-color: #8b5cf6; }
+    .device-header {
+      height: 22px; display: flex; align-items: center; padding: 0 8px;
+      background: #242424; border-bottom: 1px solid #27272a; gap: 6px;
+    }
+    .device-header .device-toggle {
+      width: 8px; height: 8px; border-radius: 50%;
+    }
+    .device-header .device-toggle.on { background: #22c55e; }
+    .device-header .device-toggle.off { background: #52525b; }
+    .device-header .device-title { font-size: 10px; font-weight: 700; color: #e4e4e7; }
+    .device-header .device-type { font-size: 8px; color: #52525b; margin-left: auto; }
+    .device-body { flex: 1; padding: 8px; display: flex; flex-direction: column; gap: 6px; }
+    .device-param {
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .device-param-label { font-size: 9px; color: #71717a; }
+    .device-param-value {
+      font-size: 9px; font-family: 'JetBrains Mono', monospace;
+      color: #a1a1aa; font-weight: 600;
+    }
+    .device-param-bar {
+      flex: 1; height: 3px; background: #27272a; border-radius: 2px;
+      margin: 0 8px; position: relative; overflow: hidden;
+    }
+    .device-param-fill {
+      height: 100%; border-radius: 2px; position: absolute; left: 0; top: 0;
+    }
+    .device-knob {
+      width: 28px; height: 28px; border-radius: 50%; border: 2px solid #3f3f46;
+      background: #0d0d0d; position: relative; margin: 0 auto;
+    }
+    .device-knob::after {
+      content: ''; position: absolute; top: 4px; left: 50%; width: 2px; height: 8px;
+      background: #e4e4e7; transform-origin: bottom center; border-radius: 1px;
+    }
+    .device-knob-row { display: flex; gap: 12px; justify-content: center; }
+    .device-knob-group { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+    .device-knob-label { font-size: 7px; color: #52525b; text-transform: uppercase; }
+    .device-visual {
+      height: 30px; display: flex; align-items: flex-end; gap: 1px; padding: 0 4px;
+    }
+    .device-visual span {
+      flex: 1; border-radius: 1px 1px 0 0; min-height: 1px;
+    }
+    .device-arrow {
+      width: 20px; display: flex; align-items: center; justify-content: center;
+      color: #3f3f46; font-size: 14px; flex-shrink: 0;
+    }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 2px; }
+    ::-webkit-scrollbar-thumb:hover { background: #3f3f46; }
+  </style>
+</head>
+<body>
+
+<!-- ═══ Transport Bar ═══ -->
+<div class="transport-bar">
+  <div class="transport-logo">Sound<span>Hub</span></div>
+  <div class="transport-divider"></div>
+  
+  <div class="transport-group">
+    <div class="transport-label">BPM</div>
+    <div class="transport-value bpm">120.00</div>
+  </div>
+  <div class="transport-divider"></div>
+  
+  <div class="transport-group">
+    <div class="transport-label">Time</div>
+    <div class="transport-value" style="min-width:40px">4/4</div>
+  </div>
+  <div class="transport-divider"></div>
+
+  <div class="transport-group" style="gap:4px">
+    <div class="transport-btn" title="Metronome">🔔</div>
+    <div class="transport-btn play" title="Play">▶</div>
+    <div class="transport-btn" title="Stop">⏹</div>
+    <div class="transport-btn record" title="Record">●</div>
+  </div>
+  <div class="transport-divider"></div>
+
+  <div class="transport-group">
+    <div class="transport-label">Bar</div>
+    <div class="transport-value" style="min-width:50px">24.4.4</div>
+  </div>
+
+  <div class="transport-spacer"></div>
+
+  <div class="transport-right">
+    <div class="transport-group">
+      <div class="transport-label">Key</div>
+      <div class="transport-value" style="min-width:30px;color:#e4e4e7">C</div>
+    </div>
+    <div class="transport-divider"></div>
+    <div class="transport-group">
+      <div class="transport-label">MIDI</div>
+      <div class="transport-value" style="min-width:30px;color:#3b82f6">44.1K</div>
+    </div>
+    <div class="transport-divider"></div>
+    <div class="transport-time">3 : 1 : 1</div>
+    <div class="transport-divider"></div>
+    <div style="font-size:10px;color:#52525b">4 : 0 : 0</div>
+  </div>
+</div>
+
+<!-- ═══ App Body ═══ -->
+<div class="app-body">
+
+  <!-- ── Left Browser ── -->
+  <div class="browser">
+    <div class="browser-search">
+      <input type="text" placeholder="Search (Ctrl+F)">
+    </div>
+    <div class="browser-categories">
+      <div class="browser-cat active">
+        <span class="arrow">▶</span> 📁 Projects
+      </div>
+      <div class="browser-sub">
+        <div class="browser-sub-item selected"><span class="dot"></span> Neon Warehouse</div>
+        <div class="browser-sub-item"><span class="dot"></span> Midnight Run</div>
+        <div class="browser-sub-item"><span class="dot"></span> Crystal Echo</div>
+        <div class="browser-sub-item"><span class="dot"></span> Summer Drums</div>
+      </div>
+
+      <div class="browser-cat">
+        <span class="arrow">▶</span> 🎵 Sounds
+      </div>
+      <div class="browser-sub" style="display:none">
+        <div class="browser-sub-item"><span class="dot"></span> Bass</div>
+        <div class="browser-sub-item"><span class="dot"></span> Drums</div>
+        <div class="browser-sub-item"><span class="dot"></span> Synths</div>
+      </div>
+
+      <div class="browser-cat">
+        <span class="arrow">▶</span> 🥁 Drums
+      </div>
+
+      <div class="browser-cat">
+        <span class="arrow">▶</span> 🎹 Instruments
+      </div>
+
+      <div class="browser-cat">
+        <span class="arrow">▶</span> 🔊 Audio Effects
+      </div>
+
+      <div class="browser-cat">
+        <span class="arrow">▶</span> 🎛️ MIDI Effects
+      </div>
+
+      <div class="browser-cat">
+        <span class="arrow">▶</span> 🔌 Plug-ins
+      </div>
+
+      <div class="browser-cat">
+        <span class="arrow">▶</span> 📋 Clips
+      </div>
+
+      <div class="browser-cat">
+        <span class="arrow">▶</span> 🎧 Samples
+      </div>
+
+      <div class="browser-cat">
+        <span class="arrow">▶</span> 🛒 Marketplace
+      </div>
+      <div class="browser-sub" style="display:none">
+        <div class="browser-sub-item"><span class="dot"></span> Trending</div>
+        <div class="browser-sub-item"><span class="dot"></span> New</div>
+        <div class="browser-sub-item"><span class="dot"></span> Free</div>
+      </div>
+
+      <div class="browser-cat">
+        <span class="arrow">▶</span> 📤 Uploads
+      </div>
+
+      <div class="browser-cat">
+        <span class="arrow">▶</span> 💬 Reviews
+      </div>
+
+      <div class="browser-cat">
+        <span class="arrow">▶</span> 📦 Packs
+      </div>
+
+      <div class="browser-cat">
+        <span class="arrow">▶</span> 👤 User Library
+      </div>
+
+      <div class="browser-cat">
+        <span class="arrow">▶</span> ⚙️ Current Project
+      </div>
+    </div>
+    <div class="browser-footer">
+      1 item selected
+    </div>
+  </div>
+
+  <!-- ── Center Workspace ── -->
+  <div class="workspace">
+    <!-- Track Headers -->
+    <div class="track-headers">
+      <div class="track-header">
+        <div class="track-color" style="background:#8b5cf6"></div>
+        <span class="track-name">Neon Warehouse</span>
+        <span class="track-type">Ableton</span>
+      </div>
+      <div class="track-header">
+        <div class="track-color" style="background:#eab308"></div>
+        <span class="track-name">Midnight Run</span>
+        <span class="track-type">FL Studio</span>
+      </div>
+      <div class="track-header">
+        <div class="track-color" style="background:#3b82f6"></div>
+        <span class="track-name">Crystal Echo</span>
+        <span class="track-type">Ableton</span>
+      </div>
+      <div class="track-header">
+        <div class="track-color" style="background:#22c55e"></div>
+        <span class="track-name">Summer Drums</span>
+        <span class="track-type">REAPER</span>
+      </div>
+    </div>
+
+    <!-- Clip Grid -->
+    <div class="clip-grid">
+      <!-- Track 1: Neon Warehouse -->
+      <div class="clip-track">
+        <div class="clip-slot has-clip" style="background:rgba(139,92,246,0.15)">
+          <div class="clip-content" style="color:#8b5cf6">
+            <div style="font-size:9px;font-weight:700">v13 — Ready</div>
+            <div class="clip-waveform">
+              <span style="height:40%;background:#8b5cf6"></span>
+              <span style="height:70%;background:#8b5cf6"></span>
+              <span style="height:55%;background:#8b5cf6"></span>
+              <span style="height:85%;background:#8b5cf6"></span>
+              <span style="height:60%;background:#8b5cf6"></span>
+              <span style="height:90%;background:#8b5cf6"></span>
+              <span style="height:45%;background:#8b5cf6"></span>
+              <span style="height:75%;background:#8b5cf6"></span>
+              <span style="height:50%;background:#8b5cf6"></span>
+              <span style="height:80%;background:#8b5cf6"></span>
+              <span style="height:35%;background:#8b5cf6"></span>
+              <span style="height:65%;background:#8b5cf6"></span>
+            </div>
+            <div style="font-size:7px;color:#71717a">128 BPM · F#m</div>
+          </div>
+        </div>
+        <div class="clip-slot has-clip" style="background:rgba(139,92,246,0.08)">
+          <div class="clip-content" style="color:#71717a">
+            <div style="font-size:8px">v12 — Approved ✓</div>
+            <div style="font-size:7px;color:#52525b">1d ago</div>
+          </div>
+        </div>
+        <div class="clip-slot has-clip" style="background:rgba(139,92,246,0.05)">
+          <div class="clip-content" style="color:#52525b">
+            <div style="font-size:8px">v11 — Changes</div>
+          </div>
+        </div>
+        <div class="clip-slot"><span class="clip-empty">+</span></div>
+      </div>
+
+      <!-- Track 2: Midnight Run -->
+      <div class="clip-track">
+        <div class="clip-slot has-clip" style="background:rgba(234,179,8,0.15)">
+          <div class="clip-content" style="color:#eab308">
+            <div style="font-size:9px;font-weight:700">v7 — In Review</div>
+            <div class="clip-waveform">
+              <span style="height:30%;background:#eab308"></span>
+              <span style="height:60%;background:#eab308"></span>
+              <span style="height:80%;background:#eab308"></span>
+              <span style="height:45%;background:#eab308"></span>
+              <span style="height:90%;background:#eab308"></span>
+              <span style="height:55%;background:#eab308"></span>
+              <span style="height:70%;background:#eab308"></span>
+              <span style="height:40%;background:#eab308"></span>
+              <span style="height:85%;background:#eab308"></span>
+              <span style="height:50%;background:#eab308"></span>
+              <span style="height:65%;background:#eab308"></span>
+              <span style="height:35%;background:#eab308"></span>
+            </div>
+            <div style="font-size:7px;color:#71717a">140 BPM · Dm</div>
+          </div>
+        </div>
+        <div class="clip-slot has-clip" style="background:rgba(234,179,8,0.06)">
+          <div class="clip-content" style="color:#52525b">
+            <div style="font-size:8px">v6 — Draft</div>
+          </div>
+        </div>
+        <div class="clip-slot"><span class="clip-empty">+</span></div>
+        <div class="clip-slot"><span class="clip-empty">+</span></div>
+      </div>
+
+      <!-- Track 3: Crystal Echo -->
+      <div class="clip-track">
+        <div class="clip-slot has-clip" style="background:rgba(59,130,246,0.12)">
+          <div class="clip-content" style="color:#3b82f6">
+            <div style="font-size:9px;font-weight:700">v1 — Draft</div>
+            <div class="clip-waveform">
+              <span style="height:25%;background:#3b82f6"></span>
+              <span style="height:50%;background:#3b82f6"></span>
+              <span style="height:35%;background:#3b82f6"></span>
+              <span style="height:60%;background:#3b82f6"></span>
+              <span style="height:40%;background:#3b82f6"></span>
+              <span style="height:55%;background:#3b82f6"></span>
+              <span style="height:30%;background:#3b82f6"></span>
+              <span style="height:45%;background:#3b82f6"></span>
+              <span style="height:20%;background:#3b82f6"></span>
+              <span style="height:50%;background:#3b82f6"></span>
+              <span style="height:35%;background:#3b82f6"></span>
+              <span style="height:40%;background:#3b82f6"></span>
+            </div>
+            <div style="font-size:7px;color:#71717a">90 BPM · Am</div>
+          </div>
+        </div>
+        <div class="clip-slot"><span class="clip-empty">+</span></div>
+        <div class="clip-slot"><span class="clip-empty">+</span></div>
+        <div class="clip-slot"><span class="clip-empty">+</span></div>
+      </div>
+
+      <!-- Track 4: Summer Drums -->
+      <div class="clip-track">
+        <div class="clip-slot has-clip" style="background:rgba(34,197,94,0.12)">
+          <div class="clip-content" style="color:#22c55e">
+            <div style="font-size:9px;font-weight:700">v5 — Published</div>
+            <div class="clip-waveform">
+              <span style="height:55%;background:#22c55e"></span>
+              <span style="height:80%;background:#22c55e"></span>
+              <span style="height:65%;background:#22c55e"></span>
+              <span style="height:90%;background:#22c55e"></span>
+              <span style="height:50%;background:#22c55e"></span>
+              <span style="height:75%;background:#22c55e"></span>
+              <span style="height:60%;background:#22c55e"></span>
+              <span style="height:85%;background:#22c55e"></span>
+              <span style="height:45%;background:#22c55e"></span>
+              <span style="height:70%;background:#22c55e"></span>
+              <span style="height:55%;background:#22c55e"></span>
+              <span style="height:80%;background:#22c55e"></span>
+            </div>
+            <div style="font-size:7px;color:#71717a">120 BPM · C</div>
+          </div>
+        </div>
+        <div class="clip-slot has-clip" style="background:rgba(34,197,94,0.06)">
+          <div class="clip-content" style="color:#52525b">
+            <div style="font-size:8px">v4 — Approved ✓</div>
+          </div>
+        </div>
+        <div class="clip-slot"><span class="clip-empty">+</span></div>
+        <div class="clip-slot"><span class="clip-empty">+</span></div>
+      </div>
+    </div>
+
+    <!-- Mixer Strip -->
+    <div style="display:flex; border-top: 1px solid #27272a;">
+      <div class="mixer-strip" style="flex:1">
+        <div class="mixer-label" style="color:#8b5cf6">Neon Warehouse</div>
+        <div class="mixer-transport">
+          <div class="mixer-transport-btn arm" title="Record Arm">●</div>
+          <div class="mixer-transport-btn solo" title="Solo">S</div>
+          <div class="mixer-transport-btn mute" title="Mute">M</div>
+        </div>
+        <div class="mixer-sends">
+          <div class="mixer-send a" title="Send A"></div>
+          <div class="mixer-send b" title="Send B"></div>
+        </div>
+        <div class="mixer-pan" title="Pan"></div>
+        <div class="mixer-fader-track">
+          <div class="mixer-fader-fill" style="height:70%;background:linear-gradient(to top,#22c55e,#8b5cf6);border-radius:2px"></div>
+          <div class="mixer-fader-knob" style="bottom:66%"></div>
+        </div>
+        <div class="mixer-db">-3.2 dB</div>
+        <div class="mixer-meter">
+          <div class="mixer-meter-bar" style="height:65%;background:#22c55e"></div>
+          <div class="mixer-meter-bar" style="height:50%;background:#22c55e"></div>
+          <div class="mixer-meter-bar" style="height:80%;background:#eab308"></div>
+          <div class="mixer-meter-bar" style="height:40%;background:#22c55e"></div>
+        </div>
+      </div>
+      <div class="mixer-strip" style="flex:1">
+        <div class="mixer-label" style="color:#eab308">Midnight Run</div>
+        <div class="mixer-transport">
+          <div class="mixer-transport-btn arm">●</div>
+          <div class="mixer-transport-btn solo">S</div>
+          <div class="mixer-transport-btn mute">M</div>
+        </div>
+        <div class="mixer-sends">
+          <div class="mixer-send a"></div>
+          <div class="mixer-send b"></div>
+        </div>
+        <div class="mixer-pan"></div>
+        <div class="mixer-fader-track">
+          <div class="mixer-fader-fill" style="height:55%;background:linear-gradient(to top,#22c55e,#eab308);border-radius:2px"></div>
+          <div class="mixer-fader-knob" style="bottom:51%"></div>
+        </div>
+        <div class="mixer-db">-6.1 dB</div>
+        <div class="mixer-meter">
+          <div class="mixer-meter-bar" style="height:45%;background:#22c55e"></div>
+          <div class="mixer-meter-bar" style="height:35%;background:#22c55e"></div>
+          <div class="mixer-meter-bar" style="height:55%;background:#22c55e"></div>
+          <div class="mixer-meter-bar" style="height:30%;background:#22c55e"></div>
+        </div>
+      </div>
+      <div class="mixer-strip" style="flex:1">
+        <div class="mixer-label" style="color:#3b82f6">Crystal Echo</div>
+        <div class="mixer-transport">
+          <div class="mixer-transport-btn arm">●</div>
+          <div class="mixer-transport-btn solo">S</div>
+          <div class="mixer-transport-btn mute">M</div>
+        </div>
+        <div class="mixer-sends">
+          <div class="mixer-send a"></div>
+          <div class="mixer-send b"></div>
+        </div>
+        <div class="mixer-pan"></div>
+        <div class="mixer-fader-track">
+          <div class="mixer-fader-fill" style="height:40%;background:linear-gradient(to top,#22c55e,#3b82f6);border-radius:2px"></div>
+          <div class="mixer-fader-knob" style="bottom:36%"></div>
+        </div>
+        <div class="mixer-db">-9.4 dB</div>
+        <div class="mixer-meter">
+          <div class="mixer-meter-bar" style="height:25%;background:#22c55e"></div>
+          <div class="mixer-meter-bar" style="height:20%;background:#22c55e"></div>
+          <div class="mixer-meter-bar" style="height:30%;background:#22c55e"></div>
+          <div class="mixer-meter-bar" style="height:15%;background:#22c55e"></div>
+        </div>
+      </div>
+      <div class="mixer-strip" style="flex:1">
+        <div class="mixer-label" style="color:#22c55e">Summer Drums</div>
+        <div class="mixer-transport">
+          <div class="mixer-transport-btn arm">●</div>
+          <div class="mixer-transport-btn solo">S</div>
+          <div class="mixer-transport-btn mute">M</div>
+        </div>
+        <div class="mixer-sends">
+          <div class="mixer-send a"></div>
+          <div class="mixer-send b"></div>
+        </div>
+        <div class="mixer-pan"></div>
+        <div class="mixer-fader-track">
+          <div class="mixer-fader-fill" style="height:60%;background:linear-gradient(to top,#22c55e,#22c55e);border-radius:2px"></div>
+          <div class="mixer-fader-knob" style="bottom:56%"></div>
+        </div>
+        <div class="mixer-db">-4.8 dB</div>
+        <div class="mixer-meter">
+          <div class="mixer-meter-bar" style="height:55%;background:#22c55e"></div>
+          <div class="mixer-meter-bar" style="height:45%;background:#22c55e"></div>
+          <div class="mixer-meter-bar" style="height:70%;background:#eab308"></div>
+          <div class="mixer-meter-bar" style="height:35%;background:#22c55e"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Right Info Panel ── -->
+  <div class="info-panel">
+    <div class="info-panel-header">Info</div>
+    <div class="info-panel-content">
+      <div class="info-card">
+        <div class="info-card-title">Neon Warehouse</div>
+        <div class="info-card-text">
+          Latest version: v13<br>
+          Status: Ready for review<br>
+          DAW: Ableton Live 12<br>
+          BPM: 128 · Key: F# minor<br>
+          Duration: 3:42<br>
+          Size: 28.7 MB
+        </div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-title">Quick Actions</div>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <a href="#" class="info-card-link">📤 Upload new version</a>
+          <a href="#" class="info-card-link">💬 Start review session</a>
+          <a href="#" class="info-card-link">🔀 A/B compare versions</a>
+          <a href="#" class="info-card-link">📊 View analytics</a>
+          <a href="#" class="info-card-link">📦 Create release package</a>
+        </div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-title">Recent Activity</div>
+        <div class="info-card-text">
+          <div style="margin-bottom:4px">
+            <span style="color:#22c55e">✓</span> Sarah approved v12<br>
+            <span style="color:#52525b;font-size:9px">30 minutes ago</span>
+          </div>
+          <div style="margin-bottom:4px">
+            <span style="color:#8b5cf6">📤</span> v13 uploaded<br>
+            <span style="color:#52525b;font-size:9px">2 hours ago</span>
+          </div>
+          <div style="margin-bottom:4px">
+            <span style="color:#3b82f6">💬</span> Comment on mixdown<br>
+            <span style="color:#52525b;font-size:9px">5 hours ago</span>
+          </div>
+        </div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-title">Storage</div>
+        <div style="background:#27272a;height:4px;border-radius:2px;overflow:hidden;margin:6px 0">
+          <div style="width:15%;height:100%;background:#8b5cf6;border-radius:2px"></div>
+        </div>
+        <div class="info-card-text">54.4 MB of 50 GB used</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ Bottom Device Chain ═══ -->
+<div class="device-chain">
+  <div class="device-chain-header">
+    <span>Device Chain</span>
+    <span class="device-name">— Neon Warehouse v13</span>
+    <span style="margin-left:auto;color:#52525b;font-size:9px">Drag devices here</span>
+  </div>
+  <div class="device-chain-body">
+    <!-- Device: QC Check -->
+    <div class="device active">
+      <div class="device-header">
+        <div class="device-toggle on"></div>
+        <div class="device-title">QC Check</div>
+        <div class="device-type">SoundHub</div>
+      </div>
+      <div class="device-body">
+        <div class="device-visual">
+          <span style="height:80%;background:#22c55e"></span>
+          <span style="height:60%;background:#22c55e"></span>
+          <span style="height:90%;background:#22c55e"></span>
+          <span style="height:45%;background:#eab308"></span>
+          <span style="height:70%;background:#22c55e"></span>
+          <span style="height:55%;background:#22c55e"></span>
+          <span style="height:85%;background:#22c55e"></span>
+          <span style="height:40%;background:#22c55e"></span>
+          <span style="height:75%;background:#22c55e"></span>
+          <span style="height:65%;background:#22c55e"></span>
+        </div>
+        <div class="device-param">
+          <span class="device-param-label">LUFS</span>
+          <div class="device-param-bar"><div class="device-param-fill" style="width:72%;background:#22c55e"></div></div>
+          <span class="device-param-value">-14.2</span>
+        </div>
+        <div class="device-param">
+          <span class="device-param-label">Peak</span>
+          <div class="device-param-bar"><div class="device-param-fill" style="width:85%;background:#eab308"></div></div>
+          <span class="device-param-value">-1.2 dB</span>
+        </div>
+        <div class="device-param">
+          <span class="device-param-label">Status</span>
+          <span class="device-param-value" style="color:#22c55e">PASS ✓</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="device-arrow">→</div>
+
+    <!-- Device: Loudness -->
+    <div class="device">
+      <div class="device-header">
+        <div class="device-toggle on"></div>
+        <div class="device-title">Loudness</div>
+        <div class="device-type">Analyzer</div>
+      </div>
+      <div class="device-body">
+        <div class="device-knob-row">
+          <div class="device-knob-group">
+            <div class="device-knob" style="transform:rotate(-30deg)"></div>
+            <div class="device-knob-label">LUFS</div>
+          </div>
+          <div class="device-knob-group">
+            <div class="device-knob" style="transform:rotate(15deg)"></div>
+            <div class="device-knob-label">Peak</div>
+          </div>
+          <div class="device-knob-group">
+            <div class="device-knob" style="transform:rotate(-45deg)"></div>
+            <div class="device-knob-label">Range</div>
+          </div>
+        </div>
+        <div class="device-param">
+          <span class="device-param-label">Integrated</span>
+          <span class="device-param-value">-14.2 LUFS</span>
+        </div>
+        <div class="device-param">
+          <span class="device-param-label">Short</span>
+          <span class="device-param-value">-12.8 LUFS</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="device-arrow">→</div>
+
+    <!-- Device: Version Compare -->
+    <div class="device">
+      <div class="device-header">
+        <div class="device-toggle on"></div>
+        <div class="device-title">A/B Compare</div>
+        <div class="device-type">SoundHub</div>
+      </div>
+      <div class="device-body">
+        <div style="display:flex;gap:4px;margin-bottom:4px">
+          <div style="flex:1;background:#8b5cf6;border-radius:3px;padding:4px 6px;text-align:center">
+            <div style="font-size:8px;font-weight:700;color:#fff">A — v12</div>
+          </div>
+          <div style="flex:1;background:#06b6d4;border-radius:3px;padding:4px 6px;text-align:center">
+            <div style="font-size:8px;font-weight:700;color:#fff">B — v13</div>
+          </div>
+        </div>
+        <div class="device-param">
+          <span class="device-param-label">Crossfade</span>
+          <div class="device-param-bar"><div class="device-param-fill" style="width:50%;background:linear-gradient(to right,#8b5cf6,#06b6d4)"></div></div>
+          <span class="device-param-value">50%</span>
+        </div>
+        <div class="device-param">
+          <span class="device-param-label">Delta</span>
+          <span class="device-param-value" style="color:#22c55e">+0.3 dB</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="device-arrow">→</div>
+
+    <!-- Device: Stem Split -->
+    <div class="device">
+      <div class="device-header">
+        <div class="device-toggle off"></div>
+        <div class="device-title">Stem Split</div>
+        <div class="device-type">AI</div>
+      </div>
+      <div class="device-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:3px">
+          <div style="background:#8b5cf6;border-radius:3px;padding:3px;text-align:center;font-size:7px;font-weight:600;color:#fff">Drums</div>
+          <div style="background:#eab308;border-radius:3px;padding:3px;text-align:center;font-size:7px;font-weight:600;color:#000">Bass</div>
+          <div style="background:#3b82f6;border-radius:3px;padding:3px;text-align:center;font-size:7px;font-weight:600;color:#fff">Vocals</div>
+          <div style="background:#22c55e;border-radius:3px;padding:3px;text-align:center;font-size:7px;font-weight:600;color:#fff">Other</div>
+        </div>
+        <div class="device-param" style="margin-top:4px">
+          <span class="device-param-label">Model</span>
+          <span class="device-param-value">Demucs v4</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="device-arrow">→</div>
+
+    <!-- Device: Release -->
+    <div class="device">
+      <div class="device-header">
+        <div class="device-toggle off"></div>
+        <div class="device-title">Release Pkg</div>
+        <div class="device-type">Export</div>
+      </div>
+      <div class="device-body">
+        <div class="device-param">
+          <span class="device-param-label">Format</span>
+          <span class="device-param-value">WAV 24bit</span>
+        </div>
+        <div class="device-param">
+          <span class="device-param-label">Sample Rate</span>
+          <span class="device-param-value">44.1 kHz</span>
+        </div>
+        <div class="device-param">
+          <span class="device-param-label">License</span>
+          <span class="device-param-value" style="color:#8b5cf6">CC BY 4.0</span>
+        </div>
+        <div class="device-param">
+          <span class="device-param-label">Price</span>
+          <span class="device-param-value">$4.99</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+</body></html>
+    </div>
+  </foreignObject>
+</svg>

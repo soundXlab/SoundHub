@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" 
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     viewBox="0 0 1440 2118" 
+     width="1440" 
+     height="2118">
+  <foreignObject width="100%" height="100%">
+    <div xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html><html lang="en"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <title>SoundHub — Dashboard</title>
+  <link rel="stylesheet" href="design-system/shared.css">
+  <style>
+    .dashboard-welcome {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      padding: 24px 28px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .welcome-text h2 {
+      font-size: 20px; font-weight: 700; letter-spacing: -0.3px;
+    }
+    .welcome-text p {
+      font-size: 13px; color: var(--text-secondary); margin-top: 4px;
+    }
+    .section-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .section-title {
+      font-size: 13px; font-weight: 700; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.8px;
+    }
+    .project-row {
+      display: flex; align-items: center; gap: 16px;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border-default);
+      transition: background 0.1s;
+    }
+    .project-row:last-child { border-bottom: none; }
+    .project-row:hover { background: var(--bg-hover); }
+    .project-icon {
+      width: 40px; height: 40px;
+      border-radius: var(--radius-md);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+    .project-info { flex: 1; }
+    .project-name { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+    .project-meta {
+      font-size: 11px; color: var(--text-muted); margin-top: 2px;
+      font-family: var(--font-mono);
+    }
+    .project-right {
+      display: flex; align-items: center; gap: 12px;
+    }
+    .project-time { font-size: 11px; color: var(--text-muted); }
+    .activity-item {
+      display: flex; gap: 12px; padding: 12px 0;
+      border-bottom: 1px solid var(--border-default);
+    }
+    .activity-item:last-child { border-bottom: none; }
+    .activity-icon {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; flex-shrink: 0;
+    }
+    .activity-text { font-size: 13px; color: var(--text-secondary); }
+    .activity-text strong { color: var(--text-primary); font-weight: 600; }
+    .activity-time { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .quick-actions {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+      margin-top: 16px;
+    }
+    .quick-action {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 16px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .quick-action:hover {
+      border-color: var(--brand-primary);
+      background: rgba(139,92,246,0.05);
+    }
+    .quick-action .qa-icon { font-size: 20px; }
+    .quick-action .qa-label { font-size: 12px; font-weight: 600; color: var(--text-primary); }
+    .quick-action .qa-sub { font-size: 10px; color: var(--text-muted); }
+    .timeline-mini {
+      position: relative;
+      padding-left: 20px;
+    }
+    .timeline-mini::before {
+      content: '';
+      position: absolute;
+      left: 6px; top: 8px; bottom: 8px;
+      width: 2px;
+      background: var(--border-default);
+    }
+    .timeline-mini .tm-item {
+      position: relative;
+      padding: 8px 0;
+    }
+    .timeline-mini .tm-dot {
+      position: absolute;
+      left: -17px; top: 12px;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <div class="logo-icon">S</div>
+        <div class="logo-text">SoundHub</div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="sidebar-section-label">Main</div>
+        <a class="sidebar-item active" href="#"><span class="icon">📊</span> Dashboard</a>
+        <a class="sidebar-item" href="#"><span class="icon">📁</span> Projects <span class="badge">3</span></a>
+        <a class="sidebar-item" href="#"><span class="icon">🛒</span> Marketplace</a>
+        <a class="sidebar-item" href="#"><span class="icon">⬆️</span> Upload</a>
+        <a class="sidebar-section-label">Workspace</a></nav></aside></div><a class="sidebar-section-label">
+        </a><a class="sidebar-item" href="#"><span class="icon">💬</span> Reviews <span class="badge">2</span></a>
+        <a class="sidebar-item" href="#"><span class="icon">📋</span> Sessions</a>
+        <a class="sidebar-item" href="#"><span class="icon">🔔</span> Notifications</a>
+        <div class="sidebar-section-label">Account</div>
+        <a class="sidebar-item" href="#"><span class="icon">⚙️</span> Settings</a>
+        <a class="sidebar-item" href="#"><span class="icon">📊</span> Analytics</a>
+      
+      <div class="sidebar-footer">
+        <a class="sidebar-item" href="#"><span class="icon">❓</span> Help &amp; Docs</a>
+      </div>
+    
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- TopBar -->
+      <header class="topbar">
+        <div class="topbar-search">
+          <span class="search-icon">🔍</span>
+          <input type="text" placeholder="Search projects, sounds, artists...">
+        </div>
+        <div class="topbar-right">
+          <div class="topbar-icon-btn">🔔<span class="notif-dot"></span></div>
+          <div class="topbar-icon-btn">💬</div>
+          <div class="topbar-avatar">P</div>
+        </div>
+      </header>
+
+      <div class="page">
+        <!-- Welcome Banner -->
+        <div class="dashboard-welcome">
+          <div class="welcome-text">
+            <h2>Welcome back, Producer 🎵</h2>
+            <p>You have 3 active projects and 2 pending reviews</p>
+          </div>
+          <button class="btn btn-primary">+ New Project</button>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="grid-4" style="margin-bottom:24px">
+          <div class="stat-card">
+            <div class="stat-label">Projects</div>
+            <div class="stat-value">12</div>
+            <div class="stat-change positive">+3 this week</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Reviews</div>
+            <div class="stat-value">5</div>
+            <div class="stat-change warning">2 pending</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Assets</div>
+            <div class="stat-value">48</div>
+            <div class="stat-change positive">+12 this month</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Downloads</div>
+            <div class="stat-value">1.2K</div>
+            <div class="stat-change positive">+180 today</div>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="section-header">
+          <div class="section-title">Quick Actions</div>
+        </div>
+        <div class="quick-actions" style="margin-bottom:24px">
+          <div class="quick-action">
+            <span class="qa-icon">📤</span>
+            <div><div class="qa-label">Upload DAW Project</div><div class="qa-sub">.als, .flp, .cpr</div></div>
+          </div>
+          <div class="quick-action">
+            <span class="qa-icon">🔍</span>
+            <div><div class="qa-label">Browse Marketplace</div><div class="qa-sub">256 audio assets</div></div>
+          </div>
+          <div class="quick-action">
+            <span class="qa-icon">💬</span>
+            <div><div class="qa-label">Start Review</div><div class="qa-sub">Request feedback</div></div>
+          </div>
+        </div>
+
+        <div class="grid-2" style="gap:24px">
+          <!-- Recent Projects -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Recent Projects</span>
+              <a href="#" class="btn btn-ghost btn-sm">View all →</a>
+            </div>
+            <div class="card-body" style="padding:0">
+              <div class="project-row">
+                <div class="project-icon" style="background:rgba(139,92,246,0.12);color:var(--brand-primary)">🎵</div>
+                <div class="project-info">
+                  <div class="project-name">Neon Warehouse</div>
+                  <div class="project-meta">v13 · Ableton Live 12 · 128 BPM · F# minor</div>
+                </div>
+                <div class="project-right">
+                  <span class="badge badge-success">Ready</span>
+                  <span class="project-time">2h ago</span>
+                </div>
+              </div>
+              <div class="project-row">
+                <div class="project-icon" style="background:rgba(234,179,8,0.12);color:var(--color-warning)">🎵</div>
+                <div class="project-info">
+                  <div class="project-name">Midnight Run</div>
+                  <div class="project-meta">v7 · FL Studio 21 · 140 BPM · D minor</div>
+                </div>
+                <div class="project-right">
+                  <span class="badge badge-warning">In Review</span>
+                  <span class="project-time">1d ago</span>
+                </div>
+              </div>
+              <div class="project-row">
+                <div class="project-icon" style="background:rgba(59,130,246,0.12);color:var(--color-info)">🎵</div>
+                <div class="project-info">
+                  <div class="project-name">Crystal Echo</div>
+                  <div class="project-meta">v1 · Ableton Live 12 · 90 BPM · Am</div>
+                </div>
+                <div class="project-right">
+                  <span class="badge badge-muted">Draft</span>
+                  <span class="project-time">3d ago</span>
+                </div>
+              </div>
+              <div class="project-row">
+                <div class="project-icon" style="background:rgba(34,197,94,0.12);color:var(--color-success)">🎵</div>
+                <div class="project-info">
+                  <div class="project-name">Summer Drums</div>
+                  <div class="project-meta">v5 · REAPER · 120 BPM · C major</div>
+                </div>
+                <div class="project-right">
+                  <span class="badge badge-success">Published</span>
+                  <span class="project-time">5d ago</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Activity Feed -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Activity Feed</span>
+              <a href="#" class="btn btn-ghost btn-sm">View all →</a>
+            </div>
+            <div class="card-body">
+              <div class="activity-item">
+                <div class="activity-icon" style="background:rgba(34,197,94,0.12)">✅</div>
+                <div>
+                  <div class="activity-text"><strong>Sarah</strong> approved v12 of <strong>Neon Warehouse</strong></div>
+                  <div class="activity-time">30 minutes ago</div>
+                </div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-icon" style="background:rgba(139,92,246,0.12)">📤</div>
+                <div>
+                  <div class="activity-text">New version uploaded: <strong>Midnight Run v7</strong></div>
+                  <div class="activity-time">2 hours ago</div>
+                </div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-icon" style="background:rgba(59,130,246,0.12)">💬</div>
+                <div>
+                  <div class="activity-text"><strong>Sarah</strong> commented on <strong>Crystal Echo</strong></div>
+                  <div class="activity-time">5 hours ago</div>
+                </div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-icon" style="background:rgba(234,179,8,0.12)">🔔</div>
+                <div>
+                  <div class="activity-text">Review request sent to <strong>Alex</strong> for <strong>Midnight Run</strong></div>
+                  <div class="activity-time">Yesterday</div>
+                </div>
+              </div>
+              <div class="activity-item">
+                <div class="activity-icon" style="background:rgba(6,182,212,0.12)">🛒</div>
+                <div>
+                  <div class="activity-text">Your asset <strong>Lo-Fi Drums</strong> was downloaded 12 times</div>
+                  <div class="activity-time">2 days ago</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+
+
+</body></html>
+    </div>
+  </foreignObject>
+</svg>

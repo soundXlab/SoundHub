@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <title>SoundHub — Deadlines & Milestones</title>
+  <link rel="stylesheet" href="design-system/shared.css">
+  <style>
+    .timeline-card {
+      background: var(--bg-surface); border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg); padding: 20px; margin-bottom: 12px;
+    }
+    .timeline-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .timeline-project { font-size: 14px; font-weight: 700; }
+    .timeline-bar {
+      position: relative; height: 8px; background: var(--bg-elevated);
+      border-radius: 4px; margin-bottom: 16px;
+    }
+    .timeline-fill { height: 100%; border-radius: 4px; background: var(--brand-primary); }
+    .timeline-milestone {
+      position: absolute; top: -4px; width: 16px; height: 16px;
+      border-radius: 50%; border: 2px solid var(--bg-surface);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 6px; color: #fff;
+    }
+    .milestone-done { background: var(--color-success); }
+    .milestone-current { background: var(--brand-primary); box-shadow: 0 0 8px rgba(139,92,246,0.5); }
+    .milestone-pending { background: var(--bg-elevated); border-color: var(--border-default); }
+    .milestone-list { display: flex; flex-direction: column; gap: 8px; }
+    .milestone-item {
+      display: flex; align-items: center; gap: 12px; padding: 8px 12px;
+      background: var(--bg-elevated); border-radius: var(--radius-sm);
+    }
+    .milestone-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .milestone-info { flex: 1; }
+    .milestone-name { font-size: 12px; font-weight: 600; }
+    .milestone-date { font-size: 10px; color: var(--text-muted); }
+    .milestone-status { font-size: 10px; font-weight: 600; }
+    .upcoming-badge {
+      display: inline-flex; padding: 2px 8px; border-radius: 4px;
+      font-size: 9px; font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-logo"><div class="logo-icon">S</div><div class="logo-text">SoundHub</div></div>
+      <nav class="sidebar-nav">
+        <div class="sidebar-section-label">Main</div>
+        <a class="sidebar-item" href="#"><span class="icon">📊</span> Dashboard</a>
+        <a class="sidebar-item" href="#"><span class="icon">📁</span> Projects</a>
+        <div class="sidebar-section-label">Workspace</div>
+        <a class="sidebar-item" href="#"><span class="icon">📅</span> Calendar</a>
+        <a class="sidebar-item active" href="#"><span class="icon">🎯</span> Milestones</a>
+        <div class="sidebar-section-label">Account</div>
+        <a class="sidebar-item" href="#"><span class="icon">⚙️</span> Settings</a>
+      </nav>
+    </aside>
+    <div class="main-content">
+      <header class="topbar">
+        <div class="topbar-search"><span class="search-icon">🔍</span><input type="text" placeholder="Search deadlines..."></div>
+        <div class="topbar-right"><div class="topbar-icon-btn">🔔<span class="notif-dot"></span></div><div class="topbar-avatar">P</div></div>
+      </header>
+      <div class="page">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
+          <div>
+            <h1 class="page-title" style="margin-bottom:4px">Deadlines & Milestones</h1>
+            <p class="page-subtitle">Track project timelines and key milestones</p>
+          </div>
+          <button class="btn btn-primary">+ Add Milestone</button>
+        </div>
+
+        <!-- Upcoming Deadlines -->
+        <div style="margin-bottom:24px">
+          <h3 style="font-size:13px;font-weight:700;margin-bottom:12px;color:var(--text-muted)">⏰ UPCOMING DEADLINES</h3>
+          <div class="grid-3">
+            <div class="timeline-card" style="border-left:3px solid var(--color-error)">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+                <span style="font-size:13px;font-weight:700">Neon Warehouse</span>
+                <span class="upcoming-badge" style="background:rgba(239,68,68,0.12);color:var(--color-error)">2 days</span>
+              </div>
+              <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px">Master approval deadline</div>
+              <div style="font-size:11px;color:var(--text-muted)">Sep 2, 2026 · 3:00 PM</div>
+            </div>
+            <div class="timeline-card" style="border-left:3px solid var(--color-warning)">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+                <span style="font-size:13px;font-weight:700">Deep House Final</span>
+                <span class="upcoming-badge" style="background:rgba(234,179,8,0.12);color:var(--color-warning)">5 days</span>
+              </div>
+              <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px">Mix review round 2</div>
+              <div style="font-size:11px;color:var(--text-muted)">Sep 5, 2026 · 12:00 PM</div>
+            </div>
+            <div class="timeline-card" style="border-left:3px solid var(--brand-primary)">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+                <span style="font-size:13px;font-weight:700">Acoustic EP</span>
+                <span class="upcoming-badge" style="background:rgba(139,92,246,0.12);color:var(--brand-primary)">9 days</span>
+              </div>
+              <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px">Release to Marketplace</div>
+              <div style="font-size:11px;color:var(--text-muted)">Sep 9, 2026 · 6:00 PM</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Project Timelines -->
+        <h3 style="font-size:13px;font-weight:700;margin-bottom:12px;color:var(--text-muted)">📈 PROJECT TIMELINES</h3>
+
+        <div class="timeline-card">
+          <div class="timeline-header">
+            <span class="timeline-project">Neon Warehouse</span>
+            <span class="badge badge-success" style="font-size:10px">75% Complete</span>
+          </div>
+          <div class="timeline-bar">
+            <div class="timeline-fill" style="width:75%"></div>
+            <div class="timeline-milestone milestone-done" style="left:0%"></div>
+            <div class="timeline-milestone milestone-done" style="left:25%"></div>
+            <div class="timeline-milestone milestone-done" style="left:50%"></div>
+            <div class="timeline-milestone milestone-current" style="left:75%"></div>
+            <div class="timeline-milestone milestone-pending" style="left:100%"></div>
+          </div>
+          <div class="milestone-list">
+            <div class="milestone-item">
+              <div class="milestone-dot milestone-done"></div>
+              <div class="milestone-info"><div class="milestone-name">Initial Recording</div><div class="milestone-date">Jul 15</div></div>
+              <div class="milestone-status" style="color:var(--color-success)">✓ Done</div>
+            </div>
+            <div class="milestone-item">
+              <div class="milestone-dot milestone-done"></div>
+              <div class="milestone-info"><div class="milestone-name">Rough Mix Complete</div><div class="milestone-date">Jul 28</div></div>
+              <div class="milestone-status" style="color:var(--color-success)">✓ Done</div>
+            </div>
+            <div class="milestone-item">
+              <div class="milestone-dot milestone-done"></div>
+              <div class="milestone-info"><div class="milestone-name">Review Round 1</div><div class="milestone-date">Aug 5</div></div>
+              <div class="milestone-status" style="color:var(--color-success)">✓ Done</div>
+            </div>
+            <div class="milestone-item" style="background:rgba(139,92,246,0.08)">
+              <div class="milestone-dot milestone-current"></div>
+              <div class="milestone-info"><div class="milestone-name">Master Approval</div><div class="milestone-date">Sep 2</div></div>
+              <div class="milestone-status" style="color:var(--brand-primary)">⟳ In Progress</div>
+            </div>
+            <div class="milestone-item">
+              <div class="milestone-dot milestone-pending"></div>
+              <div class="milestone-info"><div class="milestone-name">Release to Marketplace</div><div class="milestone-date">Sep 10</div></div>
+              <div class="milestone-status" style="color:var(--text-muted)">○ Pending</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="timeline-card">
+          <div class="timeline-header">
+            <span class="timeline-project">Summer Album</span>
+            <span class="badge badge-warning" style="font-size:10px">50% Complete</span>
+          </div>
+          <div class="timeline-bar">
+            <div class="timeline-fill" style="width:50%;background:var(--color-warning)"></div>
+            <div class="timeline-milestone milestone-done" style="left:0%"></div>
+            <div class="timeline-milestone milestone-done" style="left:25%"></div>
+            <div class="timeline-milestone milestone-current" style="left:50%"></div>
+            <div class="timeline-milestone milestone-pending" style="left:75%"></div>
+            <div class="timeline-milestone milestone-pending" style="left:100%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

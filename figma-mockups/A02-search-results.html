@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <title>SoundHub — Search Results</title>
+  <link rel="stylesheet" href="design-system/shared.css">
+  <style>
+    .search-hero { text-align: center; padding: 40px 0 24px; }
+    .search-hero h1 { font-size: 24px; font-weight: 800; margin-bottom: 16px; }
+    .search-box { max-width: 640px; margin: 0 auto; position: relative; }
+    .search-box input {
+      width: 100%; padding: 14px 20px 14px 48px; font-size: 16px;
+      background: var(--bg-surface); border: 2px solid var(--border-default);
+      border-radius: var(--radius-lg); color: var(--text-primary); outline: none;
+    }
+    .search-box input:focus { border-color: var(--brand-primary); }
+    .search-box .icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); font-size: 18px; }
+    .search-tabs { display: flex; gap: 4px; justify-content: center; margin: 20px 0; }
+    .search-tab {
+      padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: 600;
+      cursor: pointer; color: var(--text-secondary); border: 1px solid var(--border-default);
+      background: transparent; transition: all 0.15s;
+    }
+    .search-tab:hover { color: var(--text-primary); }
+    .search-tab.active { background: var(--brand-primary); color: #fff; border-color: var(--brand-primary); }
+    .results-section { margin-bottom: 32px; }
+    .results-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border-default);
+    }
+    .results-title { font-size: 14px; font-weight: 700; color: var(--text-primary); }
+    .results-count { font-size: 12px; color: var(--text-muted); }
+    .result-item {
+      display: flex; align-items: center; gap: 14px; padding: 14px;
+      background: var(--bg-surface); border: 1px solid var(--border-default);
+      border-radius: var(--radius-md); margin-bottom: 8px; cursor: pointer;
+      transition: all 0.15s;
+    }
+    .result-item:hover { border-color: var(--border-hover); transform: translateY(-1px); }
+    .result-icon {
+      width: 40px; height: 40px; border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center; font-size: 18px;
+      flex-shrink: 0;
+    }
+    .result-body { flex: 1; min-width: 0; }
+    .result-name { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+    .result-name mark { background: rgba(234,88,8,0.25); color: var(--text-primary); border-radius: 2px; padding: 0 2px; }
+    .result-meta { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .result-tags { display: flex; gap: 4px; margin-top: 4px; }
+    .result-actions { display: flex; gap: 6px; flex-shrink: 0; }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-logo"><div class="logo-icon">S</div><div class="logo-text">SoundHub</div></div>
+      <nav class="sidebar-nav">
+        <div class="sidebar-section-label">Main</div>
+        <a class="sidebar-item" href="#"><span class="icon">📊</span> Dashboard</a>
+        <a class="sidebar-item" href="#"><span class="icon">📁</span> Projects</a>
+        <a class="sidebar-item" href="#"><span class="icon">🛒</span> Marketplace</a>
+        <a class="sidebar-item" href="#"><span class="icon">⬆️</span> Upload</a>
+        <div class="sidebar-section-label">Workspace</div>
+        <a class="sidebar-item" href="#"><span class="icon">💬</span> Reviews</a>
+        <a class="sidebar-item" href="#"><span class="icon">📋</span> Sessions</a>
+        <div class="sidebar-section-label">Account</div>
+        <a class="sidebar-item" href="#"><span class="icon">⚙️</span> Settings</a>
+      </nav>
+    </aside>
+    <div class="main-content">
+      <header class="topbar">
+        <div class="topbar-search"><span class="search-icon">🔍</span><input type="text" value="lo-fi drums"></div>
+        <div class="topbar-right"><div class="topbar-icon-btn">🔔<span class="notif-dot"></span></div><div class="topbar-avatar">P</div></div>
+      </header>
+      <div class="page">
+        <div class="search-hero">
+          <h1>Search Results</h1>
+          <div class="search-box">
+            <span class="icon">🔍</span>
+            <input type="text" value="lo-fi drums" style="font-size:16px">
+          </div>
+        </div>
+        <div class="search-tabs">
+          <div class="search-tab active">All (24)</div>
+          <div class="search-tab">Assets (12)</div>
+          <div class="search-tab">Projects (6)</div>
+          <div class="search-tab">Users (4)</div>
+          <div class="search-tab">Tags (2)</div>
+        </div>
+
+        <!-- Assets -->
+        <div class="results-section">
+          <div class="results-header"><span class="results-title">🎵 Assets</span><span class="results-count">12 results</span></div>
+          <div class="result-item">
+            <div class="result-icon" style="background:rgba(139,92,246,0.12)">🎵</div>
+            <div class="result-body">
+              <div class="result-name">Lo-Fi <mark>Drums</mark> Pack</div>
+              <div class="result-meta">by @producer1 · WAV · 24bit · Free</div>
+              <div class="result-tags"><span class="badge badge-purple" style="font-size:9px">lo-fi</span><span class="badge badge-muted" style="font-size:9px">drums</span></div>
+            </div>
+            <div class="result-actions"><button class="btn btn-secondary" style="font-size:11px">▶ Preview</button></div>
+          </div>
+          <div class="result-item">
+            <div class="result-icon" style="background:rgba(6,182,212,0.12)">🎵</div>
+            <div class="result-body">
+              <div class="result-name">Chill <mark>Lo-Fi</mark> Beats Vol.3</div>
+              <div class="result-meta">by @beatsmith · WAV · 16bit · $4.99</div>
+              <div class="result-tags"><span class="badge badge-purple" style="font-size:9px">lo-fi</span><span class="badge badge-muted" style="font-size:9px">beats</span></div>
+            </div>
+            <div class="result-actions"><button class="btn btn-secondary" style="font-size:11px">▶ Preview</button></div>
+          </div>
+          <div class="result-item">
+            <div class="result-icon" style="background:rgba(234,88,8,0.12)">🎵</div>
+            <div class="result-body">
+              <div class="result-name">Vinyl <mark>Drums</mark> Collection</div>
+              <div class="result-meta">by @vintage_sounds · FLAC · 24bit · $7.99</div>
+              <div class="result-tags"><span class="badge badge-muted" style="font-size:9px">drums</span><span class="badge badge-muted" style="font-size:9px">vinyl</span></div>
+            </div>
+            <div class="result-actions"><button class="btn btn-secondary" style="font-size:11px">▶ Preview</button></div>
+          </div>
+        </div>
+
+        <!-- Projects -->
+        <div class="results-section">
+          <div class="results-header"><span class="results-title">📁 Projects</span><span class="results-count">6 results</span></div>
+          <div class="result-item">
+            <div class="result-icon" style="background:rgba(139,92,246,0.12)">📁</div>
+            <div class="result-body">
+              <div class="result-name">Lo-Fi <mark>Drums</mark> Toolkit</div>
+              <div class="result-meta">Private · 14 versions · Updated 2h ago</div>
+            </div>
+            <div class="result-actions"><button class="btn btn-secondary" style="font-size:11px">Open</button></div>
+          </div>
+          <div class="result-item">
+            <div class="result-icon" style="background:rgba(34,197,94,0.12)">📁</div>
+            <div class="result-body">
+              <div class="result-name">Chill <mark>Lo-Fi</mark> Album</div>
+              <div class="result-meta">Public · 8 versions · Updated 1d ago</div>
+            </div>
+            <div class="result-actions"><button class="btn btn-secondary" style="font-size:11px">Open</button></div>
+          </div>
+        </div>
+
+        <!-- Users -->
+        <div class="results-section">
+          <div class="results-header"><span class="results-title">👤 Users</span><span class="results-count">4 results</span></div>
+          <div class="result-item">
+            <div class="result-icon" style="background:rgba(139,92,246,0.12);border-radius:50%;color:#fff;font-size:14px;font-weight:700">P</div>
+            <div class="result-body">
+              <div class="result-name">@producer1</div>
+              <div class="result-meta">48 assets · 1.2k downloads · Joined Mar 2025</div>
+            </div>
+            <div class="result-actions"><button class="btn btn-secondary" style="font-size:11px">Profile</button></div>
+          </div>
+          <div class="result-item">
+            <div class="result-icon" style="background:rgba(234,88,8,0.12);border-radius:50%;color:#fff;font-size:14px;font-weight:700">D</div>
+            <div class="result-body">
+              <div class="result-name">@drum_lo_fi</div>
+              <div class="result-meta">12 assets · 890 downloads · Joined Jan 2026</div>
+            </div>
+            <div class="result-actions"><button class="btn btn-secondary" style="font-size:11px">Profile</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

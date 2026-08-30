@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" width="1440" height="900">
+  <defs>
+    <linearGradient id="loginGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8B5CF6;stop-opacity:0.12"/>
+      <stop offset="100%" style="stop-color:#06B6D4;stop-opacity:0.06"/>
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#8B5CF6"/>
+      <stop offset="100%" style="stop-color:#06B6D4"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="60" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1440" height="900" fill="#0A0A0B"/>
+
+  <!-- Left panel - Branding -->
+  <rect width="720" height="900" fill="#0A0A0B"/>
+  <rect width="720" height="900" fill="url(#loginGrad)"/>
+  <!-- Glow orbs -->
+  <circle cx="300" cy="400" r="300" fill="#8B5CF6" opacity="0.06" filter="url(#glow)"/>
+  <circle cx="500" cy="600" r="200" fill="#06B6D4" opacity="0.04" filter="url(#glow)"/>
+
+  <!-- Brand content -->
+  <text x="80" y="320" font-family="Inter, sans-serif" font-size="16" font-weight="600" fill="#8B5CF6" letter-spacing="2">VERSION CONTROL FOR MUSIC</text>
+  <text x="80" y="380" font-family="Inter, -apple-system, sans-serif" font-size="48" font-weight="900" fill="#FFFFFF" letter-spacing="-1.5">Welcome back</text>
+  <text x="80" y="430" font-family="Inter, sans-serif" font-size="18" fill="#A1A1AA">Pick up where you left off. Your projects</text>
+  <text x="80" y="458" font-family="Inter, sans-serif" font-size="18" fill="#A1A1AA">are safe and versioned.</text>
+
+  <!-- Mini waveform decoration -->
+  <g transform="translate(80, 510)">
+    <rect x="0" y="20" width="5" height="30" rx="2" fill="#8B5CF6" opacity="0.2"/>
+    <rect x="10" y="10" width="5" height="50" rx="2" fill="#8B5CF6" opacity="0.3"/>
+    <rect x="20" y="5" width="5" height="60" rx="2" fill="#8B5CF6" opacity="0.4"/>
+    <rect x="30" y="15" width="5" height="40" rx="2" fill="#8B5CF6" opacity="0.3"/>
+    <rect x="40" y="25" width="5" height="20" rx="2" fill="#8B5CF6" opacity="0.2"/>
+    <rect x="50" y="10" width="5" height="50" rx="2" fill="#8B5CF6" opacity="0.3"/>
+    <rect x="60" y="0" width="5" height="70" rx="2" fill="url(#accentGrad)" opacity="0.5"/>
+    <rect x="70" y="5" width="5" height="60" rx="2" fill="url(#accentGrad)" opacity="0.6"/>
+    <rect x="80" y="15" width="5" height="40" rx="2" fill="#06B6D4" opacity="0.3"/>
+    <rect x="90" y="25" width="5" height="20" rx="2" fill="#06B6D4" opacity="0.2"/>
+  </g>
+
+  <!-- Right panel - Form -->
+  <rect x="720" y="0" width="720" height="900" fill="#111113"/>
+  <line x1="720" y1="0" x2="720" y2="900" stroke="#1F1F23" stroke-width="1"/>
+
+  <!-- Form card -->
+  <rect x="860" y="200" width="440" height="500" rx="20" fill="#18181B" stroke="#27272A" stroke-width="1"/>
+
+  <!-- Logo -->
+  <text x="1080" y="260" text-anchor="middle" font-family="Inter, sans-serif" font-size="24" font-weight="800" fill="#FFFFFF">🎵 SoundHub</text>
+
+  <!-- Tab switcher -->
+  <rect x="900" y="300" width="180" height="36" rx="8" fill="#8B5CF6" opacity="0.12"/>
+  <text x="960" y="324" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#8B5CF6">Sign In</text>
+  <rect x="1090" y="300" width="180" height="36" rx="8" fill="transparent"/>
+  <text x="1160" y="324" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#71717A">Sign Up</text>
+
+  <!-- Form fields -->
+  <text x="900" y="370" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#A1A1AA">Username</text>
+  <rect x="900" y="380" width="360" height="44" rx="10" fill="#0A0A0B" stroke="#27272A" stroke-width="1"/>
+  <text x="920" y="407" font-family="Inter, sans-serif" font-size="14" fill="#52525B">demo</text>
+  <!-- Cursor -->
+  <line x1="960" y1="390" x2="960" y2="420" stroke="#8B5CF6" stroke-width="2"/>
+
+  <text x="900" y="455" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#A1A1AA">Password</text>
+  <rect x="900" y="465" width="360" height="44" rx="10" fill="#0A0A0B" stroke="#27272A" stroke-width="1"/>
+  <text x="920" y="493" font-family="Inter, sans-serif" font-size="14" fill="#52525B">••••••••</text>
+  <!-- Eye icon -->
+  <text x="1230" y="493" font-family="Inter, sans-serif" font-size="14" fill="#52525B">👁</text>
+
+  <!-- Remember me / Forgot -->
+  <rect x="900" y="530" width="16" height="16" rx="4" fill="#8B5CF6"/>
+  <text x="924" y="543" font-family="Inter, sans-serif" font-size="13" fill="#A1A1AA">Remember me</text>
+  <text x="1160" y="543" font-family="Inter, sans-serif" font-size="13" fill="#8B5CF6">Forgot password?</text>
+
+  <!-- Sign in button -->
+  <rect x="900" y="570" width="360" height="48" rx="12" fill="#8B5CF6"/>
+  <text x="1080" y="600" text-anchor="middle" font-family="Inter, sans-serif" font-size="15" font-weight="700" fill="#FFFFFF">Sign In →</text>
+
+  <!-- Divider -->
+  <line x1="920" y1="645" x2="1240" y2="645" stroke="#27272A" stroke-width="1"/>
+  <rect x="1048" y="636" width="64" height="18" rx="4" fill="#111113"/>
+  <text x="1080" y="649" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#52525B">OR</text>
+
+  <!-- Wallet connect -->
+  <rect x="900" y="665" width="360" height="44" rx="12" fill="none" stroke="#3F3F46" stroke-width="1.5"/>
+  <text x="920" y="693" font-family="Inter, sans-serif" font-size="16">🦊</text>
+  <text x="1040" y="693" font-family="Inter, sans-serif" font-size="14" font-weight="600" fill="#E4E4E7">Connect MetaMask</text>
+
+  <!-- Footer text -->
+  <text x="1080" y="740" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#52525B">Don't have an account? <tspan fill="#8B5CF6">Sign up free</tspan></text>
+
+  <!-- Demo hint -->
+  <rect x="900" y="760" width="360" height="36" rx="8" fill="#8B5CF6" opacity="0.06"/>
+  <text x="1080" y="783" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#8B5CF6">Try demo: username "demo" / password "demo123"</text>
+</svg>

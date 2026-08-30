@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <title>SoundHub — Reviews</title>
+  <link rel="stylesheet" href="design-system/shared.css">
+  <style>
+    .review-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      transition: border-color 0.15s;
+      cursor: pointer;
+    }
+    .review-card:hover { border-color: var(--border-hover); }
+    .review-card-icon { width: 48px; height: 48px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+    .review-card-info { flex: 1; }
+    .review-card-title { font-size: 14px; font-weight: 700; }
+    .review-card-meta { font-size: 11px; color: var(--text-muted); margin-top: 2px; font-family: var(--font-mono); }
+    .review-card-desc { font-size: 12px; color: var(--text-secondary); margin-top: 6px; }
+    .review-card-right { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+    .review-rounds { display: flex; gap: 4px; }
+    .round-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .round-dot.open { background: var(--color-warning); }
+    .round-dot.submitted { background: var(--brand-primary); }
+    .round-dot.approved { background: var(--color-success); }
+    .round-dot.closed { background: var(--border-default); }
+    .filter-tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+    .filter-tab { padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 500; color: var(--text-muted); cursor: pointer; border: 1px solid var(--border-default); transition: all 0.15s; }
+    .filter-tab:hover { border-color: var(--border-hover); color: var(--text-primary); }
+    .filter-tab.active { background: var(--brand-primary); color: white; border-color: var(--brand-primary); }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-logo"><div class="logo-icon">S</div><div class="logo-text">SoundHub</div></div>
+      <nav class="sidebar-nav">
+        <div class="sidebar-section-label">Main</div>
+        <a class="sidebar-item" href="#"><span class="icon">📊</span> Dashboard</a>
+        <a class="sidebar-item" href="#"><span class="icon">📁</span> Projects</a>
+        <a class="sidebar-item" href="#"><span class="icon">🛒</span> Marketplace</a>
+        <div class="sidebar-section-label">Workspace</div>
+        <a class="sidebar-item active" href="#"><span class="icon">💬</span> Reviews <span class="badge">3</span></a>
+        <a class="sidebar-item" href="#"><span class="icon">📋</span> Sessions</a>
+        <div class="sidebar-section-label">Account</div>
+        <a class="sidebar-item" href="#"><span class="icon">⚙️</span> Settings</a>
+      </nav>
+      <div class="sidebar-footer"><a class="sidebar-item" href="#"><span class="icon">❓</span> Help</a></div>
+    </aside>
+    <div class="main-content">
+      <header class="topbar">
+        <div class="topbar-search"><span class="search-icon">🔍</span><input type="text" placeholder="Search reviews..."></div>
+        <div class="topbar-right"><div class="topbar-icon-btn">🔔<span class="notif-dot"></span></div><div class="topbar-avatar">P</div></div>
+      </header>
+      <div class="page">
+        <div class="page-header">
+          <div><h1 class="page-title">Reviews</h1><p class="page-subtitle">3 active review sessions</p></div>
+          <button class="btn btn-primary">+ New Review</button>
+        </div>
+
+        <div class="filter-tabs">
+          <div class="filter-tab active">All (3)</div>
+          <div class="filter-tab">Pending (1)</div>
+          <div class="filter-tab">Active (1)</div>
+          <div class="filter-tab">Completed (1)</div>
+        </div>
+
+        <!-- Active Review -->
+        <div class="review-card" style="border-color:var(--brand-primary)">
+          <div class="review-card-icon" style="background:rgba(139,92,246,0.12);color:var(--brand-primary)">🎵</div>
+          <div class="review-card-info">
+            <div class="review-card-title">Neon Warehouse — v13 Review</div>
+            <div class="review-card-meta">Round 3 · Producer → Sarah, Alex · 4 comments</div>
+            <div class="review-card-desc">Added new synth layer, improved low-end balance. Ready for final approval.</div>
+          </div>
+          <div class="review-card-right">
+            <span class="badge badge-warning">Awaiting Review</span>
+            <div class="review-rounds"><div class="round-dot approved"></div><div class="round-dot approved"></div><div class="round-dot open"></div></div>
+          </div>
+        </div>
+
+        <!-- Pending Review -->
+        <div class="review-card">
+          <div class="review-card-icon" style="background:rgba(234,179,8,0.12);color:var(--color-warning)">🎵</div>
+          <div class="review-card-info">
+            <div class="review-card-title">Midnight Run — v7 Review</div>
+            <div class="review-card-meta">Round 1 · Producer → Alex · 0 comments</div>
+            <div class="review-card-desc">New mastering pass, re-balanced stereo field.</div>
+          </div>
+          <div class="review-card-right">
+            <span class="badge badge-info">Review Requested</span>
+            <div class="review-rounds"><div class="round-dot open"></div></div>
+          </div>
+        </div>
+
+        <!-- Completed Review -->
+        <div class="review-card">
+          <div class="review-card-icon" style="background:rgba(34,197,94,0.12);color:var(--color-success)">🎵</div>
+          <div class="review-card-info">
+            <div class="review-card-title">Summer Drums — v5 Review</div>
+            <div class="review-card-meta">Round 3 · Producer → Sarah, Alex, Maya · 12 comments</div>
+            <div class="review-card-desc">Final mix approved. Ready for release.</div>
+          </div>
+          <div class="review-card-right">
+            <span class="badge badge-success">Approved ✓</span>
+            <div class="review-rounds"><div class="round-dot approved"></div><div class="round-dot approved"></div><div class="round-dot approved"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

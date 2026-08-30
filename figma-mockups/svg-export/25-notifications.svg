@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" 
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     viewBox="0 0 1440 900" 
+     width="1440" 
+     height="900">
+  <foreignObject width="100%" height="100%">
+    <div xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html><html lang="en"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <title>SoundHub — Notifications</title>
+  <link rel="stylesheet" href="design-system/shared.css">
+  <style>
+    .notif-group-title { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.8px; padding: 12px 0 8px; }
+    .notif-item { display: flex; gap: 12px; padding: 12px 16px; border-radius: var(--radius-md); transition: background 0.1s; cursor: pointer; margin-bottom: 2px; }
+    .notif-item:hover { background: var(--bg-hover); }
+    .notif-item.unread { background: rgba(139,92,246,0.05); }
+    .notif-item.unread::before { content: ''; width: 6px; height: 6px; background: var(--brand-primary); border-radius: 50%; margin-top: 6px; flex-shrink: 0; }
+    .notif-icon { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+    .notif-content { flex: 1; }
+    .notif-text { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+    .notif-text strong { color: var(--text-primary); font-weight: 600; }
+    .notif-time { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .notif-actions { display: flex; gap: 8px; margin-top: 6px; }
+    .notif-toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--border-default); }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-logo"><div class="logo-icon">S</div><div class="logo-text">SoundHub</div></div>
+      <nav class="sidebar-nav">
+        <div class="sidebar-section-label">Main</div>
+        <a class="sidebar-item" href="#"><span class="icon">📊</span> Dashboard</a>
+        <a class="sidebar-item" href="#"><span class="icon">📁</span> Projects</a>
+        <a class="sidebar-item" href="#"><span class="icon">🛒</span> Marketplace</a>
+        <div class="sidebar-section-label">Workspace</div>
+        <a class="sidebar-item active" href="#"><span class="icon">🔔</span> Notifications <span class="badge">5</span></a>
+        <a class="sidebar-item" href="#"><span class="icon">💬</span> Messages</a>
+        <div class="sidebar-section-label">Account</div>
+        <a class="sidebar-item" href="#"><span class="icon">⚙️</span> Settings</a>
+      </nav>
+      <div class="sidebar-footer"><a class="sidebar-item" href="#"><span class="icon">❓</span> Help</a></div>
+    </aside>
+    <div class="main-content">
+      <header class="topbar">
+        <div style="font-size:14px;font-weight:600">Notifications</div>
+        <div class="topbar-right"><div class="topbar-avatar">P</div></div>
+      </header>
+      <div class="page">
+        <div class="notif-toolbar">
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-ghost btn-sm">All</button>
+            <button class="btn btn-ghost btn-sm">Unread (5)</button>
+            <button class="btn btn-ghost btn-sm">Reviews</button>
+            <button class="btn btn-ghost btn-sm">Comments</button>
+          </div>
+          <button class="btn btn-ghost btn-sm">Mark all as read</button>
+        </div>
+
+        <div class="notif-group-title">Today</div>
+
+        <div class="notif-item unread">
+          <div class="notif-icon" style="background:rgba(34,197,94,0.12)">✅</div>
+          <div class="notif-content">
+            <div class="notif-text"><strong>Sarah</strong> approved <strong>v12</strong> of <strong>Neon Warehouse</strong></div>
+            <div class="notif-time">30 minutes ago</div>
+            <div class="notif-actions"><button class="btn btn-ghost btn-sm">View version</button></div>
+          </div>
+        </div>
+
+        <div class="notif-item unread">
+          <div class="notif-icon" style="background:rgba(139,92,246,0.12)">💬</div>
+          <div class="notif-content">
+            <div class="notif-text"><strong>Sarah</strong> commented on <strong>v13</strong> of <strong>Neon Warehouse</strong>: "Bass is much better here now!"</div>
+            <div class="notif-time">1 hour ago</div>
+            <div class="notif-actions"><button class="btn btn-ghost btn-sm">View comment</button><button class="btn btn-ghost btn-sm">Reply</button></div>
+          </div>
+        </div>
+
+        <div class="notif-item unread">
+          <div class="notif-icon" style="background:rgba(234,179,8,0.12)">🔔</div>
+          <div class="notif-content">
+            <div class="notif-text">New review request: <strong>Midnight Run v7</strong> is awaiting your review</div>
+            <div class="notif-time">2 hours ago</div>
+            <div class="notif-actions"><button class="btn btn-primary btn-sm">Start review</button></div>
+          </div>
+        </div>
+
+        <div class="notif-group-title">Yesterday</div>
+
+        <div class="notif-item unread">
+          <div class="notif-icon" style="background:rgba(6,182,212,0.12)">📤</div>
+          <div class="notif-content">
+            <div class="notif-text"><strong>Alex</strong> uploaded <strong>v7</strong> of <strong>Midnight Run</strong></div>
+            <div class="notif-time">Yesterday at 3:42 PM</div>
+          </div>
+        </div>
+
+        <div class="notif-item unread">
+          <div class="notif-icon" style="background:rgba(59,130,246,0.12)">💰</div>
+          <div class="notif-content">
+            <div class="notif-text">Your asset <strong>Lo-Fi Drums Pack</strong> was downloaded <strong>12 times</strong> today</div>
+            <div class="notif-time">Yesterday at 1:15 PM</div>
+          </div>
+        </div>
+
+        <div class="notif-item">
+          <div class="notif-icon" style="background:rgba(34,197,94,0.12)">📦</div>
+          <div class="notif-content">
+            <div class="notif-text"><strong>Summer Drums</strong> release package is <strong>ready for delivery</strong></div>
+            <div class="notif-time">2 days ago</div>
+          </div>
+        </div>
+
+        <div class="notif-item">
+          <div class="notif-icon" style="background:rgba(239,68,68,0.12)">⚠️</div>
+          <div class="notif-content">
+            <div class="notif-text">Audio CI warning: <strong>Crystal Echo v1</strong> has peak near limit (-1.2 dBFS)</div>
+            <div class="notif-time">3 days ago</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+</body></html>
+    </div>
+  </foreignObject>
+</svg>

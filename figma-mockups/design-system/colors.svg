@@ -1,0 +1,135 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" width="1200" height="800">
+  <rect width="1200" height="800" fill="#0A0A0B"/>
+  
+  <!-- Title -->
+  <text x="40" y="50" font-family="Inter, sans-serif" font-size="32" font-weight="800" fill="#FFFFFF">Design System — Colors</text>
+  <text x="40" y="80" font-family="Inter, sans-serif" font-size="14" fill="#71717A">SoundHub Dark Theme Palette</text>
+  
+  <!-- PRIMARY COLORS -->
+  <text x="40" y="130" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#52525B" letter-spacing="1">PRIMARY</text>
+  
+  <!-- Purple -->
+  <rect x="40" y="145" width="120" height="120" rx="12" fill="#8B5CF6"/>
+  <text x="100" y="200" text-anchor="middle" font-family="Inter, sans-serif" font-size="14" font-weight="700" fill="#FFFFFF">#8B5CF6</text>
+  <text x="100" y="220" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#FFFFFF" opacity="0.7">Primary</text>
+  
+  <!-- Purple variants -->
+  <rect x="180" y="145" width="60" height="60" rx="8" fill="#8B5CF6" opacity="0.12"/>
+  <text x="210" y="180" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" fill="#8B5CF6">12%</text>
+  <rect x="250" y="145" width="60" height="60" rx="8" fill="#8B5CF6" opacity="0.25"/>
+  <text x="280" y="180" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" fill="#8B5CF6">25%</text>
+  <rect x="320" y="145" width="60" height="60" rx="8" fill="#8B5CF6" opacity="0.5"/>
+  <text x="350" y="180" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" fill="#FFFFFF">50%</text>
+  <rect x="390" y="145" width="60" height="60" rx="8" fill="#8B5CF6" opacity="0.75"/>
+  <text x="420" y="180" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" fill="#FFFFFF">75%</text>
+  
+  <!-- Cyan -->
+  <rect x="40" y="280" width="120" height="120" rx="12" fill="#06B6D4"/>
+  <text x="100" y="335" text-anchor="middle" font-family="Inter, sans-serif" font-size="14" font-weight="700" fill="#FFFFFF">#06B6D4</text>
+  <text x="100" y="355" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#FFFFFF" opacity="0.7">Secondary</text>
+  
+  <rect x="180" y="280" width="60" height="60" rx="8" fill="#06B6D4" opacity="0.12"/>
+  <rect x="250" y="280" width="60" height="60" rx="8" fill="#06B6D4" opacity="0.25"/>
+  <rect x="320" y="280" width="60" height="60" rx="8" fill="#06B6D4" opacity="0.5"/>
+  <rect x="390" y="280" width="60" height="60" rx="8" fill="#06B6D4" opacity="0.75"/>
+  
+  <!-- SEMANTIC COLORS -->
+  <text x="500" y="130" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#52525B" letter-spacing="1">SEMANTIC</text>
+  
+  <!-- Success -->
+  <rect x="500" y="145" width="120" height="80" rx="12" fill="#22C55E"/>
+  <text x="560" y="185" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF">#22C55E</text>
+  <text x="560" y="200" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#FFFFFF" opacity="0.7">Success</text>
+  
+  <!-- Warning -->
+  <rect x="640" y="145" width="120" height="80" rx="12" fill="#EAB308"/>
+  <text x="700" y="185" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#000000">#EAB308</text>
+  <text x="700" y="200" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#000000" opacity="0.7">Warning</text>
+  
+  <!-- Error -->
+  <rect x="780" y="145" width="120" height="80" rx="12" fill="#EF4444"/>
+  <text x="840" y="185" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF">#EF4444</text>
+  <text x="840" y="200" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#FFFFFF" opacity="0.7">Error</text>
+  
+  <!-- Info -->
+  <rect x="920" y="145" width="120" height="80" rx="12" fill="#3B82F6"/>
+  <text x="980" y="185" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF">#3B82F6</text>
+  <text x="980" y="200" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#FFFFFF" opacity="0.7">Info</text>
+  
+  <!-- NEUTRAL / BACKGROUND -->
+  <text x="40" y="430" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#52525B" letter-spacing="1">NEUTRALS</text>
+  
+  <rect x="40" y="445" width="80" height="80" rx="8" fill="#0A0A0B" stroke="#27272A" stroke-width="1"/>
+  <text x="80" y="495" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" fill="#71717A">#0A0A0B</text>
+  <text x="80" y="510" text-anchor="middle" font-family="Inter, sans-serif" font-size="8" fill="#52525B">BG</text>
+  
+  <rect x="140" y="445" width="80" height="80" rx="8" fill="#111113"/>
+  <text x="180" y="495" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" fill="#A1A1AA">#111113</text>
+  <text x="180" y="510" text-anchor="middle" font-family="Inter, sans-serif" font-size="8" fill="#52525B">Surface</text>
+  
+  <rect x="240" y="445" width="80" height="80" rx="8" fill="#1A1A1E"/>
+  <text x="280" y="495" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" fill="#A1A1AA">#1A1A1E</text>
+  <text x="280" y="510" text-anchor="middle" font-family="Inter, sans-serif" font-size="8" fill="#52525B">Elevated</text>
+  
+  <rect x="340" y="445" width="80" height="80" rx="8" fill="#232328"/>
+  <text x="380" y="495" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" fill="#A1A1AA">#232328</text>
+  <text x="380" y="510" text-anchor="middle" font-family="Inter, sans-serif" font-size="8" fill="#52525B">Panel</text>
+  
+  <rect x="440" y="445" width="80" height="80" rx="8" fill="#27272A"/>
+  <text x="480" y="495" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" fill="#A1A1AA">#27272A</text>
+  <text x="480" y="510" text-anchor="middle" font-family="Inter, sans-serif" font-size="8" fill="#52525B">Border</text>
+  
+  <rect x="540" y="445" width="80" height="80" rx="8" fill="#3F3F46"/>
+  <text x="580" y="495" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" fill="#E4E4E7">#3F3F46</text>
+  <text x="580" y="510" text-anchor="middle" font-family="Inter, sans-serif" font-size="8" fill="#52525B">Muted</text>
+  
+  <rect x="640" y="445" width="80" height="80" rx="8" fill="#52525B"/>
+  <text x="680" y="495" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" fill="#E4E4E7">#52525B</text>
+  <text x="680" y="510" text-anchor="middle" font-family="Inter, sans-serif" font-size="8" fill="#52525B">Subtle</text>
+  
+  <rect x="740" y="445" width="80" height="80" rx="8" fill="#71717A"/>
+  <text x="780" y="495" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" fill="#FFFFFF">#71717A</text>
+  <text x="780" y="510" text-anchor="middle" font-family="Inter, sans-serif" font-size="8" fill="#52525B">Gray</text>
+  
+  <rect x="840" y="445" width="80" height="80" rx="8" fill="#A1A1AA"/>
+  <text x="880" y="495" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" fill="#000000">#A1A1AA</text>
+  <text x="880" y="510" text-anchor="middle" font-family="Inter, sans-serif" font-size="8" fill="#52525B">Light</text>
+  
+  <rect x="940" y="445" width="80" height="80" rx="8" fill="#E4E4E7"/>
+  <text x="980" y="495" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" fill="#000000">#E4E4E7</text>
+  <text x="980" y="510" text-anchor="middle" font-family="Inter, sans-serif" font-size="8" fill="#52525B">White</text>
+  
+  <!-- TEXT COLORS -->
+  <text x="40" y="570" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#52525B" letter-spacing="1">TEXT</text>
+  
+  <rect x="40" y="585" width="200" height="40" rx="8" fill="#1A1A1E"/>
+  <text x="60" y="610" font-family="Inter, sans-serif" font-size="14" font-weight="700" fill="#FFFFFF">Primary Text #FFFFFF</text>
+  
+  <rect x="260" y="585" width="200" height="40" rx="8" fill="#1A1A1E"/>
+  <text x="280" y="610" font-family="Inter, sans-serif" font-size="14" fill="#A1A1AA">Secondary #A1A1AA</text>
+  
+  <rect x="480" y="585" width="200" height="40" rx="8" fill="#1A1A1E"/>
+  <text x="500" y="610" font-family="Inter, sans-serif" font-size="14" fill="#52525B">Muted #52525B</text>
+  
+  <rect x="700" y="585" width="200" height="40" rx="8" fill="#1A1A1E"/>
+  <text x="720" y="610" font-family="Inter, sans-serif" font-size="14" fill="#8B5CF6">Accent #8B5CF6</text>
+  
+  <!-- GRADIENTS -->
+  <text x="40" y="670" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#52525B" letter-spacing="1">GRADIENTS</text>
+  
+  <defs>
+    <linearGradient id="brandGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#8B5CF6"/>
+      <stop offset="100%" style="stop-color:#06B6D4"/>
+    </linearGradient>
+  </defs>
+  
+  <rect x="40" y="685" width="300" height="60" rx="12" fill="url(#brandGrad)"/>
+  <text x="190" y="722" text-anchor="middle" font-family="Inter, sans-serif" font-size="14" font-weight="700" fill="#FFFFFF">Brand Gradient</text>
+  
+  <rect x="360" y="685" width="300" height="60" rx="12" fill="#8B5CF6" opacity="0.12" stroke="#8B5CF6" stroke-width="1"/>
+  <text x="510" y="722" text-anchor="middle" font-family="Inter, sans-serif" font-size="14" font-weight="600" fill="#8B5CF6">Purple 12%</text>
+  
+  <rect x="680" y="685" width="300" height="60" rx="12" fill="#06B6D4" opacity="0.12" stroke="#06B6D4" stroke-width="1"/>
+  <text x="830" y="722" text-anchor="middle" font-family="Inter, sans-serif" font-size="14" font-weight="600" fill="#06B6D4">Cyan 12%</text>
+</svg>

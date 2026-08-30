@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <title>SoundHub — Approval Confirmation</title>
+  <link rel="stylesheet" href="design-system/shared.css">
+  <style>
+    body { display: flex; align-items: center; justify-content: center; min-height: 100vh; background: var(--bg-primary); }
+    .approval-card {
+      background: var(--bg-elevated); border: 1px solid var(--border-default);
+      border-radius: var(--radius-xl); width: 480px; text-align: center; padding: 40px 32px;
+    }
+    .approval-icon { font-size: 64px; margin-bottom: 20px; }
+    .approval-title { font-size: 20px; font-weight: 800; margin-bottom: 8px; }
+    .approval-desc { font-size: 13px; color: var(--text-secondary); margin-bottom: 28px; line-height: 1.5; }
+    .approval-meta {
+      background: var(--bg-surface); border: 1px solid var(--border-default);
+      border-radius: var(--radius-md); padding: 16px; margin-bottom: 24px; text-align: left;
+    }
+    .meta-row {
+      display: flex; justify-content: space-between; padding: 6px 0;
+      font-size: 12px;
+    }
+    .meta-label { color: var(--text-muted); }
+    .meta-value { font-weight: 600; color: var(--text-primary); }
+    .approval-actions { display: flex; gap: 10px; justify-content: center; }
+    .btn-approve {
+      padding: 12px 32px; background: var(--color-success); color: #fff;
+      border: none; border-radius: var(--radius-sm); font-size: 14px; font-weight: 700;
+      cursor: pointer; transition: all 0.15s;
+    }
+    .btn-approve:hover { opacity: 0.9; transform: translateY(-1px); }
+    .btn-decline {
+      padding: 12px 32px; background: transparent; color: var(--text-secondary);
+      border: 1px solid var(--border-default); border-radius: var(--radius-sm);
+      font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.15s;
+    }
+    .btn-decline:hover { border-color: var(--color-error); color: var(--color-error); }
+    .reviewer-status { display: flex; align-items: center; gap: 8px; padding: 8px 12px; margin-bottom: 6px; border-radius: var(--radius-sm); font-size: 12px; }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .status-approved { background: var(--color-success); }
+    .status-pending { background: var(--color-warning); }
+    .status-declined { background: var(--color-error); }
+  </style>
+</head>
+<body>
+  <div class="approval-card">
+    <div class="approval-icon">✅</div>
+    <div class="approval-title">Approve Version?</div>
+    <div class="approval-desc">
+      You're about to approve <strong>v13 — Final Mix</strong> of <strong>Neon Warehouse</strong>.
+      This will mark the version as approved and notify all collaborators.
+    </div>
+
+    <div class="approval-meta">
+      <div class="meta-row"><span class="meta-label">Project</span><span class="meta-value">Neon Warehouse</span></div>
+      <div class="meta-row"><span class="meta-label">Version</span><span class="meta-value">v13 — Final Mix</span></div>
+      <div class="meta-row"><span class="meta-label">Session</span><span class="meta-value">Master Review — Round 2/3</span></div>
+      <div class="meta-row"><span class="meta-label">Uploaded</span><span class="meta-value">2 hours ago</span></div>
+    </div>
+
+    <div style="text-align:left;margin-bottom:20px">
+      <div style="font-size:12px;font-weight:600;margin-bottom:8px;color:var(--text-muted)">REVIEWER STATUS</div>
+      <div class="reviewer-status" style="background:rgba(34,197,94,0.08)">
+        <div class="status-dot status-approved"></div>
+        <span style="font-weight:600">@remixer</span>
+        <span style="margin-left:auto;color:var(--color-success);font-size:11px">Approved</span>
+      </div>
+      <div class="reviewer-status" style="background:rgba(234,179,8,0.08)">
+        <div class="status-dot status-pending"></div>
+        <span style="font-weight:600">@mastering_guru</span>
+        <span style="margin-left:auto;color:var(--color-warning);font-size:11px">Pending</span>
+      </div>
+      <div class="reviewer-status" style="background:rgba(113,113,122,0.08)">
+        <div class="status-dot" style="background:var(--brand-primary)"></div>
+        <span style="font-weight:600">@you</span>
+        <span style="margin-left:auto;color:var(--brand-primary);font-size:11px">Your turn</span>
+      </div>
+    </div>
+
+    <div class="approval-actions">
+      <button class="btn-decline">✕ Decline</button>
+      <button class="btn-approve">✓ Approve Version</button>
+    </div>
+  </div>
+</body>
+</html>

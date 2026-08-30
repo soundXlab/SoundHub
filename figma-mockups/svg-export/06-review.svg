@@ -1,0 +1,431 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" 
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     viewBox="0 0 1440 1255" 
+     width="1440" 
+     height="1255">
+  <foreignObject width="100%" height="100%">
+    <div xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html><html lang="en"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <title>SoundHub — Review</title>
+  <link rel="stylesheet" href="design-system/shared.css">
+  <style>
+    .review-layout { display: flex; gap: 24px; }
+    .review-main { flex: 1; }
+    .review-sidebar { width: 320px; flex-shrink: 0; }
+    .version-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 12px;
+      background: rgba(139,92,246,0.12);
+      border-radius: 20px;
+      font-size: 12px; font-weight: 600;
+      color: var(--brand-primary);
+    }
+    .waveform-canvas {
+      width: 100%; height: 80px;
+      background: var(--bg-elevated);
+      border-radius: var(--radius-md);
+      position: relative;
+      overflow: hidden;
+    }
+    .waveform-canvas svg { width: 100%; height: 100%; }
+    .comment-input-area {
+      display: flex; gap: 12px;
+      padding: 16px;
+      border-top: 1px solid var(--border-default);
+    }
+    .comment-input {
+      flex: 1;
+      padding: 10px 14px;
+      background: var(--bg-input);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+      font-size: 13px;
+      font-family: var(--font-sans);
+      outline: none;
+    }
+    .comment-input:focus { border-color: var(--brand-primary); }
+    .metadata-row {
+      display: flex; justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border-default);
+      font-size: 12px;
+    }
+    .metadata-row:last-child { border-bottom: none; }
+    .metadata-label { color: var(--text-muted); }
+    .metadata-value { color: var(--text-primary); font-family: var(--font-mono); font-weight: 500; }
+    .audio-ci-check {
+      display: flex; align-items: center; gap: 8px;
+      padding: 6px 0;
+      font-size: 12px;
+    }
+    .audio-ci-check .check-icon { width: 18px; text-align: center; }
+    .audio-ci-check.pass { color: var(--color-success); }
+    .audio-ci-check.warn { color: var(--color-warning); }
+    .audio-ci-check.fail { color: var(--color-error); }
+    .ab-switcher {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 12px;
+      background: var(--bg-elevated);
+      border-radius: var(--radius-sm);
+      font-size: 12px; color: var(--text-secondary);
+      margin-top: 12px;
+    }
+    .ab-btn {
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 11px;
+    }
+    .ab-btn.active { background: var(--brand-primary); color: white; }
+    .ab-btn:not(.active) { background: var(--bg-surface); color: var(--text-muted); }
+    .review-actions {
+      display: flex; gap: 8px;
+      padding: 16px 20px;
+      border-top: 1px solid var(--border-default);
+    }
+    .decision-btn {
+      flex: 1;
+      padding: 10px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 600;
+      text-align: center;
+      cursor: pointer;
+      border: 1px solid var(--border-default);
+      background: var(--bg-surface);
+      color: var(--text-secondary);
+      transition: all 0.15s;
+    }
+    .decision-btn.approve {
+      background: rgba(34,197,94,0.12);
+      border-color: var(--color-success);
+      color: var(--color-success);
+    }
+    .decision-btn.changes {
+      background: rgba(234,179,8,0.12);
+      border-color: var(--color-warning);
+      color: var(--color-warning);
+    }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <div class="logo-icon">S</div>
+        <div class="logo-text">SoundHub</div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="sidebar-section-label">Main</div>
+        <a class="sidebar-item" href="#"><span class="icon">📊</span> Dashboard</a>
+        <a class="sidebar-item" href="#"><span class="icon">📁</span> Projects</a>
+        <a class="sidebar-item" href="#"><span class="icon">🛒</span> Marketplace</a>
+        <a class="sidebar-item" href="#"><span class="icon">⬆️</span> Upload</a>
+        <div class="sidebar-section-label">Workspace</div>
+        <a class="sidebar-item active" href="#"><span class="icon">💬</span> Reviews <span class="badge">2</span></a>
+        <a class="sidebar-item" href="#"><span class="icon">📋</span> Sessions</a>
+        <div class="sidebar-section-label">Account</div>
+        <a class="sidebar-item" href="#"><span class="icon">⚙️</span> Settings</a>
+      </nav>
+      <div class="sidebar-footer">
+        <a class="sidebar-item" href="#"><span class="icon">❓</span> Help &amp; Docs</a>
+      </div>
+    </aside>
+
+    <div class="main-content">
+      <header class="topbar">
+        <div style="display:flex;align-items:center;gap:12px">
+          <a href="#" style="color:var(--text-muted);text-decoration:none;font-size:13px">← Projects</a>
+          <span style="color:var(--text-muted)">/</span>
+          <span style="font-size:14px;font-weight:600">Neon Warehouse</span>
+          <div class="version-badge">v13</div>
+        </div>
+        <div class="topbar-right">
+          <div class="topbar-icon-btn">🔔</div>
+          <div class="topbar-avatar">P</div>
+        </div>
+      </header>
+
+      <div class="page">
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Review v13</h1>
+            <p class="page-subtitle">Ready for review · Uploaded 2 hours ago by Producer</p>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-ghost">💬 Add Comment</button>
+            <button class="btn btn-primary">Approve</button>
+            <button class="btn btn-secondary">Request Changes ▾</button>
+          </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+          <div class="tab active">Audio Player</div>
+          <div class="tab">Files</div>
+          <div class="tab">Versions</div>
+          <div class="tab">Comments</div>
+          <div class="tab">Settings</div>
+        </div>
+
+        <div class="review-layout">
+          <!-- Main Content -->
+          <div class="review-main">
+            <!-- Audio Player -->
+            <div class="card" style="margin-bottom:20px">
+              <div class="card-body">
+                <div class="waveform-controls">
+                  <div class="waveform-play-btn">▶</div>
+                  <span class="waveform-time">0:00</span>
+                  <div class="waveform-progress">
+                    <div class="waveform-progress-fill" style="width:0%"></div>
+                  </div>
+                  <span class="waveform-time">3:42</span>
+                  <div style="display:flex;align-items:center;gap:4px;margin-left:8px">
+                    <span style="font-size:12px">🔊</span>
+                    <div style="width:60px;height:4px;background:var(--border-default);border-radius:2px;position:relative">
+                      <div style="position:absolute;left:0;top:0;bottom:0;width:70%;background:var(--text-secondary);border-radius:2px"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="waveform-canvas">
+                  <svg viewBox="0 0 800 80" preserveAspectRatio="none">
+                    <defs>
+                      <linearGradient id="wg" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#8B5CF6" stop-opacity="0.8"></stop>
+                        <stop offset="100%" stop-color="#06B6D4" stop-opacity="0.4"></stop>
+                      </linearGradient>
+                    </defs>
+                    <!-- Simulated waveform -->
+                    <path d="M0,40 Q20,20 40,40 Q60,60 80,40 Q100,15 120,40 Q140,65 160,40 Q180,25 200,40 Q220,55 240,40 Q260,10 280,40 Q300,70 320,40 Q340,20 360,40 Q380,60 400,40 Q420,15 440,40 Q460,65 480,40 Q500,25 520,40 Q540,55 560,40 Q580,10 600,40 Q620,70 640,40 Q660,20 680,40 Q700,60 720,40 Q740,15 760,40 Q780,55 800,40" fill="none" stroke="url(#wg)" stroke-width="2"></path>
+                    <path d="M0,40 Q20,25 40,40 Q60,55 80,40 Q100,20 120,40 Q140,60 160,40 Q180,28 200,40 Q220,52 240,40 Q260,15 280,40 Q300,65 320,40 Q340,22 360,40 Q380,58 400,40 Q420,18 440,40 Q460,62 480,40 Q500,28 520,40 Q540,52 560,40 Q580,15 600,40 Q620,65 640,40 Q660,22 680,40 Q700,58 720,40 Q740,18 760,40 Q780,52 800,40" fill="none" stroke="url(#wg)" stroke-width="1.5" opacity="0.5"></path>
+                    <!-- Playhead -->
+                    <line x1="280" y1="0" x2="280" y2="80" stroke="#8B5CF6" stroke-width="2"></line>
+                    <circle cx="280" cy="40" r="4" fill="#8B5CF6"></circle>
+                    <!-- Comment markers -->
+                    <circle cx="120" cy="40" r="5" fill="#EAB308" opacity="0.8"></circle>
+                    <circle cx="350" cy="40" r="5" fill="#EAB308" opacity="0.8"></circle>
+                    <circle cx="580" cy="40" r="5" fill="#EAB308" opacity="0.8"></circle>
+                  </svg>
+                </div>
+                <div class="waveform-markers" style="margin-top:8px">
+                  <div class="waveform-marker">0:45 — Sarah</div>
+                  <div class="waveform-marker">1:32 — Alex</div>
+                  <div class="waveform-marker">2:18 — Sarah</div>
+                </div>
+              </div>
+
+              <!-- A/B Compare -->
+              <div style="padding:12px 20px;border-top:1px solid var(--border-default)">
+                <div class="ab-switcher">
+                  <span style="font-weight:600;color:var(--text-primary)">A/B Compare</span>
+                  <span style="color:var(--text-muted)">|</span>
+                  <div class="ab-btn active">A: v12</div>
+                  <div class="ab-btn">B: v13</div>
+                  <span style="color:var(--text-muted);margin-left:auto;font-family:var(--font-mono)">Crossfade: 50%</span>
+                </div>
+              </div>
+
+              <!-- Decision -->
+              <div class="review-actions">
+                <div class="decision-btn approve">✅ Approve</div>
+                <div class="decision-btn changes">💬 Request Changes</div>
+              </div>
+            </div>
+
+            <!-- Comments -->
+            <div class="card">
+              <div class="card-header">
+                <span class="card-title">Comments (4)</span>
+                <button class="btn btn-ghost btn-sm">Sort: Newest</button>
+              </div>
+              <div class="card-body" style="padding:0">
+                <div class="comment" style="padding:16px 20px">
+                  <div class="comment-avatar" style="background:var(--brand-secondary);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:white">S</div>
+                  <div class="comment-body">
+                    <div class="comment-meta">
+                      <span class="comment-author">Sarah</span>
+                      <span class="comment-timestamp">@ 0:45</span>
+                      <span class="comment-time">30 min ago</span>
+                    </div>
+                    <div class="comment-text">Bass is much better here now! The low-end sits perfectly in the mix.</div>
+                    <div class="comment-actions">
+                      <span class="comment-action">👍 2</span>
+                      <span class="comment-action">💬 Reply</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="comment" style="padding:16px 20px">
+                  <div class="comment-avatar" style="background:var(--brand-primary);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:white">A</div>
+                  <div class="comment-body">
+                    <div class="comment-meta">
+                      <span class="comment-author">Alex</span>
+                      <span class="comment-timestamp">@ 1:32</span>
+                      <span class="comment-time">2 hours ago</span>
+                    </div>
+                    <div class="comment-text">Love the new synth layer. The atmosphere really evolved from v12.</div>
+                    <div class="comment-actions">
+                      <span class="comment-action">👍 1</span>
+                      <span class="comment-action">💬 Reply</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="comment" style="padding:16px 20px">
+                  <div class="comment-avatar" style="background:var(--brand-secondary);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:white">S</div>
+                  <div class="comment-body">
+                    <div class="comment-meta">
+                      <span class="comment-author">Sarah</span>
+                      <span class="comment-timestamp">@ 2:18</span>
+                      <span class="comment-time">2 hours ago</span>
+                    </div>
+                    <div class="comment-text">Can we boost the hi-hats here? They feel a bit buried under the pad.</div>
+                    <div class="comment-actions">
+                      <span class="comment-action">👍 0</span>
+                      <span class="comment-action">💬 Reply</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="comment" style="padding:16px 20px">
+                  <div class="comment-avatar" style="background:#E85D2A;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:white">P</div>
+                  <div class="comment-body">
+                    <div class="comment-meta">
+                      <span class="comment-author">Producer</span>
+                      <span class="comment-time">2 hours ago</span>
+                    </div>
+                    <div class="comment-text">Thanks for the feedback! I'll address the hi-hats in v14.</div>
+                    <div class="comment-actions">
+                      <span class="comment-action">💬 Reply</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="comment-input-area">
+                <div class="comment-avatar" style="background:var(--brand-primary);width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:white;flex-shrink:0">P</div>
+                <input class="comment-input" placeholder="Add a comment at 0:00..." style="flex:1">
+                <button class="btn btn-primary btn-sm">Post</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sidebar -->
+          <div class="review-sidebar">
+            <!-- Metadata -->
+            <div class="card" style="margin-bottom:16px">
+              <div class="card-header">
+                <span class="card-title">Audio Metadata</span>
+              </div>
+              <div class="card-body">
+                <div class="metadata-row">
+                  <span class="metadata-label">Loudness</span>
+                  <span class="metadata-value">-14.2 LUFS</span>
+                </div>
+                <div class="metadata-row">
+                  <span class="metadata-label">True Peak</span>
+                  <span class="metadata-value">-1.2 dBFS</span>
+                </div>
+                <div class="metadata-row">
+                  <span class="metadata-label">Tempo</span>
+                  <span class="metadata-value">128 BPM</span>
+                </div>
+                <div class="metadata-row">
+                  <span class="metadata-label">Key</span>
+                  <span class="metadata-value">F# minor</span>
+                </div>
+                <div class="metadata-row">
+                  <span class="metadata-label">Duration</span>
+                  <span class="metadata-value">3:42</span>
+                </div>
+                <div class="metadata-row">
+                  <span class="metadata-label">Format</span>
+                  <span class="metadata-value">WAV 24bit</span>
+                </div>
+                <div class="metadata-row">
+                  <span class="metadata-label">Sample Rate</span>
+                  <span class="metadata-value">44.1 kHz</span>
+                </div>
+                <div class="metadata-row">
+                  <span class="metadata-label">Channels</span>
+                  <span class="metadata-value">Stereo</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Audio CI -->
+            <div class="card" style="margin-bottom:16px">
+              <div class="card-header">
+                <span class="card-title">Audio CI</span>
+                <span class="badge badge-success">3/4 Pass</span>
+              </div>
+              <div class="card-body">
+                <div class="audio-ci-check pass">
+                  <span class="check-icon">✓</span> Loudness (-14.2 LUFS)
+                </div>
+                <div class="audio-ci-check pass">
+                  <span class="check-icon">✓</span> Waveform generated
+                </div>
+                <div class="audio-ci-check pass">
+                  <span class="check-icon">✓</span> Metadata parsed
+                </div>
+                <div class="audio-ci-check warn">
+                  <span class="check-icon">⚠</span> Peak near limit (-1.2 dBFS)
+                </div>
+              </div>
+            </div>
+
+            <!-- Version History -->
+            <div class="card">
+              <div class="card-header">
+                <span class="card-title">Version History</span>
+              </div>
+              <div class="card-body">
+                <div class="timeline">
+                  <div class="timeline-item">
+                    <div class="timeline-dot active"></div>
+                    <div class="timeline-line"></div>
+                    <div class="timeline-content">
+                      <div class="timeline-title">v13 — Ready for review</div>
+                      <div class="timeline-meta">2 hours ago · Producer</div>
+                    </div>
+                  </div>
+                  <div class="timeline-item">
+                    <div class="timeline-dot success"></div>
+                    <div class="timeline-line"></div>
+                    <div class="timeline-content">
+                      <div class="timeline-title">v12 — Approved</div>
+                      <div class="timeline-meta">1 day ago · Sarah · "Great mix!"</div>
+                    </div>
+                  </div>
+                  <div class="timeline-item">
+                    <div class="timeline-dot warning"></div>
+                    <div class="timeline-line"></div>
+                    <div class="timeline-content">
+                      <div class="timeline-title">v11 — Changes requested</div>
+                      <div class="timeline-meta">2 days ago · Alex · "Bass too loud"</div>
+                    </div>
+                  </div>
+                  <div class="timeline-item">
+                    <div class="timeline-dot muted"></div>
+                    <div class="timeline-content">
+                      <div class="timeline-title">v10 — Ready for review</div>
+                      <div class="timeline-meta">3 days ago · Producer</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+</body></html>
+    </div>
+  </foreignObject>
+</svg>

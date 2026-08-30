@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <title>SoundHub — Empty States</title>
+  <link rel="stylesheet" href="design-system/shared.css">
+  <style>
+    body { background: var(--bg-primary); }
+    .mockup-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+      padding: 40px;
+      max-width: 1440px;
+      margin: 0 auto;
+    }
+    .mockup-frame {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+    }
+    .mockup-label {
+      padding: 12px 16px;
+      background: var(--bg-elevated);
+      border-bottom: 1px solid var(--border-default);
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+    .empty-page {
+      height: 320px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 32px;
+    }
+    .empty-icon {
+      font-size: 56px;
+      margin-bottom: 16px;
+      opacity: 0.25;
+    }
+    .empty-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+    .empty-desc {
+      font-size: 13px;
+      color: var(--text-secondary);
+      max-width: 280px;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+    .empty-cta {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 10px 20px;
+      background: var(--brand-primary);
+      color: white;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .empty-secondary {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 10px 20px;
+      background: transparent;
+      border: 1px solid var(--border-default);
+      color: var(--text-secondary);
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+    h1.page-title {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--text-primary);
+      text-align: center;
+      padding: 40px 0 0;
+      letter-spacing: -0.5px;
+    }
+    p.page-subtitle {
+      font-size: 14px;
+      color: var(--text-secondary);
+      text-align: center;
+      padding: 8px 0 24px;
+    }
+  </style>
+</head>
+<body>
+  <h1 class="page-title">Empty States</h1>
+  <p class="page-subtitle">Every screen when there's no data yet</p>
+
+  <div class="mockup-grid">
+    <!-- Dashboard Empty -->
+    <div class="mockup-frame">
+      <div class="mockup-label">Dashboard — No Projects</div>
+      <div class="empty-page" style="background:var(--bg-primary)">
+        <div class="empty-icon">🎵</div>
+        <div class="empty-title">Welcome to SoundHub!</div>
+        <div class="empty-desc">You haven't created any projects yet. Start by uploading your first DAW project or browsing the marketplace.</div>
+        <button class="empty-cta">+ Create your first project</button>
+        <button class="empty-secondary">Browse Marketplace</button>
+      </div>
+    </div>
+
+    <!-- Projects Empty -->
+    <div class="mockup-frame">
+      <div class="mockup-label">Projects — No Files</div>
+      <div class="empty-page" style="background:var(--bg-primary)">
+        <div class="empty-icon">📁</div>
+        <div class="empty-title">No files uploaded yet</div>
+        <div class="empty-desc">Drop your DAW project files here to get started with versioning and review.</div>
+        <button class="empty-cta">⬆️ Upload files</button>
+      </div>
+    </div>
+
+    <!-- Reviews Empty -->
+    <div class="mockup-frame">
+      <div class="mockup-label">Reviews — No Reviews</div>
+      <div class="empty-page" style="background:var(--bg-primary)">
+        <div class="empty-icon">💬</div>
+        <div class="empty-title">No reviews yet</div>
+        <div class="empty-desc">Request feedback on your project by creating a review session and inviting collaborators.</div>
+        <button class="empty-cta">+ Request a review</button>
+      </div>
+    </div>
+
+    <!-- Marketplace No Results -->
+    <div class="mockup-frame">
+      <div class="mockup-label">Marketplace — No Results</div>
+      <div class="empty-page" style="background:var(--bg-primary)">
+        <div class="empty-icon">🔍</div>
+        <div class="empty-title">No assets found</div>
+        <div class="empty-desc">No assets match your current filters. Try adjusting your search criteria or clearing filters.</div>
+        <button class="empty-secondary">Clear all filters</button>
+      </div>
+    </div>
+
+    <!-- Notifications Empty -->
+    <div class="mockup-frame">
+      <div class="mockup-label">Notifications — All Caught Up</div>
+      <div class="empty-page" style="background:var(--bg-primary)">
+        <div class="empty-icon">✅</div>
+        <div class="empty-title">You're all caught up!</div>
+        <div class="empty-desc">No new notifications. We'll let you know when there's activity on your projects.</div>
+      </div>
+    </div>
+
+    <!-- Search No Results -->
+    <div class="mockup-frame">
+      <div class="mockup-label">Search — No Results</div>
+      <div class="empty-page" style="background:var(--bg-primary)">
+        <div class="empty-icon">🔎</div>
+        <div class="empty-title">No results for "xyzabc"</div>
+        <div class="empty-desc">Try different keywords or check the spelling. You can also browse the marketplace directly.</div>
+        <button class="empty-secondary">Browse Marketplace</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

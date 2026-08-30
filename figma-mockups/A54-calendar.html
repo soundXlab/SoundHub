@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <title>SoundHub — Calendar</title>
+  <link rel="stylesheet" href="design-system/shared.css">
+  <style>
+    .calendar-grid {
+      display: grid; grid-template-columns: repeat(7, 1fr);
+      border: 1px solid var(--border-default); border-radius: var(--radius-lg); overflow: hidden;
+    }
+    .calendar-header-cell {
+      padding: 10px; text-align: center; font-size: 11px; font-weight: 700;
+      color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;
+      background: var(--bg-elevated); border-bottom: 1px solid var(--border-default);
+    }
+    .calendar-cell {
+      min-height: 100px; padding: 8px; background: var(--bg-surface);
+      border-right: 1px solid var(--border-default); border-bottom: 1px solid var(--border-default);
+      cursor: pointer; transition: background 0.1s;
+    }
+    .calendar-cell:nth-child(7n) { border-right: none; }
+    .calendar-cell:hover { background: var(--bg-hover); }
+    .calendar-cell.today { background: rgba(139,92,246,0.06); }
+    .calendar-cell.other-month { opacity: 0.4; }
+    .calendar-day { font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px; }
+    .calendar-cell.today .calendar-day { color: var(--brand-primary); font-weight: 700; }
+    .calendar-event {
+      padding: 2px 6px; border-radius: 3px; font-size: 9px; font-weight: 600;
+      margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .event-deadline { background: rgba(239,68,68,0.12); color: var(--color-error); }
+    .event-review { background: rgba(234,179,8,0.12); color: var(--color-warning); }
+    .event-release { background: rgba(34,197,94,0.12); color: var(--color-success); }
+    .event-meeting { background: rgba(139,92,246,0.12); color: var(--brand-primary); }
+    .cal-nav { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+    .cal-nav-btn {
+      width: 32px; height: 32px; border-radius: var(--radius-sm); display: flex;
+      align-items: center; justify-content: center; cursor: pointer;
+      border: 1px solid var(--border-default); background: transparent;
+      color: var(--text-secondary); transition: all 0.15s;
+    }
+    .cal-nav-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
+    .cal-legend { display: flex; gap: 16px; margin-bottom: 16px; }
+    .cal-legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-muted); }
+    .legend-dot { width: 8px; height: 8px; border-radius: 2px; }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-logo"><div class="logo-icon">S</div><div class="logo-text">SoundHub</div></div>
+      <nav class="sidebar-nav">
+        <div class="sidebar-section-label">Main</div>
+        <a class="sidebar-item" href="#"><span class="icon">📊</span> Dashboard</a>
+        <a class="sidebar-item" href="#"><span class="icon">📁</span> Projects</a>
+        <a class="sidebar-item" href="#"><span class="icon">🛒</span> Marketplace</a>
+        <div class="sidebar-section-label">Workspace</div>
+        <a class="sidebar-item" href="#"><span class="icon">💬</span> Reviews</a>
+        <a class="sidebar-item active" href="#"><span class="icon">📅</span> Calendar</a>
+        <div class="sidebar-section-label">Account</div>
+        <a class="sidebar-item" href="#"><span class="icon">⚙️</span> Settings</a>
+      </nav>
+    </aside>
+    <div class="main-content">
+      <header class="topbar">
+        <div class="topbar-search"><span class="search-icon">🔍</span><input type="text" placeholder="Search..."></div>
+        <div class="topbar-right"><div class="topbar-icon-btn">🔔<span class="notif-dot"></span></div><div class="topbar-avatar">P</div></div>
+      </header>
+      <div class="page">
+        <div class="cal-nav">
+          <button class="cal-nav-btn">◀</button>
+          <h1 class="page-title" style="margin:0">August 2026</h1>
+          <button class="cal-nav-btn">▶</button>
+          <div style="flex:1"></div>
+          <button class="btn btn-secondary">Today</button>
+          <button class="btn btn-primary">+ Add Event</button>
+        </div>
+
+        <div class="cal-legend">
+          <div class="cal-legend-item"><div class="legend-dot" style="background:var(--color-error)"></div>Deadline</div>
+          <div class="cal-legend-item"><div class="legend-dot" style="background:var(--color-warning)"></div>Review Due</div>
+          <div class="cal-legend-item"><div class="legend-dot" style="background:var(--color-success)"></div>Release</div>
+          <div class="cal-legend-item"><div class="legend-dot" style="background:var(--brand-primary)"></div>Meeting</div>
+        </div>
+
+        <div class="calendar-grid">
+          <div class="calendar-header-cell">Mon</div>
+          <div class="calendar-header-cell">Tue</div>
+          <div class="calendar-header-cell">Wed</div>
+          <div class="calendar-header-cell">Thu</div>
+          <div class="calendar-header-cell">Fri</div>
+          <div class="calendar-header-cell">Sat</div>
+          <div class="calendar-header-cell">Sun</div>
+
+          <!-- Week 1 -->
+          <div class="calendar-cell other-month"><div class="calendar-day">27</div></div>
+          <div class="calendar-cell other-month"><div class="calendar-day">28</div></div>
+          <div class="calendar-cell other-month"><div class="calendar-day">29</div></div>
+          <div class="calendar-cell other-month"><div class="calendar-day">30</div></div>
+          <div class="calendar-cell other-month"><div class="calendar-day">31</div></div>
+          <div class="calendar-cell"><div class="calendar-day">1</div></div>
+          <div class="calendar-cell"><div class="calendar-day">2</div></div>
+
+          <!-- Week 2 -->
+          <div class="calendar-cell"><div class="calendar-day">3</div></div>
+          <div class="calendar-cell"><div class="calendar-day">4</div><div class="calendar-event event-deadline">Neon Wh. Deadline</div></div>
+          <div class="calendar-cell"><div class="calendar-day">5</div></div>
+          <div class="calendar-cell"><div class="calendar-day">6</div><div class="calendar-event event-review">Mix Review Due</div></div>
+          <div class="calendar-cell"><div class="calendar-day">7</div></div>
+          <div class="calendar-cell"><div class="calendar-day">8</div><div class="calendar-event event-meeting">Team Sync</div></div>
+          <div class="calendar-cell"><div class="calendar-day">9</div></div>
+
+          <!-- Week 3 -->
+          <div class="calendar-cell"><div class="calendar-day">10</div></div>
+          <div class="calendar-cell"><div class="calendar-day">11</div></div>
+          <div class="calendar-cell"><div class="calendar-day">12</div><div class="calendar-event event-release">Summer EP Release</div></div>
+          <div class="calendar-cell"><div class="calendar-day">13</div></div>
+          <div class="calendar-cell"><div class="calendar-day">14</div></div>
+          <div class="calendar-cell"><div class="calendar-day">15</div></div>
+          <div class="calendar-cell"><div class="calendar-day">16</div></div>
+
+          <!-- Week 4 -->
+          <div class="calendar-cell today"><div class="calendar-day">17</div><div class="calendar-event event-review">Master Review Due</div></div>
+          <div class="calendar-cell"><div class="calendar-day">18</div></div>
+          <div class="calendar-cell"><div class="calendar-day">19</div><div class="calendar-event event-meeting">Client Call</div></div>
+          <div class="calendar-cell"><div class="calendar-day">20</div></div>
+          <div class="calendar-cell"><div class="calendar-day">21</div><div class="calendar-event event-deadline">Deep House Deadline</div></div>
+          <div class="calendar-cell"><div class="calendar-day">22</div></div>
+          <div class="calendar-cell"><div class="calendar-day">23</div></div>
+
+          <!-- Week 5 -->
+          <div class="calendar-cell"><div class="calendar-day">24</div></div>
+          <div class="calendar-cell"><div class="calendar-day">25</div></div>
+          <div class="calendar-cell"><div class="calendar-day">26</div><div class="calendar-event event-release">Acoustic EP Release</div></div>
+          <div class="calendar-cell"><div class="calendar-day">27</div></div>
+          <div class="calendar-cell"><div class="calendar-day">28</div></div>
+          <div class="calendar-cell"><div class="calendar-day">29</div></div>
+          <div class="calendar-cell"><div class="calendar-day">30</div></div>
+
+          <!-- Week 6 -->
+          <div class="calendar-cell"><div class="calendar-day">31</div></div>
+          <div class="calendar-cell other-month"><div class="calendar-day">1</div></div>
+          <div class="calendar-cell other-month"><div class="calendar-day">2</div></div>
+          <div class="calendar-cell other-month"><div class="calendar-day">3</div></div>
+          <div class="calendar-cell other-month"><div class="calendar-day">4</div></div>
+          <div class="calendar-cell other-month"><div class="calendar-day">5</div></div>
+          <div class="calendar-cell other-month"><div class="calendar-day">6</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SoundHub — GitHub Repo</title>
+<link rel="stylesheet" href="design-system/shared.css">
+<style>
+  body { margin: 0; background: var(--bg-primary); color: var(--text-primary); font-family: 'Inter', system-ui, sans-serif; }
+  .app { display: flex; min-height: 100vh; }
+  .sidebar { width: 240px; background: var(--bg-panel); border-right: 1px solid var(--border-default); padding: 20px 0; flex-shrink: 0; }
+  .sidebar .logo { padding: 0 16px; font-size: 18px; font-weight: 800; color: var(--brand-accent); margin-bottom: 24px; }
+  .sidebar .nav-item { padding: 8px 20px; font-size: 13px; color: var(--text-secondary); cursor: pointer; }
+  .sidebar .nav-item.active { color: var(--brand-primary); background: rgba(139,92,246,0.08); border-radius: 6px; margin: 0 8px; padding: 8px 12px; }
+  .main { flex: 1; padding: 24px; max-width: 900px; }
+  .breadcrumb { font-size: 16px; margin-bottom: 4px; }
+  .breadcrumb .owner { color: var(--brand-primary); font-weight: 600; }
+  .breadcrumb .sep { color: var(--text-muted); }
+  .breadcrumb .name { color: var(--text-primary); font-weight: 600; }
+  .vis-badge { display: inline-block; padding: 2px 8px; border-radius: 12px; background: rgba(34,197,94,0.12); color: var(--color-success); font-size: 10px; font-weight: 600; margin-left: 8px; vertical-align: middle; }
+  .desc { font-size: 13px; color: var(--text-secondary); margin: 4px 0 12px; }
+  .stats { display: flex; gap: 16px; margin-bottom: 16px; }
+  .stats span { font-size: 12px; color: var(--text-secondary); display: flex; align-items: center; gap: 4px; }
+  .stats b { color: var(--text-primary); }
+  .controls { display: flex; gap: 8px; margin-bottom: 16px; align-items: center; }
+  select { background: var(--bg-input); border: 1px solid var(--border-default); color: var(--text-primary); padding: 8px 12px; border-radius: 6px; font-size: 12px; width: 300px; }
+  .btn { padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; text-decoration: none; border: 1px solid var(--border-default); background: var(--bg-elevated); color: var(--text-secondary); cursor: pointer; }
+  .commit-list { border: 1px solid var(--border-default); border-radius: 8px; overflow: hidden; }
+  .commit-header { display: flex; justify-content: space-between; padding: 10px 16px; background: var(--bg-surface); border-bottom: 1px solid var(--border-default); font-size: 12px; font-weight: 600; }
+  .commit-row { display: flex; align-items: center; gap: 12px; padding: 10px 16px; border-bottom: 1px solid var(--border-default); text-decoration: none; color: inherit; }
+  .commit-row:last-child { border-bottom: none; }
+  .commit-row:hover { background: var(--bg-elevated); }
+  .avatar { width: 28px; height: 28px; border-radius: 14px; background: var(--brand-primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; flex-shrink: 0; }
+  .commit-msg { font-size: 13px; font-weight: 600; flex: 1; }
+  .sha { font-size: 11px; font-weight: 600; color: var(--brand-primary); font-family: monospace; }
+  .commit-meta { font-size: 11px; color: var(--text-muted); }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="sidebar">
+    <div class="logo">🎵 SoundHub</div>
+    <div class="nav-item">📊 Dashboard</div>
+    <div class="nav-item active">🔗 GitHub</div>
+    <div class="nav-item">📁 Projects</div>
+    <div class="nav-item">⚙️ Settings</div>
+  </div>
+  <div class="main">
+    <div class="breadcrumb">
+      <span class="owner">soundXlab</span><span class="sep"> / </span><a class="name" href="#">SoundHub</a><span class="vis-badge">Public</span>
+    </div>
+    <p class="desc">The SoundHub codebase — mirrors git branches and commits from the public GitHub API.</p>
+    <div class="stats">
+      <span>⎇ <b>5</b> branches</span>
+      <span>⏱ <b>42</b> commits on main</span>
+    </div>
+    <div class="controls">
+      <select><option>⎇ main</option><option>⎇ fix/project-assets-license-validation</option><option>⎇ feat/sessions-api</option><option>⎇ dev</option><option>⎇ staging</option></select>
+      <a href="#" class="btn">All branches ↗</a>
+    </div>
+    <div class="commit-list">
+      <div class="commit-header"><span>Commits on main</span><span>42</span></div>
+      <a href="#" class="commit-row"><div class="avatar">A</div><span class="commit-msg">fix: license validation for project assets</span><span class="sha">66d44af</span><span class="commit-meta">Alex K. · 2h ago</span></a>
+      <a href="#" class="commit-row"><div class="avatar">B</div><span class="commit-msg">feat: E2E test fixes and session endpoints</span><span class="sha">3c6fa7c</span><span class="commit-meta">Buffy · 5h ago</span></a>
+      <a href="#" class="commit-row"><div class="avatar">B</div><span class="commit-msg">feat: reference upload, audio analysis</span><span class="sha">900601f</span><span class="commit-meta">Buffy · 8h ago</span></a>
+      <a href="#" class="commit-row"><div class="avatar">B</div><span class="commit-msg">fix: frontend build and TypeScript errors</span><span class="sha">f6819b3</span><span class="commit-meta">Buffy · 1d ago</span></a>
+      <a href="#" class="commit-row"><div class="avatar">B</div><span class="commit-msg">docs: update STATE.md</span><span class="sha">f1d3418</span><span class="commit-meta">Buffy · 1d ago</span></a>
+      <a href="#" class="commit-row"><div class="avatar">M</div><span class="commit-msg">feat: release package delivery endpoints</span><span class="sha">a2b3c4d</span><span class="commit-meta">Maria G. · 2d ago</span></a>
+    </div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,653 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" 
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     viewBox="0 0 1440 900" 
+     width="1440" 
+     height="900">
+  <foreignObject width="100%" height="100%">
+    <div xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html><html lang="en"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <title>SoundHub — Settings (DAW Style)</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', -apple-system, sans-serif; background: #0d0d0d; color: #e4e4e7; overflow: hidden; height: 100vh; }
+
+    /* ── Transport Bar ── */
+    .transport-bar {
+      height: 40px; background: #111113; border-bottom: 1px solid #27272a;
+      display: flex; align-items: center; padding: 0 12px; gap: 16px;
+      font-size: 11px; user-select: none;
+    }
+    .transport-logo { font-weight: 800; font-size: 13px; color: #ea5808; letter-spacing: -0.5px; }
+    .transport-logo span { color: #e4e4e7; }
+    .transport-divider { width: 1px; height: 20px; background: #27272a; }
+    .transport-group { display: flex; align-items: center; gap: 6px; }
+    .transport-label { color: #71717a; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .transport-value {
+      background: #0d0d0d; border: 1px solid #27272a; border-radius: 4px;
+      padding: 2px 8px; font-family: 'JetBrains Mono', monospace; font-size: 12px;
+      color: #22c55e; font-weight: 600; min-width: 60px; text-align: center;
+    }
+    .transport-spacer { flex: 1; }
+    .transport-time {
+      font-family: 'JetBrains Mono', monospace; font-size: 18px; font-weight: 700;
+      color: #e4e4e7; letter-spacing: 1px;
+    }
+
+    /* ── Main Layout ── */
+    .app-body { display: flex; height: calc(100vh - 40px); }
+
+    /* ── Left Sidebar ── */
+    .sidebar {
+      width: 240px; background: #111113; border-right: 1px solid #27272a;
+      display: flex; flex-direction: column; user-select: none;
+    }
+    .sidebar-search { padding: 8px; border-bottom: 1px solid #27272a; }
+    .sidebar-search input {
+      width: 100%; background: #0d0d0d; border: 1px solid #27272a; border-radius: 4px;
+      padding: 6px 8px 6px 28px; font-size: 11px; color: #e4e4e7; outline: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: 8px center;
+    }
+    .sidebar-search input::placeholder { color: #52525b; }
+    .sidebar-nav { flex: 1; overflow-y: auto; padding: 4px 0; }
+    .sidebar-section { padding: 8px 12px 4px; font-size: 9px; color: #52525b; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+    .sidebar-item {
+      padding: 6px 12px; font-size: 11px; font-weight: 500; color: #a1a1aa;
+      cursor: pointer; display: flex; align-items: center; gap: 8px;
+      border-left: 2px solid transparent; transition: all 0.1s;
+    }
+    .sidebar-item:hover { color: #e4e4e7; }
+    .sidebar-item.active { color: #ea5808; background: rgba(234,88,8,0.08); border-left-color: #ea5808; }
+    .sidebar-item .icon { width: 16px; text-align: center; }
+
+    /* ── Content Area ── */
+    .content { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
+
+    /* ── Header ── */
+    .page-header {
+      padding: 16px 24px; border-bottom: 1px solid #27272a;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .page-title { font-size: 18px; font-weight: 700; color: #e4e4e7; }
+    .header-actions { display: flex; gap: 8px; }
+    .btn {
+      padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 600;
+      cursor: pointer; border: 1px solid #27272a; transition: all 0.15s;
+    }
+    .btn-primary { background: #ea5808; color: #fff; border-color: #ea5808; }
+    .btn-primary:hover { background: #c2410c; }
+    .btn-secondary { background: #1a1a1a; color: #e4e4e7; }
+    .btn-secondary:hover { background: #27272a; }
+    .btn-ghost { background: transparent; color: #71717a; border-color: transparent; }
+    .btn-ghost:hover { color: #e4e4e7; background: #1a1a1a; }
+    .btn-danger { background: transparent; color: #ef4444; border-color: #ef4444; }
+    .btn-danger:hover { background: rgba(239,68,68,0.1); }
+
+    /* ── Settings Layout ── */
+    .settings-layout { display: flex; flex: 1; overflow: hidden; }
+
+    /* ── Settings Nav ── */
+    .settings-nav {
+      width: 200px; background: #111113; border-right: 1px solid #27272a;
+      padding: 16px 0; overflow-y: auto; flex-shrink: 0;
+    }
+    .settings-nav-title {
+      padding: 0 16px; font-size: 9px; color: #52525b; text-transform: uppercase;
+      letter-spacing: 1px; font-weight: 700; margin-bottom: 8px;
+    }
+    .settings-nav-item {
+      padding: 8px 16px; font-size: 12px; font-weight: 500; color: #a1a1aa;
+      cursor: pointer; display: flex; align-items: center; gap: 8px;
+      border-left: 2px solid transparent; transition: all 0.1s;
+    }
+    .settings-nav-item:hover { color: #e4e4e7; background: rgba(255,255,255,0.02); }
+    .settings-nav-item.active { color: #ea5808; background: rgba(234,88,8,0.08); border-left-color: #ea5808; }
+    .settings-nav-item .icon { width: 16px; text-align: center; font-size: 13px; }
+
+    /* ── Settings Content ── */
+    .settings-content {
+      flex: 1; overflow-y: auto; padding: 24px 32px;
+    }
+    .settings-section {
+      margin-bottom: 32px; padding-bottom: 32px; border-bottom: 1px solid #27272a;
+    }
+    .settings-section:last-child { border-bottom: none; }
+    .settings-section-title {
+      font-size: 16px; font-weight: 700; color: #e4e4e7; margin-bottom: 4px;
+    }
+    .settings-section-desc {
+      font-size: 12px; color: #71717a; margin-bottom: 16px;
+    }
+    .settings-row {
+      display: flex; align-items: flex-start; gap: 16px; margin-bottom: 16px;
+    }
+    .settings-label {
+      width: 180px; flex-shrink: 0;
+    }
+    .settings-label-title { font-size: 12px; font-weight: 600; color: #e4e4e7; }
+    .settings-label-desc { font-size: 11px; color: #52525b; margin-top: 2px; }
+    .settings-field { flex: 1; max-width: 480px; }
+
+    /* ── Form Elements ── */
+    .input {
+      width: 100%; background: #0d0d0d; border: 1px solid #27272a; border-radius: 6px;
+      padding: 8px 12px; font-size: 12px; color: #e4e4e7; outline: none;
+      transition: border-color 0.15s;
+    }
+    .input:focus { border-color: #ea5808; }
+    .input::placeholder { color: #52525b; }
+    .input-hint { font-size: 10px; color: #52525b; margin-top: 4px; }
+    .input-row { display: flex; gap: 8px; }
+    .input-row .input { flex: 1; }
+    .select {
+      width: 100%; background: #0d0d0d; border: 1px solid #27272a; border-radius: 6px;
+      padding: 8px 12px; font-size: 12px; color: #e4e4e7; outline: none;
+      cursor: pointer; appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 10px center;
+    }
+    .select:focus { border-color: #ea5808; }
+
+    /* ── Toggle Switch ── */
+    .toggle-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 0; border-bottom: 1px solid #1a1a1a;
+    }
+    .toggle-row:last-child { border-bottom: none; }
+    .toggle-info { flex: 1; }
+    .toggle-title { font-size: 12px; font-weight: 500; color: #e4e4e7; }
+    .toggle-desc { font-size: 11px; color: #52525b; margin-top: 2px; }
+    .toggle {
+      width: 36px; height: 20px; background: #27272a; border-radius: 10px;
+      position: relative; cursor: pointer; transition: background 0.2s; flex-shrink: 0;
+    }
+    .toggle.on { background: #ea5808; }
+    .toggle::after {
+      content: ''; position: absolute; width: 16px; height: 16px;
+      background: #fff; border-radius: 50%; top: 2px; left: 2px;
+      transition: transform 0.2s;
+    }
+    .toggle.on::after { transform: translateX(16px); }
+
+    /* ── Avatar Upload ── */
+    .avatar-upload {
+      display: flex; align-items: center; gap: 16px;
+    }
+    .avatar-preview {
+      width: 72px; height: 72px; border-radius: 50%; background: #ea5808;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px; font-weight: 700; color: #fff; flex-shrink: 0;
+    }
+    .avatar-actions { display: flex; flex-direction: column; gap: 6px; }
+
+    /* ── Color Swatches ── */
+    .color-swatches { display: flex; gap: 8px; margin-top: 8px; }
+    .color-swatch {
+      width: 32px; height: 32px; border-radius: 6px; cursor: pointer;
+      border: 2px solid transparent; transition: all 0.15s;
+    }
+    .color-swatch:hover { transform: scale(1.1); }
+    .color-swatch.active { border-color: #fff; box-shadow: 0 0 0 2px #ea5808; }
+
+    /* ── Keybind ── */
+    .keybind {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 4px 8px; background: #0d0d0d; border: 1px solid #27272a;
+      border-radius: 4px; font-family: 'JetBrains Mono', monospace;
+      font-size: 11px; color: #a1a1aa;
+    }
+    .keybind kbd {
+      padding: 2px 6px; background: #1a1a1a; border: 1px solid #27272a;
+      border-radius: 3px; font-size: 10px; color: #e4e4e7;
+    }
+
+    /* ── Storage Meter ── */
+    .storage-meter {
+      width: 100%; height: 8px; background: #27272a; border-radius: 4px;
+      overflow: hidden; margin-top: 8px;
+    }
+    .storage-fill { height: 100%; border-radius: 4px; }
+
+    /* ── Device Chain (Bottom) ── */
+    .device-chain {
+      height: 60px; background: #111113; border-top: 1px solid #27272a;
+      display: flex; align-items: center; padding: 0 16px; gap: 8px;
+    }
+    .device {
+      padding: 6px 12px; background: #0d0d0d; border: 1px solid #27272a;
+      border-radius: 4px; font-size: 10px; color: #a1a1aa;
+      display: flex; align-items: center; gap: 6px; cursor: pointer;
+      transition: all 0.1s;
+    }
+    .device:hover { border-color: #3f3f46; color: #e4e4e7; }
+    .device.active { border-color: #ea5808; color: #ea5808; background: rgba(234,88,8,0.08); }
+    .device .led { width: 6px; height: 6px; border-radius: 50%; background: #27272a; }
+    .device.active .led { background: #22c55e; box-shadow: 0 0 6px rgba(34,197,94,0.5); }
+    .device-chain-spacer { flex: 1; }
+    .device-chain-label {
+      font-size: 9px; color: #52525b; text-transform: uppercase;
+      letter-spacing: 0.5px; font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <!-- Transport Bar -->
+  <div class="transport-bar">
+    <div class="transport-logo">Sound<span>Hub</span></div>
+    <div class="transport-divider"></div>
+    <div class="transport-group">
+      <span class="transport-label">Plan</span>
+      <div class="transport-value" style="color:#ea5808">Pro</div>
+    </div>
+    <div class="transport-group">
+      <span class="transport-label">Storage</span>
+      <div class="transport-value">2.3 GB</div>
+    </div>
+    <div class="transport-group">
+      <span class="transport-label">Projects</span>
+      <div class="transport-value">12</div>
+    </div>
+    <div class="transport-spacer"></div>
+    <div class="transport-time">SETTINGS</div>
+    <div class="transport-divider"></div>
+    <div class="transport-group">
+      <span class="transport-label">API</span>
+      <div class="transport-value" style="color:#22c55e">Active</div>
+    </div>
+  </div>
+
+  <div class="app-body">
+    <!-- Left Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-search">
+        <input type="text" placeholder="Search projects...">
+      </div>
+      <div class="sidebar-nav">
+        <div class="sidebar-section">Main</div>
+        <div class="sidebar-item"><span class="icon">📊</span> Dashboard</div>
+        <div class="sidebar-item"><span class="icon">📁</span> Projects</div>
+        <div class="sidebar-item"><span class="icon">🛒</span> Marketplace</div>
+        <div class="sidebar-item"><span class="icon">⬆️</span> Upload</div>
+        <div class="sidebar-section">Workspace</div>
+        <div class="sidebar-item"><span class="icon">💬</span> Reviews</div>
+        <div class="sidebar-item"><span class="icon">📋</span> Sessions</div>
+        <div class="sidebar-section">Account</div>
+        <div class="sidebar-item active"><span class="icon">⚙️</span> Settings</div>
+        <div class="sidebar-item"><span class="icon">📊</span> Analytics</div>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+      <!-- Page Header -->
+      <div class="page-header">
+        <div class="page-title">Settings</div>
+        <div class="header-actions">
+          <button class="btn btn-ghost">↩ Reset to Defaults</button>
+          <button class="btn btn-primary">Save Changes</button>
+        </div>
+      </div>
+
+      <!-- Settings Layout -->
+      <div class="settings-layout">
+        <!-- Settings Nav -->
+        <div class="settings-nav">
+          <div class="settings-nav-title">Account</div>
+          <div class="settings-nav-item active"><span class="icon">👤</span> Profile</div>
+          <div class="settings-nav-item"><span class="icon">🔐</span> Security</div>
+          <div class="settings-nav-item"><span class="icon">🔔</span> Notifications</div>
+          <div class="settings-nav-item"><span class="icon">🔗</span> Connected Accounts</div>
+          <div class="settings-nav-title">Workspace</div>
+          <div class="settings-nav-item"><span class="icon">🎨</span> Appearance</div>
+          <div class="settings-nav-item"><span class="icon">⌨️</span> Keybindings</div>
+          <div class="settings-nav-item"><span class="icon">🎚️</span> Audio</div>
+          <div class="settings-nav-item"><span class="icon">💾</span> Storage</div>
+          <div class="settings-nav-title">Developer</div>
+          <div class="settings-nav-item"><span class="icon">🔌</span> API Keys</div>
+          <div class="settings-nav-item"><span class="icon">🪝</span> Webhooks</div>
+          <div class="settings-nav-title">Billing</div>
+          <div class="settings-nav-item"><span class="icon">💳</span> Subscription</div>
+          <div class="settings-nav-item"><span class="icon">📄</span> Invoices</div>
+        </div>
+
+        <!-- Settings Content -->
+        <div class="settings-content">
+          <!-- Profile Section -->
+          <div class="settings-section">
+            <div class="settings-section-title">Profile</div>
+            <div class="settings-section-desc">Manage your public profile and personal information.</div>
+
+            <div class="settings-row">
+              <div class="settings-label">
+                <div class="settings-label-title">Avatar</div>
+                <div class="settings-label-desc">Your profile photo</div>
+              </div>
+              <div class="settings-field">
+                <div class="avatar-upload">
+                  <div class="avatar-preview">S</div>
+                  <div class="avatar-actions">
+                    <button class="btn btn-secondary" style="font-size:11px">Upload new image</button>
+                    <button class="btn btn-ghost" style="font-size:11px;color:#ef4444">Remove</button>
+                    <div style="font-size:10px;color:#52525b">JPG, PNG or GIF. Max 2MB.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="settings-row">
+              <div class="settings-label">
+                <div class="settings-label-title">Display Name</div>
+                <div class="settings-label-desc">Your public name</div>
+              </div>
+              <div class="settings-field">
+                <input class="input" type="text" value="scatter">
+              </div>
+            </div>
+
+            <div class="settings-row">
+              <div class="settings-label">
+                <div class="settings-label-title">Username</div>
+                <div class="settings-label-desc">Your unique handle</div>
+              </div>
+              <div class="settings-field">
+                <div class="input-row">
+                  <span style="padding:8px 12px;background:#0d0d0d;border:1px solid #27272a;border-radius:6px 0 0 6px;font-size:12px;color:#71717a">@</span>
+                  <input class="input" type="text" value="soundXlab" style="border-radius:0 6px 6px 0">
+                </div>
+              </div>
+            </div>
+
+            <div class="settings-row">
+              <div class="settings-label">
+                <div class="settings-label-title">Bio</div>
+                <div class="settings-label-desc">A short description</div>
+              </div>
+              <div class="settings-field">
+                <textarea class="input" rows="3" style="resize:vertical">Music producer, sound designer, and audio engineer. Building SoundHub — the marketplace for creators.</textarea>
+                <div class="input-hint">0 / 160 characters</div>
+              </div>
+            </div>
+
+            <div class="settings-row">
+              <div class="settings-label">
+                <div class="settings-label-title">Location</div>
+                <div class="settings-label-desc">Where you're based</div>
+              </div>
+              <div class="settings-field">
+                <input class="input" type="text" value="Berlin, Germany">
+              </div>
+            </div>
+
+            <div class="settings-row">
+              <div class="settings-label">
+                <div class="settings-label-title">Website</div>
+                <div class="settings-label-desc">Your personal site</div>
+              </div>
+              <div class="settings-field">
+                <input class="input" type="url" value="https://soundxlab.io">
+              </div>
+            </div>
+          </div>
+
+          <!-- Appearance Section -->
+          <div class="settings-section">
+            <div class="settings-section-title">Appearance</div>
+            <div class="settings-section-desc">Customize the look and feel of SoundHub.</div>
+
+            <div class="settings-row">
+              <div class="settings-label">
+                <div class="settings-label-title">Theme</div>
+                <div class="settings-label-desc">Dark or light mode</div>
+              </div>
+              <div class="settings-field">
+                <div style="display:flex;gap:8px">
+                  <div style="padding:8px 16px;background:#1a1a1a;border:2px solid #ea5808;border-radius:6px;font-size:11px;cursor:pointer;color:#e4e4e7">🌙 Dark</div>
+                  <div style="padding:8px 16px;background:#0d0d0d;border:1px solid #27272a;border-radius:6px;font-size:11px;cursor:pointer;color:#71717a">☀️ Light</div>
+                  <div style="padding:8px 16px;background:#0d0d0d;border:1px solid #27272a;border-radius:6px;font-size:11px;cursor:pointer;color:#71717a">🖥️ System</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="settings-row">
+              <div class="settings-label">
+                <div class="settings-label-title">Accent Color</div>
+                <div class="settings-label-desc">Primary brand color</div>
+              </div>
+              <div class="settings-field">
+                <div class="color-swatches">
+                  <div class="color-swatch active" style="background:#ea5808"></div>
+                  <div class="color-swatch" style="background:#3b82f6"></div>
+                  <div class="color-swatch" style="background:#22c55e"></div>
+                  <div class="color-swatch" style="background:#eab308"></div>
+                  <div class="color-swatch" style="background:#ef4444"></div>
+                  <div class="color-swatch" style="background:#ec4899"></div>
+                  <div class="color-swatch" style="background:#06b6d4"></div>
+                  <div class="color-swatch" style="background:#f97316"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="settings-row">
+              <div class="settings-label">
+                <div class="settings-label-title">Font Size</div>
+                <div class="settings-label-desc">UI text size</div>
+              </div>
+              <div class="settings-field">
+                <select class="select">
+                  <option>Small (11px)</option>
+                  <option selected="">Medium (12px)</option>
+                  <option>Large (14px)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="settings-row">
+              <div class="settings-label">
+                <div class="settings-label-title">Compact Mode</div>
+                <div class="settings-label-desc">Reduce spacing in UI</div>
+              </div>
+              <div class="settings-field">
+                <div class="toggle-row" style="border:none;padding:0">
+                  <div class="toggle on"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Audio Section -->
+          <div class="settings-section">
+            <div class="settings-section-title">Audio</div>
+            <div class="settings-section-desc">Configure audio playback and processing preferences.</div>
+
+            <div class="settings-row">
+              <div class="settings-label">
+                <div class="settings-label-title">Default Sample Rate</div>
+                <div class="settings-label-desc">For new projects</div>
+              </div>
+              <div class="settings-field">
+                <select class="select">
+                  <option>44.1 kHz</option>
+                  <option selected="">48 kHz</option>
+                  <option>88.2 kHz</option>
+                  <option>96 kHz</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="settings-row">
+              <div class="settings-label">
+                <div class="settings-label-title">Default Bit Depth</div>
+                <div class="settings-label-desc">For new projects</div>
+              </div>
+              <div class="settings-field">
+                <select class="select">
+                  <option>16 bit</option>
+                  <option selected="">24 bit</option>
+                  <option>32 bit float</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="settings-row">
+              <div class="settings-label">
+                <div class="settings-label-title">Export Format</div>
+                <div class="settings-label-desc">Default export format</div>
+              </div>
+              <div class="settings-field">
+                <select class="select">
+                  <option selected="">WAV</option>
+                  <option>FLAC</option>
+                  <option>MP3 (320kbps)</option>
+                  <option>OGG Vorbis</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="settings-row">
+              <div class="settings-label">
+                <div class="settings-label-title">Loudness Target</div>
+                <div class="settings-label-desc">For mastering</div>
+              </div>
+              <div class="settings-field">
+                <select class="select">
+                  <option>-14 LUFS (Streaming)</option>
+                  <option>-16 LUFS (Podcast)</option>
+                  <option selected="">-23 LUFS (Broadcast)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="settings-row">
+              <div class="settings-label">
+                <div class="settings-label-title">Auto-Save</div>
+                <div class="settings-label-desc">Save project state</div>
+              </div>
+              <div class="settings-field">
+                <div class="toggle-row" style="border:none;padding:0">
+                  <div class="toggle on"></div>
+                </div>
+                <div class="input-hint">Saves every 30 seconds</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Keybindings Section -->
+          <div class="settings-section">
+            <div class="settings-section-title">Keybindings</div>
+            <div class="settings-section-desc">Customize keyboard shortcuts.</div>
+
+            <div style="display:flex;flex-direction:column;gap:2px">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:#111113;border-radius:4px;font-size:12px">
+                <span style="color:#a1a1aa">Play / Pause</span>
+                <div class="keybind"><kbd>Space</kbd></div>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:#111113;border-radius:4px;font-size:12px">
+                <span style="color:#a1a1aa">Stop</span>
+                <div class="keybind"><kbd>Enter</kbd></div>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:#111113;border-radius:4px;font-size:12px">
+                <span style="color:#a1a1aa">Record</span>
+                <div class="keybind"><kbd>Ctrl</kbd><kbd>R</kbd></div>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:#111113;border-radius:4px;font-size:12px">
+                <span style="color:#a1a1aa">Undo</span>
+                <div class="keybind"><kbd>Ctrl</kbd><kbd>Z</kbd></div>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:#111113;border-radius:4px;font-size:12px">
+                <span style="color:#a1a1aa">Redo</span>
+                <div class="keybind"><kbd>Ctrl</kbd><kbd>Shift</kbd><kbd>Z</kbd></div>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:#111113;border-radius:4px;font-size:12px">
+                <span style="color:#a1a1aa">Save Project</span>
+                <div class="keybind"><kbd>Ctrl</kbd><kbd>S</kbd></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Notifications Section -->
+          <div class="settings-section">
+            <div class="settings-section-title">Notifications</div>
+            <div class="settings-section-desc">Choose what you want to be notified about.</div>
+
+            <div style="background:#0d0d0d;border:1px solid #27272a;border-radius:6px;padding:12px">
+              <div class="toggle-row">
+                <div class="toggle-info">
+                  <div class="toggle-title">Review Comments</div>
+                  <div class="toggle-desc">When someone comments on your review</div>
+                </div>
+                <div class="toggle on"></div>
+              </div>
+              <div class="toggle-row">
+                <div class="toggle-info">
+                  <div class="toggle-title">Review Approved</div>
+                  <div class="toggle-desc">When your review is approved</div>
+                </div>
+                <div class="toggle on"></div>
+              </div>
+              <div class="toggle-row">
+                <div class="toggle-info">
+                  <div class="toggle-title">Review Rejected</div>
+                  <div class="toggle-desc">When your review is rejected</div>
+                </div>
+                <div class="toggle on"></div>
+              </div>
+              <div class="toggle-row">
+                <div class="toggle-info">
+                  <div class="toggle-title">Download Completed</div>
+                  <div class="toggle-desc">When a download finishes</div>
+                </div>
+                <div class="toggle on"></div>
+              </div>
+              <div class="toggle-row">
+                <div class="toggle-info">
+                  <div class="toggle-title">Marketplace Updates</div>
+                  <div class="toggle-desc">New assets and promotions</div>
+                </div>
+                <div class="toggle"></div>
+              </div>
+              <div class="toggle-row">
+                <div class="toggle-info">
+                  <div class="toggle-title">Email Digest</div>
+                  <div class="toggle-desc">Weekly summary of activity</div>
+                </div>
+                <div class="toggle on"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Danger Zone -->
+          <div class="settings-section" style="border-bottom:none">
+            <div class="settings-section-title" style="color:#ef4444">Danger Zone</div>
+            <div class="settings-section-desc">Irreversible actions.</div>
+
+            <div style="background:#0d0d0d;border:1px solid rgba(239,68,68,0.3);border-radius:6px;padding:16px;display:flex;align-items:center;justify-content:space-between">
+              <div>
+                <div style="font-size:12px;font-weight:600;color:#e4e4e7">Delete Account</div>
+                <div style="font-size:11px;color:#71717a;margin-top:2px">Permanently delete your account and all data</div>
+              </div>
+              <button class="btn btn-danger">Delete Account</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Device Chain -->
+      <div class="device-chain">
+        <span class="device-chain-label">System:</span>
+        <div class="device active"><div class="led"></div> CPU: 12%</div>
+        <div class="device active"><div class="led"></div> RAM: 4.2 GB</div>
+        <div class="device"><div class="led"></div> Disk: 2.3 / 10 GB</div>
+        <div class="device-chain-spacer"></div>
+        <span class="device-chain-label">Last saved:</span>
+        <div class="device"><div class="led"></div> 2 minutes ago</div>
+      </div>
+    </div>
+  </div>
+
+</body></html>
+    </div>
+  </foreignObject>
+</svg>

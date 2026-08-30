@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <title>SoundHub — Marketplace</title>
+  <link rel="stylesheet" href="design-system/shared.css">
+  <style>
+    .marketplace-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .filter-bar {
+      display: flex; gap: 12px; align-items: center;
+      padding: 12px 16px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg);
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .filter-chip {
+      display: flex; align-items: center; gap: 6px;
+      padding: 6px 12px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-default);
+      border-radius: 20px;
+      font-size: 12px; font-weight: 500;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .filter-chip:hover { border-color: var(--border-hover); color: var(--text-primary); }
+    .filter-chip.active {
+      background: rgba(139,92,246,0.12);
+      border-color: var(--brand-primary);
+      color: var(--brand-primary);
+    }
+    .filter-chip .remove { font-size: 14px; opacity: 0.6; }
+    .asset-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    .asset-waveform-bar {
+      display: flex; align-items: end; gap: 2px; height: 50px; padding: 0 16px 16px;
+    }
+    .wave-bar {
+      flex: 1;
+      background: var(--brand-primary);
+      border-radius: 1px;
+      opacity: 0.6;
+      transition: opacity 0.15s;
+    }
+    .asset-card:hover .wave-bar { opacity: 1; }
+    .asset-play-btn {
+      position: absolute;
+      left: 12px; bottom: 12px;
+      width: 32px; height: 32px;
+      background: var(--brand-primary);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-size: 12px;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(139,92,246,0.4);
+    }
+    .sort-dropdown {
+      display: flex; align-items: center; gap: 6px;
+      padding: 6px 12px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      color: var(--text-secondary);
+      cursor: pointer;
+    }
+    .pagination {
+      display: flex; align-items: center; justify-content: center;
+      gap: 4px;
+      margin-top: 32px;
+    }
+    .page-btn {
+      width: 32px; height: 32px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: var(--radius-sm);
+      font-size: 12px; font-weight: 500;
+      color: var(--text-secondary);
+      cursor: pointer;
+    }
+    .page-btn:hover { background: var(--bg-hover); }
+    .page-btn.active { background: var(--brand-primary); color: white; }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <div class="logo-icon">S</div>
+        <div class="logo-text">SoundHub</div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="sidebar-section-label">Main</div>
+        <a class="sidebar-item" href="#"><span class="icon">📊</span> Dashboard</a>
+        <a class="sidebar-item" href="#"><span class="icon">📁</span> Projects</a>
+        <a class="sidebar-item active" href="#"><span class="icon">🛒</span> Marketplace</a>
+        <a class="sidebar-item" href="#"><span class="icon">⬆️</span> Upload</a>
+        <div class="sidebar-section-label">Workspace</div>
+        <a class="sidebar-item" href="#"><span class="icon">💬</span> Reviews</a>
+        <a class="sidebar-item" href="#"><span class="icon">📋</span> Sessions</a>
+        <div class="sidebar-section-label">Account</div>
+        <a class="sidebar-item" href="#"><span class="icon">⚙️</span> Settings</a>
+        <a class="sidebar-item" href="#"><span class="icon">📊</span> Analytics</a>
+      </nav>
+      <div class="sidebar-footer">
+        <a class="sidebar-item" href="#"><span class="icon">❓</span> Help & Docs</a>
+      </div>
+    </aside>
+
+    <div class="main-content">
+      <header class="topbar">
+        <div class="topbar-search">
+          <span class="search-icon">🔍</span>
+          <input type="text" placeholder="Search 256 assets...">
+        </div>
+        <div class="topbar-right">
+          <div class="topbar-icon-btn">🔔<span class="notif-dot"></span></div>
+          <div class="topbar-avatar">P</div>
+        </div>
+      </header>
+
+      <div class="page">
+        <div class="marketplace-header">
+          <div>
+            <h1 class="page-title">Marketplace</h1>
+            <p class="page-subtitle">256 audio assets from 48 creators</p>
+          </div>
+          <div class="sort-dropdown">
+            Sort: Popular ▾
+          </div>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+          <div class="filter-chip active">All Types</div>
+          <div class="filter-chip">DAW: Ableton ▾</div>
+          <div class="filter-chip">Genre: All ▾</div>
+          <div class="filter-chip">BPM: Any ▾</div>
+          <div class="filter-chip">Key: Any ▾</div>
+          <div style="flex:1"></div>
+          <div class="filter-chip">lo-fi <span class="remove">×</span></div>
+          <div class="filter-chip">drums <span class="remove">×</span></div>
+          <div class="filter-chip">synth <span class="remove">×</span></div>
+          <div style="font-size:11px;color:var(--text-muted);cursor:pointer">Clear all</div>
+        </div>
+
+        <!-- Asset Grid -->
+        <div class="asset-grid">
+          <!-- Card 1 -->
+          <div class="asset-card">
+            <div class="asset-card-waveform" style="background:linear-gradient(135deg,rgba(139,92,246,0.1),rgba(6,182,212,0.1))">
+              <div class="asset-waveform-bar">
+                <div class="wave-bar" style="height:60%"></div>
+                <div class="wave-bar" style="height:80%"></div>
+                <div class="wave-bar" style="height:45%"></div>
+                <div class="wave-bar" style="height:90%"></div>
+                <div class="wave-bar" style="height:70%"></div>
+                <div class="wave-bar" style="height:55%"></div>
+                <div class="wave-bar" style="height:85%"></div>
+                <div class="wave-bar" style="height:40%"></div>
+                <div class="wave-bar" style="height:75%"></div>
+                <div class="wave-bar" style="height:65%"></div>
+                <div class="wave-bar" style="height:50%"></div>
+                <div class="wave-bar" style="height:80%"></div>
+                <div class="wave-bar" style="height:35%"></div>
+                <div class="wave-bar" style="height:90%"></div>
+                <div class="wave-bar" style="height:60%"></div>
+                <div class="wave-bar" style="height:70%"></div>
+              </div>
+              <div class="asset-play-btn">▶</div>
+            </div>
+            <div class="asset-card-body">
+              <div class="asset-card-title">Lo-Fi Drums Pack</div>
+              <div class="asset-card-meta">by @producer1 · WAV · 24bit</div>
+              <div class="asset-card-tags">
+                <span class="badge badge-purple" style="font-size:10px">lo-fi</span>
+                <span class="badge badge-muted" style="font-size:10px">drums</span>
+                <span class="badge badge-muted" style="font-size:10px">chill</span>
+              </div>
+              <div class="asset-card-footer">
+                <div class="asset-card-price free">Free</div>
+                <div class="asset-card-rating">★ 4.8 <span style="color:var(--text-muted)">(124)</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 2 -->
+          <div class="asset-card">
+            <div class="asset-card-waveform" style="background:linear-gradient(135deg,rgba(6,182,212,0.1),rgba(34,197,94,0.1))">
+              <div class="asset-waveform-bar">
+                <div class="wave-bar" style="height:30%;background:var(--brand-secondary)"></div>
+                <div class="wave-bar" style="height:50%;background:var(--brand-secondary)"></div>
+                <div class="wave-bar" style="height:70%;background:var(--brand-secondary)"></div>
+                <div class="wave-bar" style="height:45%;background:var(--brand-secondary)"></div>
+                <div class="wave-bar" style="height:80%;background:var(--brand-secondary)"></div>
+                <div class="wave-bar" style="height:55%;background:var(--brand-secondary)"></div>
+                <div class="wave-bar" style="height:65%;background:var(--brand-secondary)"></div>
+                <div class="wave-bar" style="height:40%;background:var(--brand-secondary)"></div>
+                <div class="wave-bar" style="height:75%;background:var(--brand-secondary)"></div>
+                <div class="wave-bar" style="height:35%;background:var(--brand-secondary)"></div>
+                <div class="wave-bar" style="height:60%;background:var(--brand-secondary)"></div>
+                <div class="wave-bar" style="height:50%;background:var(--brand-secondary)"></div>
+                <div class="wave-bar" style="height:45%;background:var(--brand-secondary)"></div>
+                <div class="wave-bar" style="height:55%;background:var(--brand-secondary)"></div>
+                <div class="wave-bar" style="height:70%;background:var(--brand-secondary)"></div>
+                <div class="wave-bar" style="height:40%;background:var(--brand-secondary)"></div>
+              </div>
+              <div class="asset-play-btn">▶</div>
+            </div>
+            <div class="asset-card-body">
+              <div class="asset-card-title">Ambient Pad Textures</div>
+              <div class="asset-card-meta">by @soundartist · WAV · 16bit</div>
+              <div class="asset-card-tags">
+                <span class="badge badge-purple" style="font-size:10px">ambient</span>
+                <span class="badge badge-muted" style="font-size:10px">pads</span>
+                <span class="badge badge-muted" style="font-size:10px">texture</span>
+              </div>
+              <div class="asset-card-footer">
+                <div class="asset-card-price">$4.99</div>
+                <div class="asset-card-rating">★ 4.6 <span style="color:var(--text-muted)">(87)</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 3 -->
+          <div class="asset-card">
+            <div class="asset-card-waveform" style="background:linear-gradient(135deg,rgba(239,68,68,0.1),rgba(234,179,8,0.1))">
+              <div class="asset-waveform-bar">
+                <div class="wave-bar" style="height:90%;background:var(--color-error)"></div>
+                <div class="wave-bar" style="height:95%;background:var(--color-error)"></div>
+                <div class="wave-bar" style="height:85%;background:var(--color-error)"></div>
+                <div class="wave-bar" style="height:100%;background:var(--color-error)"></div>
+                <div class="wave-bar" style="height:80%;background:var(--color-error)"></div>
+                <div class="wave-bar" style="height:95%;background:var(--color-error)"></div>
+                <div class="wave-bar" style="height:90%;background:var(--color-error)"></div>
+                <div class="wave-bar" style="height:100%;background:var(--color-error)"></div>
+                <div class="wave-bar" style="height:85%;background:var(--color-error)"></div>
+                <div class="wave-bar" style="height:90%;background:var(--color-error)"></div>
+                <div class="wave-bar" style="height:95%;background:var(--color-error)"></div>
+                <div class="wave-bar" style="height:100%;background:var(--color-error)"></div>
+                <div class="wave-bar" style="height:88%;background:var(--color-error)"></div>
+                <div class="wave-bar" style="height:92%;background:var(--color-error)"></div>
+                <div class="wave-bar" style="height:97%;background:var(--color-error)"></div>
+                <div class="wave-bar" style="height:85%;background:var(--color-error)"></div>
+              </div>
+              <div class="asset-play-btn">▶</div>
+            </div>
+            <div class="asset-card-body">
+              <div class="asset-card-title">808 Bass Kit</div>
+              <div class="asset-card-meta">by @beatmaker · WAV · 32bit</div>
+              <div class="asset-card-tags">
+                <span class="badge badge-purple" style="font-size:10px">808</span>
+                <span class="badge badge-muted" style="font-size:10px">bass</span>
+                <span class="badge badge-muted" style="font-size:10px">trap</span>
+              </div>
+              <div class="asset-card-footer">
+                <div class="asset-card-price">$9.99</div>
+                <div class="asset-card-rating">★ 4.9 <span style="color:var(--text-muted)">(203)</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 4 -->
+          <div class="asset-card">
+            <div class="asset-card-waveform" style="background:linear-gradient(135deg,rgba(234,179,8,0.1),rgba(139,92,246,0.1))">
+              <div class="asset-waveform-bar">
+                <div class="wave-bar" style="height:50%;background:var(--color-warning)"></div>
+                <div class="wave-bar" style="height:70%;background:var(--color-warning)"></div>
+                <div class="wave-bar" style="height:40%;background:var(--color-warning)"></div>
+                <div class="wave-bar" style="height:60%;background:var(--color-warning)"></div>
+                <div class="wave-bar" style="height:80%;background:var(--color-warning)"></div>
+                <div class="wave-bar" style="height:55%;background:var(--color-warning)"></div>
+                <div class="wave-bar" style="height:65%;background:var(--color-warning)"></div>
+                <div class="wave-bar" style="height:45%;background:var(--color-warning)"></div>
+                <div class="wave-bar" style="height:75%;background:var(--color-warning)"></div>
+                <div class="wave-bar" style="height:50%;background:var(--color-warning)"></div>
+                <div class="wave-bar" style="height:60%;background:var(--color-warning)"></div>
+                <div class="wave-bar" style="height:70%;background:var(--color-warning)"></div>
+                <div class="wave-bar" style="height:55%;background:var(--color-warning)"></div>
+                <div class="wave-bar" style="height:65%;background:var(--color-warning)"></div>
+                <div class="wave-bar" style="height:50%;background:var(--color-warning)"></div>
+                <div class="wave-bar" style="height:60%;background:var(--color-warning)"></div>
+              </div>
+              <div class="asset-play-btn">▶</div>
+            </div>
+            <div class="asset-card-body">
+              <div class="asset-card-title">Vinyl Classics Vol.2</div>
+              <div class="asset-card-meta">by @Zero-G · Ableton · 24bit</div>
+              <div class="asset-card-tags">
+                <span class="badge badge-purple" style="font-size:10px">electronic</span>
+                <span class="badge badge-muted" style="font-size:10px">vinyl</span>
+              </div>
+              <div class="asset-card-footer">
+                <div class="asset-card-price">$29.99</div>
+                <div class="asset-card-rating">★ 4.7 <span style="color:var(--text-muted)">(64)</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 5 -->
+          <div class="asset-card">
+            <div class="asset-card-waveform" style="background:linear-gradient(135deg,rgba(34,197,94,0.1),rgba(6,182,212,0.1))">
+              <div class="asset-waveform-bar">
+                <div class="wave-bar" style="height:40%;background:var(--color-success)"></div>
+                <div class="wave-bar" style="height:55%;background:var(--color-success)"></div>
+                <div class="wave-bar" style="height:65%;background:var(--color-success)"></div>
+                <div class="wave-bar" style="height:50%;background:var(--color-success)"></div>
+                <div class="wave-bar" style="height:75%;background:var(--color-success)"></div>
+                <div class="wave-bar" style="height:60%;background:var(--color-success)"></div>
+                <div class="wave-bar" style="height:45%;background:var(--color-success)"></div>
+                <div class="wave-bar" style="height:70%;background:var(--color-success)"></div>
+                <div class="wave-bar" style="height:55%;background:var(--color-success)"></div>
+                <div class="wave-bar" style="height:50%;background:var(--color-success)"></div>
+                <div class="wave-bar" style="height:60%;background:var(--color-success)"></div>
+                <div class="wave-bar" style="height:45%;background:var(--color-success)"></div>
+                <div class="wave-bar" style="height:55%;background:var(--color-success)"></div>
+                <div class="wave-bar" style="height:65%;background:var(--color-success)"></div>
+                <div class="wave-bar" style="height:50%;background:var(--color-success)"></div>
+                <div class="wave-bar" style="height:60%;background:var(--color-success)"></div>
+              </div>
+              <div class="asset-play-btn">▶</div>
+            </div>
+            <div class="asset-card-body">
+              <div class="asset-card-title">Organic Percussion</div>
+              <div class="asset-card-meta">by @worldsounds · FLAC · 24bit</div>
+              <div class="asset-card-tags">
+                <span class="badge badge-purple" style="font-size:10px">organic</span>
+                <span class="badge badge-muted" style="font-size:10px">percussion</span>
+              </div>
+              <div class="asset-card-footer">
+                <div class="asset-card-price">$7.99</div>
+                <div class="asset-card-rating">★ 4.5 <span style="color:var(--text-muted)">(42)</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 6 -->
+          <div class="asset-card">
+            <div class="asset-card-waveform" style="background:linear-gradient(135deg,rgba(139,92,246,0.1),rgba(239,68,68,0.1))">
+              <div class="asset-waveform-bar">
+                <div class="wave-bar" style="height:70%;background:#E85D2A"></div>
+                <div class="wave-bar" style="height:85%;background:#E85D2A"></div>
+                <div class="wave-bar" style="height:60%;background:#E85D2A"></div>
+                <div class="wave-bar" style="height:95%;background:#E85D2A"></div>
+                <div class="wave-bar" style="height:75%;background:#E85D2A"></div>
+                <div class="wave-bar" style="height:80%;background:#E85D2A"></div>
+                <div class="wave-bar" style="height:65%;background:#E85D2A"></div>
+                <div class="wave-bar" style="height:90%;background:#E85D2A"></div>
+                <div class="wave-bar" style="height:70%;background:#E85D2A"></div>
+                <div class="wave-bar" style="height:85%;background:#E85D2A"></div>
+                <div class="wave-bar" style="height:75%;background:#E85D2A"></div>
+                <div class="wave-bar" style="height:80%;background:#E85D2A"></div>
+                <div class="wave-bar" style="height:65%;background:#E85D2A"></div>
+                <div class="wave-bar" style="height:90%;background:#E85D2A"></div>
+                <div class="wave-bar" style="height:80%;background:#E85D2A"></div>
+                <div class="wave-bar" style="height:75%;background:#E85D2A"></div>
+              </div>
+              <div class="asset-play-btn">▶</div>
+            </div>
+            <div class="asset-card-body">
+              <div class="asset-card-title">Grand Piano Studio</div>
+              <div class="asset-card-meta">by @in-house · Ableton · 24bit</div>
+              <div class="asset-card-tags">
+                <span class="badge badge-purple" style="font-size:10px">piano</span>
+                <span class="badge badge-muted" style="font-size:10px">acoustic</span>
+              </div>
+              <div class="asset-card-footer">
+                <div class="asset-card-price free">Free</div>
+                <div class="asset-card-rating">★ 4.9 <span style="color:var(--text-muted)">(312)</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination">
+          <div class="page-btn">←</div>
+          <div class="page-btn active">1</div>
+          <div class="page-btn">2</div>
+          <div class="page-btn">3</div>
+          <div class="page-btn">...</div>
+          <div class="page-btn">8</div>
+          <div class="page-btn">→</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

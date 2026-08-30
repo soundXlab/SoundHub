@@ -1,0 +1,590 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" 
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     viewBox="0 0 1440 900" 
+     width="1440" 
+     height="900">
+  <foreignObject width="100%" height="100%">
+    <div xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html><html lang="en"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <title>SoundHub — User Management (DAW Style)</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', -apple-system, sans-serif; background: #0d0d0d; color: #e4e4e7; overflow: hidden; height: 100vh; }
+
+    /* ── Transport Bar ── */
+    .transport-bar {
+      height: 40px; background: #111113; border-bottom: 1px solid #27272a;
+      display: flex; align-items: center; padding: 0 12px; gap: 16px;
+      font-size: 11px; user-select: none;
+    }
+    .transport-logo { font-weight: 800; font-size: 13px; color: #ea5808; letter-spacing: -0.5px; }
+    .transport-logo span { color: #e4e4e7; }
+    .transport-divider { width: 1px; height: 20px; background: #27272a; }
+    .transport-group { display: flex; align-items: center; gap: 6px; }
+    .transport-label { color: #71717a; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .transport-value {
+      background: #0d0d0d; border: 1px solid #27272a; border-radius: 4px;
+      padding: 2px 8px; font-family: 'JetBrains Mono', monospace; font-size: 12px;
+      color: #22c55e; font-weight: 600; min-width: 60px; text-align: center;
+    }
+    .transport-spacer { flex: 1; }
+    .transport-time {
+      font-family: 'JetBrains Mono', monospace; font-size: 18px; font-weight: 700;
+      color: #e4e4e7; letter-spacing: 1px;
+    }
+
+    /* ── Main Layout ── */
+    .app-body { display: flex; height: calc(100vh - 40px); }
+
+    /* ── Left Sidebar ── */
+    .sidebar {
+      width: 240px; background: #111113; border-right: 1px solid #27272a;
+      display: flex; flex-direction: column; user-select: none;
+    }
+    .sidebar-search { padding: 8px; border-bottom: 1px solid #27272a; }
+    .sidebar-search input {
+      width: 100%; background: #0d0d0d; border: 1px solid #27272a; border-radius: 4px;
+      padding: 6px 8px 6px 28px; font-size: 11px; color: #e4e4e7; outline: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: 8px center;
+    }
+    .sidebar-search input::placeholder { color: #52525b; }
+    .sidebar-nav { flex: 1; overflow-y: auto; padding: 4px 0; }
+    .sidebar-section { padding: 8px 12px 4px; font-size: 9px; color: #52525b; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+    .sidebar-item {
+      padding: 6px 12px; font-size: 11px; font-weight: 500; color: #a1a1aa;
+      cursor: pointer; display: flex; align-items: center; gap: 8px;
+      border-left: 2px solid transparent; transition: all 0.1s;
+    }
+    .sidebar-item:hover { color: #e4e4e7; }
+    .sidebar-item.active { color: #ea5808; background: rgba(234,88,8,0.08); border-left-color: #ea5808; }
+    .sidebar-item .icon { width: 16px; text-align: center; }
+
+    /* ── Content Area ── */
+    .content { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
+
+    /* ── Header ── */
+    .page-header {
+      padding: 16px 24px; border-bottom: 1px solid #27272a;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .page-title { font-size: 18px; font-weight: 700; color: #e4e4e7; }
+    .page-title span { color: #71717a; font-weight: 400; font-size: 14px; margin-left: 8px; }
+    .header-actions { display: flex; gap: 8px; }
+    .btn {
+      padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 600;
+      cursor: pointer; border: 1px solid #27272a; transition: all 0.15s;
+    }
+    .btn-primary { background: #ea5808; color: #fff; border-color: #ea5808; }
+    .btn-primary:hover { background: #c2410c; }
+    .btn-secondary { background: #1a1a1a; color: #e4e4e7; }
+    .btn-secondary:hover { background: #27272a; }
+    .btn-ghost { background: transparent; color: #71717a; border-color: transparent; }
+    .btn-ghost:hover { color: #e4e4e7; background: #1a1a1a; }
+    .btn-danger { background: transparent; color: #ef4444; border-color: #ef4444; }
+
+    /* ── Search Bar ── */
+    .search-bar {
+      display: flex; gap: 12px; padding: 12px 24px; border-bottom: 1px solid #27272a;
+      align-items: center;
+    }
+    .search-input {
+      flex: 1; background: #0d0d0d; border: 1px solid #27272a; border-radius: 6px;
+      padding: 8px 12px 8px 32px; font-size: 12px; color: #e4e4e7; outline: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: 10px center;
+    }
+    .search-input::placeholder { color: #52525b; }
+    .filter-chip {
+      padding: 6px 12px; background: #1a1a1a; border: 1px solid #27272a;
+      border-radius: 20px; font-size: 11px; font-weight: 500; color: #a1a1aa;
+      cursor: pointer; transition: all 0.1s; white-space: nowrap;
+    }
+    .filter-chip:hover { border-color: #3f3f46; color: #e4e4e7; }
+    .filter-chip.active { background: rgba(234,88,8,0.12); border-color: #ea5808; color: #ea5808; }
+
+    /* ── Users Table ── */
+    .users-container { flex: 1; overflow-y: auto; padding: 16px 24px; }
+    .users-table { width: 100%; border-collapse: collapse; }
+    .users-table th {
+      text-align: left; padding: 10px 12px; font-size: 10px; font-weight: 600;
+      color: #52525b; text-transform: uppercase; letter-spacing: 0.5px;
+      border-bottom: 1px solid #27272a; position: sticky; top: 0; background: #0d0d0d;
+    }
+    .users-table td {
+      padding: 12px; font-size: 11px; color: #a1a1aa;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    .users-table tr:hover td { background: rgba(255,255,255,0.02); }
+    .user-cell {
+      display: flex; align-items: center; gap: 10px;
+    }
+    .user-avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 700; color: #fff;
+    }
+    .user-name { font-weight: 600; color: #e4e4e7; }
+    .user-email { font-size: 10px; color: #52525b; }
+    .role-badge {
+      padding: 3px 8px; border-radius: 4px; font-size: 9px;
+      font-weight: 600; text-transform: uppercase;
+    }
+    .role-admin { background: rgba(234,88,8,0.12); color: #ea5808; }
+    .role-mod { background: rgba(168,85,247,0.12); color: #a855f7; }
+    .role-user { background: #1a1a1a; color: #71717a; }
+    .status-badge {
+      padding: 3px 8px; border-radius: 4px; font-size: 9px;
+      font-weight: 600; text-transform: uppercase;
+    }
+    .status-active { background: rgba(34,197,94,0.12); color: #22c55e; }
+    .status-suspended { background: rgba(239,68,68,0.12); color: #ef4444; }
+    .status-inactive { background: #1a1a1a; color: #71717a; }
+    .action-btn {
+      padding: 4px 8px; background: transparent; border: 1px solid #27272a;
+      border-radius: 4px; font-size: 10px; color: #71717a; cursor: pointer;
+      transition: all 0.1s;
+    }
+    .action-btn:hover { border-color: #3f3f46; color: #e4e4e7; }
+
+    /* ── Right Panel ── */
+    .right-panel {
+      width: 320px; background: #111113; border-left: 1px solid #27272a;
+      display: flex; flex-direction: column; user-select: none; overflow-y: auto;
+    }
+    .panel-section { padding: 16px; border-bottom: 1px solid #27272a; }
+    .panel-section-title {
+      font-size: 9px; color: #52525b; text-transform: uppercase;
+      letter-spacing: 1px; font-weight: 700; margin-bottom: 10px;
+    }
+    .panel-stat {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 6px 0; font-size: 12px;
+    }
+    .panel-stat-label { color: #71717a; }
+    .panel-stat-value { color: #e4e4e7; font-family: 'JetBrains Mono', monospace; font-weight: 600; }
+
+    /* ── Quick Stats ── */
+    .quick-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .stat-box {
+      padding: 10px; background: #0d0d0d; border: 1px solid #27272a;
+      border-radius: 6px; text-align: center;
+    }
+    .stat-value {
+      font-size: 18px; font-weight: 700; color: #e4e4e7;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .stat-label { font-size: 9px; color: #52525b; margin-top: 2px; }
+
+    /* ── Recent Activity ── */
+    .activity-list { display: flex; flex-direction: column; gap: 10px; }
+    .activity-item { display: flex; gap: 10px; font-size: 11px; }
+    .activity-avatar {
+      width: 24px; height: 24px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 9px; font-weight: 700; color: #fff; flex-shrink: 0;
+    }
+    .activity-content { flex: 1; }
+    .activity-text { color: #a1a1aa; }
+    .activity-text strong { color: #e4e4e7; font-weight: 600; }
+    .activity-time { font-size: 10px; color: #52525b; margin-top: 2px; }
+
+    /* ── Role Distribution ── */
+    .role-bars { display: flex; flex-direction: column; gap: 8px; }
+    .role-bar-row { display: flex; align-items: center; gap: 8px; }
+    .role-bar-label { width: 60px; font-size: 10px; color: #71717a; }
+    .role-bar-track {
+      flex: 1; height: 8px; background: #27272a; border-radius: 4px;
+      overflow: hidden;
+    }
+    .role-bar-fill { height: 100%; border-radius: 4px; }
+    .role-bar-value {
+      width: 40px; font-size: 10px; color: #a1a1aa;
+      font-family: 'JetBrains Mono', monospace; text-align: right;
+    }
+
+    /* ── Device Chain (Bottom) ── */
+    .device-chain {
+      height: 60px; background: #111113; border-top: 1px solid #27272a;
+      display: flex; align-items: center; padding: 0 16px; gap: 8px;
+    }
+    .device {
+      padding: 6px 12px; background: #0d0d0d; border: 1px solid #27272a;
+      border-radius: 4px; font-size: 10px; color: #a1a1aa;
+      display: flex; align-items: center; gap: 6px; cursor: pointer;
+      transition: all 0.1s;
+    }
+    .device:hover { border-color: #3f3f46; color: #e4e4e7; }
+    .device.active { border-color: #ea5808; color: #ea5808; background: rgba(234,88,8,0.08); }
+    .device .led { width: 6px; height: 6px; border-radius: 50%; background: #27272a; }
+    .device.active .led { background: #22c55e; box-shadow: 0 0 6px rgba(34,197,94,0.5); }
+    .device-chain-spacer { flex: 1; }
+    .device-chain-label {
+      font-size: 9px; color: #52525b; text-transform: uppercase;
+      letter-spacing: 0.5px; font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <!-- Transport Bar -->
+  <div class="transport-bar">
+    <div class="transport-logo">Sound<span>Hub</span></div>
+    <div class="transport-divider"></div>
+    <div class="transport-group">
+      <span class="transport-label">Users</span>
+      <div class="transport-value">1,247</div>
+    </div>
+    <div class="transport-group">
+      <span class="transport-label">Active</span>
+      <div class="transport-value">892</div>
+    </div>
+    <div class="transport-group">
+      <span class="transport-label">Suspended</span>
+      <div class="transport-value" style="color:#ef4444">12</div>
+    </div>
+    <div class="transport-spacer"></div>
+    <div class="transport-time">USER MANAGEMENT</div>
+    <div class="transport-divider"></div>
+    <div class="transport-group">
+      <span class="transport-label">Online</span>
+      <div class="transport-value">124</div>
+    </div>
+  </div>
+
+  <div class="app-body">
+    <!-- Left Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-search">
+        <input type="text" placeholder="Search admin...">
+      </div>
+      <div class="sidebar-nav">
+        <div class="sidebar-section">Admin</div>
+        <div class="sidebar-item"><span class="icon">📊</span> Dashboard</div>
+        <div class="sidebar-item active"><span class="icon">👥</span> Users</div>
+        <div class="sidebar-item"><span class="icon">🛒</span> Marketplace</div>
+        <div class="sidebar-item"><span class="icon">💰</span> Revenue</div>
+        <div class="sidebar-section">Moderation</div>
+        <div class="sidebar-item"><span class="icon">🛡️</span> Reports</div>
+        <div class="sidebar-item"><span class="icon">📋</span> Queue</div>
+        <div class="sidebar-section">System</div>
+        <div class="sidebar-item"><span class="icon">⚙️</span> Settings</div>
+        <div class="sidebar-item"><span class="icon">🔌</span> API</div>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+      <!-- Page Header -->
+      <div class="page-header">
+        <div class="page-title">User Management <span>1,247 users</span></div>
+        <div class="header-actions">
+          <button class="btn btn-ghost">📥 Export CSV</button>
+          <button class="btn btn-secondary">🔄 Refresh</button>
+          <button class="btn btn-primary">+ Add User</button>
+        </div>
+      </div>
+
+      <!-- Search Bar -->
+      <div class="search-bar">
+        <input class="search-input" type="text" placeholder="Search by name, email, or username...">
+        <div class="filter-chip active">All</div>
+        <div class="filter-chip">Admin</div>
+        <div class="filter-chip">Moderator</div>
+        <div class="filter-chip">User</div>
+        <div class="filter-chip">Suspended</div>
+      </div>
+
+      <!-- Users Table -->
+      <div class="users-container">
+        <table class="users-table">
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Role</th>
+              <th>Status</th>
+              <th>Assets</th>
+              <th>Downloads</th>
+              <th>Joined</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <div class="user-cell">
+                  <div class="user-avatar" style="background:#ea5808">P</div>
+                  <div>
+                    <div class="user-name">@producer1</div>
+                    <div class="user-email">producer1@email.com</div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="role-badge role-admin">Admin</span></td>
+              <td><span class="status-badge status-active">Active</span></td>
+              <td style="font-family:'JetBrains Mono',monospace">47</td>
+              <td style="font-family:'JetBrains Mono',monospace">12,472</td>
+              <td style="color:#52525b">Aug 14, 2026</td>
+              <td>
+                <div style="display:flex;gap:4px">
+                  <div class="action-btn">Edit</div>
+                  <div class="action-btn">View</div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div class="user-cell">
+                  <div class="user-avatar" style="background:#22c55e">R</div>
+                  <div>
+                    <div class="user-name">@reviewer</div>
+                    <div class="user-email">reviewer@email.com</div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="role-badge role-mod">Mod</span></td>
+              <td><span class="status-badge status-active">Active</span></td>
+              <td style="font-family:'JetBrains Mono',monospace">12</td>
+              <td style="font-family:'JetBrains Mono',monospace">8,921</td>
+              <td style="color:#52525b">Aug 15, 2026</td>
+              <td>
+                <div style="display:flex;gap:4px">
+                  <div class="action-btn">Edit</div>
+                  <div class="action-btn">View</div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div class="user-cell">
+                  <div class="user-avatar" style="background:#3b82f6">M</div>
+                  <div>
+                    <div class="user-name">@mixmaster</div>
+                    <div class="user-email">mixmaster@email.com</div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="role-badge role-user">User</span></td>
+              <td><span class="status-badge status-active">Active</span></td>
+              <td style="font-family:'JetBrains Mono',monospace">8</td>
+              <td style="font-family:'JetBrains Mono',monospace">6,543</td>
+              <td style="color:#52525b">Aug 16, 2026</td>
+              <td>
+                <div style="display:flex;gap:4px">
+                  <div class="action-btn">Edit</div>
+                  <div class="action-btn">View</div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div class="user-cell">
+                  <div class="user-avatar" style="background:#eab308">A</div>
+                  <div>
+                    <div class="user-name">@audioguy</div>
+                    <div class="user-email">audioguy@email.com</div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="role-badge role-user">User</span></td>
+              <td><span class="status-badge status-active">Active</span></td>
+              <td style="font-family:'JetBrains Mono',monospace">5</td>
+              <td style="font-family:'JetBrains Mono',monospace">4,321</td>
+              <td style="color:#52525b">Aug 17, 2026</td>
+              <td>
+                <div style="display:flex;gap:4px">
+                  <div class="action-btn">Edit</div>
+                  <div class="action-btn">View</div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div class="user-cell">
+                  <div class="user-avatar" style="background:#a855f7">L</div>
+                  <div>
+                    <div class="user-name">@lofimaster</div>
+                    <div class="user-email">lofimaster@email.com</div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="role-badge role-user">User</span></td>
+              <td><span class="status-badge status-active">Active</span></td>
+              <td style="font-family:'JetBrains Mono',monospace">23</td>
+              <td style="font-family:'JetBrains Mono',monospace">18,742</td>
+              <td style="color:#52525b">Aug 18, 2026</td>
+              <td>
+                <div style="display:flex;gap:4px">
+                  <div class="action-btn">Edit</div>
+                  <div class="action-btn">View</div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div class="user-cell">
+                  <div class="user-avatar" style="background:#ef4444">X</div>
+                  <div>
+                    <div class="user-name">@spammer</div>
+                    <div class="user-email">spam@email.com</div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="role-badge role-user">User</span></td>
+              <td><span class="status-badge status-suspended">Suspended</span></td>
+              <td style="font-family:'JetBrains Mono',monospace">0</td>
+              <td style="font-family:'JetBrains Mono',monospace">0</td>
+              <td style="color:#52525b">Aug 20, 2026</td>
+              <td>
+                <div style="display:flex;gap:4px">
+                  <div class="action-btn">Edit</div>
+                  <div class="action-btn" style="color:#22c55e;border-color:rgba(34,197,94,0.3)">Reactivate</div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div class="user-cell">
+                  <div class="user-avatar" style="background:#71717a">G</div>
+                  <div>
+                    <div class="user-name">@ghostuser</div>
+                    <div class="user-email">ghost@email.com</div>
+                  </div>
+                </div>
+              </td>
+              <td><span class="role-badge role-user">User</span></td>
+              <td><span class="status-badge status-inactive">Inactive</span></td>
+              <td style="font-family:'JetBrains Mono',monospace">2</td>
+              <td style="font-family:'JetBrains Mono',monospace">156</td>
+              <td style="color:#52525b">Jul 12, 2026</td>
+              <td>
+                <div style="display:flex;gap:4px">
+                  <div class="action-btn">Edit</div>
+                  <div class="action-btn">View</div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Device Chain -->
+      <div class="device-chain">
+        <span class="device-chain-label">Showing:</span>
+        <div class="device active"><div class="led"></div> 7 / 1,247 users</div>
+        <div class="device-chain-spacer"></div>
+        <span class="device-chain-label">Page:</span>
+        <div class="device"><div class="led"></div> 1 of 178</div>
+      </div>
+    </div>
+
+    <!-- Right Panel -->
+    <div class="right-panel">
+      <!-- Quick Stats -->
+      <div class="panel-section">
+        <div class="panel-section-title">User Stats</div>
+        <div class="quick-stats">
+          <div class="stat-box">
+            <div class="stat-value" style="color:#ea5808">1,247</div>
+            <div class="stat-label">Total</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value" style="color:#22c55e">892</div>
+            <div class="stat-label">Active</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value" style="color:#71717a">343</div>
+            <div class="stat-label">Inactive</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value" style="color:#ef4444">12</div>
+            <div class="stat-label">Suspended</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Role Distribution -->
+      <div class="panel-section">
+        <div class="panel-section-title">Role Distribution</div>
+        <div class="role-bars">
+          <div class="role-bar-row">
+            <div class="role-bar-label">Admin</div>
+            <div class="role-bar-track">
+              <div class="role-bar-fill" style="width:3%;background:#ea5808"></div>
+            </div>
+            <div class="role-bar-value">4</div>
+          </div>
+          <div class="role-bar-row">
+            <div class="role-bar-label">Moderator</div>
+            <div class="role-bar-track">
+              <div class="role-bar-fill" style="width:12%;background:#a855f7"></div>
+            </div>
+            <div class="role-bar-value">15</div>
+          </div>
+          <div class="role-bar-row">
+            <div class="role-bar-label">User</div>
+            <div class="role-bar-track">
+              <div class="role-bar-fill" style="width:85%;background:#71717a"></div>
+            </div>
+            <div class="role-bar-value">1,228</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Online Now -->
+      <div class="panel-section">
+        <div class="panel-section-title">Online Now (124)</div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px">
+          <div style="width:28px;height:28px;background:#ea5808;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;border:2px solid #0d0d0d">P</div>
+          <div style="width:28px;height:28px;background:#22c55e;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;border:2px solid #0d0d0d">R</div>
+          <div style="width:28px;height:28px;background:#3b82f6;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;border:2px solid #0d0d0d">M</div>
+          <div style="width:28px;height:28px;background:#eab308;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;border:2px solid #0d0d0d">A</div>
+          <div style="width:28px;height:28px;background:#a855f7;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;border:2px solid #0d0d0d">L</div>
+          <div style="width:28px;height:28px;background:#06b6d4;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;border:2px solid #0d0d0d">W</div>
+          <div style="width:28px;height:28px;background:#1a1a1a;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;color:#71717a;border:2px solid #0d0d0d">+118</div>
+        </div>
+      </div>
+
+      <!-- Recent Activity -->
+      <div class="panel-section">
+        <div class="panel-section-title">Recent Activity</div>
+        <div class="activity-list">
+          <div class="activity-item">
+            <div class="activity-avatar" style="background:#22c55e">R</div>
+            <div class="activity-content">
+              <div class="activity-text"><strong>@reviewer</strong> approved asset</div>
+              <div class="activity-time">5 min ago</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-avatar" style="background:#ea5808">P</div>
+            <div class="activity-content">
+              <div class="activity-text"><strong>@producer1</strong> uploaded new version</div>
+              <div class="activity-time">15 min ago</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-avatar" style="background:#ef4444">A</div>
+            <div class="activity-content">
+              <div class="activity-text"><strong>@admin</strong> suspended @spammer</div>
+              <div class="activity-time">1 hour ago</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-avatar" style="background:#3b82f6">S</div>
+            <div class="activity-content">
+              <div class="activity-text"><strong>System</strong> new user registration</div>
+              <div class="activity-time">2 hours ago</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body></html>
+    </div>
+  </foreignObject>
+</svg>

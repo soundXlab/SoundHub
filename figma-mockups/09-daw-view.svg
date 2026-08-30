@@ -1,0 +1,668 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 1200" width="1440" height="1200">
+  <defs>
+    <linearGradient id="trackGrad1" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#8B5CF6;stop-opacity:0.8"/>
+      <stop offset="100%" style="stop-color:#8B5CF6;stop-opacity:0.4"/>
+    </linearGradient>
+    <linearGradient id="trackGrad2" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#06B6D4;stop-opacity:0.8"/>
+      <stop offset="100%" style="stop-color:#06B6D4;stop-opacity:0.4"/>
+    </linearGradient>
+    <linearGradient id="trackGrad3" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#22C55E;stop-opacity:0.8"/>
+      <stop offset="100%" style="stop-color:#22C55E;stop-opacity:0.4"/>
+    </linearGradient>
+    <linearGradient id="trackGrad4" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#EAB308;stop-opacity:0.8"/>
+      <stop offset="100%" style="stop-color:#EAB308;stop-opacity:0.4"/>
+    </linearGradient>
+    <linearGradient id="trackGrad5" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#EF4444;stop-opacity:0.8"/>
+      <stop offset="100%" style="stop-color:#EF4444;stop-opacity:0.4"/>
+    </linearGradient>
+    <linearGradient id="trackGrad6" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#3B82F6;stop-opacity:0.8"/>
+      <stop offset="100%" style="stop-color:#3B82F6;stop-opacity:0.4"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1440" height="1200" fill="#0D0D0F"/>
+
+  <!-- ========== TOP BAR ========== -->
+  <rect width="1440" height="48" fill="#141416"/>
+  <line x1="0" y1="48" x2="1440" y2="48" stroke="#1F1F23" stroke-width="1"/>
+
+  <!-- Logo -->
+  <text x="16" y="32" font-family="Inter, sans-serif" font-size="15" font-weight="800" fill="#FFFFFF">🎵 SoundHub</text>
+
+  <!-- Breadcrumb -->
+  <text x="160" y="32" font-family="Inter, sans-serif" font-size="13" fill="#71717A">Projects</text>
+  <text x="240" y="32" font-family="Inter, sans-serif" font-size="13" fill="#52525B">/</text>
+  <text x="256" y="32" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#E4E4E7">Neon Bloom</text>
+  <rect x="370" y="20" width="56" height="20" rx="10" fill="#22C55E" opacity="0.12"/>
+  <text x="384" y="35" font-family="Inter, sans-serif" font-size="10" font-weight="700" fill="#22C55E">v3.2</text>
+
+  <!-- Version tabs -->
+  <rect x="460" y="14" width="60" height="24" rx="6" fill="#8B5CF6" opacity="0.12" stroke="#8B5CF6" stroke-width="1"/>
+  <text x="478" y="31" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#8B5CF6">v3.2</text>
+  <rect x="530" y="14" width="60" height="24" rx="6" fill="transparent" stroke="#27272A" stroke-width="1"/>
+  <text x="548" y="31" font-family="JetBrains Mono, monospace" font-size="11" fill="#71717A">v3.1</text>
+  <rect x="600" y="14" width="60" height="24" rx="6" fill="transparent" stroke="#27272A" stroke-width="1"/>
+  <text x="618" y="31" font-family="JetBrains Mono, monospace" font-size="11" fill="#71717A">v3.0</text>
+  <rect x="670" y="14" width="60" height="24" rx="6" fill="transparent" stroke="#27272A" stroke-width="1"/>
+  <text x="688" y="31" font-family="JetBrains Mono, monospace" font-size="11" fill="#71717A">v2.0</text>
+
+  <!-- Right actions -->
+  <rect x="1200" y="12" width="80" height="28" rx="6" fill="transparent" stroke="#3F3F46" stroke-width="1"/>
+  <text x="1218" y="31" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#E4E4E7">💬 Review</text>
+  <rect x="1290" y="12" width="80" height="28" rx="6" fill="transparent" stroke="#3F3F46" stroke-width="1"/>
+  <text x="1308" y="31" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#E4E4E7">⬇️ Pull</text>
+  <rect x="1380" y="12" width="28" height="28" rx="6" fill="transparent" stroke="#27272A" stroke-width="1"/>
+  <text x="1394" y="31" font-family="Inter, sans-serif" font-size="14" fill="#71717A">⋯</text>
+
+  <!-- ========== TRANSPORT BAR ========== -->
+  <rect y="48" width="1440" height="56" fill="#18181B"/>
+  <line x1="0" y1="104" x2="1440" y2="104" stroke="#1F1F23" stroke-width="1"/>
+
+  <!-- Transport controls -->
+  <rect x="20" y="60" width="36" height="32" rx="6" fill="#27272A"/>
+  <text x="34" y="82" text-anchor="middle" font-family="Inter, sans-serif" font-size="14">⏮</text>
+
+  <rect x="64" y="60" width="36" height="32" rx="6" fill="#22C55E"/>
+  <text x="82" y="82" text-anchor="middle" font-family="Inter, sans-serif" font-size="14" fill="#000">▶</text>
+
+  <rect x="108" y="60" width="36" height="32" rx="6" fill="#27272A"/>
+  <text x="126" y="82" text-anchor="middle" font-family="Inter, sans-serif" font-size="14">⏹</text>
+
+  <rect x="152" y="60" width="36" height="32" rx="6" fill="#EF4444" opacity="0.8"/>
+  <text x="170" y="82" text-anchor="middle" font-family="Inter, sans-serif" font-size="14" fill="#FFF">⏺</text>
+
+  <rect x="196" y="60" width="36" height="32" rx="6" fill="#27272A"/>
+  <text x="214" y="82" text-anchor="middle" font-family="Inter, sans-serif" font-size="12">🔁</text>
+
+  <!-- Time display -->
+  <rect x="260" y="56" width="160" height="40" rx="8" fill="#0D0D0F" stroke="#27272A" stroke-width="1"/>
+  <text x="340" y="83" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="22" font-weight="700" fill="#22C55E">004:02:12</text>
+
+  <!-- Tempo -->
+  <rect x="440" y="60" width="100" height="32" rx="6" fill="#0D0D0F" stroke="#27272A" stroke-width="1"/>
+  <text x="456" y="82" font-family="Inter, sans-serif" font-size="11" fill="#71717A">BPM</text>
+  <text x="500" y="82" font-family="JetBrains Mono, monospace" font-size="14" font-weight="700" fill="#E4E4E7">128.0</text>
+
+  <!-- Time signature -->
+  <rect x="550" y="60" width="70" height="32" rx="6" fill="#0D0D0F" stroke="#27272A" stroke-width="1"/>
+  <text x="585" y="82" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="14" font-weight="700" fill="#E4E4E7">4/4</text>
+
+  <!-- Metronome -->
+  <rect x="630" y="60" width="32" height="32" rx="6" fill="#27272A"/>
+  <text x="646" y="82" text-anchor="middle" font-family="Inter, sans-serif" font-size="14">🔔</text>
+
+  <!-- Count-in -->
+  <rect x="670" y="60" width="32" height="32" rx="6" fill="#27272A"/>
+  <text x="686" y="82" text-anchor="middle" font-family="Inter, sans-serif" font-size="12">1234</text>
+
+  <!-- Swing -->
+  <rect x="710" y="60" width="32" height="32" rx="6" fill="#27272A"/>
+  <text x="726" y="82" text-anchor="middle" font-family="Inter, sans-serif" font-size="12">~</text>
+
+  <!-- CPU / Memory -->
+  <rect x="1100" y="64" width="120" height="24" rx="4" fill="#0D0D0F"/>
+  <text x="1112" y="81" font-family="Inter, sans-serif" font-size="10" fill="#71717A">CPU</text>
+  <rect x="1140" y="70" width="60" height="8" rx="2" fill="#27272A"/>
+  <rect x="1140" y="70" width="24" height="8" rx="2" fill="#22C55E"/>
+  <text x="1208" y="81" font-family="Inter, sans-serif" font-size="10" fill="#22C55E">38%</text>
+
+  <rect x="1240" y="64" width="120" height="24" rx="4" fill="#0D0D0F"/>
+  <text x="1252" y="81" font-family="Inter, sans-serif" font-size="10" fill="#71717A">RAM</text>
+  <rect x="1280" y="70" width="60" height="8" rx="2" fill="#27272A"/>
+  <rect x="1280" y="70" width="36" height="8" rx="2" fill="#EAB308"/>
+  <text x="1348" y="81" font-family="Inter, sans-serif" font-size="10" fill="#EAB308">1.2 GB</text>
+
+  <!-- Sample rate -->
+  <rect x="1380" y="64" width="50" height="24" rx="4" fill="#0D0D0F"/>
+  <text x="1396" y="81" font-family="JetBrains Mono, monospace" font-size="10" fill="#71717A">48kHz</text>
+
+  <!-- ========== ARRANGEMENT VIEW ========== -->
+  <!-- Timeline ruler -->
+  <rect x="240" y="104" width="1200" height="24" fill="#141416"/>
+  <line x1="240" y1="128" x2="1440" y2="128" stroke="#1F1F23" stroke-width="1"/>
+  <!-- Bar numbers -->
+  <text x="280" y="120" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#52525B">1</text>
+  <text x="356" y="120" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#52525B">2</text>
+  <text x="432" y="120" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#52525B">3</text>
+  <text x="508" y="120" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#52525B">4</text>
+  <text x="584" y="120" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#52525B">5</text>
+  <text x="660" y="120" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#52525B">6</text>
+  <text x="736" y="120" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#52525B">7</text>
+  <text x="812" y="120" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#52525B">8</text>
+  <text x="888" y="120" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#52525B">9</text>
+  <text x="964" y="120" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#52525B">10</text>
+  <text x="1040" y="120" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#52525B">11</text>
+  <text x="1116" y="120" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#52525B">12</text>
+  <text x="1192" y="120" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#52525B">13</text>
+  <text x="1268" y="120" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#52525B">14</text>
+  <text x="1344" y="120" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#52525B">15</text>
+  <text x="1420" y="120" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#52525B">16</text>
+
+  <!-- Grid lines -->
+  <line x1="356" y1="128" x2="356" y2="680" stroke="#1A1A1C" stroke-width="1"/>
+  <line x1="432" y1="128" x2="432" y2="680" stroke="#1A1A1C" stroke-width="1"/>
+  <line x1="508" y1="128" x2="508" y2="680" stroke="#1A1A1C" stroke-width="1"/>
+  <line x1="584" y1="128" x2="584" y2="680" stroke="#1A1A1C" stroke-width="1"/>
+  <line x1="660" y1="128" x2="660" y2="680" stroke="#1A1A1C" stroke-width="1"/>
+  <line x1="736" y1="128" x2="736" y2="680" stroke="#1A1A1C" stroke-width="1"/>
+  <line x1="812" y1="128" x2="812" y2="680" stroke="#1A1A1C" stroke-width="1"/>
+  <line x1="888" y1="128" x2="888" y2="680" stroke="#1A1A1C" stroke-width="1"/>
+  <line x1="964" y1="128" x2="964" y2="680" stroke="#1A1A1C" stroke-width="1"/>
+  <line x1="1040" y1="128" x2="1040" y2="680" stroke="#1A1A1C" stroke-width="1"/>
+  <line x1="1116" y1="128" x2="1116" y2="680" stroke="#1A1A1C" stroke-width="1"/>
+  <line x1="1192" y1="128" x2="1192" y2="680" stroke="#1A1A1C" stroke-width="1"/>
+  <line x1="1268" y1="128" x2="1268" y2="680" stroke="#1A1A1C" stroke-width="1"/>
+  <line x1="1344" y1="128" x2="1344" y2="680" stroke="#1A1A1C" stroke-width="1"/>
+  <line x1="1420" y1="128" x2="1420" y2="680" stroke="#1A1A1C" stroke-width="1"/>
+
+  <!-- Playhead -->
+  <line x1="584" y1="128" x2="584" y2="680" stroke="#22C55E" stroke-width="2"/>
+  <polygon points="578,128 590,128 584,136" fill="#22C55E"/>
+
+  <!-- ========== TRACK LANES ========== -->
+
+  <!-- Track 1: Neon Lead (MIDI) -->
+  <rect x="0" y="128" width="240" height="80" fill="#141416"/>
+  <line x1="0" y1="208" x2="240" y2="208" stroke="#1F1F23" stroke-width="1"/>
+  <line x1="240" y1="128" x2="240" y2="680" stroke="#1F1F23" stroke-width="1"/>
+  <!-- Track controls -->
+  <circle cx="20" cy="168" r="8" fill="#8B5CF6"/>
+  <text x="20" y="172" text-anchor="middle" font-family="Inter, sans-serif" font-size="8" font-weight="700" fill="#FFF">1</text>
+  <text x="38" y="164" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#E4E4E7">Neon Lead</text>
+  <text x="38" y="180" font-family="Inter, sans-serif" font-size="10" fill="#8B5CF6">MIDI · Serum</text>
+  <!-- Mute/Solo/Record -->
+  <rect x="160" y="154" width="22" height="18" rx="3" fill="#27272A"/>
+  <text x="171" y="167" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" font-weight="700" fill="#71717A">M</text>
+  <rect x="186" y="154" width="22" height="18" rx="3" fill="#27272A"/>
+  <text x="197" y="167" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" font-weight="700" fill="#71717A">S</text>
+  <rect x="212" y="154" width="22" height="18" rx="3" fill="#27272A"/>
+  <text x="223" y="167" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" font-weight="700" fill="#71717A">R</text>
+  <!-- Volume -->
+  <rect x="38" y="188" width="80" height="6" rx="3" fill="#27272A"/>
+  <rect x="38" y="188" width="56" height="6" rx="3" fill="#8B5CF6" opacity="0.6"/>
+  <text x="130" y="196" font-family="JetBrains Mono, monospace" font-size="9" fill="#52525B">-3.2 dB</text>
+  <!-- Pan -->
+  <text x="180" y="196" font-family="JetBrains Mono, monospace" font-size="9" fill="#52525B">C</text>
+
+  <!-- MIDI clips on track 1 -->
+  <rect x="240" y="136" width="192" height="64" rx="4" fill="url(#trackGrad1)" opacity="0.3"/>
+  <rect x="240" y="136" width="192" height="64" rx="4" fill="none" stroke="#8B5CF6" stroke-width="1"/>
+  <!-- MIDI notes visualization -->
+  <rect x="250" y="150" width="40" height="4" rx="1" fill="#8B5CF6" opacity="0.8"/>
+  <rect x="250" y="160" width="60" height="4" rx="1" fill="#8B5CF6" opacity="0.6"/>
+  <rect x="250" y="170" width="30" height="4" rx="1" fill="#8B5CF6" opacity="0.7"/>
+  <rect x="260" y="180" width="80" height="4" rx="1" fill="#8B5CF6" opacity="0.5"/>
+  <rect x="310" y="145" width="50" height="4" rx="1" fill="#8B5CF6" opacity="0.7"/>
+  <rect x="310" y="155" width="70" height="4" rx="1" fill="#8B5CF6" opacity="0.6"/>
+  <rect x="310" y="165" width="40" height="4" rx="1" fill="#8B5CF6" opacity="0.8"/>
+  <rect x="310" y="175" width="60" height="4" rx="1" fill="#8B5CF6" opacity="0.5"/>
+  <rect x="310" y="185" width="35" height="4" rx="1" fill="#8B5CF6" opacity="0.7"/>
+  <text x="250" y="148" font-family="Inter, sans-serif" font-size="8" fill="#FFF" opacity="0.7">Neon Lead v3.2</text>
+
+  <!-- Clip 2 -->
+  <rect x="448" y="136" width="240" height="64" rx="4" fill="url(#trackGrad1)" opacity="0.3"/>
+  <rect x="448" y="136" width="240" height="64" rx="4" fill="none" stroke="#8B5CF6" stroke-width="1"/>
+  <rect x="458" y="150" width="50" height="4" rx="1" fill="#8B5CF6" opacity="0.8"/>
+  <rect x="458" y="160" width="80" height="4" rx="1" fill="#8B5CF6" opacity="0.6"/>
+  <rect x="458" y="170" width="40" height="4" rx="1" fill="#8B5CF6" opacity="0.7"/>
+  <rect x="458" y="180" width="100" height="4" rx="1" fill="#8B5CF6" opacity="0.5"/>
+  <rect x="458" y="190" width="60" height="4" rx="1" fill="#8B5CF6" opacity="0.6"/>
+  <rect x="530" y="145" width="70" height="4" rx="1" fill="#8B5CF6" opacity="0.7"/>
+  <rect x="530" y="155" width="90" height="4" rx="1" fill="#8B5CF6" opacity="0.6"/>
+  <rect x="530" y="165" width="50" height="4" rx="1" fill="#8B5CF6" opacity="0.8"/>
+  <rect x="530" y="175" width="80" height="4" rx="1" fill="#8B5CF6" opacity="0.5"/>
+
+  <!-- Track 2: Bass Synth (MIDI) -->
+  <rect x="0" y="208" width="240" height="80" fill="#111113"/>
+  <line x1="0" y1="288" x2="240" y2="288" stroke="#1F1F23" stroke-width="1"/>
+  <circle cx="20" cy="248" r="8" fill="#06B6D4"/>
+  <text x="20" y="252" text-anchor="middle" font-family="Inter, sans-serif" font-size="8" font-weight="700" fill="#FFF">2</text>
+  <text x="38" y="244" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#E4E4E7">Bass Synth</text>
+  <text x="38" y="260" font-family="Inter, sans-serif" font-size="10" fill="#06B6D4">MIDI · Massive</text>
+  <rect x="160" y="234" width="22" height="18" rx="3" fill="#27272A"/>
+  <text x="171" y="247" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" font-weight="700" fill="#71717A">M</text>
+  <rect x="186" y="234" width="22" height="18" rx="3" fill="#27272A"/>
+  <text x="197" y="247" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" font-weight="700" fill="#71717A">S</text>
+  <rect x="212" y="234" width="22" height="18" rx="3" fill="#27272A"/>
+  <text x="223" y="247" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" font-weight="700" fill="#71717A">R</text>
+  <rect x="38" y="268" width="80" height="6" rx="3" fill="#27272A"/>
+  <rect x="38" y="268" width="64" height="6" rx="3" fill="#06B6D4" opacity="0.6"/>
+  <text x="130" y="276" font-family="JetBrains Mono, monospace" font-size="9" fill="#52525B">-1.8 dB</text>
+  <text x="180" y="276" font-family="JetBrains Mono, monospace" font-size="9" fill="#52525B">C</text>
+
+  <!-- MIDI clips track 2 -->
+  <rect x="240" y="216" width="448" height="64" rx="4" fill="url(#trackGrad2)" opacity="0.3"/>
+  <rect x="240" y="216" width="448" height="64" rx="4" fill="none" stroke="#06B6D4" stroke-width="1"/>
+  <rect x="250" y="230" width="60" height="4" rx="1" fill="#06B6D4" opacity="0.7"/>
+  <rect x="250" y="240" width="80" height="4" rx="1" fill="#06B6D4" opacity="0.6"/>
+  <rect x="250" y="250" width="100" height="4" rx="1" fill="#06B6D4" opacity="0.5"/>
+  <rect x="250" y="260" width="120" height="4" rx="1" fill="#06B6D4" opacity="0.6"/>
+  <rect x="250" y="270" width="80" height="4" rx="1" fill="#06B6D4" opacity="0.7"/>
+  <text x="250" y="228" font-family="Inter, sans-serif" font-size="8" fill="#FFF" opacity="0.7">Bass Synth</text>
+
+  <rect x="704" y="216" width="240" height="64" rx="4" fill="url(#trackGrad2)" opacity="0.3"/>
+  <rect x="704" y="216" width="240" height="64" rx="4" fill="none" stroke="#06B6D4" stroke-width="1"/>
+  <rect x="714" y="230" width="70" height="4" rx="1" fill="#06B6D4" opacity="0.7"/>
+  <rect x="714" y="240" width="90" height="4" rx="1" fill="#06B6D4" opacity="0.6"/>
+  <rect x="714" y="250" width="110" height="4" rx="1" fill="#06B6D4" opacity="0.5"/>
+  <rect x="714" y="260" width="130" height="4" rx="1" fill="#06B6D4" opacity="0.6"/>
+
+  <!-- Track 3: Pad (MIDI) -->
+  <rect x="0" y="288" width="240" height="80" fill="#141416"/>
+  <line x1="0" y1="368" x2="240" y2="368" stroke="#1F1F23" stroke-width="1"/>
+  <circle cx="20" cy="328" r="8" fill="#22C55E"/>
+  <text x="20" y="332" text-anchor="middle" font-family="Inter, sans-serif" font-size="8" font-weight="700" fill="#FFF">3</text>
+  <text x="38" y="324" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#E4E4E7">Pad</text>
+  <text x="38" y="340" font-family="Inter, sans-serif" font-size="10" fill="#22C55E">MIDI · Omnisphere</text>
+  <rect x="160" y="314" width="22" height="18" rx="3" fill="#27272A"/>
+  <text x="171" y="327" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" font-weight="700" fill="#71717A">M</text>
+  <rect x="186" y="314" width="22" height="18" rx="3" fill="#27272A"/>
+  <text x="197" y="327" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" font-weight="700" fill="#71717A">S</text>
+  <rect x="212" y="314" width="22" height="18" rx="3" fill="#27272A"/>
+  <text x="223" y="327" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" font-weight="700" fill="#71717A">R</text>
+  <rect x="38" y="348" width="80" height="6" rx="3" fill="#27272A"/>
+  <rect x="38" y="348" width="48" height="6" rx="3" fill="#22C55E" opacity="0.6"/>
+  <text x="130" y="356" font-family="JetBrains Mono, monospace" font-size="9" fill="#52525B">-6.4 dB</text>
+  <text x="180" y="356" font-family="JetBrains Mono, monospace" font-size="9" fill="#52525B">L20</text>
+
+  <!-- Pad clip - long sustained -->
+  <rect x="240" y="296" width="960" height="64" rx="4" fill="url(#trackGrad3)" opacity="0.2"/>
+  <rect x="240" y="296" width="960" height="64" rx="4" fill="none" stroke="#22C55E" stroke-width="1"/>
+  <rect x="250" y="310" width="940" height="4" rx="1" fill="#22C55E" opacity="0.4"/>
+  <rect x="250" y="320" width="940" height="4" rx="1" fill="#22C55E" opacity="0.3"/>
+  <rect x="250" y="330" width="940" height="4" rx="1" fill="#22C55E" opacity="0.4"/>
+  <rect x="250" y="340" width="940" height="4" rx="1" fill="#22C55E" opacity="0.3"/>
+  <rect x="250" y="350" width="940" height="4" rx="1" fill="#22C55E" opacity="0.4"/>
+  <text x="250" y="308" font-family="Inter, sans-serif" font-size="8" fill="#FFF" opacity="0.7">Ambient Pad</text>
+
+  <!-- Track 4: Drums (Audio) -->
+  <rect x="0" y="368" width="240" height="80" fill="#111113"/>
+  <line x1="0" y1="448" x2="240" y2="448" stroke="#1F1F23" stroke-width="1"/>
+  <circle cx="20" cy="408" r="8" fill="#EAB308"/>
+  <text x="20" y="412" text-anchor="middle" font-family="Inter, sans-serif" font-size="8" font-weight="700" fill="#000">4</text>
+  <text x="38" y="404" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#E4E4E7">Drums</text>
+  <text x="38" y="420" font-family="Inter, sans-serif" font-size="10" fill="#EAB308">Audio · 6 clips</text>
+  <rect x="160" y="394" width="22" height="18" rx="3" fill="#27272A"/>
+  <text x="171" y="407" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" font-weight="700" fill="#71717A">M</text>
+  <rect x="186" y="394" width="22" height="18" rx="3" fill="#27272A"/>
+  <text x="197" y="407" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" font-weight="700" fill="#71717A">S</text>
+  <rect x="212" y="394" width="22" height="18" rx="3" fill="#27272A"/>
+  <text x="223" y="407" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" font-weight="700" fill="#71717A">R</text>
+  <rect x="38" y="428" width="80" height="6" rx="3" fill="#27272A"/>
+  <rect x="38" y="428" width="72" height="6" rx="3" fill="#EAB308" opacity="0.6"/>
+  <text x="130" y="436" font-family="JetBrains Mono, monospace" font-size="9" fill="#52525B">-0.5 dB</text>
+  <text x="180" y="436" font-family="JetBrains Mono, monospace" font-size="9" fill="#52525B">C</text>
+
+  <!-- Drum audio waveform -->
+  <rect x="240" y="376" width="448" height="64" rx="4" fill="#1A1A1C"/>
+  <rect x="240" y="376" width="448" height="64" rx="4" fill="none" stroke="#EAB308" stroke-width="1"/>
+  <!-- Waveform bars -->
+  <g transform="translate(248, 384)">
+    <rect x="0" y="16" width="3" height="24" rx="1" fill="#EAB308" opacity="0.6"/>
+    <rect x="5" y="8" width="3" height="40" rx="1" fill="#EAB308" opacity="0.8"/>
+    <rect x="10" y="4" width="3" height="48" rx="1" fill="#EAB308"/>
+    <rect x="15" y="12" width="3" height="32" rx="1" fill="#EAB308" opacity="0.7"/>
+    <rect x="20" y="20" width="3" height="16" rx="1" fill="#EAB308" opacity="0.4"/>
+    <rect x="25" y="6" width="3" height="44" rx="1" fill="#EAB308" opacity="0.8"/>
+    <rect x="30" y="2" width="3" height="52" rx="1" fill="#EAB308"/>
+    <rect x="35" y="10" width="3" height="36" rx="1" fill="#EAB308" opacity="0.7"/>
+    <rect x="40" y="18" width="3" height="20" rx="1" fill="#EAB308" opacity="0.4"/>
+    <rect x="45" y="4" width="3" height="48" rx="1" fill="#EAB308" opacity="0.8"/>
+    <rect x="50" y="8" width="3" height="40" rx="1" fill="#EAB308" opacity="0.7"/>
+    <rect x="55" y="14" width="3" height="28" rx="1" fill="#EAB308" opacity="0.5"/>
+    <rect x="60" y="20" width="3" height="16" rx="1" fill="#EAB308" opacity="0.4"/>
+    <rect x="65" y="6" width="3" height="44" rx="1" fill="#EAB308" opacity="0.8"/>
+    <rect x="70" y="2" width="3" height="52" rx="1" fill="#EAB308"/>
+    <rect x="75" y="10" width="3" height="36" rx="1" fill="#EAB308" opacity="0.7"/>
+    <rect x="80" y="16" width="3" height="24" rx="1" fill="#EAB308" opacity="0.5"/>
+    <rect x="85" y="4" width="3" height="48" rx="1" fill="#EAB308" opacity="0.8"/>
+    <rect x="90" y="8" width="3" height="40" rx="1" fill="#EAB308" opacity="0.7"/>
+    <rect x="95" y="12" width="3" height="32" rx="1" fill="#EAB308" opacity="0.6"/>
+    <rect x="100" y="18" width="3" height="20" rx="1" fill="#EAB308" opacity="0.4"/>
+    <rect x="105" y="6" width="3" height="44" rx="1" fill="#EAB308" opacity="0.8"/>
+    <rect x="110" y="2" width="3" height="52" rx="1" fill="#EAB308"/>
+    <rect x="115" y="10" width="3" height="36" rx="1" fill="#EAB308" opacity="0.7"/>
+    <rect x="120" y="16" width="3" height="24" rx="1" fill="#EAB308" opacity="0.5"/>
+    <rect x="125" y="4" width="3" height="48" rx="1" fill="#EAB308" opacity="0.8"/>
+    <rect x="130" y="8" width="3" height="40" rx="1" fill="#EAB308" opacity="0.7"/>
+    <rect x="135" y="14" width="3" height="28" rx="1" fill="#EAB308" opacity="0.5"/>
+    <rect x="140" y="20" width="3" height="16" rx="1" fill="#EAB308" opacity="0.4"/>
+    <rect x="145" y="6" width="3" height="44" rx="1" fill="#EAB308" opacity="0.8"/>
+    <rect x="150" y="2" width="3" height="52" rx="1" fill="#EAB308"/>
+    <rect x="155" y="10" width="3" height="36" rx="1" fill="#EAB308" opacity="0.7"/>
+    <rect x="160" y="18" width="3" height="20" rx="1" fill="#EAB308" opacity="0.4"/>
+    <rect x="165" y="4" width="3" height="48" rx="1" fill="#EAB308" opacity="0.8"/>
+    <rect x="170" y="8" width="3" height="40" rx="1" fill="#EAB308" opacity="0.7"/>
+    <rect x="175" y="12" width="3" height="32" rx="1" fill="#EAB308" opacity="0.6"/>
+    <rect x="180" y="16" width="3" height="24" rx="1" fill="#EAB308" opacity="0.5"/>
+    <rect x="185" y="6" width="3" height="44" rx="1" fill="#EAB308" opacity="0.8"/>
+    <rect x="190" y="2" width="3" height="52" rx="1" fill="#EAB308"/>
+    <rect x="195" y="10" width="3" height="36" rx="1" fill="#EAB308" opacity="0.7"/>
+    <rect x="200" y="14" width="3" height="28" rx="1" fill="#EAB308" opacity="0.5"/>
+    <rect x="205" y="4" width="3" height="48" rx="1" fill="#EAB308" opacity="0.8"/>
+    <rect x="210" y="8" width="3" height="40" rx="1" fill="#EAB308" opacity="0.7"/>
+    <rect x="215" y="18" width="3" height="20" rx="1" fill="#EAB308" opacity="0.4"/>
+    <rect x="220" y="20" width="3" height="16" rx="1" fill="#EAB308" opacity="0.4"/>
+    <rect x="225" y="6" width="3" height="44" rx="1" fill="#EAB308" opacity="0.8"/>
+    <rect x="230" y="2" width="3" height="52" rx="1" fill="#EAB308"/>
+    <rect x="235" y="10" width="3" height="36" rx="1" fill="#EAB308" opacity="0.7"/>
+    <rect x="240" y="14" width="3" height="28" rx="1" fill="#EAB308" opacity="0.5"/>
+    <rect x="245" y="4" width="3" height="48" rx="1" fill="#EAB308" opacity="0.8"/>
+    <rect x="250" y="8" width="3" height="40" rx="1" fill="#EAB308" opacity="0.7"/>
+    <rect x="255" y="16" width="3" height="24" rx="1" fill="#EAB308" opacity="0.5"/>
+    <rect x="260" y="20" width="3" height="16" rx="1" fill="#EAB308" opacity="0.4"/>
+    <rect x="265" y="6" width="3" height="44" rx="1" fill="#EAB308" opacity="0.8"/>
+    <rect x="270" y="2" width="3" height="52" rx="1" fill="#EAB308"/>
+    <rect x="275" y="10" width="3" height="36" rx="1" fill="#EAB308" opacity="0.7"/>
+    <rect x="280" y="14" width="3" height="28" rx="1" fill="#EAB308" opacity="0.5"/>
+    <rect x="285" y="4" width="3" height="48" rx="1" fill="#EAB308" opacity="0.8"/>
+    <rect x="290" y="8" width="3" height="40" rx="1" fill="#EAB308" opacity="0.7"/>
+    <rect x="295" y="18" width="3" height="20" rx="1" fill="#EAB308" opacity="0.4"/>
+    <rect x="300" y="20" width="3" height="16" rx="1" fill="#EAB308" opacity="0.4"/>
+    <rect x="305" y="6" width="3" height="44" rx="1" fill="#EAB308" opacity="0.8"/>
+    <rect x="310" y="2" width="3" height="52" rx="1" fill="#EAB308"/>
+    <rect x="315" y="10" width="3" height="36" rx="1" fill="#EAB308" opacity="0.7"/>
+    <rect x="320" y="16" width="3" height="24" rx="1" fill="#EAB308" opacity="0.5"/>
+    <rect x="325" y="4" width="3" height="48" rx="1" fill="#EAB308" opacity="0.8"/>
+    <rect x="330" y="8" width="3" height="40" rx="1" fill="#EAB308" opacity="0.7"/>
+    <rect x="335" y="14" width="3" height="28" rx="1" fill="#EAB308" opacity="0.5"/>
+    <rect x="340" y="20" width="3" height="16" rx="1" fill="#EAB308" opacity="0.4"/>
+    <rect x="345" y="6" width="3" height="44" rx="1" fill="#EAB308" opacity="0.8"/>
+    <rect x="350" y="2" width="3" height="52" rx="1" fill="#EAB308"/>
+    <rect x="355" y="10" width="3" height="36" rx="1" fill="#EAB308" opacity="0.7"/>
+    <rect x="360" y="18" width="3" height="20" rx="1" fill="#EAB308" opacity="0.4"/>
+    <rect x="365" y="4" width="3" height="48" rx="1" fill="#EAB308" opacity="0.8"/>
+    <rect x="370" y="8" width="3" height="40" rx="1" fill="#EAB308" opacity="0.7"/>
+    <rect x="375" y="14" width="3" height="28" rx="1" fill="#EAB308" opacity="0.5"/>
+    <rect x="380" y="20" width="3" height="16" rx="1" fill="#EAB308" opacity="0.4"/>
+    <rect x="385" y="6" width="3" height="44" rx="1" fill="#EAB308" opacity="0.8"/>
+    <rect x="390" y="2" width="3" height="52" rx="1" fill="#EAB308"/>
+    <rect x="395" y="10" width="3" height="36" rx="1" fill="#EAB308" opacity="0.7"/>
+    <rect x="400" y="16" width="3" height="24" rx="1" fill="#EAB308" opacity="0.5"/>
+    <rect x="405" y="4" width="3" height="48" rx="1" fill="#EAB308" opacity="0.8"/>
+    <rect x="410" y="8" width="3" height="40" rx="1" fill="#EAB308" opacity="0.7"/>
+    <rect x="415" y="14" width="3" height="28" rx="1" fill="#EAB308" opacity="0.5"/>
+    <rect x="420" y="20" width="3" height="16" rx="1" fill="#EAB308" opacity="0.4"/>
+    <rect x="425" y="6" width="3" height="44" rx="1" fill="#EAB308" opacity="0.8"/>
+    <rect x="430" y="10" width="3" height="36" rx="1" fill="#EAB308" opacity="0.6"/>
+  </g>
+  <text x="250" y="388" font-family="Inter, sans-serif" font-size="8" fill="#FFF" opacity="0.7">Drums Loop A</text>
+
+  <!-- Track 5: Arp (MIDI) -->
+  <rect x="0" y="448" width="240" height="80" fill="#141416"/>
+  <line x1="0" y1="528" x2="240" y2="528" stroke="#1F1F23" stroke-width="1"/>
+  <circle cx="20" cy="488" r="8" fill="#EF4444"/>
+  <text x="20" y="492" text-anchor="middle" font-family="Inter, sans-serif" font-size="8" font-weight="700" fill="#FFF">5</text>
+  <text x="38" y="484" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#E4E4E7">Arp Sequence</text>
+  <text x="38" y="500" font-family="Inter, sans-serif" font-size="10" fill="#EF4444">MIDI · Diva</text>
+  <rect x="160" y="474" width="22" height="18" rx="3" fill="#27272A"/>
+  <text x="171" y="487" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" font-weight="700" fill="#71717A">M</text>
+  <rect x="186" y="474" width="22" height="18" rx="3" fill="#27272A"/>
+  <text x="197" y="487" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" font-weight="700" fill="#71717A">S</text>
+  <rect x="212" y="474" width="22" height="18" rx="3" fill="#27272A"/>
+  <text x="223" y="487" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" font-weight="700" fill="#71717A">R</text>
+  <rect x="38" y="508" width="80" height="6" rx="3" fill="#27272A"/>
+  <rect x="38" y="508" width="40" height="6" rx="3" fill="#EF4444" opacity="0.6"/>
+  <text x="130" y="516" font-family="JetBrains Mono, monospace" font-size="9" fill="#52525B">-8.1 dB</text>
+  <text x="180" y="516" font-family="JetBrains Mono, monospace" font-size="9" fill="#52525B">R30</text>
+
+  <!-- Arp clips -->
+  <rect x="448" y="456" width="504" height="64" rx="4" fill="url(#trackGrad5)" opacity="0.3"/>
+  <rect x="448" y="456" width="504" height="64" rx="4" fill="none" stroke="#EF4444" stroke-width="1"/>
+  <rect x="458" y="470" width="20" height="4" rx="1" fill="#EF4444" opacity="0.8"/>
+  <rect x="482" y="470" width="20" height="4" rx="1" fill="#EF4444" opacity="0.8"/>
+  <rect x="506" y="470" width="20" height="4" rx="1" fill="#EF4444" opacity="0.8"/>
+  <rect x="530" y="470" width="20" height="4" rx="1" fill="#EF4444" opacity="0.8"/>
+  <rect x="458" y="480" width="20" height="4" rx="1" fill="#EF4444" opacity="0.6"/>
+  <rect x="482" y="480" width="20" height="4" rx="1" fill="#EF4444" opacity="0.6"/>
+  <rect x="506" y="480" width="20" height="4" rx="1" fill="#EF4444" opacity="0.6"/>
+  <rect x="530" y="480" width="20" height="4" rx="1" fill="#EF4444" opacity="0.6"/>
+  <rect x="458" y="490" width="20" height="4" rx="1" fill="#EF4444" opacity="0.7"/>
+  <rect x="482" y="490" width="20" height="4" rx="1" fill="#EF4444" opacity="0.7"/>
+  <rect x="506" y="490" width="20" height="4" rx="1" fill="#EF4444" opacity="0.7"/>
+  <rect x="530" y="490" width="20" height="4" rx="1" fill="#EF4444" opacity="0.7"/>
+  <text x="458" y="468" font-family="Inter, sans-serif" font-size="8" fill="#FFF" opacity="0.7">Arp v3.2</text>
+
+  <!-- Track 6: Chords (MIDI) -->
+  <rect x="0" y="528" width="240" height="80" fill="#111113"/>
+  <line x1="0" y1="608" x2="240" y2="608" stroke="#1F1F23" stroke-width="1"/>
+  <circle cx="20" cy="568" r="8" fill="#3B82F6"/>
+  <text x="20" y="572" text-anchor="middle" font-family="Inter, sans-serif" font-size="8" font-weight="700" fill="#FFF">6</text>
+  <text x="38" y="564" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#E4E4E7">Chords</text>
+  <text x="38" y="580" font-family="Inter, sans-serif" font-size="10" fill="#3B82F6">MIDI · TAL-U-NO</text>
+  <rect x="160" y="554" width="22" height="18" rx="3" fill="#27272A"/>
+  <text x="171" y="567" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" font-weight="700" fill="#71717A">M</text>
+  <rect x="186" y="554" width="22" height="18" rx="3" fill="#27272A"/>
+  <text x="197" y="567" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" font-weight="700" fill="#71717A">S</text>
+  <rect x="212" y="554" width="22" height="18" rx="3" fill="#27272A"/>
+  <text x="223" y="567" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" font-weight="700" fill="#71717A">R</text>
+  <rect x="38" y="588" width="80" height="6" rx="3" fill="#27272A"/>
+  <rect x="38" y="588" width="52" height="6" rx="3" fill="#3B82F6" opacity="0.6"/>
+  <text x="130" y="596" font-family="JetBrains Mono, monospace" font-size="9" fill="#52525B">-4.7 dB</text>
+  <text x="180" y="596" font-family="JetBrains Mono, monospace" font-size="9" fill="#52525B">L15</text>
+
+  <!-- Chords clips -->
+  <rect x="240" y="536" width="712" height="64" rx="4" fill="url(#trackGrad6)" opacity="0.2"/>
+  <rect x="240" y="536" width="712" height="64" rx="4" fill="none" stroke="#3B82F6" stroke-width="1"/>
+  <rect x="250" y="550" width="692" height="4" rx="1" fill="#3B82F6" opacity="0.4"/>
+  <rect x="250" y="560" width="692" height="4" rx="1" fill="#3B82F6" opacity="0.3"/>
+  <rect x="250" y="570" width="692" height="4" rx="1" fill="#3B82F6" opacity="0.4"/>
+  <rect x="250" y="580" width="692" height="4" rx="1" fill="#3B82F6" opacity="0.3"/>
+  <rect x="250" y="590" width="692" height="4" rx="1" fill="#3B82F6" opacity="0.4"/>
+  <text x="250" y="548" font-family="Inter, sans-serif" font-size="8" fill="#FFF" opacity="0.7">Chords Layer</text>
+
+  <!-- Track 7: Group - Drums -->
+  <rect x="0" y="608" width="240" height="60" fill="#18181B" stroke="#8B5CF6" stroke-width="1" opacity="0.5"/>
+  <text x="12" y="642" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#8B5CF6">🥁 Drums Group</text>
+  <text x="160" y="642" font-family="Inter, sans-serif" font-size="10" fill="#52525B">4 tracks</text>
+
+  <!-- Group children indicators -->
+  <rect x="240" y="608" width="1200" height="60" fill="#111113" opacity="0.3"/>
+  <!-- Small clip indicators -->
+  <rect x="260" y="618" width="180" height="8" rx="2" fill="#EAB308" opacity="0.3"/>
+  <rect x="260" y="630" width="180" height="8" rx="2" fill="#EAB308" opacity="0.2"/>
+  <rect x="260" y="642" width="180" height="8" rx="2" fill="#EAB308" opacity="0.3"/>
+  <rect x="260" y="654" width="180" height="8" rx="2" fill="#EAB308" opacity="0.2"/>
+
+  <!-- ========== MIXER SECTION ========== -->
+  <rect y="680" width="1440" height="520" fill="#111113"/>
+  <line x1="0" y1="680" x2="1440" y2="680" stroke="#27272A" stroke-width="1"/>
+
+  <!-- Mixer header -->
+  <text x="20" y="710" font-family="Inter, sans-serif" font-size="14" font-weight="700" fill="#FFFFFF">Mixer</text>
+  <rect x="100" y="696" width="60" height="24" rx="6" fill="#8B5CF6" opacity="0.12"/>
+  <text x="114" y="713" font-family="Inter, sans-serif" font-size="11" font-weight="600" fill="#8B5CF6">Faders</text>
+  <rect x="170" y="696" width="80" height="24" rx="6" fill="transparent"/>
+  <text x="184" y="713" font-family="Inter, sans-serif" font-size="11" fill="#71717A">Sends</text>
+  <rect x="260" y="696" width="90" height="24" rx="6" fill="transparent"/>
+  <text x="274" y="713" font-family="Inter, sans-serif" font-size="11" fill="#71717A">EQ/Inserts</text>
+
+  <!-- Mixer channels -->
+  <!-- Channel 1: Neon Lead -->
+  <rect x="40" y="730" width="100" height="400" rx="8" fill="#18181B" stroke="#27272A" stroke-width="1"/>
+  <circle cx="90" cy="752" r="10" fill="#8B5CF6"/>
+  <text x="90" y="756" text-anchor="middle" font-family="Inter, sans-serif" font-size="8" font-weight="700" fill="#FFF">1</text>
+  <text x="90" y="778" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" font-weight="600" fill="#E4E4E7">Neon Lead</text>
+  <text x="90" y="794" text-anchor="middle" font-family="Inter, sans-serif" font-size="8" fill="#8B5CF6">Serum</text>
+  <!-- Fader -->
+  <rect x="78" y="810" width="24" height="240" rx="4" fill="#0D0D0F"/>
+  <rect x="78" y="860" width="24" height="190" rx="4" fill="#8B5CF6" opacity="0.3"/>
+  <rect x="72" y="856" width="36" height="12" rx="4" fill="#8B5CF6"/>
+  <!-- dB marks -->
+  <text x="70" y="870" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="7" fill="#52525B">0</text>
+  <text x="70" y="910" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="7" fill="#52525B">-6</text>
+  <text x="70" y="950" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="7" fill="#52525B">-12</text>
+  <text x="70" y="990" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="7" fill="#52525B">-24</text>
+  <text x="70" y="1030" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="7" fill="#52525B">-∞</text>
+  <!-- Level meter -->
+  <rect x="100" y="810" width="8" height="240" rx="2" fill="#0D0D0F"/>
+  <rect x="100" y="830" width="8" height="220" rx="2" fill="#22C55E" opacity="0.5"/>
+  <rect x="100" y="810" width="8" height="20" rx="2" fill="#EAB308" opacity="0.7"/>
+  <!-- Pan -->
+  <text x="90" y="1070" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="8" fill="#52525B">C</text>
+  <!-- M/S buttons -->
+  <rect x="58" y="1080" width="20" height="16" rx="3" fill="#27272A"/>
+  <text x="68" y="1092" text-anchor="middle" font-family="Inter, sans-serif" font-size="8" font-weight="700" fill="#71717A">M</text>
+  <rect x="82" y="1080" width="20" height="16" rx="3" fill="#27272A"/>
+  <text x="92" y="1092" text-anchor="middle" font-family="Inter, sans-serif" font-size="8" font-weight="700" fill="#71717A">S</text>
+  <text x="90" y="1120" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#E4E4E7">-3.2</text>
+
+  <!-- Channel 2: Bass -->
+  <rect x="160" y="730" width="100" height="400" rx="8" fill="#18181B" stroke="#27272A" stroke-width="1"/>
+  <circle cx="210" cy="752" r="10" fill="#06B6D4"/>
+  <text x="210" y="756" text-anchor="middle" font-family="Inter, sans-serif" font-size="8" font-weight="700" fill="#FFF">2</text>
+  <text x="210" y="778" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" font-weight="600" fill="#E4E4E7">Bass</text>
+  <text x="210" y="794" text-anchor="middle" font-family="Inter, sans-serif" font-size="8" fill="#06B6D4">Massive</text>
+  <rect x="198" y="810" width="24" height="240" rx="4" fill="#0D0D0F"/>
+  <rect x="198" y="840" width="24" height="210" rx="4" fill="#06B6D4" opacity="0.3"/>
+  <rect x="192" y="836" width="36" height="12" rx="4" fill="#06B6D4"/>
+  <rect x="220" y="810" width="8" height="240" rx="2" fill="#0D0D0F"/>
+  <rect x="220" y="820" width="8" height="230" rx="2" fill="#22C55E" opacity="0.5"/>
+  <text x="210" y="1070" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="8" fill="#52525B">C</text>
+  <rect x="178" y="1080" width="20" height="16" rx="3" fill="#27272A"/>
+  <text x="188" y="1092" text-anchor="middle" font-family="Inter, sans-serif" font-size="8" font-weight="700" fill="#71717A">M</text>
+  <rect x="202" y="1080" width="20" height="16" rx="3" fill="#27272A"/>
+  <text x="212" y="1092" text-anchor="middle" font-family="Inter, sans-serif" font-size="8" font-weight="700" fill="#71717A">S</text>
+  <text x="210" y="1120" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#E4E4E7">-1.8</text>
+
+  <!-- Channel 3: Pad -->
+  <rect x="280" y="730" width="100" height="400" rx="8" fill="#18181B" stroke="#27272A" stroke-width="1"/>
+  <circle cx="330" cy="752" r="10" fill="#22C55E"/>
+  <text x="330" y="756" text-anchor="middle" font-family="Inter, sans-serif" font-size="8" font-weight="700" fill="#FFF">3</text>
+  <text x="330" y="778" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" font-weight="600" fill="#E4E4E7">Pad</text>
+  <text x="330" y="794" text-anchor="middle" font-family="Inter, sans-serif" font-size="8" fill="#22C55E">Omnisphere</text>
+  <rect x="318" y="810" width="24" height="240" rx="4" fill="#0D0D0F"/>
+  <rect x="318" y="880" width="24" height="170" rx="4" fill="#22C55E" opacity="0.3"/>
+  <rect x="312" y="876" width="36" height="12" rx="4" fill="#22C55E"/>
+  <rect x="340" y="810" width="8" height="240" rx="2" fill="#0D0D0F"/>
+  <rect x="340" y="850" width="8" height="200" rx="2" fill="#22C55E" opacity="0.4"/>
+  <text x="330" y="1070" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="8" fill="#52525B">L20</text>
+  <rect x="298" y="1080" width="20" height="16" rx="3" fill="#27272A"/>
+  <text x="308" y="1092" text-anchor="middle" font-family="Inter, sans-serif" font-size="8" font-weight="700" fill="#71717A">M</text>
+  <rect x="322" y="1080" width="20" height="16" rx="3" fill="#27272A"/>
+  <text x="332" y="1092" text-anchor="middle" font-family="Inter, sans-serif" font-size="8" font-weight="700" fill="#71717A">S</text>
+  <text x="330" y="1120" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#E4E4E7">-6.4</text>
+
+  <!-- Channel 4: Drums -->
+  <rect x="400" y="730" width="100" height="400" rx="8" fill="#18181B" stroke="#27272A" stroke-width="1"/>
+  <circle cx="450" cy="752" r="10" fill="#EAB308"/>
+  <text x="450" y="756" text-anchor="middle" font-family="Inter, sans-serif" font-size="8" font-weight="700" fill="#000">4</text>
+  <text x="450" y="778" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" font-weight="600" fill="#E4E4E7">Drums</text>
+  <text x="450" y="794" text-anchor="middle" font-family="Inter, sans-serif" font-size="8" fill="#EAB308">Audio</text>
+  <rect x="438" y="810" width="24" height="240" rx="4" fill="#0D0D0F"/>
+  <rect x="438" y="820" width="24" height="230" rx="4" fill="#EAB308" opacity="0.3"/>
+  <rect x="432" y="816" width="36" height="12" rx="4" fill="#EAB308"/>
+  <rect x="460" y="810" width="8" height="240" rx="2" fill="#0D0D0F"/>
+  <rect x="460" y="810" width="8" height="240" rx="2" fill="#22C55E" opacity="0.6"/>
+  <text x="450" y="1070" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="8" fill="#52525B">C</text>
+  <rect x="418" y="1080" width="20" height="16" rx="3" fill="#27272A"/>
+  <text x="428" y="1092" text-anchor="middle" font-family="Inter, sans-serif" font-size="8" font-weight="700" fill="#71717A">M</text>
+  <rect x="442" y="1080" width="20" height="16" rx="3" fill="#27272A"/>
+  <text x="452" y="1092" text-anchor="middle" font-family="Inter, sans-serif" font-size="8" font-weight="700" fill="#71717A">S</text>
+  <text x="450" y="1120" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#E4E4E7">-0.5</text>
+
+  <!-- Channel 5: Arp -->
+  <rect x="520" y="730" width="100" height="400" rx="8" fill="#18181B" stroke="#27272A" stroke-width="1"/>
+  <circle cx="570" cy="752" r="10" fill="#EF4444"/>
+  <text x="570" y="756" text-anchor="middle" font-family="Inter, sans-serif" font-size="8" font-weight="700" fill="#FFF">5</text>
+  <text x="570" y="778" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" font-weight="600" fill="#E4E4E7">Arp</text>
+  <text x="570" y="794" text-anchor="middle" font-family="Inter, sans-serif" font-size="8" fill="#EF4444">Diva</text>
+  <rect x="558" y="810" width="24" height="240" rx="4" fill="#0D0D0F"/>
+  <rect x="558" y="900" width="24" height="150" rx="4" fill="#EF4444" opacity="0.3"/>
+  <rect x="552" y="896" width="36" height="12" rx="4" fill="#EF4444"/>
+  <rect x="580" y="810" width="8" height="240" rx="2" fill="#0D0D0F"/>
+  <rect x="580" y="870" width="8" height="180" rx="2" fill="#22C55E" opacity="0.3"/>
+  <text x="570" y="1070" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="8" fill="#52525B">R30</text>
+  <rect x="538" y="1080" width="20" height="16" rx="3" fill="#27272A"/>
+  <text x="548" y="1092" text-anchor="middle" font-family="Inter, sans-serif" font-size="8" font-weight="700" fill="#71717A">M</text>
+  <rect x="562" y="1080" width="20" height="16" rx="3" fill="#27272A"/>
+  <text x="572" y="1092" text-anchor="middle" font-family="Inter, sans-serif" font-size="8" font-weight="700" fill="#71717A">S</text>
+  <text x="570" y="1120" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#E4E4E7">-8.1</text>
+
+  <!-- Channel 6: Chords -->
+  <rect x="640" y="730" width="100" height="400" rx="8" fill="#18181B" stroke="#27272A" stroke-width="1"/>
+  <circle cx="690" cy="752" r="10" fill="#3B82F6"/>
+  <text x="690" y="756" text-anchor="middle" font-family="Inter, sans-serif" font-size="8" font-weight="700" fill="#FFF">6</text>
+  <text x="690" y="778" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" font-weight="600" fill="#E4E4E7">Chords</text>
+  <text x="690" y="794" text-anchor="middle" font-family="Inter, sans-serif" font-size="8" fill="#3B82F6">TAL-U-NO</text>
+  <rect x="678" y="810" width="24" height="240" rx="4" fill="#0D0D0F"/>
+  <rect x="678" y="870" width="24" height="180" rx="4" fill="#3B82F6" opacity="0.3"/>
+  <rect x="672" y="866" width="36" height="12" rx="4" fill="#3B82F6"/>
+  <rect x="700" y="810" width="8" height="240" rx="2" fill="#0D0D0F"/>
+  <rect x="700" y="840" width="8" height="210" rx="2" fill="#22C55E" opacity="0.4"/>
+  <text x="690" y="1070" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="8" fill="#52525B">L15</text>
+  <rect x="658" y="1080" width="20" height="16" rx="3" fill="#27272A"/>
+  <text x="668" y="1092" text-anchor="middle" font-family="Inter, sans-serif" font-size="8" font-weight="700" fill="#71717A">M</text>
+  <rect x="682" y="1080" width="20" height="16" rx="3" fill="#27272A"/>
+  <text x="692" y="1092" text-anchor="middle" font-family="Inter, sans-serif" font-size="8" font-weight="700" fill="#71717A">S</text>
+  <text x="690" y="1120" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#E4E4E7">-4.7</text>
+
+  <!-- Master channel -->
+  <rect x="1280" y="730" width="120" height="400" rx="8" fill="#18181B" stroke="#8B5CF6" stroke-width="1"/>
+  <text x="1340" y="760" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF">MASTER</text>
+  <text x="1340" y="780" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#71717A">Stereo Out</text>
+  <rect x="1318" y="810" width="44" height="240" rx="4" fill="#0D0D0F"/>
+  <rect x="1318" y="830" width="44" height="220" rx="4" fill="#8B5CF6" opacity="0.3"/>
+  <rect x="1312" y="826" width="56" height="12" rx="4" fill="#8B5CF6"/>
+  <!-- Master meters (stereo) -->
+  <rect x="1370" y="810" width="10" height="240" rx="2" fill="#0D0D0F"/>
+  <rect x="1370" y="820" width="10" height="230" rx="2" fill="#22C55E" opacity="0.5"/>
+  <rect x="1370" y="810" width="10" height="20" rx="2" fill="#EAB308" opacity="0.7"/>
+  <rect x="1384" y="810" width="10" height="240" rx="2" fill="#0D0D0F"/>
+  <rect x="1384" y="825" width="10" height="225" rx="2" fill="#22C55E" opacity="0.5"/>
+  <rect x="1384" y="810" width="10" height="18" rx="2" fill="#EAB308" opacity="0.7"/>
+
+  <text x="1340" y="1070" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="8" fill="#52525B">C</text>
+  <text x="1340" y="1120" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#E4E4E7">-1.2 dB</text>
+
+  <!-- Inserts section on the right -->
+  <rect x="780" y="730" width="480" height="120" rx="8" fill="#18181B" stroke="#27272A" stroke-width="1"/>
+  <text x="800" y="756" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF">Inserts — Neon Lead</text>
+
+  <!-- Plugin chain -->
+  <rect x="800" y="770" width="130" height="60" rx="6" fill="#0D0D0F" stroke="#8B5CF6" stroke-width="1"/>
+  <text x="865" y="794" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" font-weight="600" fill="#8B5CF6">🎛️ Serum</text>
+  <text x="865" y="812" text-anchor="middle" font-family="Inter, sans-serif" font-size="8" fill="#71717A">Synthesizer</text>
+
+  <text x="940" y="802" font-family="Inter, sans-serif" font-size="14" fill="#52525B">→</text>
+
+  <rect x="960" y="770" width="130" height="60" rx="6" fill="#0D0D0F" stroke="#27272A" stroke-width="1"/>
+  <text x="1025" y="794" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" font-weight="600" fill="#E4E4E7">🎚️ EQ Eight</text>
+  <text x="1025" y="812" text-anchor="middle" font-family="Inter, sans-serif" font-size="8" fill="#71717A">Equalizer</text>
+
+  <text x="1100" y="802" font-family="Inter, sans-serif" font-size="14" fill="#52525B">→</text>
+
+  <rect x="1120" y="770" width="130" height="60" rx="6" fill="#0D0D0F" stroke="#27272A" stroke-width="1"/>
+  <text x="1185" y="794" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" font-weight="600" fill="#E4E4E7">🔊 Compressor</text>
+  <text x="1185" y="812" text-anchor="middle" font-family="Inter, sans-serif" font-size="8" fill="#71717A">Dynamics</text>
+
+  <!-- Sends section -->
+  <rect x="780" y="870" width="480" height="80" rx="8" fill="#18181B" stroke="#27272A" stroke-width="1"/>
+  <text x="800" y="896" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF">Sends</text>
+
+  <rect x="800" y="910" width="140" height="28" rx="4" fill="#0D0D0F"/>
+  <text x="812" y="929" font-family="Inter, sans-serif" font-size="10" fill="#71717A">A: Reverb</text>
+  <rect x="890" y="916" width="40" height="8" rx="2" fill="#27272A"/>
+  <rect x="890" y="916" width="28" height="8" rx="2" fill="#8B5CF6" opacity="0.5"/>
+  <text x="940" y="929" font-family="JetBrains Mono, monospace" font-size="9" fill="#52525B">-12 dB</text>
+
+  <rect x="960" y="910" width="140" height="28" rx="4" fill="#0D0D0F"/>
+  <text x="972" y="929" font-family="Inter, sans-serif" font-size="10" fill="#71717A">B: Delay</text>
+  <rect x="1050" y="916" width="40" height="8" rx="2" fill="#27272A"/>
+  <rect x="1050" y="916" width="20" height="8" rx="2" fill="#06B6D4" opacity="0.5"/>
+  <text x="1100" y="929" font-family="JetBrains Mono, monospace" font-size="9" fill="#52525B">-18 dB</text>
+
+  <!-- ========== BOTTOM INFO BAR ========== -->
+  <rect y="1160" width="1440" height="40" fill="#141416"/>
+  <line x1="0" y1="1160" x2="1440" y2="1160" stroke="#1F1F23" stroke-width="1"/>
+  <text x="20" y="1186" font-family="Inter, sans-serif" font-size="11" fill="#52525B">8 tracks · 16 bars · 128 BPM · F# minor · 48kHz · 24bit</text>
+  <text x="1300" y="1186" font-family="Inter, sans-serif" font-size="11" fill="#52525B">Ableton Live 12 Suite · macOS</text>
+  <text x="1420" y="1186" text-anchor="end" font-family="Inter, sans-serif" font-size="11" fill="#52525B">181.3 MB</text>
+</svg>

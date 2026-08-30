@@ -1,0 +1,150 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 1000" width="1400" height="1000">
+  <rect width="1400" height="1000" fill="#18181B"/>
+  
+  <!-- Title -->
+  <text x="40" y="35" font-family="Inter, sans-serif" font-size="20" font-weight="700" fill="#E4E4E7">SoundHub — Marketplace (DaVinci Resolve 21 Style)</text>
+  
+  <!-- Main Container -->
+  <rect x="40" y="50" width="1320" height="900" rx="4" fill="#1E1E22" stroke="#3F3F46" stroke-width="1"/>
+  
+  <!-- Menu Bar -->
+  <rect x="40" y="50" width="1320" height="32" fill="#252528"/>
+  <text x="60" y="72" font-family="Inter, sans-serif" font-size="11" fill="#A1A1AA">File</text>
+  <text x="100" y="72" font-family="Inter, sans-serif" font-size="11" fill="#A1A1AA">Edit</text>
+  <text x="140" y="72" font-family="Inter, sans-serif" font-size="11" fill="#A1A1AA">View</text>
+  <text x="180" y="72" font-family="Inter, sans-serif" font-size="11" fill="#A1A1AA">Tools</text>
+  <text x="1280" y="72" font-family="Inter, sans-serif" font-size="11" fill="#71717A">⬡ SoundHub v1.0</text>
+  
+  <!-- Top Toolbar -->
+  <rect x="40" y="82" width="1320" height="40" fill="#2A2A2E"/>
+  <text x="60" y="107" font-family="Inter, sans-serif" font-size="12" fill="#E4E4E7">⬡ SoundHub</text>
+  <rect x="200" y="90" width="400" height="24" rx="4" fill="#18181B" stroke="#3F3F46" stroke-width="1"/>
+  <text x="220" y="107" font-family="Inter, sans-serif" font-size="11" fill="#52525B">🔍 Search marketplace...</text>
+  <text x="1200" y="107" font-family="Inter, sans-serif" font-size="11" fill="#71717A">256 assets</text>
+  
+  <!-- Left Panel (Filters) -->
+  <rect x="40" y="122" width="260" height="778" fill="#252528"/>
+  
+  <rect x="40" y="122" width="260" height="28" fill="#2A2A2E"/>
+  <text x="60" y="142" font-family="Inter, sans-serif" font-size="10" font-weight="600" fill="#A1A1AA">FILTERS</text>
+  
+  <!-- DAW -->
+  <text x="60" y="175" font-family="Inter, sans-serif" font-size="10" font-weight="600" fill="#71717A">DAW</text>
+  <rect x="50" y="185" width="100" height="28" rx="4" fill="#E74C3C" opacity="0.15"/>
+  <text x="100" y="204" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#E74C3C">Ableton</text>
+  <rect x="160" y="185" width="80" height="28" rx="4" fill="#18181B"/>
+  <text x="200" y="204" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#71717A">FL Studio</text>
+  
+  <!-- Genre -->
+  <text x="60" y="240" font-family="Inter, sans-serif" font-size="10" font-weight="600" fill="#71717A">GENRE</text>
+  <rect x="50" y="250" width="70" height="28" rx="4" fill="#E74C3C" opacity="0.15"/>
+  <text x="85" y="269" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#E74C3C">All</text>
+  <rect x="130" y="250" width="80" height="28" rx="4" fill="#18181B"/>
+  <text x="170" y="269" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#71717A">Electronic</text>
+  <rect x="50" y="285" width="70" height="28" rx="4" fill="#18181B"/>
+  <text x="85" y="304" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#71717A">Hip-Hop</text>
+  <rect x="130" y="285" width="80" height="28" rx="4" fill="#18181B"/>
+  <text x="170" y="304" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#71717A">Ambient</text>
+  
+  <!-- Price -->
+  <text x="60" y="340" font-family="Inter, sans-serif" font-size="10" font-weight="600" fill="#71717A">PRICE</text>
+  <rect x="50" y="350" width="60" height="28" rx="4" fill="#22C55E" opacity="0.15"/>
+  <text x="80" y="369" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#22C55E">Free</text>
+  <rect x="120" y="350" width="60" height="28" rx="4" fill="#18181B"/>
+  <text x="150" y="369" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#71717A">Paid</text>
+  <rect x="190" y="350" width="80" height="28" rx="4" fill="#18181B"/>
+  <text x="230" y="369" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#71717A">Premium</text>
+  
+  <!-- Sort -->
+  <text x="60" y="410" font-family="Inter, sans-serif" font-size="10" font-weight="600" fill="#71717A">SORT BY</text>
+  <rect x="50" y="420" width="240" height="32" rx="4" fill="#18181B" stroke="#3F3F46" stroke-width="1"/>
+  <text x="70" y="441" font-family="Inter, sans-serif" font-size="10" fill="#A1A1AA">Most Popular ▾</text>
+  
+  <!-- Main Content -->
+  <rect x="300" y="122" width="1060" height="778" fill="#18181B"/>
+  
+  <!-- Header -->
+  <rect x="300" y="122" width="1060" height="32" fill="#2A2A2E"/>
+  <text x="320" y="144" font-family="Inter, sans-serif" font-size="11" font-weight="600" fill="#A1A1AA">MARKETPLACE</text>
+  
+  <!-- Asset Card 1 -->
+  <rect x="320" y="170" width="330" height="260" rx="4" fill="#252528" stroke="#3F3F46" stroke-width="1"/>
+  <rect x="320" y="170" width="330" height="100" rx="4" fill="#2A2A2E"/>
+  <text x="485" y="230" text-anchor="middle" font-family="Inter, sans-serif" font-size="24" fill="#52525B">🎵</text>
+  <text x="340" y="295" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#E4E4E7">Vinyl Classics</text>
+  <text x="340" y="315" font-family="Inter, sans-serif" font-size="10" fill="#71717A">Zero-G · Ableton Live 9</text>
+  <rect x="340" y="325" width="60" height="18" rx="4" fill="#E74C3C" opacity="0.15"/>
+  <text x="370" y="338" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" fill="#E74C3C">Electronic</text>
+  <rect x="410" y="325" width="50" height="18" rx="4" fill="#06B6D4" opacity="0.15"/>
+  <text x="435" y="338" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" fill="#06B6D4">128 BPM</text>
+  <text x="340" y="370" font-family="Inter, sans-serif" font-size="10" fill="#52525B">12 tracks · 10 samples · 483 MB</text>
+  <rect x="340" y="390" width="80" height="28" rx="4" fill="#E74C3C"/>
+  <text x="380" y="409" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="600" fill="#FFFFFF">$29.99</text>
+  <text x="580" y="409" font-family="Inter, sans-serif" font-size="10" fill="#52525B">⬇ 1.2K</text>
+  
+  <!-- Asset Card 2 -->
+  <rect x="665" y="170" width="330" height="260" rx="4" fill="#252528" stroke="#3F3F46" stroke-width="1"/>
+  <rect x="665" y="170" width="330" height="100" rx="4" fill="#2A2A2E"/>
+  <text x="830" y="230" text-anchor="middle" font-family="Inter, sans-serif" font-size="24" fill="#52525B">🎹</text>
+  <text x="685" y="295" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#E4E4E7">Grand Piano</text>
+  <text x="685" y="315" font-family="Inter, sans-serif" font-size="10" fill="#71717A">In-house · Ableton Live 9</text>
+  <rect x="685" y="325" width="50" height="18" rx="4" fill="#22C55E" opacity="0.15"/>
+  <text x="710" y="338" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" fill="#22C55E">Free</text>
+  <rect x="745" y="325" width="50" height="18" rx="4" fill="#06B6D4" opacity="0.15"/>
+  <text x="770" y="338" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" fill="#06B6D4">120 BPM</text>
+  <text x="685" y="370" font-family="Inter, sans-serif" font-size="10" fill="#52525B">4 tracks · 2 samples · 89 MB</text>
+  <rect x="685" y="390" width="80" height="28" rx="4" fill="#22C55E"/>
+  <text x="725" y="409" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="600" fill="#FFFFFF">Free</text>
+  <text x="925" y="409" font-family="Inter, sans-serif" font-size="10" fill="#52525B">⬇ 3.4K</text>
+  
+  <!-- Asset Card 3 -->
+  <rect x="1010" y="170" width="330" height="260" rx="4" fill="#252528" stroke="#3F3F46" stroke-width="1"/>
+  <rect x="1010" y="170" width="330" height="100" rx="4" fill="#2A2A2E"/>
+  <text x="1175" y="230" text-anchor="middle" font-family="Inter, sans-serif" font-size="24" fill="#52525B">🥁</text>
+  <text x="1030" y="295" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#E4E4E7">The Forge</text>
+  <text x="1030" y="315" font-family="Inter, sans-serif" font-size="10" fill="#71717A">Hecq · Ableton Live 9</text>
+  <rect x="1030" y="325" width="60" height="18" rx="4" fill="#F59E0B" opacity="0.15"/>
+  <text x="1060" y="338" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" fill="#F59E0B">Industrial</text>
+  <rect x="1100" y="325" width="50" height="18" rx="4" fill="#06B6D4" opacity="0.15"/>
+  <text x="1125" y="338" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" fill="#06B6D4">140 BPM</text>
+  <text x="1030" y="370" font-family="Inter, sans-serif" font-size="10" fill="#52525B">6 tracks · 8 samples · 312 MB</text>
+  <rect x="1030" y="390" width="80" height="28" rx="4" fill="#E74C3C"/>
+  <text x="1070" y="409" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" font-weight="600" fill="#FFFFFF">$19.99</text>
+  <text x="1270" y="409" font-family="Inter, sans-serif" font-size="10" fill="#52525B">⬇ 890</text>
+  
+  <!-- Bottom Toolbar -->
+  <rect x="40" y="900" width="1320" height="50" fill="#252528"/>
+  
+  <!-- Transport -->
+  <rect x="60" y="910" width="32" height="32" rx="4" fill="#3F3F46"/>
+  <text x="76" y="931" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#A1A1AA">⏮</text>
+  <rect x="100" y="910" width="32" height="32" rx="4" fill="#22C55E"/>
+  <text x="116" y="931" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#FFFFFF">▶</text>
+  <rect x="140" y="910" width="32" height="32" rx="4" fill="#3F3F46"/>
+  <text x="156" y="931" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#A1A1AA">⏹</text>
+  <rect x="180" y="910" width="32" height="32" rx="4" fill="#E74C3C"/>
+  <text x="196" y="931" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#FFFFFF">⏺</text>
+  
+  <text x="240" y="931" font-family="JetBrains Mono, monospace" font-size="14" fill="#E4E4E7">00:00:00:00</text>
+  
+  <!-- Page Icons -->
+  <rect x="500" y="910" width="80" height="32" rx="4" fill="#3F3F46"/>
+  <text x="540" y="931" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#71717A">Media</text>
+  <rect x="590" y="910" width="80" height="32" rx="4" fill="#3F3F46"/>
+  <text x="630" y="931" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#71717A">Cut</text>
+  <rect x="680" y="910" width="80" height="32" rx="4" fill="#3F3F46"/>
+  <text x="720" y="931" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#71717A">Edit</text>
+  <rect x="770" y="910" width="80" height="32" rx="4" fill="#3F3F46"/>
+  <text x="810" y="931" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#71717A">Fusion</text>
+  <rect x="860" y="910" width="80" height="32" rx="4" fill="#E74C3C"/>
+  <text x="900" y="931" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" font-weight="600" fill="#FFFFFF">Color</text>
+  <rect x="950" y="910" width="80" height="32" rx="4" fill="#3F3F46"/>
+  <text x="990" y="931" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#71717A">Fairlight</text>
+  <rect x="1040" y="910" width="80" height="32" rx="4" fill="#3F3F46"/>
+  <text x="1080" y="931" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#71717A">Deliver</text>
+  
+  <text x="1200" y="931" font-family="JetBrains Mono, monospace" font-size="10" fill="#52525B">CPU 12% · RAM 1.2 GB</text>
+  
+  <!-- Specs -->
+  <text x="40" y="970" font-family="JetBrains Mono, monospace" font-size="10" fill="#52525B">Colors: #18181B (bg) · #252528 (panel) · #2A2A2E (header) · #3F3F46 (border) · #E74C3C (accent) · #22C55E (play/free)</text>
+</svg>

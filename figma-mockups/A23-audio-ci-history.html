@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <title>SoundHub — Audio CI History</title>
+  <link rel="stylesheet" href="design-system/shared.css">
+  <style>
+    .ci-table { width: 100%; border-collapse: collapse; }
+    .ci-table th {
+      text-align: left; padding: 10px 14px; font-size: 11px; font-weight: 700;
+      color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--border-default);
+    }
+    .ci-table td {
+      padding: 12px 14px; font-size: 12px; border-bottom: 1px solid var(--border-default);
+    }
+    .ci-table tr:hover td { background: var(--bg-hover); }
+    .ci-result { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: 600; }
+    .ci-pass { background: rgba(34,197,94,0.12); color: var(--color-success); }
+    .ci-fail { background: rgba(239,68,68,0.12); color: var(--color-error); }
+    .ci-warn { background: rgba(234,179,8,0.12); color: var(--color-warning); }
+    .metric-pill { padding: 2px 6px; background: var(--bg-elevated); border-radius: 3px; font-size: 10px; font-family: var(--font-mono); }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-logo"><div class="logo-icon">S</div><div class="logo-text">SoundHub</div></div>
+      <nav class="sidebar-nav">
+        <div class="sidebar-section-label">Main</div>
+        <a class="sidebar-item" href="#"><span class="icon">📊</span> Dashboard</a>
+        <a class="sidebar-item" href="#"><span class="icon">📁</span> Projects</a>
+        <a class="sidebar-item" href="#"><span class="icon">🛒</span> Marketplace</a>
+        <div class="sidebar-section-label">Workspace</div>
+        <a class="sidebar-item active" href="#"><span class="icon">🔬</span> Audio CI</a>
+        <a class="sidebar-item" href="#"><span class="icon">💬</span> Reviews</a>
+        <div class="sidebar-section-label">Account</div>
+        <a class="sidebar-item" href="#"><span class="icon">⚙️</span> Settings</a>
+      </nav>
+    </aside>
+    <div class="main-content">
+      <header class="topbar">
+        <div class="topbar-search"><span class="search-icon">🔍</span><input type="text" placeholder="Search CI reports..."></div>
+        <div class="topbar-right"><div class="topbar-icon-btn">🔔<span class="notif-dot"></span></div><div class="topbar-avatar">P</div></div>
+      </header>
+      <div class="page">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
+          <div>
+            <h1 class="page-title" style="margin-bottom:4px">Audio CI History</h1>
+            <p class="page-subtitle">Past audio analysis reports and quality checks</p>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-secondary">📥 Export CSV</button>
+            <button class="btn btn-primary">🔬 Run Analysis</button>
+          </div>
+        </div>
+
+        <!-- Summary Stats -->
+        <div class="grid-4" style="margin-bottom:24px">
+          <div class="stat-card"><div class="stat-label">Total Runs</div><div class="stat-value">47</div></div>
+          <div class="stat-card"><div class="stat-label">Passed</div><div class="stat-value" style="color:var(--color-success)">42</div></div>
+          <div class="stat-card"><div class="stat-label">Warnings</div><div class="stat-value" style="color:var(--color-warning)">3</div></div>
+          <div class="stat-card"><div class="stat-label">Failed</div><div class="stat-value" style="color:var(--color-error)">2</div></div>
+        </div>
+
+        <!-- History Table -->
+        <div style="background:var(--bg-surface);border:1px solid var(--border-default);border-radius:var(--radius-lg);overflow:hidden">
+          <table class="ci-table">
+            <thead>
+              <tr>
+                <th>File</th>
+                <th>Version</th>
+                <th>Result</th>
+                <th>Loudness</th>
+                <th>True Peak</th>
+                <th>Duration</th>
+                <th>Run Date</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="font-weight:600">Neon_Warehouse_v13.wav</td>
+                <td>v13</td>
+                <td><span class="ci-result ci-pass">✓ Pass</span></td>
+                <td><span class="metric-pill">-14.2 LUFS</span></td>
+                <td><span class="metric-pill">-1.2 dBTP</span></td>
+                <td style="color:var(--text-secondary)">3:42</td>
+                <td style="color:var(--text-muted)">2h ago</td>
+                <td><button class="btn btn-ghost" style="font-size:11px">View</button></td>
+              </tr>
+              <tr>
+                <td style="font-weight:600">Midnight_Drive_mix.wav</td>
+                <td>v7</td>
+                <td><span class="ci-result ci-warn">⚠ Warn</span></td>
+                <td><span class="metric-pill" style="color:var(--color-warning)">-10.1 LUFS</span></td>
+                <td><span class="metric-pill">-1.5 dBTP</span></td>
+                <td style="color:var(--text-secondary)">4:18</td>
+                <td style="color:var(--text-muted)">5h ago</td>
+                <td><button class="btn btn-ghost" style="font-size:11px">View</button></td>
+              </tr>
+              <tr>
+                <td style="font-weight:600">Summer_Vibes_master.wav</td>
+                <td>v11</td>
+                <td><span class="ci-result ci-pass">✓ Pass</span></td>
+                <td><span class="metric-pill">-14.0 LUFS</span></td>
+                <td><span class="metric-pill">-1.0 dBTP</span></td>
+                <td style="color:var(--text-secondary)">3:55</td>
+                <td style="color:var(--text-muted)">1d ago</td>
+                <td><button class="btn btn-ghost" style="font-size:11px">View</button></td>
+              </tr>
+              <tr>
+                <td style="font-weight:600">Deep_House_final.wav</td>
+                <td>v9</td>
+                <td><span class="ci-result ci-fail">✕ Fail</span></td>
+                <td><span class="metric-pill" style="color:var(--color-error)">-6.3 LUFS</span></td>
+                <td><span class="metric-pill" style="color:var(--color-error)">+0.5 dBTP</span></td>
+                <td style="color:var(--text-secondary)">5:12</td>
+                <td style="color:var(--text-muted)">2d ago</td>
+                <td><button class="btn btn-ghost" style="font-size:11px">View</button></td>
+              </tr>
+              <tr>
+                <td style="font-weight:600">Acoustic_EP_live.wav</td>
+                <td>v4</td>
+                <td><span class="ci-result ci-pass">✓ Pass</span></td>
+                <td><span class="metric-pill">-16.1 LUFS</span></td>
+                <td><span class="metric-pill">-2.1 dBTP</span></td>
+                <td style="color:var(--text-secondary)">2:48</td>
+                <td style="color:var(--text-muted)">3d ago</td>
+                <td><button class="btn btn-ghost" style="font-size:11px">View</button></td>
+              </tr>
+              <tr>
+                <td style="font-weight:600">Techno_Drive_master.wav</td>
+                <td>v6</td>
+                <td><span class="ci-result ci-warn">⚠ Warn</span></td>
+                <td><span class="metric-pill" style="color:var(--color-warning)">-11.8 LUFS</span></td>
+                <td><span class="metric-pill">-1.8 dBTP</span></td>
+                <td style="color:var(--text-secondary)">6:03</td>
+                <td style="color:var(--text-muted)">4d ago</td>
+                <td><button class="btn btn-ghost" style="font-size:11px">View</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

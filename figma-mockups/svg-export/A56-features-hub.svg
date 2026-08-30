@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" 
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     viewBox="0 0 1440 1002" 
+     width="1440" 
+     height="1002">
+  <foreignObject width="100%" height="100%">
+    <div xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SoundHub — Features Hub</title>
+<link rel="stylesheet" href="design-system/shared.css">
+<style>
+  body { margin: 0; background: var(--bg-primary); color: var(--text-primary); font-family: 'Inter', system-ui, sans-serif; }
+  .app { display: flex; min-height: 100vh; }
+  .sidebar { width: 240px; background: var(--bg-panel); border-right: 1px solid var(--border-default); padding: 20px 0; flex-shrink: 0; }
+  .sidebar .logo { padding: 0 16px; font-size: 18px; font-weight: 800; color: var(--brand-accent); margin-bottom: 24px; }
+  .sidebar .nav-item { padding: 8px 20px; font-size: 13px; color: var(--text-secondary); cursor: pointer; }
+  .sidebar .nav-item.active { color: var(--brand-primary); background: rgba(139,92,246,0.08); border-radius: 6px; margin: 0 8px; padding: 8px 12px; }
+  .main { flex: 1; padding: 0; }
+  .header { padding: 16px 24px; border-bottom: 1px solid var(--border-default); }
+  .breadcrumb { font-size: 14px; margin-bottom: 12px; }
+  .breadcrumb .owner { color: var(--brand-primary); font-weight: 600; }
+  .breadcrumb .sep { color: var(--text-muted); }
+  .breadcrumb .name { color: var(--text-primary); font-weight: 600; }
+  .tabs { display: flex; gap: 0; flex-wrap: wrap; }
+  .tab { padding: 8px 14px; font-size: 12px; color: var(--text-secondary); cursor: pointer; border: none; background: none; font-family: inherit; }
+  .tab.active { color: var(--brand-primary); background: rgba(139,92,246,0.08); border-radius: 6px; font-weight: 600; }
+  .content { padding: 24px; }
+  .card { background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+  .card h2 { font-size: 14px; font-weight: 600; margin: 0 0 12px; }
+  .list-row { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--border-default); }
+  .list-row:last-child { border-bottom: none; }
+  .list-row .icon { font-size: 14px; }
+  .list-row .title { font-size: 13px; font-weight: 600; flex: 1; }
+  .list-row .meta { font-size: 11px; color: var(--text-muted); }
+  .badge { padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 600; border: 1px solid; }
+  .badge.active { border-color: var(--color-success); color: var(--color-success); }
+  .badge.planned { border-color: var(--brand-secondary); color: var(--brand-secondary); }
+  .badge.completed { border-color: var(--text-muted); color: var(--text-muted); }
+  .form-row { display: flex; gap: 8px; margin-top: 12px; }
+  .form-row input, .form-row textarea { flex: 1; background: var(--bg-input); border: 1px solid var(--border-default); color: var(--text-primary); padding: 8px 12px; border-radius: 6px; font-size: 12px; font-family: inherit; }
+  .form-row textarea { min-height: 80px; resize: vertical; }
+  .btn { padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; border: none; cursor: pointer; }
+  .btn-primary { background: var(--brand-primary); color: white; }
+  .btn-ghost { background: var(--bg-elevated); color: var(--text-secondary); border: 1px solid var(--border-default); }
+  .empty { font-size: 12px; color: var(--text-muted); padding: 16px 0; }
+  .retro-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  .retro-col h3 { font-size: 12px; font-weight: 600; margin: 0 0 8px; }
+  .retro-item { padding: 8px; background: var(--bg-elevated); border-radius: 6px; font-size: 12px; margin-bottom: 4px; display: flex; justify-content: space-between; }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="sidebar">
+    <div class="logo">🎵 SoundHub</div>
+    <div class="nav-item">📊 Dashboard</div>
+    <div class="nav-item active">🧩 Features</div>
+    <div class="nav-item">📁 Projects</div>
+    <div class="nav-item">⚙️ Settings</div>
+  </div>
+  <div class="main">
+    <div class="header">
+      <div class="breadcrumb"><span class="owner">Midnight Sessions EP</span><span class="sep"> / </span><span class="name">Features</span></div>
+      <div class="tabs">
+        <button class="tab active">📚 Wiki</button>
+        <button class="tab">🏃 Sprints</button>
+        <button class="tab">🔄 Retros</button>
+        <button class="tab">🧪 Tests</button>
+        <button class="tab">📋 Kanban</button>
+        <button class="tab">📌 Tasks</button>
+        <button class="tab">🔀 PRs</button>
+        <button class="tab">🏁 Milestones</button>
+        <button class="tab">🎯 Epics</button>
+        <button class="tab">💬 Discussions</button>
+        <button class="tab">⚙️ Workflows</button>
+        <button class="tab">🏷 Tags</button>
+      </div>
+    </div>
+    <div class="content">
+      <div class="card">
+        <h2>Wiki Pages</h2>
+        <div class="list-row"><span class="icon">📄</span><span class="title">Mixing Guide</span><span class="badge completed">v3</span><span class="meta">2d ago</span></div>
+        <div class="list-row"><span class="icon">📄</span><span class="title">Recording Setup</span><span class="badge completed">v1</span><span class="meta">5d ago</span></div>
+        <div class="list-row"><span class="icon">📄</span><span class="title">Mastering Checklist</span><span class="badge completed">v2</span><span class="meta">1d ago</span></div>
+      </div>
+      <div class="card">
+        <h2>Create Page</h2>
+        <div class="form-row"><input placeholder="slug (e.g. mixing-guide)"><input placeholder="Title"></div>
+        <div class="form-row"><textarea placeholder="Markdown content..."></textarea></div>
+        <div class="form-row"><button class="btn btn-primary">Create Page</button></div>
+      </div>
+      <div class="card">
+        <h2>Sprints</h2>
+        <div class="list-row"><span style="color:var(--color-success)">●</span><span class="title">Sprint 3 — Final Mix</span><span class="badge active">active</span><span class="meta">24 pts</span></div>
+        <div class="list-row"><span style="color:var(--text-muted)">●</span><span class="title">Sprint 2 — Revisions</span><span class="badge completed">completed</span><span class="meta">18 pts</span></div>
+        <div class="list-row"><span style="color:var(--brand-secondary)">●</span><span class="title">Sprint 4 — Delivery</span><span class="badge planned">planned</span></div>
+      </div>
+      <div class="card">
+        <h2>Tasks</h2>
+        <div class="list-row"><span class="icon">🐛</span><span class="title">Fix bass frequency clash</span><span class="badge" style="border-color:var(--color-error);color:var(--color-error)">high</span><span class="badge active">in progress</span></div>
+        <div class="list-row"><span class="icon">✨</span><span class="title">Add reverb to bridge</span><span class="badge" style="border-color:var(--color-warning);color:var(--color-warning)">medium</span><span class="badge planned">todo</span></div>
+        <div class="list-row"><span class="icon">📌</span><span class="title">Update track metadata</span><span class="badge" style="border-color:var(--text-muted);color:var(--text-muted)">low</span><span class="badge completed">done</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+</body></html>
+    </div>
+  </foreignObject>
+</svg>

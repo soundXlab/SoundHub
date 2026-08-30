@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SoundHub — Kettle (Newbie Corner)</title>
+<link rel="stylesheet" href="design-system/shared.css">
+<style>
+  body { margin: 0; background: var(--bg-primary); color: var(--text-primary); font-family: 'Inter', system-ui, sans-serif; }
+  .hero { text-align: center; padding: 80px 20px 60px; background: var(--bg-panel); }
+  .kettle-icon { width: 110px; height: 110px; border-radius: 55px; background: var(--bg-surface); border: 1px solid var(--border-default); display: inline-flex; align-items: center; justify-content: center; font-size: 48px; margin-bottom: 20px; }
+  .eyebrow { font-size: 14px; font-weight: 600; color: var(--brand-accent); margin-bottom: 12px; }
+  .hero h1 { font-size: 36px; font-weight: 800; margin: 0 0 12px; line-height: 1.2; }
+  .hero p { font-size: 14px; color: var(--text-secondary); max-width: 500px; margin: 0 auto 24px; }
+  .cta { display: flex; gap: 12px; justify-content: center; }
+  .btn { padding: 12px 24px; border-radius: 6px; font-size: 13px; font-weight: 600; text-decoration: none; cursor: pointer; border: none; }
+  .btn-primary { background: var(--brand-primary); color: white; }
+  .btn-ghost { background: transparent; color: var(--text-secondary); border: 1px solid var(--border-default); }
+  .section { max-width: 1200px; margin: 0 auto; padding: 60px 20px; }
+  .section .eyebrow { text-align: center; }
+  .section h2 { text-align: center; font-size: 28px; font-weight: 800; margin: 0 0 32px; }
+  .steps { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
+  .step { background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: 12px; padding: 20px; }
+  .step-num { width: 32px; height: 32px; border-radius: 16px; background: var(--brand-primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; margin-bottom: 12px; }
+  .step h3 { font-size: 14px; font-weight: 600; margin: 0 0 8px; }
+  .step p { font-size: 12px; color: var(--text-secondary); margin: 0; line-height: 1.5; }
+  .banner { background: rgba(234,179,8,0.08); border: 1px solid rgba(234,179,8,0.2); border-radius: 8px; padding: 16px; margin-top: 24px; display: flex; gap: 12px; align-items: flex-start; }
+  .banner-icon { font-size: 20px; }
+  .banner p { font-size: 13px; color: var(--text-secondary); margin: 0; }
+  .glossary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .term { padding: 0; }
+  .term h3 { font-size: 14px; font-weight: 600; color: var(--brand-primary); margin: 0 0 6px; }
+  .term p { font-size: 12px; color: var(--text-secondary); margin: 0; line-height: 1.5; }
+  .faq { max-width: 700px; margin: 0 auto; }
+  .faq-item { border-bottom: 1px solid var(--border-default); padding: 16px 0; }
+  .faq-item summary { font-size: 14px; font-weight: 600; cursor: pointer; list-style: none; }
+  .faq-item p { font-size: 13px; color: var(--text-secondary); margin: 8px 0 0; line-height: 1.5; }
+  .footer { text-align: center; padding: 60px 20px; background: var(--bg-panel); }
+  .footer h2 { font-size: 24px; font-weight: 800; }
+  .footer p { font-size: 13px; color: var(--text-secondary); }
+</style>
+</head>
+<body>
+<div class="hero">
+  <div class="kettle-icon">🫖</div>
+  <div class="eyebrow">Kettle — the newbie corner</div>
+  <h1>Music review &amp; approvals,<br>explained like you're new.</h1>
+  <p>The whole SoundHub loop in plain words — what everything means, what each button does.</p>
+  <div class="cta">
+    <a href="#steps" class="btn btn-primary">Show me how it works</a>
+    <a href="#" class="btn btn-ghost">Skip to the demo</a>
+  </div>
+</div>
+
+<div class="section" id="steps">
+  <div class="eyebrow">The loop, step by step</div>
+  <h2>Your first review session in 5 steps</h2>
+  <div class="steps">
+    <div class="step"><div class="step-num">1</div><h3>Upload a version</h3><p>One audio file — your mix, a demo, a take. SoundHub calls it v1, v2, v3…</p></div>
+    <div class="step"><div class="step-num">2</div><h3>Share the private link</h3><p>Send it to your client. They don't need an account — just open and listen.</p></div>
+    <div class="step"><div class="step-num">3</div><h3>Comments pinned to moments</h3><p>"01:24 — bass masks the vocal" lands exactly at 01:24.</p></div>
+    <div class="step"><div class="step-num">4</div><h3>Fix, upload next version</h3><p>A/B the two versions to prove the fix — level-matched.</p></div>
+    <div class="step"><div class="step-num">5</div><h3>Approve and deliver</h3><p>Lock the final package. Client gets a delivery link with checksummed files.</p></div>
+  </div>
+  <div class="banner">
+    <div class="banner-icon">💡</div>
+    <p><strong>The golden rule:</strong> one version at a time, one consolidated list of feedback per round. That's the whole trick.</p>
+  </div>
+</div>
+
+<div class="section" id="glossary">
+  <div class="eyebrow">The glossary</div>
+  <h2>Every word, translated</h2>
+  <div class="glossary">
+    <div class="term"><h3>Bounce</h3><p>Exporting audio out of your DAW into a file. The thing you upload as a version.</p></div>
+    <div class="term"><h3>Version</h3><p>One exported audio file in a session. v1, v2, v13 — every bounce keeps its own history.</p></div>
+    <div class="term"><h3>Master</h3><p>The final, finished mix of a track — the one that goes to the label.</p></div>
+    <div class="term"><h3>Stems</h3><p>Submixes: drums, bass, vocals, synths, each in its own file.</p></div>
+    <div class="term"><h3>LUFS</h3><p>A measure of how loud a track feels. SoundHub level-matches before A/B.</p></div>
+    <div class="term"><h3>A/B compare</h3><p>Two versions back to back from the same moment. Great for proving "it's better now".</p></div>
+    <div class="term"><h3>Revision round</h3><p>One complete cycle of feedback → fixes. Rounds keep revisions controlled.</p></div>
+    <div class="term"><h3>Approval</h3><p>An explicit thumbs-up recorded against a version and a scope.</p></div>
+    <div class="term"><h3>Release package</h3><p>Locked final deliverables with checksums. Immutable.</p></div>
+  </div>
+</div>
+
+<div class="section" id="faq">
+  <div class="eyebrow">Still curious?</div>
+  <h2>Questions you might actually have</h2>
+  <div class="faq">
+    <details class="faq-item" open><summary>Do I need a DAW to use SoundHub?</summary><p>No. Uploading audio and reviewing works from any browser. DAW integrations are extras.</p></details>
+    <details class="faq-item" open><summary>Does the reviewer need an account?</summary><p>No. Reviewers open the private link, type their name, and leave comments. That's it.</p></details>
+    <details class="faq-item" open><summary>What does "watermarked preview" mean?</summary><p>Until approved, guests hear audio with a soft beep. Keeps demos from leaking as "the final file".</p></details>
+  </div>
+</div>
+
+<div class="footer">
+  <h2>Ready to stop emailing audio files?</h2>
+  <p>Create a session, upload a bounce, and see the loop yourself.</p>
+  <div class="cta" style="margin-top:20px"><a href="#" class="btn btn-primary">Try the demo session →</a></div>
+</div>
+</body>
+</html>

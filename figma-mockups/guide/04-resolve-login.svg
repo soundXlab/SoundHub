@@ -1,0 +1,114 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 900" width="1400" height="900">
+  <rect width="1400" height="900" fill="#18181B"/>
+  
+  <!-- Title -->
+  <text x="40" y="35" font-family="Inter, sans-serif" font-size="20" font-weight="700" fill="#E4E4E7">SoundHub — Login (DaVinci Resolve 21 Style)</text>
+  
+  <!-- Main Container -->
+  <rect x="40" y="50" width="1320" height="780" rx="4" fill="#1E1E22" stroke="#3F3F46" stroke-width="1"/>
+  
+  <!-- Menu Bar -->
+  <rect x="40" y="50" width="1320" height="32" fill="#252528"/>
+  <text x="60" y="72" font-family="Inter, sans-serif" font-size="11" fill="#A1A1AA">File</text>
+  <text x="100" y="72" font-family="Inter, sans-serif" font-size="11" fill="#A1A1AA">Edit</text>
+  <text x="140" y="72" font-family="Inter, sans-serif" font-size="11" fill="#A1A1AA">View</text>
+  <text x="180" y="72" font-family="Inter, sans-serif" font-size="11" fill="#A1A1AA">Tools</text>
+  <text x="220" y="72" font-family="Inter, sans-serif" font-size="11" fill="#A1A1AA">Help</text>
+  <text x="1280" y="72" font-family="Inter, sans-serif" font-size="11" fill="#71717A">⬡ SoundHub v1.0</text>
+  
+  <!-- Top Toolbar -->
+  <rect x="40" y="82" width="1320" height="40" fill="#2A2A2E"/>
+  <text x="60" y="107" font-family="Inter, sans-serif" font-size="12" fill="#E4E4E7">⬡ SoundHub</text>
+  <rect x="200" y="90" width="300" height="24" rx="4" fill="#18181B" stroke="#3F3F46" stroke-width="1"/>
+  <text x="220" y="107" font-family="Inter, sans-serif" font-size="11" fill="#52525B">🔍 Search...</text>
+  <text x="1200" y="107" font-family="Inter, sans-serif" font-size="11" fill="#71717A">00:00:00:00</text>
+  <text x="1300" y="107" font-family="Inter, sans-serif" font-size="11" fill="#E74C3C">●</text>
+  
+  <!-- Login Panel -->
+  <rect x="400" y="180" width="600" height="520" rx="4" fill="#252528" stroke="#3F3F46" stroke-width="1"/>
+  
+  <!-- Panel Header -->
+  <rect x="400" y="180" width="600" height="32" fill="#2A2A2E"/>
+  <text x="420" y="202" font-family="Inter, sans-serif" font-size="11" font-weight="600" fill="#A1A1AA">SIGN IN</text>
+  
+  <!-- Logo -->
+  <text x="700" y="260" text-anchor="middle" font-family="Inter, sans-serif" font-size="32" font-weight="900" fill="#E74C3C">⬡ SoundHub</text>
+  <text x="700" y="285" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#71717A">Professional Sound Marketplace</text>
+  
+  <!-- Tabs -->
+  <rect x="420" y="310" width="280" height="36" rx="4" fill="#E74C3C"/>
+  <text x="560" y="333" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#FFFFFF">Sign In</text>
+  <rect x="700" y="310" width="280" height="36" rx="4" fill="#3F3F46"/>
+  <text x="840" y="333" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#71717A">Register</text>
+  
+  <!-- Username -->
+  <text x="440" y="375" font-family="Inter, sans-serif" font-size="11" font-weight="600" fill="#A1A1AA">USERNAME</text>
+  <rect x="440" y="385" width="520" height="36" rx="4" fill="#18181B" stroke="#3F3F46" stroke-width="1"/>
+  <text x="460" y="408" font-family="Inter, sans-serif" font-size="12" fill="#52525B">demo</text>
+  
+  <!-- Password -->
+  <text x="440" y="445" font-family="Inter, sans-serif" font-size="11" font-weight="600" fill="#A1A1AA">PASSWORD</text>
+  <rect x="440" y="455" width="520" height="36" rx="4" fill="#18181B" stroke="#3F3F46" stroke-width="1"/>
+  <text x="460" y="478" font-family="Inter, sans-serif" font-size="12" fill="#52525B">••••••••</text>
+  <text x="940" y="478" font-family="Inter, sans-serif" font-size="11" fill="#E74C3C">Show</text>
+  
+  <!-- Sign In Button -->
+  <rect x="440" y="510" width="520" height="40" rx="4" fill="#E74C3C"/>
+  <text x="700" y="535" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#FFFFFF">SIGN IN</text>
+  
+  <!-- Divider -->
+  <line x1="440" y1="575" x2="600" y2="575" stroke="#3F3F46" stroke-width="1"/>
+  <text x="700" y="580" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#52525B">OR</text>
+  <line x1="800" y1="575" x2="960" y2="575" stroke="#3F3F46" stroke-width="1"/>
+  
+  <!-- MetaMask -->
+  <rect x="440" y="595" width="520" height="40" rx="4" fill="#18181B" stroke="#F6851B" stroke-width="2"/>
+  <text x="700" y="620" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#F6851B">🦊 SIGN IN WITH WALLET</text>
+  
+  <!-- Footer -->
+  <text x="700" y="665" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#52525B">Need an account? Register</text>
+  
+  <!-- Bottom Toolbar (DaVinci Style) -->
+  <rect x="40" y="830" width="1320" height="50" fill="#252528"/>
+  
+  <!-- Transport Controls -->
+  <rect x="60" y="840" width="32" height="32" rx="4" fill="#3F3F46"/>
+  <text x="76" y="861" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#A1A1AA">⏮</text>
+  <rect x="100" y="840" width="32" height="32" rx="4" fill="#22C55E"/>
+  <text x="116" y="861" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#FFFFFF">▶</text>
+  <rect x="140" y="840" width="32" height="32" rx="4" fill="#3F3F46"/>
+  <text x="156" y="861" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#A1A1AA">⏹</text>
+  <rect x="180" y="840" width="32" height="32" rx="4" fill="#E74C3C"/>
+  <text x="196" y="861" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" fill="#FFFFFF">⏺</text>
+  
+  <!-- Timecode -->
+  <text x="240" y="861" font-family="JetBrains Mono, monospace" font-size="14" fill="#E4E4E7">00:00:00:00</text>
+  
+  <!-- Page Icons (DaVinci Style) -->
+  <rect x="500" y="840" width="80" height="32" rx="4" fill="#3F3F46"/>
+  <text x="540" y="861" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#71717A">Media</text>
+  
+  <rect x="590" y="840" width="80" height="32" rx="4" fill="#3F3F46"/>
+  <text x="630" y="861" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#71717A">Cut</text>
+  
+  <rect x="680" y="840" width="80" height="32" rx="4" fill="#E74C3C"/>
+  <text x="720" y="861" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" font-weight="600" fill="#FFFFFF">Edit</text>
+  
+  <rect x="770" y="840" width="80" height="32" rx="4" fill="#3F3F46"/>
+  <text x="810" y="861" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#71717A">Fusion</text>
+  
+  <rect x="860" y="840" width="80" height="32" rx="4" fill="#3F3F46"/>
+  <text x="900" y="861" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#71717A">Color</text>
+  
+  <rect x="950" y="840" width="80" height="32" rx="4" fill="#3F3F46"/>
+  <text x="990" y="861" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#71717A">Fairlight</text>
+  
+  <rect x="1040" y="840" width="80" height="32" rx="4" fill="#3F3F46"/>
+  <text x="1080" y="861" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#71717A">Deliver</text>
+  
+  <!-- Status Bar -->
+  <text x="1200" y="861" font-family="JetBrains Mono, monospace" font-size="10" fill="#52525B">CPU 12% · RAM 1.2 GB</text>
+  
+  <!-- Specs -->
+  <text x="40" y="895" font-family="JetBrains Mono, monospace" font-size="10" fill="#52525B">Colors: #18181B (bg) · #252528 (panel) · #2A2A2E (header) · #3F3F46 (border) · #E74C3C (accent)</text>
+</svg>

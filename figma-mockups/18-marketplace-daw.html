@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <title>SoundHub — Marketplace (DAW Style)</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', -apple-system, sans-serif; background: #0d0d0d; color: #e4e4e7; overflow: hidden; height: 100vh; }
+
+    /* ── Transport Bar ── */
+    .transport-bar {
+      height: 40px; background: #111113; border-bottom: 1px solid #27272a;
+      display: flex; align-items: center; padding: 0 12px; gap: 16px;
+      font-size: 11px; user-select: none;
+    }
+    .transport-logo { font-weight: 800; font-size: 13px; color: #ea5808; letter-spacing: -0.5px; }
+    .transport-logo span { color: #e4e4e7; }
+    .transport-divider { width: 1px; height: 20px; background: #27272a; }
+    .transport-group { display: flex; align-items: center; gap: 6px; }
+    .transport-label { color: #71717a; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .transport-value {
+      background: #0d0d0d; border: 1px solid #27272a; border-radius: 4px;
+      padding: 2px 8px; font-family: 'JetBrains Mono', monospace; font-size: 12px;
+      color: #22c55e; font-weight: 600; min-width: 60px; text-align: center;
+    }
+    .transport-spacer { flex: 1; }
+    .transport-time {
+      font-family: 'JetBrains Mono', monospace; font-size: 18px; font-weight: 700;
+      color: #e4e4e7; letter-spacing: 1px;
+    }
+
+    /* ── Main Layout ── */
+    .app-body { display: flex; height: calc(100vh - 40px); }
+
+    /* ── Left Sidebar ── */
+    .sidebar {
+      width: 240px; background: #111113; border-right: 1px solid #27272a;
+      display: flex; flex-direction: column; user-select: none;
+    }
+    .sidebar-search { padding: 8px; border-bottom: 1px solid #27272a; }
+    .sidebar-search input {
+      width: 100%; background: #0d0d0d; border: 1px solid #27272a; border-radius: 4px;
+      padding: 6px 8px 6px 28px; font-size: 11px; color: #e4e4e7; outline: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: 8px center;
+    }
+    .sidebar-search input::placeholder { color: #52525b; }
+    .sidebar-nav { flex: 1; overflow-y: auto; padding: 4px 0; }
+    .sidebar-section { padding: 8px 12px 4px; font-size: 9px; color: #52525b; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+    .sidebar-item {
+      padding: 6px 12px; font-size: 11px; font-weight: 500; color: #a1a1aa;
+      cursor: pointer; display: flex; align-items: center; gap: 8px;
+      border-left: 2px solid transparent; transition: all 0.1s;
+    }
+    .sidebar-item:hover { color: #e4e4e7; }
+    .sidebar-item.active { color: #ea5808; background: rgba(234,88,8,0.08); border-left-color: #ea5808; }
+    .sidebar-item .icon { width: 16px; text-align: center; }
+
+    /* ── Content Area ── */
+    .content { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
+
+    /* ── Header ── */
+    .page-header {
+      padding: 16px 24px; border-bottom: 1px solid #27272a;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .page-title { font-size: 18px; font-weight: 700; color: #e4e4e7; }
+    .page-title span { color: #71717a; font-weight: 400; font-size: 14px; margin-left: 8px; }
+    .header-actions { display: flex; gap: 8px; }
+    .btn {
+      padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 600;
+      cursor: pointer; border: 1px solid #27272a; transition: all 0.15s;
+    }
+    .btn-primary { background: #ea5808; color: #fff; border-color: #ea5808; }
+    .btn-primary:hover { background: #c2410c; }
+    .btn-secondary { background: #1a1a1a; color: #e4e4e7; }
+    .btn-secondary:hover { background: #27272a; }
+    .btn-ghost { background: transparent; color: #71717a; border-color: transparent; }
+    .btn-ghost:hover { color: #e4e4e7; background: #1a1a1a; }
+
+    /* ── Filter Tabs ── */
+    .filter-tabs {
+      display: flex; gap: 0; border-bottom: 1px solid #27272a; padding: 0 24px;
+      background: #111113;
+    }
+    .filter-tab {
+      padding: 10px 16px; font-size: 12px; font-weight: 500; color: #71717a;
+      cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.1s;
+    }
+    .filter-tab:hover { color: #e4e4e7; }
+    .filter-tab.active { color: #ea5808; border-bottom-color: #ea5808; }
+    .filter-tab .count {
+      background: #27272a; color: #a1a1aa; font-size: 10px; padding: 1px 6px;
+      border-radius: 10px; margin-left: 4px;
+    }
+    .filter-tab.active .count { background: rgba(234,88,8,0.2); color: #ea5808; }
+
+    /* ── Search & Filters ── */
+    .search-bar {
+      display: flex; gap: 12px; padding: 16px 24px; border-bottom: 1px solid #27272a;
+      align-items: center;
+    }
+    .search-input {
+      flex: 1; background: #0d0d0d; border: 1px solid #27272a; border-radius: 6px;
+      padding: 8px 12px 8px 32px; font-size: 12px; color: #e4e4e7; outline: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: 10px center;
+    }
+    .search-input::placeholder { color: #52525b; }
+    .filter-chip {
+      display: flex; align-items: center; gap: 6px;
+      padding: 6px 12px; background: #1a1a1a; border: 1px solid #27272a;
+      border-radius: 20px; font-size: 11px; font-weight: 500; color: #a1a1aa;
+      cursor: pointer; transition: all 0.1s; white-space: nowrap;
+    }
+    .filter-chip:hover { border-color: #3f3f46; color: #e4e4e7; }
+    .filter-chip.active { background: rgba(234,88,8,0.12); border-color: #ea5808; color: #ea5808; }
+    .filter-chip .remove { font-size: 12px; opacity: 0.6; }
+
+    /* ── Sort Bar ── */
+    .sort-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 24px; border-bottom: 1px solid #27272a;
+    }
+    .sort-left { display: flex; align-items: center; gap: 12px; }
+    .sort-left span { font-size: 12px; color: #71717a; }
+    .sort-left strong { color: #e4e4e7; }
+    .sort-right { display: flex; gap: 8px; }
+    .view-btn {
+      width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
+      background: #1a1a1a; border: 1px solid #27272a; border-radius: 4px;
+      font-size: 12px; color: #71717a; cursor: pointer;
+    }
+    .view-btn.active { background: #ea5808; color: #fff; border-color: #ea5808; }
+
+    /* ── Asset Grid ── */
+    .asset-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 12px; padding: 16px 24px; overflow-y: auto; flex: 1;
+    }
+    .asset-card {
+      background: #111113; border: 1px solid #27272a; border-radius: 8px;
+      overflow: hidden; cursor: pointer; transition: all 0.15s;
+    }
+    .asset-card:hover { border-color: #3f3f46; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+    .asset-card:hover .play-overlay { opacity: 1; }
+    .waveform-area {
+      height: 80px; position: relative; display: flex; align-items: flex-end;
+      padding: 0 12px 12px; gap: 2px;
+    }
+    .wave-bar {
+      flex: 1; border-radius: 1px; transition: opacity 0.1s;
+    }
+    .play-overlay {
+      position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+      background: rgba(0,0,0,0.5); opacity: 0; transition: opacity 0.15s;
+    }
+    .play-btn {
+      width: 36px; height: 36px; background: #ea5808; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 14px; box-shadow: 0 2px 8px rgba(234,88,8,0.4);
+    }
+    .card-body { padding: 12px; }
+    .card-title {
+      font-size: 12px; font-weight: 600; color: #e4e4e7;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .card-meta {
+      font-size: 10px; color: #71717a; margin-top: 4px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .card-tags { display: flex; gap: 4px; margin-top: 8px; flex-wrap: wrap; }
+    .tag {
+      padding: 2px 6px; background: #1a1a1a; border: 1px solid #27272a;
+      border-radius: 3px; font-size: 9px; color: #a1a1aa;
+    }
+    .tag.primary { background: rgba(234,88,8,0.12); border-color: rgba(234,88,8,0.3); color: #ea5808; }
+    .card-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-top: 8px; padding-top: 8px; border-top: 1px solid #27272a;
+    }
+    .card-price {
+      font-size: 14px; font-weight: 700; color: #22c55e;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .card-price.free { color: #3b82f6; }
+    .card-price.premium { color: #eab308; }
+    .card-rating { font-size: 10px; color: #71717a; }
+    .card-rating .star { color: #eab308; }
+    .card-format {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 2px 6px; background: #0d0d0d; border-radius: 3px;
+      font-size: 9px; color: #52525b; font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* ── Right Panel ── */
+    .right-panel {
+      width: 260px; background: #111113; border-left: 1px solid #27272a;
+      display: flex; flex-direction: column; user-select: none;
+    }
+    .panel-section { padding: 12px; border-bottom: 1px solid #27272a; }
+    .panel-section-title {
+      font-size: 9px; color: #52525b; text-transform: uppercase;
+      letter-spacing: 1px; font-weight: 700; margin-bottom: 8px;
+    }
+    .panel-item {
+      display: flex; align-items: center; gap: 8px; padding: 6px 0;
+      font-size: 11px; color: #a1a1aa; cursor: pointer;
+    }
+    .panel-item:hover { color: #e4e4e7; }
+    .panel-item .dot {
+      width: 6px; height: 6px; border-radius: 50%;
+    }
+    .panel-stat {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 4px 0; font-size: 11px;
+    }
+    .panel-stat-label { color: #71717a; }
+    .panel-stat-value { color: #e4e4e7; font-family: 'JetBrains Mono', monospace; font-weight: 600; }
+
+    /* ── Device Chain (Bottom) ── */
+    .device-chain {
+      height: 60px; background: #111113; border-top: 1px solid #27272a;
+      display: flex; align-items: center; padding: 0 16px; gap: 8px;
+    }
+    .device {
+      padding: 6px 12px; background: #0d0d0d; border: 1px solid #27272a;
+      border-radius: 4px; font-size: 10px; color: #a1a1aa;
+      display: flex; align-items: center; gap: 6px; cursor: pointer;
+      transition: all 0.1s;
+    }
+    .device:hover { border-color: #3f3f46; color: #e4e4e7; }
+    .device.active { border-color: #ea5808; color: #ea5808; background: rgba(234,88,8,0.08); }
+    .device .led { width: 6px; height: 6px; border-radius: 50%; background: #27272a; }
+    .device.active .led { background: #22c55e; box-shadow: 0 0 6px rgba(34,197,94,0.5); }
+    .device-chain-spacer { flex: 1; }
+    .device-chain-label {
+      font-size: 9px; color: #52525b; text-transform: uppercase;
+      letter-spacing: 0.5px; font-weight: 700;
+    }
+
+    /* ── Featured Banner ── */
+    .featured-banner {
+      margin: 0 24px 0; padding: 16px; background: linear-gradient(135deg, rgba(234,88,8,0.15), rgba(6,182,212,0.1));
+      border: 1px solid rgba(234,88,8,0.3); border-radius: 8px;
+      display: flex; align-items: center; gap: 16px;
+    }
+    .featured-icon {
+      width: 48px; height: 48px; background: rgba(234,88,8,0.2); border-radius: 8px;
+      display: flex; align-items: center; justify-content: center; font-size: 24px;
+    }
+    .featured-info { flex: 1; }
+    .featured-title { font-size: 14px; font-weight: 700; color: #e4e4e7; }
+    .featured-desc { font-size: 11px; color: #71717a; margin-top: 2px; }
+    .featured-badge {
+      padding: 4px 10px; background: rgba(34,197,94,0.12); border: 1px solid rgba(34,197,94,0.3);
+      border-radius: 4px; font-size: 10px; color: #22c55e; font-weight: 600;
+    }
+
+    /* ── Quick Stats ── */
+    .quick-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+    .stat-box {
+      padding: 8px; background: #0d0d0d; border: 1px solid #27272a; border-radius: 4px;
+      text-align: center;
+    }
+    .stat-value { font-size: 16px; font-weight: 700; color: #e4e4e7; font-family: 'JetBrains Mono', monospace; }
+    .stat-label { font-size: 9px; color: #71717a; margin-top: 2px; }
+  </style>
+</head>
+<body>
+  <!-- Transport Bar -->
+  <div class="transport-bar">
+    <div class="transport-logo">Sound<span>Hub</span></div>
+    <div class="transport-divider"></div>
+    <div class="transport-group">
+      <span class="transport-label">Assets</span>
+      <div class="transport-value">256</div>
+    </div>
+    <div class="transport-group">
+      <span class="transport-label">Creators</span>
+      <div class="transport-value">48</div>
+    </div>
+    <div class="transport-group">
+      <span class="transport-label">Downloads</span>
+      <div class="transport-value">12.4K</div>
+    </div>
+    <div class="transport-spacer"></div>
+    <div class="transport-time">MARKETPLACE</div>
+    <div class="transport-divider"></div>
+    <div class="transport-group">
+      <span class="transport-label">Cart</span>
+      <div class="transport-value">3</div>
+    </div>
+  </div>
+
+  <div class="app-body">
+    <!-- Left Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-search">
+        <input type="text" placeholder="Search projects...">
+      </div>
+      <div class="sidebar-nav">
+        <div class="sidebar-section">Main</div>
+        <div class="sidebar-item"><span class="icon">📊</span> Dashboard</div>
+        <div class="sidebar-item"><span class="icon">📁</span> Projects</div>
+        <div class="sidebar-item active"><span class="icon">🛒</span> Marketplace</div>
+        <div class="sidebar-item"><span class="icon">⬆️</span> Upload</div>
+        <div class="sidebar-section">Workspace</div>
+        <div class="sidebar-item"><span class="icon">💬</span> Reviews</div>
+        <div class="sidebar-item"><span class="icon">📋</span> Sessions</div>
+        <div class="sidebar-item"><span class="icon">🔔</span> Notifications <span style="margin-left:auto;background:#ea5808;color:#fff;font-size:9px;padding:1px 5px;border-radius:8px">3</span></div>
+        <div class="sidebar-section">Account</div>
+        <div class="sidebar-item"><span class="icon">⚙️</span> Settings</div>
+        <div class="sidebar-item"><span class="icon">📊</span> Analytics</div>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+      <!-- Page Header -->
+      <div class="page-header">
+        <div class="page-title">Marketplace <span>256 assets</span></div>
+        <div class="header-actions">
+          <button class="btn btn-ghost">📋 My Purchases</button>
+          <button class="btn btn-ghost">❤️ Wishlist</button>
+          <button class="btn btn-primary">+ Upload Asset</button>
+        </div>
+      </div>
+
+      <!-- Filter Tabs -->
+      <div class="filter-tabs">
+        <div class="filter-tab active">All <span class="count">256</span></div>
+        <div class="filter-tab">Loops <span class="count">89</span></div>
+        <div class="filter-tab">One-Shots <span class="count">64</span></div>
+        <div class="filter-tab">Presets <span class="count">45</span></div>
+        <div class="filter-tab">Project Files <span class="count">32</span></div>
+        <div class="filter-tab">Stems <span class="count">26</span></div>
+      </div>
+
+      <!-- Search & Filters -->
+      <div class="search-bar">
+        <input class="search-input" type="text" placeholder="Search by name, genre, BPM, key...">
+        <div class="filter-chip active">All Genres</div>
+        <div class="filter-chip">BPM ▾</div>
+        <div class="filter-chip">Key ▾</div>
+        <div class="filter-chip">Format ▾</div>
+        <div class="filter-chip">Price ▾</div>
+      </div>
+
+      <!-- Sort Bar -->
+      <div class="sort-bar">
+        <div class="sort-left">
+          <span>Showing</span> <strong>256</strong> <span>results</span>
+          <span style="margin-left:8px">Sort:</span>
+          <strong>Popular ▾</strong>
+        </div>
+        <div class="sort-right">
+          <div class="view-btn active">▦</div>
+          <div class="view-btn">☰</div>
+        </div>
+      </div>
+
+      <!-- Featured Banner -->
+      <div style="padding: 16px 24px 0">
+        <div class="featured-banner">
+          <div class="featured-icon">🔥</div>
+          <div class="featured-info">
+            <div class="featured-title">Summer Drums — Premium Sample Pack</div>
+            <div class="featured-desc">200+ acoustic drum loops, one-shots, and MIDI. 24-bit WAV, 90-160 BPM.</div>
+          </div>
+          <div class="featured-badge">TRENDING</div>
+          <button class="btn btn-primary" style="margin-left:8px">View Pack</button>
+        </div>
+      </div>
+
+      <!-- Asset Grid -->
+      <div class="asset-grid">
+        <!-- Card 1 -->
+        <div class="asset-card">
+          <div class="waveform-area" style="background:linear-gradient(135deg, rgba(234,88,8,0.15), rgba(6,182,212,0.1))">
+            <div class="wave-bar" style="height:60%;background:#ea5808"></div>
+            <div class="wave-bar" style="height:80%;background:#ea5808"></div>
+            <div class="wave-bar" style="height:45%;background:#ea5808"></div>
+            <div class="wave-bar" style="height:90%;background:#ea5808"></div>
+            <div class="wave-bar" style="height:70%;background:#ea5808"></div>
+            <div class="wave-bar" style="height:55%;background:#ea5808"></div>
+            <div class="wave-bar" style="height:85%;background:#ea5808"></div>
+            <div class="wave-bar" style="height:40%;background:#ea5808"></div>
+            <div class="wave-bar" style="height:75%;background:#ea5808"></div>
+            <div class="wave-bar" style="height:65%;background:#ea5808"></div>
+            <div class="wave-bar" style="height:50%;background:#ea5808"></div>
+            <div class="wave-bar" style="height:80%;background:#ea5808"></div>
+            <div class="wave-bar" style="height:35%;background:#ea5808"></div>
+            <div class="wave-bar" style="height:90%;background:#ea5808"></div>
+            <div class="wave-bar" style="height:60%;background:#ea5808"></div>
+            <div class="wave-bar" style="height:70%;background:#ea5808"></div>
+            <div class="play-overlay"><div class="play-btn">▶</div></div>
+          </div>
+          <div class="card-body">
+            <div class="card-title">Lo-Fi Drums Pack</div>
+            <div class="card-meta">
+              <span>by @producer1</span>
+              <span class="card-format">WAV 24bit</span>
+            </div>
+            <div class="card-tags">
+              <span class="tag primary">lo-fi</span>
+              <span class="tag">drums</span>
+              <span class="tag">chill</span>
+            </div>
+            <div class="card-footer">
+              <div class="card-price free">Free</div>
+              <div class="card-rating"><span class="star">★</span> 4.8 (124)</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="asset-card">
+          <div class="waveform-area" style="background:linear-gradient(135deg, rgba(6,182,212,0.15), rgba(34,197,94,0.1))">
+            <div class="wave-bar" style="height:30%;background:#06b6d4"></div>
+            <div class="wave-bar" style="height:50%;background:#06b6d4"></div>
+            <div class="wave-bar" style="height:70%;background:#06b6d4"></div>
+            <div class="wave-bar" style="height:45%;background:#06b6d4"></div>
+            <div class="wave-bar" style="height:80%;background:#06b6d4"></div>
+            <div class="wave-bar" style="height:55%;background:#06b6d4"></div>
+            <div class="wave-bar" style="height:65%;background:#06b6d4"></div>
+            <div class="wave-bar" style="height:40%;background:#06b6d4"></div>
+            <div class="wave-bar" style="height:75%;background:#06b6d4"></div>
+            <div class="wave-bar" style="height:35%;background:#06b6d4"></div>
+            <div class="wave-bar" style="height:60%;background:#06b6d4"></div>
+            <div class="wave-bar" style="height:50%;background:#06b6d4"></div>
+            <div class="wave-bar" style="height:45%;background:#06b6d4"></div>
+            <div class="wave-bar" style="height:55%;background:#06b6d4"></div>
+            <div class="wave-bar" style="height:70%;background:#06b6d4"></div>
+            <div class="wave-bar" style="height:40%;background:#06b6d4"></div>
+            <div class="play-overlay"><div class="play-btn">▶</div></div>
+          </div>
+          <div class="card-body">
+            <div class="card-title">Ambient Pad Textures</div>
+            <div class="card-meta">
+              <span>by @soundartist</span>
+              <span class="card-format">WAV 16bit</span>
+            </div>
+            <div class="card-tags">
+              <span class="tag primary">ambient</span>
+              <span class="tag">pads</span>
+              <span class="tag">texture</span>
+            </div>
+            <div class="card-footer">
+              <div class="card-price">$4.99</div>
+              <div class="card-rating"><span class="star">★</span> 4.6 (87)</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="asset-card">
+          <div class="waveform-area" style="background:linear-gradient(135deg, rgba(239,68,68,0.15), rgba(234,179,8,0.1))">
+            <div class="wave-bar" style="height:90%;background:#ef4444"></div>
+            <div class="wave-bar" style="height:95%;background:#ef4444"></div>
+            <div class="wave-bar" style="height:85%;background:#ef4444"></div>
+            <div class="wave-bar" style="height:100%;background:#ef4444"></div>
+            <div class="wave-bar" style="height:80%;background:#ef4444"></div>
+            <div class="wave-bar" style="height:95%;background:#ef4444"></div>
+            <div class="wave-bar" style="height:90%;background:#ef4444"></div>
+            <div class="wave-bar" style="height:100%;background:#ef4444"></div>
+            <div class="wave-bar" style="height:85%;background:#ef4444"></div>
+            <div class="wave-bar" style="height:90%;background:#ef4444"></div>
+            <div class="wave-bar" style="height:95%;background:#ef4444"></div>
+            <div class="wave-bar" style="height:100%;background:#ef4444"></div>
+            <div class="wave-bar" style="height:88%;background:#ef4444"></div>
+            <div class="wave-bar" style="height:92%;background:#ef4444"></div>
+            <div class="wave-bar" style="height:97%;background:#ef4444"></div>
+            <div class="wave-bar" style="height:85%;background:#ef4444"></div>
+            <div class="play-overlay"><div class="play-btn">▶</div></div>
+          </div>
+          <div class="card-body">
+            <div class="card-title">808 Bass Kit</div>
+            <div class="card-meta">
+              <span>by @beatmaker</span>
+              <span class="card-format">WAV 32bit</span>
+            </div>
+            <div class="card-tags">
+              <span class="tag primary">808</span>
+              <span class="tag">bass</span>
+              <span class="tag">trap</span>
+            </div>
+            <div class="card-footer">
+              <div class="card-price premium">$9.99</div>
+              <div class="card-rating"><span class="star">★</span> 4.9 (203)</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 4 -->
+        <div class="asset-card">
+          <div class="waveform-area" style="background:linear-gradient(135deg, rgba(234,179,8,0.15), rgba(234,88,8,0.1))">
+            <div class="wave-bar" style="height:50%;background:#eab308"></div>
+            <div class="wave-bar" style="height:70%;background:#eab308"></div>
+            <div class="wave-bar" style="height:40%;background:#eab308"></div>
+            <div class="wave-bar" style="height:60%;background:#eab308"></div>
+            <div class="wave-bar" style="height:80%;background:#eab308"></div>
+            <div class="wave-bar" style="height:55%;background:#eab308"></div>
+            <div class="wave-bar" style="height:65%;background:#eab308"></div>
+            <div class="wave-bar" style="height:45%;background:#eab308"></div>
+            <div class="wave-bar" style="height:75%;background:#eab308"></div>
+            <div class="wave-bar" style="height:50%;background:#eab308"></div>
+            <div class="wave-bar" style="height:60%;background:#eab308"></div>
+            <div class="wave-bar" style="height:70%;background:#eab308"></div>
+            <div class="wave-bar" style="height:55%;background:#eab308"></div>
+            <div class="wave-bar" style="height:65%;background:#eab308"></div>
+            <div class="wave-bar" style="height:50%;background:#eab308"></div>
+            <div class="wave-bar" style="height:60%;background:#eab308"></div>
+            <div class="play-overlay"><div class="play-btn">▶</div></div>
+          </div>
+          <div class="card-body">
+            <div class="card-title">Vinyl Classics Vol.2</div>
+            <div class="card-meta">
+              <span>by @Zero-G</span>
+              <span class="card-format">ALP 24bit</span>
+            </div>
+            <div class="card-tags">
+              <span class="tag primary">electronic</span>
+              <span class="tag">vinyl</span>
+            </div>
+            <div class="card-footer">
+              <div class="card-price premium">$29.99</div>
+              <div class="card-rating"><span class="star">★</span> 4.7 (64)</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 5 -->
+        <div class="asset-card">
+          <div class="waveform-area" style="background:linear-gradient(135deg, rgba(34,197,94,0.15), rgba(6,182,212,0.1))">
+            <div class="wave-bar" style="height:40%;background:#22c55e"></div>
+            <div class="wave-bar" style="height:55%;background:#22c55e"></div>
+            <div class="wave-bar" style="height:65%;background:#22c55e"></div>
+            <div class="wave-bar" style="height:50%;background:#22c55e"></div>
+            <div class="wave-bar" style="height:75%;background:#22c55e"></div>
+            <div class="wave-bar" style="height:60%;background:#22c55e"></div>
+            <div class="wave-bar" style="height:45%;background:#22c55e"></div>
+            <div class="wave-bar" style="height:70%;background:#22c55e"></div>
+            <div class="wave-bar" style="height:55%;background:#22c55e"></div>
+            <div class="wave-bar" style="height:50%;background:#22c55e"></div>
+            <div class="wave-bar" style="height:60%;background:#22c55e"></div>
+            <div class="wave-bar" style="height:45%;background:#22c55e"></div>
+            <div class="wave-bar" style="height:55%;background:#22c55e"></div>
+            <div class="wave-bar" style="height:65%;background:#22c55e"></div>
+            <div class="wave-bar" style="height:50%;background:#22c55e"></div>
+            <div class="wave-bar" style="height:60%;background:#22c55e"></div>
+            <div class="play-overlay"><div class="play-btn">▶</div></div>
+          </div>
+          <div class="card-body">
+            <div class="card-title">Organic Percussion</div>
+            <div class="card-meta">
+              <span>by @worldsounds</span>
+              <span class="card-format">FLAC 24bit</span>
+            </div>
+            <div class="card-tags">
+              <span class="tag primary">organic</span>
+              <span class="tag">percussion</span>
+            </div>
+            <div class="card-footer">
+              <div class="card-price">$7.99</div>
+              <div class="card-rating"><span class="star">★</span> 4.5 (42)</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 6 -->
+        <div class="asset-card">
+          <div class="waveform-area" style="background:linear-gradient(135deg, rgba(234,88,8,0.15), rgba(239,68,68,0.1))">
+            <div class="wave-bar" style="height:70%;background:#a855f7"></div>
+            <div class="wave-bar" style="height:85%;background:#a855f7"></div>
+            <div class="wave-bar" style="height:60%;background:#a855f7"></div>
+            <div class="wave-bar" style="height:95%;background:#a855f7"></div>
+            <div class="wave-bar" style="height:75%;background:#a855f7"></div>
+            <div class="wave-bar" style="height:80%;background:#a855f7"></div>
+            <div class="wave-bar" style="height:65%;background:#a855f7"></div>
+            <div class="wave-bar" style="height:90%;background:#a855f7"></div>
+            <div class="wave-bar" style="height:70%;background:#a855f7"></div>
+            <div class="wave-bar" style="height:85%;background:#a855f7"></div>
+            <div class="wave-bar" style="height:75%;background:#a855f7"></div>
+            <div class="wave-bar" style="height:80%;background:#a855f7"></div>
+            <div class="wave-bar" style="height:65%;background:#a855f7"></div>
+            <div class="wave-bar" style="height:90%;background:#a855f7"></div>
+            <div class="wave-bar" style="height:80%;background:#a855f7"></div>
+            <div class="wave-bar" style="height:75%;background:#a855f7"></div>
+            <div class="play-overlay"><div class="play-btn">▶</div></div>
+          </div>
+          <div class="card-body">
+            <div class="card-title">Grand Piano Studio</div>
+            <div class="card-meta">
+              <span>by @in-house</span>
+              <span class="card-format">ALP 24bit</span>
+            </div>
+            <div class="card-tags">
+              <span class="tag primary">piano</span>
+              <span class="tag">acoustic</span>
+            </div>
+            <div class="card-footer">
+              <div class="card-price free">Free</div>
+              <div class="card-rating"><span class="star">★</span> 4.9 (312)</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 7 -->
+        <div class="asset-card">
+          <div class="waveform-area" style="background:linear-gradient(135deg, rgba(236,72,153,0.15), rgba(234,88,8,0.1))">
+            <div class="wave-bar" style="height:55%;background:#ec4899"></div>
+            <div class="wave-bar" style="height:75%;background:#ec4899"></div>
+            <div class="wave-bar" style="height:45%;background:#ec4899"></div>
+            <div class="wave-bar" style="height:85%;background:#ec4899"></div>
+            <div class="wave-bar" style="height:65%;background:#ec4899"></div>
+            <div class="wave-bar" style="height:70%;background:#ec4899"></div>
+            <div class="wave-bar" style="height:50%;background:#ec4899"></div>
+            <div class="wave-bar" style="height:80%;background:#ec4899"></div>
+            <div class="wave-bar" style="height:60%;background:#ec4899"></div>
+            <div class="wave-bar" style="height:75%;background:#ec4899"></div>
+            <div class="wave-bar" style="height:55%;background:#ec4899"></div>
+            <div class="wave-bar" style="height:70%;background:#ec4899"></div>
+            <div class="wave-bar" style="height:50%;background:#ec4899"></div>
+            <div class="wave-bar" style="height:80%;background:#ec4899"></div>
+            <div class="wave-bar" style="height:65%;background:#ec4899"></div>
+            <div class="wave-bar" style="height:60%;background:#ec4899"></div>
+            <div class="play-overlay"><div class="play-btn">▶</div></div>
+          </div>
+          <div class="card-body">
+            <div class="card-title">Synthwave Dreams</div>
+            <div class="card-meta">
+              <span>by @neonbeats</span>
+              <span class="card-format">WAV 24bit</span>
+            </div>
+            <div class="card-tags">
+              <span class="tag primary">synthwave</span>
+              <span class="tag">retro</span>
+              <span class="tag">synth</span>
+            </div>
+            <div class="card-footer">
+              <div class="card-price">$14.99</div>
+              <div class="card-rating"><span class="star">★</span> 4.7 (156)</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 8 -->
+        <div class="asset-card">
+          <div class="waveform-area" style="background:linear-gradient(135deg, rgba(59,130,246,0.15), rgba(6,182,212,0.1))">
+            <div class="wave-bar" style="height:35%;background:#3b82f6"></div>
+            <div class="wave-bar" style="height:55%;background:#3b82f6"></div>
+            <div class="wave-bar" style="height:75%;background:#3b82f6"></div>
+            <div class="wave-bar" style="height:45%;background:#3b82f6"></div>
+            <div class="wave-bar" style="height:85%;background:#3b82f6"></div>
+            <div class="wave-bar" style="height:60%;background:#3b82f6"></div>
+            <div class="wave-bar" style="height:50%;background:#3b82f6"></div>
+            <div class="wave-bar" style="height:70%;background:#3b82f6"></div>
+            <div class="wave-bar" style="height:40%;background:#3b82f6"></div>
+            <div class="wave-bar" style="height:65%;background:#3b82f6"></div>
+            <div class="wave-bar" style="height:55%;background:#3b82f6"></div>
+            <div class="wave-bar" style="height:75%;background:#3b82f6"></div>
+            <div class="wave-bar" style="height:45%;background:#3b82f6"></div>
+            <div class="wave-bar" style="height:80%;background:#3b82f6"></div>
+            <div class="wave-bar" style="height:60%;background:#3b82f6"></div>
+            <div class="wave-bar" style="height:50%;background:#3b82f6"></div>
+            <div class="play-overlay"><div class="play-btn">▶</div></div>
+          </div>
+          <div class="card-body">
+            <div class="card-title">Chillhop Beats Vol.3</div>
+            <div class="card-meta">
+              <span>by @lofimaster</span>
+              <span class="card-format">WAV 16bit</span>
+            </div>
+            <div class="card-tags">
+              <span class="tag primary">chillhop</span>
+              <span class="tag">lo-fi</span>
+            </div>
+            <div class="card-footer">
+              <div class="card-price free">Free</div>
+              <div class="card-rating"><span class="star">★</span> 4.8 (278)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Device Chain -->
+      <div class="device-chain">
+        <span class="device-chain-label">Processing Chain:</span>
+        <div class="device"><div class="led"></div> QC Check</div>
+        <div class="device active"><div class="led"></div> Loudness</div>
+        <div class="device"><div class="led"></div> A/B Compare</div>
+        <div class="device"><div class="led"></div> Stem Split</div>
+        <div class="device"><div class="led"></div> Release Package</div>
+        <div class="device-chain-spacer"></div>
+        <span class="device-chain-label">Preview:</span>
+        <div class="device active"><div class="led"></div> ▶ Playing: Lo-Fi Drums</div>
+      </div>
+    </div>
+
+    <!-- Right Panel -->
+    <div class="right-panel">
+      <div class="panel-section">
+        <div class="panel-section-title">Quick Stats</div>
+        <div class="quick-stats">
+          <div class="stat-box">
+            <div class="stat-value" style="color:#ea5808">256</div>
+            <div class="stat-label">Assets</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value" style="color:#22c55e">12.4K</div>
+            <div class="stat-label">Downloads</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value" style="color:#3b82f6">48</div>
+            <div class="stat-label">Creators</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value" style="color:#eab308">$2.1K</div>
+            <div class="stat-label">Revenue</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <div class="panel-section-title">Categories</div>
+        <div class="panel-item"><div class="dot" style="background:#ea5808"></div> Loops <span style="margin-left:auto;color:#52525b">89</span></div>
+        <div class="panel-item"><div class="dot" style="background:#22c55e"></div> One-Shots <span style="margin-left:auto;color:#52525b">64</span></div>
+        <div class="panel-item"><div class="dot" style="background:#3b82f6"></div> Presets <span style="margin-left:auto;color:#52525b">45</span></div>
+        <div class="panel-item"><div class="dot" style="background:#eab308"></div> Project Files <span style="margin-left:auto;color:#52525b">32</span></div>
+        <div class="panel-item"><div class="dot" style="background:#ef4444"></div> Stems <span style="margin-left:auto;color:#52525b">26</span></div>
+      </div>
+
+      <div class="panel-section">
+        <div class="panel-section-title">Trending Tags</div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px">
+          <span class="tag primary">lo-fi</span>
+          <span class="tag">808</span>
+          <span class="tag">ambient</span>
+          <span class="tag">trap</span>
+          <span class="tag">vinyl</span>
+          <span class="tag">synthwave</span>
+          <span class="tag">piano</span>
+          <span class="tag">chillhop</span>
+          <span class="tag">organic</span>
+          <span class="tag">electronic</span>
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <div class="panel-section-title">Top Creators</div>
+        <div class="panel-item">
+          <span style="width:20px;height:20px;background:#ea5808;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;color:#fff">P</span>
+          @producer1 <span style="margin-left:auto;color:#eab308;font-size:10px">★ 4.9</span>
+        </div>
+        <div class="panel-item">
+          <span style="width:20px;height:20px;background:#22c55e;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;color:#fff">B</span>
+          @beatmaker <span style="margin-left:auto;color:#eab308;font-size:10px">★ 4.8</span>
+        </div>
+        <div class="panel-item">
+          <span style="width:20px;height:20px;background:#3b82f6;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;color:#fff">S</span>
+          @soundartist <span style="margin-left:auto;color:#eab308;font-size:10px">★ 4.7</span>
+        </div>
+        <div class="panel-item">
+          <span style="width:20px;height:20px;background:#eab308;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;color:#000">Z</span>
+          @Zero-G <span style="margin-left:auto;color:#eab308;font-size:10px">★ 4.7</span>
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <div class="panel-section-title">Your Cart</div>
+        <div class="panel-stat">
+          <span class="panel-stat-label">808 Bass Kit</span>
+          <span class="panel-stat-value">$9.99</span>
+        </div>
+        <div class="panel-stat">
+          <span class="panel-stat-label">Synthwave Dreams</span>
+          <span class="panel-stat-value">$14.99</span>
+        </div>
+        <div class="panel-stat">
+          <span class="panel-stat-label">Vinyl Classics</span>
+          <span class="panel-stat-value">$29.99</span>
+        </div>
+        <div style="margin-top:8px;padding-top:8px;border-top:1px solid #27272a;display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:12px;color:#71717a">Total</span>
+          <span style="font-size:16px;font-weight:700;color:#22c55e;font-family:'JetBrains Mono',monospace">$54.97</span>
+        </div>
+        <button class="btn btn-primary" style="width:100%;margin-top:8px">Checkout</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

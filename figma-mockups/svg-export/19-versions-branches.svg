@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" 
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     viewBox="0 0 1440 900" 
+     width="1440" 
+     height="900">
+  <foreignObject width="100%" height="100%">
+    <div xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html><html lang="en"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <title>SoundHub — Versions &amp; Branches</title>
+  <link rel="stylesheet" href="design-system/shared.css">
+  <style>
+    .versions-layout { display: grid; grid-template-columns: 1fr 320px; gap: 24px; }
+    .branch-tree { display: flex; flex-direction: column; gap: 0; }
+    .branch-node { display: flex; gap: 16px; padding: 16px 0; position: relative; }
+    .branch-node::before { content: ''; position: absolute; left: 19px; top: 44px; bottom: -16px; width: 2px; background: var(--border-default); }
+    .branch-node:last-child::before { display: none; }
+    .branch-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; position: relative; z-index: 1; }
+    .branch-dot.main { background: var(--brand-primary); border: 3px solid rgba(139,92,246,0.3); }
+    .branch-dot.success { background: var(--color-success); }
+    .branch-dot.warning { background: var(--color-warning); }
+    .branch-dot.muted { background: var(--border-default); }
+    .branch-card { flex: 1; background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: var(--radius-lg); padding: 16px; transition: border-color 0.15s; cursor: pointer; }
+    .branch-card:hover { border-color: var(--border-hover); }
+    .branch-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .branch-card-title { font-size: 14px; font-weight: 700; }
+    .branch-card-meta { font-size: 11px; color: var(--text-muted); margin-bottom: 8px; }
+    .branch-card-desc { font-size: 12px; color: var(--text-secondary); margin-bottom: 10px; }
+    .branch-card-ci { display: flex; gap: 8px; }
+    .ci-pill { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: 600; }
+    .ci-pill.pass { background: rgba(34,197,94,0.12); color: var(--color-success); }
+    .ci-pill.fail { background: rgba(239,68,68,0.12); color: var(--color-error); }
+    .ci-pill.pending { background: var(--bg-elevated); color: var(--text-muted); }
+    .branch-actions { display: flex; gap: 6px; margin-top: 10px; }
+    .branch-tag { display: inline-flex; padding: 2px 8px; border-radius: 10px; font-size: 9px; font-weight: 600; }
+    .branch-tag.main { background: rgba(139,92,246,0.12); color: var(--branch-primary); }
+    .branch-tag.branch { background: rgba(6,182,212,0.12); color: var(--brand-secondary); }
+    .branch-summary { background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 16px; }
+    .branch-stat { display: flex; justify-content: space-between; padding: 6px 0; font-size: 12px; border-bottom: 1px solid var(--border-default); }
+    .branch-stat:last-child { border-bottom: none; }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-logo"><div class="logo-icon">S</div><div class="logo-text">SoundHub</div></div>
+      <nav class="sidebar-nav">
+        <div class="sidebar-section-label">Main</div>
+        <a class="sidebar-item" href="#"><span class="icon">📊</span> Dashboard</a>
+        <a class="sidebar-item active" href="#"><span class="icon">📁</span> Projects</a>
+        <div class="sidebar-section-label">Workspace</div>
+        <a class="sidebar-item" href="#"><span class="icon">💬</span> Reviews</a>
+        <div class="sidebar-section-label">Account</div>
+        <a class="sidebar-item" href="#"><span class="icon">⚙️</span> Settings</a>
+      </nav>
+      <div class="sidebar-footer"><a class="sidebar-item" href="#"><span class="icon">❓</span> Help</a></div>
+    </aside>
+    <div class="main-content">
+      <header class="topbar">
+        <div style="display:flex;align-items:center;gap:12px">
+          <a href="#" style="color:var(--text-muted);text-decoration:none;font-size:13px">← Neon Warehouse</a>
+          <span style="color:var(--text-muted)">/</span>
+          <span style="font-size:14px;font-weight:600">Versions &amp; Branches</span>
+        </div>
+        <div class="topbar-right"><div class="topbar-avatar">P</div></div>
+      </header>
+      <div class="page">
+        <div class="page-header">
+          <div><h1 class="page-title">Versions &amp; Branches</h1><p class="page-subtitle">Neon Warehouse · main branch · 13 versions</p></div>
+          <button class="btn btn-primary">⬆️ Upload new version</button>
+        </div>
+
+        <div class="versions-layout">
+          <div>
+            <!-- Branch Tree -->
+            <div class="branch-tree">
+              <div class="branch-node">
+                <div class="branch-dot main"></div>
+                <div class="branch-card" style="border-color:var(--brand-primary)">
+                  <div class="branch-card-header">
+                    <div class="branch-card-title">v13 — Ready for review</div>
+                    <div style="display:flex;gap:6px;align-items:center"><span class="branch-tag main">main</span><span class="branch-tag branch">HEAD</span></div>
+                  </div>
+                  <div class="branch-card-meta">2 hours ago · Producer · WAV 24bit · 28.7 MB</div>
+                  <div class="branch-card-desc">Added new synth layer, improved low-end balance, re-mastered with Ozone.</div>
+                  <div class="branch-card-ci">
+                    <span class="ci-pill pass">✓ Loudness</span>
+                    <span class="ci-pill pass">✓ Waveform</span>
+                    <span class="ci-pill pass">✓ Metadata</span>
+                    <span class="ci-pill pending">⏳ Peak</span>
+                  </div>
+                  <div class="branch-actions">
+                    <button class="btn btn-primary btn-sm">Start Review</button>
+                    <button class="btn btn-ghost btn-sm">▶ Listen</button>
+                    <button class="btn btn-ghost btn-sm">A/B Compare</button>
+                    <button class="btn btn-ghost btn-sm">Download</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="branch-node">
+                <div class="branch-dot success"></div>
+                <div class="branch-card">
+                  <div class="branch-card-header"><div class="branch-card-title">v12 — Approved ✓</div><span class="badge badge-success" style="font-size:9px">APPROVED</span></div>
+                  <div class="branch-card-meta">1 day ago · Producer · WAV 24bit · 28.4 MB</div>
+                  <div class="branch-card-desc">"Great mix, approved!" — Sarah. Fixed bass issues from v11.</div>
+                  <div class="branch-card-ci"><span class="ci-pill pass">✓ All checks</span></div>
+                </div>
+              </div>
+
+              <div class="branch-node">
+                <div class="branch-dot warning"></div>
+                <div class="branch-card">
+                  <div class="branch-card-header"><div class="branch-card-title">v11 — Changes requested</div><span class="badge badge-warning" style="font-size:9px">CHANGES</span></div>
+                  <div class="branch-card-meta">2 days ago · Producer · WAV 24bit · 27.9 MB</div>
+                  <div class="branch-card-desc">"Bass too loud in chorus" — Alex. Initial mastering pass.</div>
+                </div>
+              </div>
+
+              <div class="branch-node">
+                <div class="branch-dot muted"></div>
+                <div class="branch-card">
+                  <div class="branch-card-header"><div class="branch-card-title">v10 — Ready for review</div></div>
+                  <div class="branch-card-meta">3 days ago · Producer · WAV 24bit · 27.2 MB</div>
+                  <div class="branch-card-desc">Initial mixdown with stem separation.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sidebar -->
+          <div>
+            <div class="branch-summary">
+              <div style="font-size:13px;font-weight:700;margin-bottom:12px">Branch: main</div>
+              <div class="branch-stat"><span style="color:var(--text-muted)">Total versions</span><span style="font-weight:600">13</span></div>
+              <div class="branch-stat"><span style="color:var(--text-muted)">Approved</span><span style="font-weight:600;color:var(--color-success)">8</span></div>
+              <div class="branch-stat"><span style="color:var(--text-muted)">Changes requested</span><span style="font-weight:600;color:var(--color-warning)">3</span></div>
+              <div class="branch-stat"><span style="color:var(--text-muted)">In review</span><span style="font-weight:600;color:var(--brand-primary)">1</span></div>
+              <div class="branch-stat"><span style="color:var(--text-muted)">First upload</span><span style="font-weight:600">14 days ago</span></div>
+            </div>
+            <div class="branch-summary">
+              <div style="font-size:13px;font-weight:700;margin-bottom:12px">Quick Actions</div>
+              <button class="btn btn-secondary" style="width:100%;justify-content:center;margin-bottom:8px">⬆️ Upload new version</button>
+              <button class="btn btn-secondary" style="width:100%;justify-content:center;margin-bottom:8px">💬 Request review</button>
+              <button class="btn btn-secondary" style="width:100%;justify-content:center;margin-bottom:8px">🔀 Create branch</button>
+              <button class="btn btn-outline" style="width:100%;justify-content:center">📦 Create release package</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+</body></html>
+    </div>
+  </foreignObject>
+</svg>

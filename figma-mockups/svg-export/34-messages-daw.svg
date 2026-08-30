@@ -1,0 +1,584 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" 
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     viewBox="0 0 1440 900" 
+     width="1440" 
+     height="900">
+  <foreignObject width="100%" height="100%">
+    <div xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html><html lang="en"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <title>SoundHub — Messages (DAW Style)</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', -apple-system, sans-serif; background: #0d0d0d; color: #e4e4e7; overflow: hidden; height: 100vh; }
+
+    /* ── Transport Bar ── */
+    .transport-bar {
+      height: 40px; background: #111113; border-bottom: 1px solid #27272a;
+      display: flex; align-items: center; padding: 0 12px; gap: 16px;
+      font-size: 11px; user-select: none;
+    }
+    .transport-logo { font-weight: 800; font-size: 13px; color: #ea5808; letter-spacing: -0.5px; }
+    .transport-logo span { color: #e4e4e7; }
+    .transport-divider { width: 1px; height: 20px; background: #27272a; }
+    .transport-group { display: flex; align-items: center; gap: 6px; }
+    .transport-label { color: #71717a; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .transport-value {
+      background: #0d0d0d; border: 1px solid #27272a; border-radius: 4px;
+      padding: 2px 8px; font-family: 'JetBrains Mono', monospace; font-size: 12px;
+      color: #22c55e; font-weight: 600; min-width: 60px; text-align: center;
+    }
+    .transport-spacer { flex: 1; }
+    .transport-time {
+      font-family: 'JetBrains Mono', monospace; font-size: 18px; font-weight: 700;
+      color: #e4e4e7; letter-spacing: 1px;
+    }
+
+    /* ── Main Layout ── */
+    .app-body { display: flex; height: calc(100vh - 40px); }
+
+    /* ── Conversations Panel ── */
+    .conversations-panel {
+      width: 320px; background: #111113; border-right: 1px solid #27272a;
+      display: flex; flex-direction: column; user-select: none;
+    }
+    .conversations-header {
+      padding: 16px; border-bottom: 1px solid #27272a;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .conversations-title { font-size: 14px; font-weight: 700; color: #e4e4e7; }
+    .conversations-search { padding: 12px 16px; border-bottom: 1px solid #27272a; }
+    .search-input {
+      width: 100%; background: #0d0d0d; border: 1px solid #27272a; border-radius: 6px;
+      padding: 8px 12px 8px 32px; font-size: 12px; color: #e4e4e7; outline: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: 10px center;
+    }
+    .search-input::placeholder { color: #52525b; }
+    .conversations-list { flex: 1; overflow-y: auto; }
+    .conversation-item {
+      display: flex; gap: 12px; padding: 12px 16px; cursor: pointer;
+      border-bottom: 1px solid #1a1a1a; transition: all 0.1s;
+    }
+    .conversation-item:hover { background: rgba(255,255,255,0.02); }
+    .conversation-item.active { background: rgba(234,88,8,0.06); border-left: 3px solid #ea5808; }
+    .conversation-avatar {
+      width: 40px; height: 40px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700; color: #fff; flex-shrink: 0;
+      position: relative;
+    }
+    .conversation-avatar .online-dot {
+      position: absolute; bottom: 0; right: 0;
+      width: 10px; height: 10px; background: #22c55e; border-radius: 50%;
+      border: 2px solid #111113;
+    }
+    .conversation-info { flex: 1; min-width: 0; }
+    .conversation-name { font-size: 12px; font-weight: 600; color: #e4e4e7; }
+    .conversation-preview { font-size: 11px; color: #71717a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+    .conversation-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; }
+    .conversation-time { font-size: 10px; color: #52525b; }
+    .conversation-unread {
+      width: 18px; height: 18px; background: #ea5808; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 9px; font-weight: 700; color: #fff;
+    }
+
+    /* ── Chat Area ── */
+    .chat-area { flex: 1; display: flex; flex-direction: column; }
+
+    /* ── Chat Header ── */
+    .chat-header {
+      padding: 12px 20px; border-bottom: 1px solid #27272a;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .chat-user {
+      display: flex; align-items: center; gap: 12px;
+    }
+    .chat-avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700; color: #fff;
+    }
+    .chat-name { font-size: 13px; font-weight: 600; color: #e4e4e7; }
+    .chat-status { font-size: 10px; color: #22c55e; }
+    .chat-actions { display: flex; gap: 8px; }
+    .chat-action-btn {
+      width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+      background: #1a1a1a; border: 1px solid #27272a; border-radius: 6px;
+      font-size: 14px; color: #71717a; cursor: pointer;
+    }
+    .chat-action-btn:hover { border-color: #3f3f46; color: #e4e4e7; }
+
+    /* ── Messages ── */
+    .messages-container { flex: 1; overflow-y: auto; padding: 20px; }
+    .message-group { margin-bottom: 20px; }
+    .message-date {
+      text-align: center; font-size: 10px; color: #52525b;
+      margin-bottom: 16px; position: relative;
+    }
+    .message-date::before, .message-date::after {
+      content: ''; position: absolute; top: 50%; width: 30%; height: 1px;
+      background: #27272a;
+    }
+    .message-date::before { left: 0; }
+    .message-date::after { right: 0; }
+    .message {
+      display: flex; gap: 10px; margin-bottom: 12px;
+    }
+    .message.sent { flex-direction: row-reverse; }
+    .message-avatar {
+      width: 28px; height: 28px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; font-weight: 700; color: #fff; flex-shrink: 0;
+    }
+    .message-bubble {
+      max-width: 400px; padding: 10px 14px; border-radius: 12px;
+      font-size: 12px; line-height: 1.5;
+    }
+    .message.received .message-bubble {
+      background: #1a1a1a; border: 1px solid #27272a; color: #a1a1aa;
+      border-bottom-left-radius: 4px;
+    }
+    .message.sent .message-bubble {
+      background: #ea5808; color: #fff;
+      border-bottom-right-radius: 4px;
+    }
+    .message-time {
+      font-size: 10px; color: #52525b; margin-top: 4px;
+    }
+    .message.sent .message-time { text-align: right; color: rgba(255,255,255,0.6); }
+    .message-attachment {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 12px; background: rgba(255,255,255,0.1); border-radius: 8px;
+      margin-top: 8px; font-size: 11px;
+    }
+    .message.received .message-attachment { background: #0d0d0d; }
+    .message-reaction {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 2px 6px; background: #0d0d0d; border: 1px solid #27272a;
+      border-radius: 12px; font-size: 10px; margin-top: 4px;
+    }
+
+    /* ── Chat Input ── */
+    .chat-input-area {
+      padding: 16px 20px; border-top: 1px solid #27272a;
+    }
+    .chat-input-tools {
+      display: flex; gap: 6px; margin-bottom: 10px;
+    }
+    .input-tool {
+      width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
+      background: #1a1a1a; border: 1px solid #27272a; border-radius: 4px;
+      font-size: 12px; color: #71717a; cursor: pointer;
+    }
+    .input-tool:hover { border-color: #3f3f46; color: #e4e4e7; }
+    .chat-input-row {
+      display: flex; gap: 8px; align-items: flex-end;
+    }
+    .chat-input {
+      flex: 1; background: #0d0d0d; border: 1px solid #27272a; border-radius: 8px;
+      padding: 10px 14px; font-size: 12px; color: #e4e4e7; outline: none;
+      resize: none; min-height: 40px; max-height: 120px; font-family: inherit;
+    }
+    .chat-input::placeholder { color: #52525b; }
+    .chat-input:focus { border-color: #ea5808; }
+    .send-btn {
+      width: 40px; height: 40px; background: #ea5808; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 16px; cursor: pointer; flex-shrink: 0;
+    }
+    .send-btn:hover { background: #c2410c; }
+
+    /* ── Right Panel ── */
+    .right-panel {
+      width: 280px; background: #111113; border-left: 1px solid #27272a;
+      display: flex; flex-direction: column; user-select: none; overflow-y: auto;
+    }
+    .panel-section { padding: 16px; border-bottom: 1px solid #27272a; }
+    .panel-section-title {
+      font-size: 9px; color: #52525b; text-transform: uppercase;
+      letter-spacing: 1px; font-weight: 700; margin-bottom: 10px;
+    }
+    .panel-stat {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 6px 0; font-size: 12px;
+    }
+    .panel-stat-label { color: #71717a; }
+    .panel-stat-value { color: #e4e4e7; font-family: 'JetBrains Mono', monospace; font-weight: 600; }
+
+    /* ── Shared Files ── */
+    .shared-files { display: flex; flex-direction: column; gap: 6px; }
+    .shared-file {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px; background: #0d0d0d; border: 1px solid #27272a;
+      border-radius: 6px; font-size: 11px;
+    }
+    .shared-file-icon { font-size: 16px; }
+    .shared-file-name { flex: 1; color: #a1a1aa; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .shared-file-size { color: #52525b; font-family: 'JetBrains Mono', monospace; font-size: 10px; }
+
+    /* ── Participants ── */
+    .participant {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 0; border-bottom: 1px solid #1a1a1a;
+    }
+    .participant:last-child { border-bottom: none; }
+    .participant-avatar {
+      width: 28px; height: 28px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; font-weight: 700; color: #fff;
+    }
+    .participant-name { font-size: 11px; font-weight: 600; color: #e4e4e7; }
+    .participant-status { font-size: 10px; color: #52525b; }
+    .participant-online {
+      margin-left: auto; width: 8px; height: 8px; border-radius: 50%;
+    }
+    .participant-online.on { background: #22c55e; box-shadow: 0 0 6px rgba(34,197,94,0.5); }
+    .participant-online.off { background: #52525b; }
+
+    /* ── Device Chain (Bottom) ── */
+    .device-chain {
+      height: 48px; background: #111113; border-top: 1px solid #27272a;
+      display: flex; align-items: center; padding: 0 16px; gap: 8px;
+      font-size: 10px;
+    }
+    .device {
+      padding: 4px 10px; background: #0d0d0d; border: 1px solid #27272a;
+      border-radius: 4px; color: #a1a1aa;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .device .led { width: 6px; height: 6px; border-radius: 50%; background: #27272a; }
+    .device.active .led { background: #22c55e; box-shadow: 0 0 6px rgba(34,197,94,0.5); }
+    .device-chain-spacer { flex: 1; }
+    .device-chain-label {
+      font-size: 9px; color: #52525b; text-transform: uppercase;
+      letter-spacing: 0.5px; font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <!-- Transport Bar -->
+  <div class="transport-bar">
+    <div class="transport-logo">Sound<span>Hub</span></div>
+    <div class="transport-divider"></div>
+    <div class="transport-group">
+      <span class="transport-label">Conversations</span>
+      <div class="transport-value">8</div>
+    </div>
+    <div class="transport-group">
+      <span class="transport-label">Unread</span>
+      <div class="transport-value" style="color:#ea5808">3</div>
+    </div>
+    <div class="transport-group">
+      <span class="transport-label">Online</span>
+      <div class="transport-value">12</div>
+    </div>
+    <div class="transport-spacer"></div>
+    <div class="transport-time">MESSAGES</div>
+    <div class="transport-divider"></div>
+    <div class="transport-group">
+      <span class="transport-label">Last seen</span>
+      <div class="transport-value">2m ago</div>
+    </div>
+  </div>
+
+  <div class="app-body">
+    <!-- Conversations Panel -->
+    <div class="conversations-panel">
+      <div class="conversations-header">
+        <div class="conversations-title">Messages</div>
+        <button style="width:28px;height:28px;background:#ea5808;border:none;border-radius:6px;color:#fff;font-size:14px;cursor:pointer">+</button>
+      </div>
+      <div class="conversations-search">
+        <input class="search-input" type="text" placeholder="Search conversations...">
+      </div>
+      <div class="conversations-list">
+        <!-- Conversation 1 - Active -->
+        <div class="conversation-item active">
+          <div class="conversation-avatar" style="background:#22c55e">
+            R
+            <div class="online-dot"></div>
+          </div>
+          <div class="conversation-info">
+            <div class="conversation-name">@reviewer</div>
+            <div class="conversation-preview">Sounds great! Let me check the low-end...</div>
+          </div>
+          <div class="conversation-meta">
+            <div class="conversation-time">2m ago</div>
+          </div>
+        </div>
+
+        <!-- Conversation 2 - Unread -->
+        <div class="conversation-item">
+          <div class="conversation-avatar" style="background:#eab308">
+            A
+            <div class="online-dot"></div>
+          </div>
+          <div class="conversation-info">
+            <div class="conversation-name">@audioguy</div>
+            <div class="conversation-preview">Dynamic range could be better on the bridge</div>
+          </div>
+          <div class="conversation-meta">
+            <div class="conversation-time">15m ago</div>
+            <div class="conversation-unread">2</div>
+          </div>
+        </div>
+
+        <!-- Conversation 3 - Unread -->
+        <div class="conversation-item">
+          <div class="conversation-avatar" style="background:#3b82f6">
+            M
+          </div>
+          <div class="conversation-info">
+            <div class="conversation-name">@mixmaster</div>
+            <div class="conversation-preview">I've uploaded the new vocal mix</div>
+          </div>
+          <div class="conversation-meta">
+            <div class="conversation-time">1h ago</div>
+            <div class="conversation-unread">1</div>
+          </div>
+        </div>
+
+        <!-- Conversation 4 -->
+        <div class="conversation-item">
+          <div class="conversation-avatar" style="background:#ea5808">
+            P
+            <div class="online-dot"></div>
+          </div>
+          <div class="conversation-info">
+            <div class="conversation-name">@producer1</div>
+            <div class="conversation-preview">Master v3.2 is ready for review</div>
+          </div>
+          <div class="conversation-meta">
+            <div class="conversation-time">3h ago</div>
+          </div>
+        </div>
+
+        <!-- Conversation 5 -->
+        <div class="conversation-item">
+          <div class="conversation-avatar" style="background:#a855f7">
+            L
+          </div>
+          <div class="conversation-info">
+            <div class="conversation-name">@lofimaster</div>
+            <div class="conversation-preview">Thanks for the feedback on Chillhop Beats!</div>
+          </div>
+          <div class="conversation-meta">
+            <div class="conversation-time">Yesterday</div>
+          </div>
+        </div>
+
+        <!-- Conversation 6 -->
+        <div class="conversation-item">
+          <div class="conversation-avatar" style="background:#06b6d4">
+            W
+          </div>
+          <div class="conversation-info">
+            <div class="conversation-name">@worldsounds</div>
+            <div class="conversation-preview">Can we collaborate on a percussion pack?</div>
+          </div>
+          <div class="conversation-meta">
+            <div class="conversation-time">2 days ago</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chat Area -->
+    <div class="chat-area">
+      <!-- Chat Header -->
+      <div class="chat-header">
+        <div class="chat-user">
+          <div class="chat-avatar" style="background:#22c55e">R</div>
+          <div>
+            <div class="chat-name">@reviewer</div>
+            <div class="chat-status">● Online</div>
+          </div>
+        </div>
+        <div class="chat-actions">
+          <div class="chat-action-btn">📞</div>
+          <div class="chat-action-btn">📹</div>
+          <div class="chat-action-btn">📌</div>
+          <div class="chat-action-btn">⋯</div>
+        </div>
+      </div>
+
+      <!-- Messages -->
+      <div class="messages-container">
+        <div class="message-date">Today</div>
+
+        <!-- Message 1 - Received -->
+        <div class="message received">
+          <div class="message-avatar" style="background:#22c55e">R</div>
+          <div>
+            <div class="message-bubble">Hey! I've been listening to the Neon Warehouse master. Sounds great overall! 🎵</div>
+            <div class="message-time">10:32 AM</div>
+          </div>
+        </div>
+
+        <!-- Message 2 - Sent -->
+        <div class="message sent">
+          <div class="message-avatar" style="background:#ea5808">S</div>
+          <div>
+            <div class="message-bubble">Thanks! I spent a lot of time on the low-end. Did you check it on headphones?</div>
+            <div class="message-time">10:35 AM</div>
+          </div>
+        </div>
+
+        <!-- Message 3 - Received -->
+        <div class="message received">
+          <div class="message-avatar" style="background:#22c55e">R</div>
+          <div>
+            <div class="message-bubble">Yes! The kick at 1:24 is punchy and well-defined. The bass sits perfectly in the mix.</div>
+            <div class="message-timestamp" style="display:inline-flex;align-items:center;gap:4px;padding:3px 8px;background:rgba(234,88,8,0.1);border-radius:4px;font-size:10px;color:#ea5808;font-family:'JetBrains Mono',monospace;margin-top:6px">⏱ 1:24</div>
+            <div class="message-time">10:38 AM</div>
+          </div>
+        </div>
+
+        <!-- Message 4 - Sent with attachment -->
+        <div class="message sent">
+          <div class="message-avatar" style="background:#ea5808">S</div>
+          <div>
+            <div class="message-bubble">Here's the QC report for reference:</div>
+            <div class="message-attachment">
+              <span>📊</span>
+              <span style="flex:1">qc-report-neon-warehouse.pdf</span>
+              <span>2.4 MB</span>
+            </div>
+            <div class="message-time">10:40 AM</div>
+          </div>
+        </div>
+
+        <!-- Message 5 - Received -->
+        <div class="message received">
+          <div class="message-avatar" style="background:#22c55e">R</div>
+          <div>
+            <div class="message-bubble">Looking at the QC now. Loudness is -14.2 LUFS — perfect for streaming! True Peak at -1.2 dBTP is also solid.</div>
+            <div class="message-reaction">👍 2</div>
+            <div class="message-time">10:45 AM</div>
+          </div>
+        </div>
+
+        <!-- Message 6 - Sent -->
+        <div class="message sent">
+          <div class="message-avatar" style="background:#ea5808">S</div>
+          <div>
+            <div class="message-bubble">@audioguy mentioned the dynamic range might be a bit low at 8.1 LU. What do you think?</div>
+            <div class="message-time">10:48 AM</div>
+          </div>
+        </div>
+
+        <!-- Message 7 - Received -->
+        <div class="message received">
+          <div class="message-avatar" style="background:#22c55e">R</div>
+          <div>
+            <div class="message-bubble">I think 8.1 LU is fine for this genre. Lo-fi typically has less dynamic range. But we could try backing off the limiter 1 dB on the bridge section if you want to be safe.</div>
+            <div class="message-time">10:52 AM</div>
+          </div>
+        </div>
+
+        <!-- Message 8 - Sent -->
+        <div class="message sent">
+          <div class="message-avatar" style="background:#ea5808">S</div>
+          <div>
+            <div class="message-bubble">Good idea. Let me try that and upload v3.3 👍</div>
+            <div class="message-reaction">🔥 1</div>
+            <div class="message-time">10:55 AM</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chat Input -->
+      <div class="chat-input-area">
+        <div class="chat-input-tools">
+          <div class="input-tool">📎</div>
+          <div class="input-tool">🎵</div>
+          <div class="input-tool">⏱</div>
+          <div class="input-tool">🎤</div>
+          <div class="input-tool">😊</div>
+        </div>
+        <div class="chat-input-row">
+          <textarea class="chat-input" rows="1" placeholder="Type a message..."></textarea>
+          <div class="send-btn">➤</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Panel -->
+    <div class="right-panel">
+      <!-- User Info -->
+      <div class="panel-section" style="text-align:center">
+        <div style="width:64px;height:64px;background:#22c55e;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:#fff;margin-bottom:8px">R</div>
+        <div style="font-size:14px;font-weight:700;color:#e4e4e7">@reviewer</div>
+        <div style="font-size:11px;color:#22c55e;margin-top:2px">● Online</div>
+        <div style="font-size:10px;color:#71717a;margin-top:4px">15 reviews · 8,921 downloads</div>
+      </div>
+
+      <!-- Shared Files -->
+      <div class="panel-section">
+        <div class="panel-section-title">Shared Files</div>
+        <div class="shared-files">
+          <div class="shared-file">
+            <span class="shared-file-icon">📊</span>
+            <span class="shared-file-name">qc-report.pdf</span>
+            <span class="shared-file-size">2.4 MB</span>
+          </div>
+          <div class="shared-file">
+            <span class="shared-file-icon">🎵</span>
+            <span class="shared-file-name">comparison-v2-vs-v3.wav</span>
+            <span class="shared-file-size">8.1 MB</span>
+          </div>
+          <div class="shared-file">
+            <span class="shared-file-icon">📸</span>
+            <span class="shared-file-name">waveform-screenshot.png</span>
+            <span class="shared-file-size">1.2 MB</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Participants -->
+      <div class="panel-section">
+        <div class="panel-section-title">Participants (4)</div>
+        <div class="participant">
+          <div class="participant-avatar" style="background:#ea5808">S</div>
+          <div>
+            <div class="participant-name">scatter (You)</div>
+            <div class="participant-status">Owner</div>
+          </div>
+          <div class="participant-online on"></div>
+        </div>
+        <div class="participant">
+          <div class="participant-avatar" style="background:#22c55e">R</div>
+          <div>
+            <div class="participant-name">@reviewer</div>
+            <div class="participant-status">Reviewer</div>
+          </div>
+          <div class="participant-online on"></div>
+        </div>
+        <div class="participant">
+          <div class="participant-avatar" style="background:#eab308">A</div>
+          <div>
+            <div class="participant-name">@audioguy</div>
+            <div class="participant-status">Reviewer</div>
+          </div>
+          <div class="participant-online off"></div>
+        </div>
+        <div class="participant">
+          <div class="participant-avatar" style="background:#3b82f6">M</div>
+          <div>
+            <div class="participant-name">@mixmaster</div>
+            <div class="participant-status">Reviewer</div>
+          </div>
+          <div class="participant-online on"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body></html>
+    </div>
+  </foreignObject>
+</svg>

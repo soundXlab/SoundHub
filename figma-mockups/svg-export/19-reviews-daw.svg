@@ -1,0 +1,813 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" 
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     viewBox="0 0 1440 900" 
+     width="1440" 
+     height="900">
+  <foreignObject width="100%" height="100%">
+    <div xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html><html lang="en"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <title>SoundHub — Reviews (DAW Style)</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', -apple-system, sans-serif; background: #0d0d0d; color: #e4e4e7; overflow: hidden; height: 100vh; }
+
+    /* ── Transport Bar ── */
+    .transport-bar {
+      height: 40px; background: #111113; border-bottom: 1px solid #27272a;
+      display: flex; align-items: center; padding: 0 12px; gap: 16px;
+      font-size: 11px; user-select: none;
+    }
+    .transport-logo { font-weight: 800; font-size: 13px; color: #ea5808; letter-spacing: -0.5px; }
+    .transport-logo span { color: #e4e4e7; }
+    .transport-divider { width: 1px; height: 20px; background: #27272a; }
+    .transport-group { display: flex; align-items: center; gap: 6px; }
+    .transport-label { color: #71717a; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .transport-value {
+      background: #0d0d0d; border: 1px solid #27272a; border-radius: 4px;
+      padding: 2px 8px; font-family: 'JetBrains Mono', monospace; font-size: 12px;
+      color: #22c55e; font-weight: 600; min-width: 60px; text-align: center;
+    }
+    .transport-spacer { flex: 1; }
+    .transport-time {
+      font-family: 'JetBrains Mono', monospace; font-size: 18px; font-weight: 700;
+      color: #e4e4e7; letter-spacing: 1px;
+    }
+
+    /* ── Main Layout ── */
+    .app-body { display: flex; height: calc(100vh - 40px); }
+
+    /* ── Left Sidebar ── */
+    .sidebar {
+      width: 240px; background: #111113; border-right: 1px solid #27272a;
+      display: flex; flex-direction: column; user-select: none;
+    }
+    .sidebar-search { padding: 8px; border-bottom: 1px solid #27272a; }
+    .sidebar-search input {
+      width: 100%; background: #0d0d0d; border: 1px solid #27272a; border-radius: 4px;
+      padding: 6px 8px 6px 28px; font-size: 11px; color: #e4e4e7; outline: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: 8px center;
+    }
+    .sidebar-search input::placeholder { color: #52525b; }
+    .sidebar-nav { flex: 1; overflow-y: auto; padding: 4px 0; }
+    .sidebar-section { padding: 8px 12px 4px; font-size: 9px; color: #52525b; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+    .sidebar-item {
+      padding: 6px 12px; font-size: 11px; font-weight: 500; color: #a1a1aa;
+      cursor: pointer; display: flex; align-items: center; gap: 8px;
+      border-left: 2px solid transparent; transition: all 0.1s;
+    }
+    .sidebar-item:hover { color: #e4e4e7; }
+    .sidebar-item.active { color: #ea5808; background: rgba(234,88,8,0.08); border-left-color: #ea5808; }
+    .sidebar-item .icon { width: 16px; text-align: center; }
+    .sidebar-badge {
+      margin-left: auto; background: #ea5808; color: #fff;
+      font-size: 9px; padding: 1px 5px; border-radius: 8px;
+    }
+
+    /* ── Content Area ── */
+    .content { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
+
+    /* ── Header ── */
+    .page-header {
+      padding: 16px 24px; border-bottom: 1px solid #27272a;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .page-title { font-size: 18px; font-weight: 700; color: #e4e4e7; }
+    .page-title span { color: #71717a; font-weight: 400; font-size: 14px; margin-left: 8px; }
+    .header-actions { display: flex; gap: 8px; }
+    .btn {
+      padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 600;
+      cursor: pointer; border: 1px solid #27272a; transition: all 0.15s;
+    }
+    .btn-primary { background: #ea5808; color: #fff; border-color: #ea5808; }
+    .btn-primary:hover { background: #c2410c; }
+    .btn-secondary { background: #1a1a1a; color: #e4e4e7; }
+    .btn-secondary:hover { background: #27272a; }
+    .btn-ghost { background: transparent; color: #71717a; border-color: transparent; }
+    .btn-ghost:hover { color: #e4e4e7; background: #1a1a1a; }
+    .btn-success { background: #22c55e; color: #fff; border-color: #22c55e; }
+    .btn-success:hover { background: #16a34a; }
+    .btn-warning { background: #eab308; color: #000; border-color: #eab308; }
+
+    /* ── Filter Tabs ── */
+    .filter-tabs {
+      display: flex; gap: 0; border-bottom: 1px solid #27272a; padding: 0 24px;
+      background: #111113;
+    }
+    .filter-tab {
+      padding: 10px 16px; font-size: 12px; font-weight: 500; color: #71717a;
+      cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.1s;
+    }
+    .filter-tab:hover { color: #e4e4e7; }
+    .filter-tab.active { color: #ea5808; border-bottom-color: #ea5808; }
+    .filter-tab .count {
+      background: #27272a; color: #a1a1aa; font-size: 10px; padding: 1px 6px;
+      border-radius: 10px; margin-left: 4px;
+    }
+    .filter-tab.active .count { background: rgba(234,88,8,0.2); color: #ea5808; }
+
+    /* ── Reviews List ── */
+    .reviews-container { display: flex; flex: 1; overflow: hidden; }
+    .reviews-list { flex: 1; overflow-y: auto; padding: 16px 24px; }
+    .review-card {
+      background: #111113; border: 1px solid #27272a; border-radius: 8px;
+      padding: 16px; margin-bottom: 12px; cursor: pointer; transition: all 0.15s;
+    }
+    .review-card:hover { border-color: #3f3f46; }
+    .review-card.selected { border-color: #ea5808; background: rgba(234,88,8,0.04); }
+    .review-header { display: flex; align-items: flex-start; gap: 12px; }
+    .review-avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700; color: #fff; flex-shrink: 0;
+    }
+    .review-meta { flex: 1; min-width: 0; }
+    .review-title { font-size: 13px; font-weight: 600; color: #e4e4e7; }
+    .review-subtitle { font-size: 11px; color: #71717a; margin-top: 2px; }
+    .review-status {
+      padding: 3px 8px; border-radius: 4px; font-size: 10px;
+      font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
+      flex-shrink: 0;
+    }
+    .status-open { background: rgba(59,130,246,0.12); color: #3b82f6; }
+    .status-in-review { background: rgba(234,179,8,0.12); color: #eab308; }
+    .status-approved { background: rgba(34,197,94,0.12); color: #22c55e; }
+    .status-rejected { background: rgba(239,68,68,0.12); color: #ef4444; }
+    .status-revision { background: rgba(168,85,247,0.12); color: #a855f7; }
+    .review-body { margin-top: 10px; font-size: 12px; color: #a1a1aa; line-height: 1.5; }
+    .review-tags { display: flex; gap: 4px; margin-top: 8px; flex-wrap: wrap; }
+    .tag {
+      padding: 2px 6px; background: #1a1a1a; border: 1px solid #27272a;
+      border-radius: 3px; font-size: 9px; color: #a1a1aa;
+    }
+    .tag.primary { background: rgba(234,88,8,0.12); border-color: rgba(234,88,8,0.3); color: #ea5808; }
+    .tag.green { background: rgba(34,197,94,0.12); border-color: rgba(34,197,94,0.3); color: #22c55e; }
+    .tag.yellow { background: rgba(234,179,8,0.12); border-color: rgba(234,179,8,0.3); color: #eab308; }
+    .tag.red { background: rgba(239,68,68,0.12); border-color: rgba(239,68,68,0.3); color: #ef4444; }
+    .review-footer {
+      display: flex; align-items: center; gap: 12px; margin-top: 10px;
+      padding-top: 10px; border-top: 1px solid #27272a; font-size: 11px; color: #71717a;
+    }
+    .review-footer-item { display: flex; align-items: center; gap: 4px; }
+    .review-progress {
+      width: 100%; height: 4px; background: #27272a; border-radius: 2px;
+      margin-top: 8px; overflow: hidden;
+    }
+    .review-progress-fill { height: 100%; border-radius: 2px; transition: width 0.3s; }
+
+    /* ── Detail Panel ── */
+    .detail-panel {
+      width: 420px; background: #111113; border-left: 1px solid #27272a;
+      display: flex; flex-direction: column; overflow: hidden;
+    }
+    .detail-header {
+      padding: 16px; border-bottom: 1px solid #27272a;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .detail-title { font-size: 14px; font-weight: 700; color: #e4e4e7; }
+    .detail-body { flex: 1; overflow-y: auto; padding: 16px; }
+
+    /* ── Waveform Player ── */
+    .waveform-player {
+      background: #0d0d0d; border: 1px solid #27272a; border-radius: 6px;
+      padding: 12px; margin-bottom: 16px;
+    }
+    .waveform-bars {
+      display: flex; align-items: flex-end; gap: 2px; height: 60px;
+    }
+    .wave-bar { flex: 1; border-radius: 1px; }
+    .waveform-controls {
+      display: flex; align-items: center; gap: 12px; margin-top: 10px;
+    }
+    .play-btn {
+      width: 32px; height: 32px; background: #ea5808; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 12px; cursor: pointer;
+      box-shadow: 0 2px 8px rgba(234,88,8,0.4);
+    }
+    .waveform-time {
+      font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #71717a;
+    }
+    .waveform-progress {
+      flex: 1; height: 4px; background: #27272a; border-radius: 2px;
+      position: relative;
+    }
+    .waveform-progress-fill {
+      position: absolute; left: 0; top: 0; height: 100%;
+      width: 35%; background: #ea5808; border-radius: 2px;
+    }
+
+    /* ── Comment Thread ── */
+    .comment-thread { margin-bottom: 16px; }
+    .comment {
+      display: flex; gap: 10px; padding: 10px; background: #0d0d0d;
+      border: 1px solid #27272a; border-radius: 6px; margin-bottom: 8px;
+    }
+    .comment-avatar {
+      width: 28px; height: 28px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700; color: #fff; flex-shrink: 0;
+    }
+    .comment-content { flex: 1; min-width: 0; }
+    .comment-header { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
+    .comment-author { font-size: 11px; font-weight: 600; color: #e4e4e7; }
+    .comment-time { font-size: 10px; color: #52525b; }
+    .comment-body { font-size: 12px; color: #a1a1aa; line-height: 1.5; }
+    .comment-timestamp {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 2px 6px; background: rgba(234,88,8,0.1); border-radius: 3px;
+      font-size: 10px; color: #ea5808; font-family: 'JetBrains Mono', monospace;
+      margin-top: 4px;
+    }
+    .comment-actions { display: flex; gap: 8px; margin-top: 6px; }
+    .comment-action {
+      font-size: 10px; color: #52525b; cursor: pointer;
+      display: flex; align-items: center; gap: 3px;
+    }
+    .comment-action:hover { color: #a1a1aa; }
+
+    /* ── Feedback Form ── */
+    .feedback-form {
+      padding: 12px; background: #0d0d0d; border: 1px solid #27272a;
+      border-radius: 6px; margin-top: 12px;
+    }
+    .feedback-input {
+      width: 100%; background: #111113; border: 1px solid #27272a;
+      border-radius: 4px; padding: 8px; font-size: 12px; color: #e4e4e7;
+      resize: none; outline: none; font-family: inherit;
+    }
+    .feedback-input::placeholder { color: #52525b; }
+    .feedback-input:focus { border-color: #ea5808; }
+    .feedback-actions {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-top: 8px;
+    }
+    .feedback-tools { display: flex; gap: 6px; }
+    .tool-btn {
+      width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
+      background: #111113; border: 1px solid #27272a; border-radius: 4px;
+      font-size: 12px; color: #71717a; cursor: pointer;
+    }
+    .tool-btn:hover { border-color: #3f3f46; color: #e4e4e7; }
+
+    /* ── Right Panel ── */
+    .right-panel {
+      width: 240px; background: #111113; border-left: 1px solid #27272a;
+      display: flex; flex-direction: column; user-select: none;
+    }
+    .panel-section { padding: 12px; border-bottom: 1px solid #27272a; }
+    .panel-section-title {
+      font-size: 9px; color: #52525b; text-transform: uppercase;
+      letter-spacing: 1px; font-weight: 700; margin-bottom: 8px;
+    }
+    .panel-stat {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 4px 0; font-size: 11px;
+    }
+    .panel-stat-label { color: #71717a; }
+    .panel-stat-value { color: #e4e4e7; font-family: 'JetBrains Mono', monospace; font-weight: 600; }
+
+    /* ── Device Chain (Bottom) ── */
+    .device-chain {
+      height: 60px; background: #111113; border-top: 1px solid #27272a;
+      display: flex; align-items: center; padding: 0 16px; gap: 8px;
+    }
+    .device {
+      padding: 6px 12px; background: #0d0d0d; border: 1px solid #27272a;
+      border-radius: 4px; font-size: 10px; color: #a1a1aa;
+      display: flex; align-items: center; gap: 6px; cursor: pointer;
+      transition: all 0.1s;
+    }
+    .device:hover { border-color: #3f3f46; color: #e4e4e7; }
+    .device.active { border-color: #ea5808; color: #ea5808; background: rgba(234,88,8,0.08); }
+    .device .led { width: 6px; height: 6px; border-radius: 50%; background: #27272a; }
+    .device.active .led { background: #22c55e; box-shadow: 0 0 6px rgba(34,197,94,0.5); }
+    .device-chain-spacer { flex: 1; }
+    .device-chain-label {
+      font-size: 9px; color: #52525b; text-transform: uppercase;
+      letter-spacing: 0.5px; font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <!-- Transport Bar -->
+  <div class="transport-bar">
+    <div class="transport-logo">Sound<span>Hub</span></div>
+    <div class="transport-divider"></div>
+    <div class="transport-group">
+      <span class="transport-label">Open</span>
+      <div class="transport-value">12</div>
+    </div>
+    <div class="transport-group">
+      <span class="transport-label">In Review</span>
+      <div class="transport-value" style="color:#eab308">8</div>
+    </div>
+    <div class="transport-group">
+      <span class="transport-label">Approved</span>
+      <div class="transport-value" style="color:#22c55e">47</div>
+    </div>
+    <div class="transport-group">
+      <span class="transport-label">Rejected</span>
+      <div class="transport-value" style="color:#ef4444">3</div>
+    </div>
+    <div class="transport-spacer"></div>
+    <div class="transport-time">REVIEWS</div>
+    <div class="transport-divider"></div>
+    <div class="transport-group">
+      <span class="transport-label">Avg Time</span>
+      <div class="transport-value">2.4d</div>
+    </div>
+  </div>
+
+  <div class="app-body">
+    <!-- Left Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-search">
+        <input type="text" placeholder="Search projects...">
+      </div>
+      <div class="sidebar-nav">
+        <div class="sidebar-section">Main</div>
+        <div class="sidebar-item"><span class="icon">📊</span> Dashboard</div>
+        <div class="sidebar-item"><span class="icon">📁</span> Projects</div>
+        <div class="sidebar-item"><span class="icon">🛒</span> Marketplace</div>
+        <div class="sidebar-item"><span class="icon">⬆️</span> Upload</div>
+        <div class="sidebar-section">Workspace</div>
+        <div class="sidebar-item active"><span class="icon">💬</span> Reviews <span class="sidebar-badge">12</span></div>
+        <div class="sidebar-item"><span class="icon">📋</span> Sessions</div>
+        <div class="sidebar-item"><span class="icon">🔔</span> Notifications <span style="margin-left:auto;background:#ea5808;color:#fff;font-size:9px;padding:1px 5px;border-radius:8px">5</span></div>
+        <div class="sidebar-section">Account</div>
+        <div class="sidebar-item"><span class="icon">⚙️</span> Settings</div>
+        <div class="sidebar-item"><span class="icon">📊</span> Analytics</div>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+      <!-- Page Header -->
+      <div class="page-header">
+        <div class="page-title">Reviews <span>70 total</span></div>
+        <div class="header-actions">
+          <button class="btn btn-ghost">📥 My Submissions</button>
+          <button class="btn btn-ghost">📤 Assigned to Me</button>
+          <button class="btn btn-primary">+ New Review</button>
+        </div>
+      </div>
+
+      <!-- Filter Tabs -->
+      <div class="filter-tabs">
+        <div class="filter-tab active">All <span class="count">70</span></div>
+        <div class="filter-tab">Open <span class="count">12</span></div>
+        <div class="filter-tab">In Review <span class="count">8</span></div>
+        <div class="filter-tab">Approved <span class="count">47</span></div>
+        <div class="filter-tab">Rejected <span class="count">3</span></div>
+      </div>
+
+      <!-- Reviews Container -->
+      <div class="reviews-container">
+        <!-- Reviews List -->
+        <div class="reviews-list">
+          <!-- Review 1 - Selected -->
+          <div class="review-card selected">
+            <div class="review-header">
+              <div class="review-avatar" style="background:#ea5808">N</div>
+              <div class="review-meta">
+                <div class="review-title">Neon Warehouse — Master Check</div>
+                <div class="review-subtitle">by @producer1 · v3.2 · submitted 2h ago</div>
+              </div>
+              <div class="review-status status-in-review">In Review</div>
+            </div>
+            <div class="review-body">
+              Master ready for release. Loudness normalized to -14 LUFS. Please check the low-end on headphones.
+            </div>
+            <div class="review-tags">
+              <span class="tag primary">master</span>
+              <span class="tag yellow">loudness</span>
+              <span class="tag">check</span>
+            </div>
+            <div class="review-progress">
+              <div class="review-progress-fill" style="width:65%;background:#eab308"></div>
+            </div>
+            <div class="review-footer">
+              <div class="review-footer-item">💬 8 comments</div>
+              <div class="review-footer-item">📎 3 files</div>
+              <div class="review-footer-item">👥 2 reviewers</div>
+              <div class="review-footer-item">⏱️ Round 2/3</div>
+            </div>
+          </div>
+
+          <!-- Review 2 -->
+          <div class="review-card">
+            <div class="review-header">
+              <div class="review-avatar" style="background:#22c55e">M</div>
+              <div class="review-meta">
+                <div class="review-title">Midnight Run — Vocal Mix</div>
+                <div class="review-subtitle">by @vocalist · v2.1 · submitted 1d ago</div>
+              </div>
+              <div class="review-status status-open">Open</div>
+            </div>
+            <div class="review-body">
+              Vocal mix with new reverb chain. Need feedback on the bridge section.
+            </div>
+            <div class="review-tags">
+              <span class="tag green">vocals</span>
+              <span class="tag">mix</span>
+              <span class="tag primary">reverb</span>
+            </div>
+            <div class="review-progress">
+              <div class="review-progress-fill" style="width:20%;background:#3b82f6"></div>
+            </div>
+            <div class="review-footer">
+              <div class="review-footer-item">💬 3 comments</div>
+              <div class="review-footer-item">📎 1 file</div>
+              <div class="review-footer-item">👥 1 reviewer</div>
+              <div class="review-footer-item">⏱️ Round 1/3</div>
+            </div>
+          </div>
+
+          <!-- Review 3 -->
+          <div class="review-card">
+            <div class="review-header">
+              <div class="review-avatar" style="background:#eab308">S</div>
+              <div class="review-meta">
+                <div class="review-title">Summer Drums — Final Approval</div>
+                <div class="review-subtitle">by @drummer · v4.0 · submitted 3d ago</div>
+              </div>
+              <div class="review-status status-approved">Approved</div>
+            </div>
+            <div class="review-body">
+              All stems approved. Ready for release package generation.
+            </div>
+            <div class="review-tags">
+              <span class="tag green">approved</span>
+              <span class="tag primary">release</span>
+            </div>
+            <div class="review-progress">
+              <div class="review-progress-fill" style="width:100%;background:#22c55e"></div>
+            </div>
+            <div class="review-footer">
+              <div class="review-footer-item">💬 12 comments</div>
+              <div class="review-footer-item">📎 6 files</div>
+              <div class="review-footer-item">👥 3 reviewers</div>
+              <div class="review-footer-item">⏱️ Round 3/3</div>
+            </div>
+          </div>
+
+          <!-- Review 4 -->
+          <div class="review-card">
+            <div class="review-header">
+              <div class="review-avatar" style="background:#ef4444">C</div>
+              <div class="review-meta">
+                <div class="review-title">Crystal Echo — Stems Review</div>
+                <div class="review-subtitle">by @producer1 · v1.0 · submitted 5d ago</div>
+              </div>
+              <div class="review-status status-rejected">Rejected</div>
+            </div>
+            <div class="review-body">
+              Stems need re-recording. Timing issues on tracks 3-5.
+            </div>
+            <div class="review-tags">
+              <span class="tag red">rejected</span>
+              <span class="tag">stems</span>
+              <span class="tag red">timing</span>
+            </div>
+            <div class="review-progress">
+              <div class="review-progress-fill" style="width:100%;background:#ef4444"></div>
+            </div>
+            <div class="review-footer">
+              <div class="review-footer-item">💬 6 comments</div>
+              <div class="review-footer-item">📎 2 files</div>
+              <div class="review-footer-item">👥 2 reviewers</div>
+              <div class="review-footer-item">⏱️ Round 2/3</div>
+            </div>
+          </div>
+
+          <!-- Review 5 -->
+          <div class="review-card">
+            <div class="review-header">
+              <div class="review-avatar" style="background:#a855f7">L</div>
+              <div class="review-meta">
+                <div class="review-title">Lo-Fi Beats — A/B Comparison</div>
+                <div class="review-subtitle">by @lofimaster · v1.3 · submitted 1d ago</div>
+              </div>
+              <div class="review-status status-revision">Revision</div>
+            </div>
+            <div class="review-body">
+              Comparing old mix vs new mix. Need consensus on which version to keep.
+            </div>
+            <div class="review-tags">
+              <span class="tag" style="background:rgba(168,85,247,0.12);border-color:rgba(168,85,247,0.3);color:#a855f7">revision</span>
+              <span class="tag primary">A/B</span>
+              <span class="tag">mix</span>
+            </div>
+            <div class="review-progress">
+              <div class="review-progress-fill" style="width:45%;background:#a855f7"></div>
+            </div>
+            <div class="review-footer">
+              <div class="review-footer-item">💬 5 comments</div>
+              <div class="review-footer-item">📎 2 files</div>
+              <div class="review-footer-item">👥 2 reviewers</div>
+              <div class="review-footer-item">⏱️ Round 2/3</div>
+            </div>
+          </div>
+
+          <!-- Review 6 -->
+          <div class="review-card">
+            <div class="review-header">
+              <div class="review-avatar" style="background:#06b6d4">W</div>
+              <div class="review-meta">
+                <div class="review-title">Warm Pads — Sound Design Check</div>
+                <div class="review-subtitle">by @sounddesigner · v0.8 · submitted 6h ago</div>
+              </div>
+              <div class="review-status status-open">Open</div>
+            </div>
+            <div class="review-body">
+              New ambient pad textures. Need feedback on frequency spectrum.
+            </div>
+            <div class="review-tags">
+              <span class="tag green">ambient</span>
+              <span class="tag primary">pads</span>
+              <span class="tag">design</span>
+            </div>
+            <div class="review-progress">
+              <div class="review-progress-fill" style="width:10%;background:#3b82f6"></div>
+            </div>
+            <div class="review-footer">
+              <div class="review-footer-item">💬 1 comment</div>
+              <div class="review-footer-item">📎 1 file</div>
+              <div class="review-footer-item">👥 1 reviewer</div>
+              <div class="review-footer-item">⏱️ Round 1/3</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Detail Panel -->
+        <div class="detail-panel">
+          <div class="detail-header">
+            <div class="detail-title">Review Details</div>
+            <div style="display:flex;gap:6px">
+              <button class="btn btn-ghost" style="font-size:11px">⋯</button>
+              <button class="btn btn-ghost" style="font-size:11px">✕</button>
+            </div>
+          </div>
+          <div class="detail-body">
+            <!-- Waveform Player -->
+            <div class="waveform-player">
+              <div class="waveform-bars">
+                <div class="wave-bar" style="height:30%;background:#ea5808"></div>
+                <div class="wave-bar" style="height:50%;background:#ea5808"></div>
+                <div class="wave-bar" style="height:70%;background:#ea5808"></div>
+                <div class="wave-bar" style="height:45%;background:#ea5808"></div>
+                <div class="wave-bar" style="height:85%;background:#ea5808"></div>
+                <div class="wave-bar" style="height:60%;background:#ea5808"></div>
+                <div class="wave-bar" style="height:75%;background:#ea5808"></div>
+                <div class="wave-bar" style="height:40%;background:#ea5808"></div>
+                <div class="wave-bar" style="height:65%;background:#ea5808"></div>
+                <div class="wave-bar" style="height:55%;background:#ea5808"></div>
+                <div class="wave-bar" style="height:80%;background:#ea5808"></div>
+                <div class="wave-bar" style="height:50%;background:#ea5808"></div>
+                <div class="wave-bar" style="height:70%;background:#ea5808"></div>
+                <div class="wave-bar" style="height:60%;background:#ea5808"></div>
+                <div class="wave-bar" style="height:45%;background:#ea5808"></div>
+                <div class="wave-bar" style="height:75%;background:#ea5808"></div>
+                <div class="wave-bar" style="height:55%;background:#ea5808"></div>
+                <div class="wave-bar" style="height:65%;background:#ea5808"></div>
+                <div class="wave-bar" style="height:80%;background:#ea5808"></div>
+                <div class="wave-bar" style="height:50%;background:#ea5808"></div>
+                <div class="wave-bar" style="height:70%;background:#ea5808"></div>
+                <div class="wave-bar" style="height:40%;background:#ea5808"></div>
+                <div class="wave-bar" style="height:60%;background:#ea5808"></div>
+                <div class="wave-bar" style="height:75%;background:#ea5808"></div>
+                <div class="wave-bar" style="height:55%;background:#ea5808"></div>
+                <div class="wave-bar" style="height:85%;background:#ea5808"></div>
+                <div class="wave-bar" style="height:45%;background:#ea5808"></div>
+                <div class="wave-bar" style="height:65%;background:#ea5808"></div>
+                <div class="wave-bar" style="height:50%;background:#ea5808"></div>
+                <div class="wave-bar" style="height:70%;background:#ea5808"></div>
+                <div class="wave-bar" style="height:60%;background:#ea5808"></div>
+                <div class="wave-bar" style="height:80%;background:#ea5808"></div>
+                <div class="wave-bar" style="height:35%;background:#ea5808"></div>
+                <div class="wave-bar" style="height:55%;background:#ea5808"></div>
+                <div class="wave-bar" style="height:45%;background:#ea5808"></div>
+                <div class="wave-bar" style="height:70%;background:#ea5808"></div>
+                <div class="wave-bar" style="height:60%;background:#ea5808"></div>
+                <div class="wave-bar" style="height:50%;background:#ea5808"></div>
+                <div class="wave-bar" style="height:75%;background:#ea5808"></div>
+                <div class="wave-bar" style="height:40%;background:#ea5808"></div>
+              </div>
+              <div class="waveform-controls">
+                <div class="play-btn">▶</div>
+                <div class="waveform-progress">
+                  <div class="waveform-progress-fill"></div>
+                </div>
+                <div class="waveform-time">1:24 / 4:02</div>
+              </div>
+            </div>
+
+            <!-- Version Info -->
+            <div style="background:#0d0d0d;border:1px solid #27272a;border-radius:6px;padding:12px;margin-bottom:16px">
+              <div style="font-size:11px;color:#71717a;margin-bottom:8px">Version Info</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:11px">
+                <div><span style="color:#52525b">Version:</span> <span style="color:#e4e4e7;font-family:'JetBrains Mono',monospace">v3.2</span></div>
+                <div><span style="color:#52525b">Format:</span> <span style="color:#e4e4e7;font-family:'JetBrains Mono',monospace">WAV 24bit</span></div>
+                <div><span style="color:#52525b">Size:</span> <span style="color:#e4e4e7;font-family:'JetBrains Mono',monospace">4.1 GB</span></div>
+                <div><span style="color:#52525b">Duration:</span> <span style="color:#e4e4e7;font-family:'JetBrains Mono',monospace">4:02</span></div>
+                <div><span style="color:#52525b">Sample Rate:</span> <span style="color:#e4e4e7;font-family:'JetBrains Mono',monospace">48 kHz</span></div>
+                <div><span style="color:#52525b">Bit Depth:</span> <span style="color:#e4e4e7;font-family:'JetBrains Mono',monospace">24 bit</span></div>
+              </div>
+            </div>
+
+            <!-- QC Metrics -->
+            <div style="background:#0d0d0d;border:1px solid #27272a;border-radius:6px;padding:12px;margin-bottom:16px">
+              <div style="font-size:11px;color:#71717a;margin-bottom:8px">QC Metrics</div>
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px">
+                  <span style="color:#71717a">Loudness</span>
+                  <span style="color:#22c55e;font-family:'JetBrains Mono',monospace">-14.2 LUFS ✓</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px">
+                  <span style="color:#71717a">True Peak</span>
+                  <span style="color:#22c55e;font-family:'JetBrains Mono',monospace">-1.2 dBTP ✓</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px">
+                  <span style="color:#71717a">Dynamic Range</span>
+                  <span style="color:#eab308;font-family:'JetBrains Mono',monospace">8.1 LU ⚠</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px">
+                  <span style="color:#71717a">SNR</span>
+                  <span style="color:#22c55e;font-family:'JetBrains Mono',monospace">42 dB ✓</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Comment Thread -->
+            <div style="font-size:11px;color:#71717a;margin-bottom:8px">Comments (8)</div>
+            <div class="comment-thread">
+              <div class="comment">
+                <div class="comment-avatar" style="background:#ea5808">P</div>
+                <div class="comment-content">
+                  <div class="comment-header">
+                    <span class="comment-author">@producer1</span>
+                    <span class="comment-time">2h ago</span>
+                  </div>
+                  <div class="comment-body">Master ready for release. Loudness normalized to -14 LUFS.</div>
+                  <div class="comment-timestamp">⏱ 0:00 — 4:02</div>
+                  <div class="comment-actions">
+                    <span class="comment-action">↩ Reply</span>
+                    <span class="comment-action">👍 2</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="comment">
+                <div class="comment-avatar" style="background:#22c55e">R</div>
+                <div class="comment-content">
+                  <div class="comment-header">
+                    <span class="comment-author">@reviewer</span>
+                    <span class="comment-time">1h ago</span>
+                  </div>
+                  <div class="comment-body">Low-end sounds great on headphones. The kick at 1:24 is punchy.</div>
+                  <div class="comment-timestamp">⏱ 1:24</div>
+                  <div class="comment-actions">
+                    <span class="comment-action">↩ Reply</span>
+                    <span class="comment-action">👍 1</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="comment">
+                <div class="comment-avatar" style="background:#eab308">A</div>
+                <div class="comment-content">
+                  <div class="comment-header">
+                    <span class="comment-author">@audioguy</span>
+                    <span class="comment-time">45m ago</span>
+                  </div>
+                  <div class="comment-body">Dynamic range is a bit low at 8.1 LU. Consider backing off the limiter?</div>
+                  <div class="comment-timestamp">⏱ 2:15</div>
+                  <div class="comment-actions">
+                    <span class="comment-action">↩ Reply</span>
+                    <span class="comment-action">👍 0</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Feedback Form -->
+            <div class="feedback-form">
+              <textarea class="feedback-input" rows="3" placeholder="Add feedback... Use @timestamp to reference a specific point"></textarea>
+              <div class="feedback-actions">
+                <div class="feedback-tools">
+                  <div class="tool-btn">📎</div>
+                  <div class="tool-btn">⏱</div>
+                  <div class="tool-btn">🎵</div>
+                  <div class="tool-btn">📐</div>
+                </div>
+                <div style="display:flex;gap:6px">
+                  <button class="btn btn-secondary" style="font-size:11px">Save Draft</button>
+                  <button class="btn btn-primary" style="font-size:11px">Submit</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Device Chain -->
+      <div class="device-chain">
+        <span class="device-chain-label">Review Tools:</span>
+        <div class="device active"><div class="led"></div> Waveform</div>
+        <div class="device"><div class="led"></div> Spectrogram</div>
+        <div class="device"><div class="led"></div> Loudness</div>
+        <div class="device"><div class="led"></div> A/B Compare</div>
+        <div class="device"><div class="led"></div> Comments</div>
+        <div class="device-chain-spacer"></div>
+        <span class="device-chain-label">Now Playing:</span>
+        <div class="device active"><div class="led"></div> ▶ Neon Warehouse — v3.2</div>
+      </div>
+    </div>
+
+    <!-- Right Panel -->
+    <div class="right-panel">
+      <div class="panel-section">
+        <div class="panel-section-title">Review Stats</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+          <div style="padding:8px;background:#0d0d0d;border:1px solid #27272a;border-radius:4px;text-align:center">
+            <div style="font-size:16px;font-weight:700;color:#3b82f6;font-family:'JetBrains Mono',monospace">12</div>
+            <div style="font-size:9px;color:#71717a;margin-top:2px">Open</div>
+          </div>
+          <div style="padding:8px;background:#0d0d0d;border:1px solid #27272a;border-radius:4px;text-align:center">
+            <div style="font-size:16px;font-weight:700;color:#eab308;font-family:'JetBrains Mono',monospace">8</div>
+            <div style="font-size:9px;color:#71717a;margin-top:2px">In Review</div>
+          </div>
+          <div style="padding:8px;background:#0d0d0d;border:1px solid #27272a;border-radius:4px;text-align:center">
+            <div style="font-size:16px;font-weight:700;color:#22c55e;font-family:'JetBrains Mono',monospace">47</div>
+            <div style="font-size:9px;color:#71717a;margin-top:2px">Approved</div>
+          </div>
+          <div style="padding:8px;background:#0d0d0d;border:1px solid #27272a;border-radius:4px;text-align:center">
+            <div style="font-size:16px;font-weight:700;color:#ef4444;font-family:'JetBrains Mono',monospace">3</div>
+            <div style="font-size:9px;color:#71717a;margin-top:2px">Rejected</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <div class="panel-section-title">My Reviews</div>
+        <div class="panel-stat">
+          <span class="panel-stat-label">Assigned</span>
+          <span class="panel-stat-value" style="color:#3b82f6">5</span>
+        </div>
+        <div class="panel-stat">
+          <span class="panel-stat-label">Submitted</span>
+          <span class="panel-stat-value" style="color:#eab308">3</span>
+        </div>
+        <div class="panel-stat">
+          <span class="panel-stat-label">Completed</span>
+          <span class="panel-stat-value" style="color:#22c55e">12</span>
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <div class="panel-section-title">Recent Activity</div>
+        <div style="font-size:11px;color:#a1a1aa;line-height:1.6">
+          <div style="margin-bottom:6px"><span style="color:#22c55e">@reviewer</span> approved <span style="color:#ea5808">Summer Drums</span></div>
+          <div style="margin-bottom:6px"><span style="color:#eab308">@audioguy</span> commented on <span style="color:#ea5808">Neon Warehouse</span></div>
+          <div style="margin-bottom:6px"><span style="color:#ef4444">@producer1</span> rejected <span style="color:#ea5808">Crystal Echo</span></div>
+          <div><span style="color:#a855f7">@lofimaster</span> requested revision on <span style="color:#ea5808">Lo-Fi Beats</span></div>
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <div class="panel-section-title">Reviewers</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;align-items:center;gap:8px;font-size:11px">
+            <span style="width:24px;height:24px;background:#22c55e;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff">R</span>
+            <div>
+              <div style="color:#e4e4e7;font-weight:500">@reviewer</div>
+              <div style="color:#52525b;font-size:10px">14 reviews</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:11px">
+            <span style="width:24px;height:24px;background:#eab308;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;color:#000">A</span>
+            <div>
+              <div style="color:#e4e4e7;font-weight:500">@audioguy</div>
+              <div style="color:#52525b;font-size:10px">9 reviews</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:11px">
+            <span style="width:24px;height:24px;background:#ea5808;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff">M</span>
+            <div>
+              <div style="color:#e4e4e7;font-weight:500">@mixmaster</div>
+              <div style="color:#52525b;font-size:10px">7 reviews</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body></html>
+    </div>
+  </foreignObject>
+</svg>

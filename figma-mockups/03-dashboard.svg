@@ -1,0 +1,362 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" width="1440" height="900">
+  <defs>
+    <linearGradient id="dashGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#8B5CF6;stop-opacity:0.1"/>
+      <stop offset="100%" style="stop-color:#06B6D4;stop-opacity:0.05"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1440" height="900" fill="#0A0A0B"/>
+
+  <!-- Sidebar -->
+  <rect width="260" height="900" fill="#111113"/>
+  <line x1="260" y1="0" x2="260" y2="900" stroke="#1F1F23" stroke-width="1"/>
+
+  <!-- Logo -->
+  <text x="28" y="38" font-family="Inter, sans-serif" font-size="18" font-weight="800" fill="#FFFFFF">🎵 SoundHub</text>
+  <!-- Collapse btn -->
+  <rect x="220" y="24" width="28" height="28" rx="6" fill="transparent" stroke="#27272A" stroke-width="1"/>
+  <text x="234" y="44" font-family="Inter, sans-serif" font-size="12" fill="#71717A">◀</text>
+
+  <!-- Sidebar nav -->
+  <text x="28" y="90" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#52525B" letter-spacing="1">MAIN</text>
+  <!-- Active item -->
+  <rect x="16" y="100" width="228" height="36" rx="8" fill="#8B5CF6" opacity="0.12"/>
+  <text x="44" y="123" font-family="Inter, sans-serif" font-size="14" font-weight="600" fill="#8B5CF6">📊 Dashboard</text>
+  <text x="216" y="123" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#8B5CF6">3</text>
+
+  <text x="44" y="163" font-family="Inter, sans-serif" font-size="14" font-weight="500" fill="#A1A1AA">📁 Projects</text>
+  <text x="44" y="198" font-family="Inter, sans-serif" font-size="14" font-weight="500" fill="#A1A1AA">🎵 Sessions</text>
+  <text x="44" y="233" font-family="Inter, sans-serif" font-size="14" font-weight="500" fill="#A1A1AA">🛒 Marketplace</text>
+
+  <line x1="28" y1="260" x2="232" y2="260" stroke="#1F1F23" stroke-width="1"/>
+  <text x="28" y="290" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#52525B" letter-spacing="1">TOOLS</text>
+  <text x="44" y="318" font-family="Inter, sans-serif" font-size="14" font-weight="500" fill="#A1A1AA">⬆️ Upload</text>
+  <text x="44" y="353" font-family="Inter, sans-serif" font-size="14" font-weight="500" fill="#A1A1AA">📈 Analytics</text>
+  <text x="44" y="388" font-family="Inter, sans-serif" font-size="14" font-weight="500" fill="#A1A1AA">⚙️ Settings</text>
+
+  <!-- Sidebar bottom -->
+  <line x1="28" y1="820" x2="232" y2="820" stroke="#1F1F23" stroke-width="1"/>
+  <circle cx="44" cy="848" r="16" fill="#27272A"/>
+  <text x="44" y="853" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#A1A1AA">V</text>
+  <text x="68" y="845" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#E4E4E7">Vasyl</text>
+  <text x="68" y="860" font-family="Inter, sans-serif" font-size="11" fill="#52525B">Producer</text>
+
+  <!-- Main content -->
+  <rect x="260" y="0" width="1180" height="900" fill="#0A0A0B"/>
+
+  <!-- Top bar -->
+  <rect x="260" y="0" width="1180" height="60" fill="#0A0A0B" opacity="0.95"/>
+  <line x1="260" y1="60" x2="1440" y2="60" stroke="#1F1F23" stroke-width="1"/>
+  <!-- Search -->
+  <rect x="290" y="14" width="320" height="36" rx="8" fill="#18181B" stroke="#27272A" stroke-width="1"/>
+  <text x="310" y="37" font-family="Inter, sans-serif" font-size="13" fill="#52525B">🔍 Search projects, sessions...</text>
+  <rect x="570" y="20" width="28" height="22" rx="4" fill="#27272A"/>
+  <text x="584" y="36" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#71717A">⌘K</text>
+
+  <!-- Right actions -->
+  <rect x="1280" y="16" width="36" height="32" rx="8" fill="transparent" stroke="#27272A" stroke-width="1"/>
+  <text x="1298" y="38" font-family="Inter, sans-serif" font-size="14" fill="#A1A1AA">🔔</text>
+  <!-- Notification dot -->
+  <circle cx="1310" cy="22" r="5" fill="#EF4444"/>
+
+  <!-- Online indicator -->
+  <circle cx="1340" cy="32" r="5" fill="#22C55E"/>
+  <text x="1352" y="37" font-family="Inter, sans-serif" font-size="11" fill="#22C55E">Online</text>
+
+  <!-- Page title -->
+  <text x="290" y="100" font-family="Inter, -apple-system, sans-serif" font-size="28" font-weight="800" fill="#FFFFFF">Dashboard</text>
+  <text x="290" y="124" font-family="Inter, sans-serif" font-size="14" fill="#71717A">Welcome back, Vasyl. You have 3 active projects.</text>
+
+  <!-- Stats cards -->
+  <!-- Card 1 -->
+  <rect x="290" y="150" width="250" height="100" rx="12" fill="#111113" stroke="#27272A" stroke-width="1"/>
+  <rect x="310" y="170" width="36" height="36" rx="8" fill="#8B5CF6" opacity="0.12"/>
+  <text x="328" y="194" font-family="Inter, sans-serif" font-size="16">📁</text>
+  <text x="358" y="186" font-family="Inter, sans-serif" font-size="12" fill="#71717A">Projects</text>
+  <text x="358" y="210" font-family="Inter, sans-serif" font-size="28" font-weight="800" fill="#FFFFFF">12</text>
+  <text x="410" y="210" font-family="Inter, sans-serif" font-size="12" fill="#22C55E">+2</text>
+
+  <!-- Card 2 -->
+  <rect x="560" y="150" width="250" height="100" rx="12" fill="#111113" stroke="#27272A" stroke-width="1"/>
+  <rect x="580" y="170" width="36" height="36" rx="8" fill="#06B6D4" opacity="0.12"/>
+  <text x="598" y="194" font-family="Inter, sans-serif" font-size="16">💬</text>
+  <text x="628" y="186" font-family="Inter, sans-serif" font-size="12" fill="#71717A">Reviews</text>
+  <text x="628" y="210" font-family="Inter, sans-serif" font-size="28" font-weight="800" fill="#FFFFFF">47</text>
+  <text x="680" y="210" font-family="Inter, sans-serif" font-size="12" fill="#22C55E">+8</text>
+
+  <!-- Card 3 -->
+  <rect x="830" y="150" width="250" height="100" rx="12" fill="#111113" stroke="#27272A" stroke-width="1"/>
+  <rect x="850" y="170" width="36" height="36" rx="8" fill="#EAB308" opacity="0.12"/>
+  <text x="868" y="194" font-family="Inter, sans-serif" font-size="16">🌍</text>
+  <text x="898" y="186" font-family="Inter, sans-serif" font-size="12" fill="#71717A">Marketplace</text>
+  <text x="898" y="210" font-family="Inter, sans-serif" font-size="28" font-weight="800" fill="#FFFFFF">234</text>
+  <text x="960" y="210" font-family="Inter, sans-serif" font-size="12" fill="#22C55E">+12</text>
+
+  <!-- Card 4 -->
+  <rect x="1100" y="150" width="250" height="100" rx="12" fill="#111113" stroke="#27272A" stroke-width="1"/>
+  <rect x="1120" y="170" width="36" height="36" rx="8" fill="#22C55E" opacity="0.12"/>
+  <text x="1138" y="194" font-family="Inter, sans-serif" font-size="16">💰</text>
+  <text x="1168" y="186" font-family="Inter, sans-serif" font-size="12" fill="#71717A">Revenue</text>
+  <text x="1168" y="210" font-family="Inter, sans-serif" font-size="28" font-weight="800" fill="#FFFFFF">$1,240</text>
+  <text x="1270" y="210" font-family="Inter, sans-serif" font-size="12" fill="#22C55E">+18%</text>
+
+  <!-- Recent Projects -->
+  <text x="290" y="290" font-family="Inter, sans-serif" font-size="16" font-weight="700" fill="#FFFFFF">Recent Projects</text>
+  <text x="1380" y="290" text-anchor="end" font-family="Inter, sans-serif" font-size="13" fill="#8B5CF6">View all →</text>
+
+  <!-- Project card 1 -->
+  <rect x="290" y="310" width="340" height="200" rx="12" fill="#111113" stroke="#27272A" stroke-width="1"/>
+  <!-- Waveform -->
+  <g transform="translate(310, 330)">
+    <rect x="0" y="14" width="3" height="12" rx="1" fill="#3F3F46"/>
+    <rect x="5" y="8" width="3" height="24" rx="1" fill="#8B5CF6" opacity="0.4"/>
+    <rect x="10" y="4" width="3" height="32" rx="1" fill="#8B5CF6" opacity="0.6"/>
+    <rect x="15" y="10" width="3" height="20" rx="1" fill="#8B5CF6" opacity="0.4"/>
+    <rect x="20" y="16" width="3" height="8" rx="1" fill="#3F3F46"/>
+    <rect x="25" y="6" width="3" height="28" rx="1" fill="#8B5CF6" opacity="0.4"/>
+    <rect x="30" y="2" width="3" height="36" rx="1" fill="#8B5CF6" opacity="0.6"/>
+    <rect x="35" y="0" width="3" height="40" rx="1" fill="#8B5CF6"/>
+    <rect x="40" y="4" width="3" height="32" rx="1" fill="#8B5CF6" opacity="0.6"/>
+    <rect x="45" y="8" width="3" height="24" rx="1" fill="#8B5CF6" opacity="0.4"/>
+    <rect x="50" y="14" width="3" height="12" rx="1" fill="#3F3F46"/>
+    <rect x="55" y="10" width="3" height="20" rx="1" fill="#8B5CF6" opacity="0.4"/>
+    <rect x="60" y="4" width="3" height="32" rx="1" fill="#8B5CF6" opacity="0.6"/>
+    <rect x="65" y="6" width="3" height="28" rx="1" fill="#8B5CF6" opacity="0.4"/>
+    <rect x="70" y="12" width="3" height="16" rx="1" fill="#3F3F46"/>
+    <rect x="75" y="8" width="3" height="24" rx="1" fill="#8B5CF6" opacity="0.4"/>
+    <rect x="80" y="2" width="3" height="36" rx="1" fill="#8B5CF6" opacity="0.6"/>
+    <rect x="85" y="0" width="3" height="40" rx="1" fill="#8B5CF6"/>
+    <rect x="90" y="4" width="3" height="32" rx="1" fill="#8B5CF6" opacity="0.6"/>
+    <rect x="95" y="10" width="3" height="20" rx="1" fill="#8B5CF6" opacity="0.4"/>
+    <rect x="100" y="14" width="3" height="12" rx="1" fill="#3F3F46"/>
+    <rect x="105" y="8" width="3" height="24" rx="1" fill="#8B5CF6" opacity="0.4"/>
+    <rect x="110" y="2" width="3" height="36" rx="1" fill="#8B5CF6" opacity="0.6"/>
+    <rect x="115" y="6" width="3" height="28" rx="1" fill="#8B5CF6" opacity="0.4"/>
+    <rect x="120" y="12" width="3" height="16" rx="1" fill="#3F3F46"/>
+    <rect x="125" y="16" width="3" height="8" rx="1" fill="#3F3F46"/>
+    <rect x="130" y="10" width="3" height="20" rx="1" fill="#8B5CF6" opacity="0.4"/>
+    <rect x="135" y="4" width="3" height="32" rx="1" fill="#8B5CF6" opacity="0.6"/>
+    <rect x="140" y="0" width="3" height="40" rx="1" fill="#8B5CF6"/>
+    <rect x="145" y="6" width="3" height="28" rx="1" fill="#8B5CF6" opacity="0.4"/>
+    <rect x="150" y="12" width="3" height="16" rx="1" fill="#3F3F46"/>
+    <rect x="155" y="8" width="3" height="24" rx="1" fill="#8B5CF6" opacity="0.4"/>
+    <rect x="160" y="2" width="3" height="36" rx="1" fill="#8B5CF6" opacity="0.6"/>
+    <rect x="165" y="4" width="3" height="32" rx="1" fill="#8B5CF6" opacity="0.6"/>
+    <rect x="170" y="10" width="3" height="20" rx="1" fill="#8B5CF6" opacity="0.4"/>
+    <rect x="175" y="14" width="3" height="12" rx="1" fill="#3F3F46"/>
+    <rect x="180" y="16" width="3" height="8" rx="1" fill="#3F3F46"/>
+    <rect x="185" y="10" width="3" height="20" rx="1" fill="#8B5CF6" opacity="0.4"/>
+    <rect x="190" y="4" width="3" height="32" rx="1" fill="#8B5CF6" opacity="0.6"/>
+    <rect x="195" y="8" width="3" height="24" rx="1" fill="#8B5CF6" opacity="0.4"/>
+    <rect x="200" y="14" width="3" height="12" rx="1" fill="#3F3F46"/>
+    <rect x="205" y="10" width="3" height="20" rx="1" fill="#8B5CF6" opacity="0.4"/>
+    <rect x="210" y="2" width="3" height="36" rx="1" fill="#8B5CF6" opacity="0.6"/>
+    <rect x="215" y="0" width="3" height="40" rx="1" fill="#8B5CF6"/>
+    <rect x="220" y="6" width="3" height="28" rx="1" fill="#8B5CF6" opacity="0.4"/>
+    <rect x="225" y="12" width="3" height="16" rx="1" fill="#3F3F46"/>
+    <rect x="230" y="16" width="3" height="8" rx="1" fill="#3F3F46"/>
+    <rect x="235" y="10" width="3" height="20" rx="1" fill="#8B5CF6" opacity="0.4"/>
+    <rect x="240" y="4" width="3" height="32" rx="1" fill="#8B5CF6" opacity="0.6"/>
+    <rect x="245" y="8" width="3" height="24" rx="1" fill="#8B5CF6" opacity="0.4"/>
+    <rect x="250" y="14" width="3" height="12" rx="1" fill="#3F3F46"/>
+    <rect x="255" y="10" width="3" height="20" rx="1" fill="#8B5CF6" opacity="0.4"/>
+    <rect x="260" y="6" width="3" height="28" rx="1" fill="#8B5CF6" opacity="0.4"/>
+    <rect x="265" y="2" width="3" height="36" rx="1" fill="#8B5CF6" opacity="0.6"/>
+    <rect x="270" y="0" width="3" height="40" rx="1" fill="#8B5CF6"/>
+    <rect x="275" y="4" width="3" height="32" rx="1" fill="#8B5CF6" opacity="0.6"/>
+    <rect x="280" y="10" width="3" height="20" rx="1" fill="#8B5CF6" opacity="0.4"/>
+    <rect x="285" y="14" width="3" height="12" rx="1" fill="#3F3F46"/>
+    <rect x="290" y="16" width="3" height="8" rx="1" fill="#3F3F46"/>
+    <rect x="295" y="10" width="3" height="20" rx="1" fill="#8B5CF6" opacity="0.4"/>
+    <rect x="300" y="4" width="3" height="32" rx="1" fill="#8B5CF6" opacity="0.6"/>
+    <rect x="305" y="8" width="3" height="24" rx="1" fill="#8B5CF6" opacity="0.4"/>
+    <rect x="310" y="14" width="3" height="12" rx="1" fill="#3F3F46"/>
+  </g>
+  <text x="310" y="400" font-family="Inter, sans-serif" font-size="16" font-weight="700" fill="#FFFFFF">Neon Bloom</text>
+  <text x="310" y="420" font-family="Inter, sans-serif" font-size="13" fill="#71717A">Electronic · 128 BPM · F# minor</text>
+  <rect x="310" y="432" width="56" height="20" rx="6" fill="#22C55E" opacity="0.12"/>
+  <text x="324" y="447" font-family="Inter, sans-serif" font-size="10" font-weight="700" fill="#22C55E">READY</text>
+  <text x="560" y="448" font-family="Inter, sans-serif" font-size="12" fill="#52525B">v3.2 · 2h ago</text>
+
+  <!-- Project card 2 -->
+  <rect x="650" y="310" width="340" height="200" rx="12" fill="#111113" stroke="#27272A" stroke-width="1"/>
+  <g transform="translate(670, 330)">
+    <rect x="0" y="8" width="3" height="24" rx="1" fill="#06B6D4" opacity="0.4"/>
+    <rect x="5" y="4" width="3" height="32" rx="1" fill="#06B6D4" opacity="0.6"/>
+    <rect x="10" y="0" width="3" height="40" rx="1" fill="#06B6D4"/>
+    <rect x="15" y="6" width="3" height="28" rx="1" fill="#06B6D4" opacity="0.6"/>
+    <rect x="20" y="12" width="3" height="16" rx="1" fill="#3F3F46"/>
+    <rect x="25" y="4" width="3" height="32" rx="1" fill="#06B6D4" opacity="0.6"/>
+    <rect x="30" y="2" width="3" height="36" rx="1" fill="#06B6D4" opacity="0.6"/>
+    <rect x="35" y="8" width="3" height="24" rx="1" fill="#06B6D4" opacity="0.4"/>
+    <rect x="40" y="14" width="3" height="12" rx="1" fill="#3F3F46"/>
+    <rect x="45" y="10" width="3" height="20" rx="1" fill="#06B6D4" opacity="0.4"/>
+    <rect x="50" y="4" width="3" height="32" rx="1" fill="#06B6D4" opacity="0.6"/>
+    <rect x="55" y="0" width="3" height="40" rx="1" fill="#06B6D4"/>
+    <rect x="60" y="6" width="3" height="28" rx="1" fill="#06B6D4" opacity="0.6"/>
+    <rect x="65" y="12" width="3" height="16" rx="1" fill="#3F3F46"/>
+    <rect x="70" y="8" width="3" height="24" rx="1" fill="#06B6D4" opacity="0.4"/>
+    <rect x="75" y="2" width="3" height="36" rx="1" fill="#06B6D4" opacity="0.6"/>
+    <rect x="80" y="4" width="3" height="32" rx="1" fill="#06B6D4" opacity="0.6"/>
+    <rect x="85" y="10" width="3" height="20" rx="1" fill="#06B6D4" opacity="0.4"/>
+    <rect x="90" y="16" width="3" height="8" rx="1" fill="#3F3F46"/>
+    <rect x="95" y="8" width="3" height="24" rx="1" fill="#06B6D4" opacity="0.4"/>
+    <rect x="100" y="0" width="3" height="40" rx="1" fill="#06B6D4"/>
+    <rect x="105" y="6" width="3" height="28" rx="1" fill="#06B6D4" opacity="0.6"/>
+    <rect x="110" y="12" width="3" height="16" rx="1" fill="#3F3F46"/>
+    <rect x="115" y="4" width="3" height="32" rx="1" fill="#06B6D4" opacity="0.6"/>
+    <rect x="120" y="8" width="3" height="24" rx="1" fill="#06B6D4" opacity="0.4"/>
+    <rect x="125" y="14" width="3" height="12" rx="1" fill="#3F3F46"/>
+    <rect x="130" y="10" width="3" height="20" rx="1" fill="#06B6D4" opacity="0.4"/>
+    <rect x="135" y="2" width="3" height="36" rx="1" fill="#06B6D4" opacity="0.6"/>
+    <rect x="140" y="0" width="3" height="40" rx="1" fill="#06B6D4"/>
+    <rect x="145" y="6" width="3" height="28" rx="1" fill="#06B6D4" opacity="0.6"/>
+    <rect x="150" y="12" width="3" height="16" rx="1" fill="#3F3F46"/>
+    <rect x="155" y="8" width="3" height="24" rx="1" fill="#06B6D4" opacity="0.4"/>
+    <rect x="160" y="4" width="3" height="32" rx="1" fill="#06B6D4" opacity="0.6"/>
+    <rect x="165" y="10" width="3" height="20" rx="1" fill="#06B6D4" opacity="0.4"/>
+    <rect x="170" y="14" width="3" height="12" rx="1" fill="#3F3F46"/>
+    <rect x="175" y="8" width="3" height="24" rx="1" fill="#06B6D4" opacity="0.4"/>
+    <rect x="180" y="2" width="3" height="36" rx="1" fill="#06B6D4" opacity="0.6"/>
+    <rect x="185" y="0" width="3" height="40" rx="1" fill="#06B6D4"/>
+    <rect x="190" y="6" width="3" height="28" rx="1" fill="#06B6D4" opacity="0.6"/>
+    <rect x="195" y="12" width="3" height="16" rx="1" fill="#3F3F46"/>
+    <rect x="200" y="10" width="3" height="20" rx="1" fill="#06B6D4" opacity="0.4"/>
+    <rect x="205" y="4" width="3" height="32" rx="1" fill="#06B6D4" opacity="0.6"/>
+    <rect x="210" y="8" width="3" height="24" rx="1" fill="#06B6D4" opacity="0.4"/>
+    <rect x="215" y="14" width="3" height="12" rx="1" fill="#3F3F46"/>
+    <rect x="220" y="10" width="3" height="20" rx="1" fill="#06B6D4" opacity="0.4"/>
+    <rect x="225" y="4" width="3" height="32" rx="1" fill="#06B6D4" opacity="0.6"/>
+    <rect x="230" y="2" width="3" height="36" rx="1" fill="#06B6D4" opacity="0.6"/>
+    <rect x="235" y="8" width="3" height="24" rx="1" fill="#06B6D4" opacity="0.4"/>
+    <rect x="240" y="14" width="3" height="12" rx="1" fill="#3F3F46"/>
+    <rect x="245" y="10" width="3" height="20" rx="1" fill="#06B6D4" opacity="0.4"/>
+    <rect x="250" y="6" width="3" height="28" rx="1" fill="#06B6D4" opacity="0.6"/>
+    <rect x="255" y="0" width="3" height="40" rx="1" fill="#06B6D4"/>
+    <rect x="260" y="4" width="3" height="32" rx="1" fill="#06B6D4" opacity="0.6"/>
+    <rect x="265" y="12" width="3" height="16" rx="1" fill="#3F3F46"/>
+    <rect x="270" y="8" width="3" height="24" rx="1" fill="#06B6D4" opacity="0.4"/>
+    <rect x="275" y="4" width="3" height="32" rx="1" fill="#06B6D4" opacity="0.6"/>
+    <rect x="280" y="0" width="3" height="40" rx="1" fill="#06B6D4"/>
+    <rect x="285" y="8" width="3" height="24" rx="1" fill="#06B6D4" opacity="0.4"/>
+    <rect x="290" y="14" width="3" height="12" rx="1" fill="#3F3F46"/>
+    <rect x="295" y="10" width="3" height="20" rx="1" fill="#06B6D4" opacity="0.4"/>
+    <rect x="300" y="4" width="3" height="32" rx="1" fill="#06B6D4" opacity="0.6"/>
+    <rect x="305" y="8" width="3" height="24" rx="1" fill="#06B6D4" opacity="0.4"/>
+    <rect x="310" y="14" width="3" height="12" rx="1" fill="#3F3F46"/>
+  </g>
+  <text x="670" y="400" font-family="Inter, sans-serif" font-size="16" font-weight="700" fill="#FFFFFF">Midnight Drive</text>
+  <text x="670" y="420" font-family="Inter, sans-serif" font-size="13" fill="#71717A">Synthwave · 110 BPM · A minor</text>
+  <rect x="670" y="432" width="72" height="20" rx="6" fill="#EAB308" opacity="0.12"/>
+  <text x="682" y="447" font-family="Inter, sans-serif" font-size="10" font-weight="700" fill="#EAB308">REVIEW</text>
+  <text x="920" y="448" font-family="Inter, sans-serif" font-size="12" fill="#52525B">v2.1 · 5h ago</text>
+
+  <!-- Project card 3 -->
+  <rect x="1010" y="310" width="340" height="200" rx="12" fill="#111113" stroke="#27272A" stroke-width="1"/>
+  <g transform="translate(1030, 330)">
+    <rect x="0" y="10" width="3" height="20" rx="1" fill="#EF4444" opacity="0.4"/>
+    <rect x="5" y="6" width="3" height="28" rx="1" fill="#EF4444" opacity="0.6"/>
+    <rect x="10" y="2" width="3" height="36" rx="1" fill="#EF4444" opacity="0.6"/>
+    <rect x="15" y="8" width="3" height="24" rx="1" fill="#EF4444" opacity="0.4"/>
+    <rect x="20" y="14" width="3" height="12" rx="1" fill="#3F3F46"/>
+    <rect x="25" y="4" width="3" height="32" rx="1" fill="#EF4444" opacity="0.6"/>
+    <rect x="30" y="0" width="3" height="40" rx="1" fill="#EF4444"/>
+    <rect x="35" y="6" width="3" height="28" rx="1" fill="#EF4444" opacity="0.6"/>
+    <rect x="40" y="12" width="3" height="16" rx="1" fill="#3F3F46"/>
+    <rect x="45" y="8" width="3" height="24" rx="1" fill="#EF4444" opacity="0.4"/>
+    <rect x="50" y="2" width="3" height="36" rx="1" fill="#EF4444" opacity="0.6"/>
+    <rect x="55" y="4" width="3" height="32" rx="1" fill="#EF4444" opacity="0.6"/>
+    <rect x="60" y="10" width="3" height="20" rx="1" fill="#EF4444" opacity="0.4"/>
+    <rect x="65" y="16" width="3" height="8" rx="1" fill="#3F3F46"/>
+    <rect x="70" y="8" width="3" height="24" rx="1" fill="#EF4444" opacity="0.4"/>
+    <rect x="75" y="0" width="3" height="40" rx="1" fill="#EF4444"/>
+    <rect x="80" y="6" width="3" height="28" rx="1" fill="#EF4444" opacity="0.6"/>
+    <rect x="85" y="12" width="3" height="16" rx="1" fill="#3F3F46"/>
+    <rect x="90" y="4" width="3" height="32" rx="1" fill="#EF4444" opacity="0.6"/>
+    <rect x="95" y="8" width="3" height="24" rx="1" fill="#EF4444" opacity="0.4"/>
+    <rect x="100" y="14" width="3" height="12" rx="1" fill="#3F3F46"/>
+    <rect x="105" y="10" width="3" height="20" rx="1" fill="#EF4444" opacity="0.4"/>
+    <rect x="110" y="4" width="3" height="32" rx="1" fill="#EF4444" opacity="0.6"/>
+    <rect x="115" y="2" width="3" height="36" rx="1" fill="#EF4444" opacity="0.6"/>
+    <rect x="120" y="8" width="3" height="24" rx="1" fill="#EF4444" opacity="0.4"/>
+    <rect x="125" y="14" width="3" height="12" rx="1" fill="#3F3F46"/>
+    <rect x="130" y="10" width="3" height="20" rx="1" fill="#EF4444" opacity="0.4"/>
+    <rect x="135" y="6" width="3" height="28" rx="1" fill="#EF4444" opacity="0.6"/>
+    <rect x="140" y="0" width="3" height="40" rx="1" fill="#EF4444"/>
+    <rect x="145" y="4" width="3" height="32" rx="1" fill="#EF4444" opacity="0.6"/>
+    <rect x="150" y="12" width="3" height="16" rx="1" fill="#3F3F46"/>
+    <rect x="155" y="8" width="3" height="24" rx="1" fill="#EF4444" opacity="0.4"/>
+    <rect x="160" y="2" width="3" height="36" rx="1" fill="#EF4444" opacity="0.6"/>
+    <rect x="165" y="6" width="3" height="28" rx="1" fill="#EF4444" opacity="0.6"/>
+    <rect x="170" y="10" width="3" height="20" rx="1" fill="#EF4444" opacity="0.4"/>
+    <rect x="175" y="16" width="3" height="8" rx="1" fill="#3F3F46"/>
+    <rect x="180" y="10" width="3" height="20" rx="1" fill="#EF4444" opacity="0.4"/>
+    <rect x="185" y="4" width="3" height="32" rx="1" fill="#EF4444" opacity="0.6"/>
+    <rect x="190" y="0" width="3" height="40" rx="1" fill="#EF4444"/>
+    <rect x="195" y="8" width="3" height="24" rx="1" fill="#EF4444" opacity="0.4"/>
+    <rect x="200" y="14" width="3" height="12" rx="1" fill="#3F3F46"/>
+    <rect x="205" y="10" width="3" height="20" rx="1" fill="#EF4444" opacity="0.4"/>
+    <rect x="210" y="6" width="3" height="28" rx="1" fill="#EF4444" opacity="0.6"/>
+    <rect x="215" y="2" width="3" height="36" rx="1" fill="#EF4444" opacity="0.6"/>
+    <rect x="220" y="8" width="3" height="24" rx="1" fill="#EF4444" opacity="0.4"/>
+    <rect x="225" y="14" width="3" height="12" rx="1" fill="#3F3F46"/>
+    <rect x="230" y="10" width="3" height="20" rx="1" fill="#EF4444" opacity="0.4"/>
+    <rect x="235" y="4" width="3" height="32" rx="1" fill="#EF4444" opacity="0.6"/>
+    <rect x="240" y="0" width="3" height="40" rx="1" fill="#EF4444"/>
+    <rect x="245" y="6" width="3" height="28" rx="1" fill="#EF4444" opacity="0.6"/>
+    <rect x="250" y="12" width="3" height="16" rx="1" fill="#3F3F46"/>
+    <rect x="255" y="8" width="3" height="24" rx="1" fill="#EF4444" opacity="0.4"/>
+    <rect x="260" y="4" width="3" height="32" rx="1" fill="#EF4444" opacity="0.6"/>
+    <rect x="265" y="10" width="3" height="20" rx="1" fill="#EF4444" opacity="0.4"/>
+    <rect x="270" y="14" width="3" height="12" rx="1" fill="#3F3F46"/>
+    <rect x="275" y="10" width="3" height="20" rx="1" fill="#EF4444" opacity="0.4"/>
+    <rect x="280" y="4" width="3" height="32" rx="1" fill="#EF4444" opacity="0.6"/>
+    <rect x="285" y="2" width="3" height="36" rx="1" fill="#EF4444" opacity="0.6"/>
+    <rect x="290" y="8" width="3" height="24" rx="1" fill="#EF4444" opacity="0.4"/>
+    <rect x="295" y="14" width="3" height="12" rx="1" fill="#3F3F46"/>
+    <rect x="300" y="10" width="3" height="20" rx="1" fill="#EF4444" opacity="0.4"/>
+    <rect x="305" y="6" width="3" height="28" rx="1" fill="#EF4444" opacity="0.6"/>
+    <rect x="310" y="0" width="3" height="40" rx="1" fill="#EF4444"/>
+  </g>
+  <text x="1030" y="400" font-family="Inter, sans-serif" font-size="16" font-weight="700" fill="#FFFFFF">Solar Wind</text>
+  <text x="1030" y="420" font-family="Inter, sans-serif" font-size="13" fill="#71717A">Ambient · 90 BPM · C major</text>
+  <rect x="1030" y="432" width="68" height="20" rx="6" fill="#EF4444" opacity="0.12"/>
+  <text x="1042" y="447" font-family="Inter, sans-serif" font-size="10" font-weight="700" fill="#EF4444">DRAFT</text>
+  <text x="1280" y="448" font-family="Inter, sans-serif" font-size="12" fill="#52525B">v1.0 · 1d ago</text>
+
+  <!-- Activity section -->
+  <text x="290" y="540" font-family="Inter, sans-serif" font-size="16" font-weight="700" fill="#FFFFFF">Recent Activity</text>
+
+  <!-- Activity items -->
+  <rect x="290" y="560" width="700" height="52" rx="10" fill="#111113" stroke="#27272A" stroke-width="1"/>
+  <circle cx="318" cy="586" r="14" fill="#8B5CF6" opacity="0.2"/>
+  <text x="318" y="591" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" font-weight="700" fill="#8B5CF6">V</text>
+  <text x="342" y="582" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#E4E4E7">Vasyl pushed v3.2</text>
+  <text x="342" y="600" font-family="Inter, sans-serif" font-size="12" fill="#52525B">Neon Bloom · 2 minutes ago</text>
+
+  <rect x="290" y="620" width="700" height="52" rx="10" fill="#111113" stroke="#27272A" stroke-width="1"/>
+  <circle cx="318" cy="646" r="14" fill="#06B6D4" opacity="0.2"/>
+  <text x="318" y="651" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" font-weight="700" fill="#06B6D4">A</text>
+  <text x="342" y="642" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#E4E4E7">Alex commented at 2:34</text>
+  <text x="342" y="660" font-family="Inter, sans-serif" font-size="12" fill="#52525B">"The kick pattern needs more attack" · Neon Bloom</text>
+
+  <rect x="290" y="680" width="700" height="52" rx="10" fill="#111113" stroke="#27272A" stroke-width="1"/>
+  <circle cx="318" cy="706" r="14" fill="#22C55E" opacity="0.2"/>
+  <text x="318" y="711" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" font-weight="700" fill="#22C55E">M</text>
+  <text x="342" y="702" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#E4E4E7">Maya approved v3.1</text>
+  <text x="342" y="720" font-family="Inter, sans-serif" font-size="12" fill="#52525B">Midnight Drive · 1 hour ago</text>
+
+  <!-- Quick actions -->
+  <rect x="1020" y="560" width="330" height="170" rx="12" fill="#111113" stroke="#27272A" stroke-width="1"/>
+  <text x="1040" y="590" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#71717A">Quick Actions</text>
+  <rect x="1040" y="605" width="140" height="40" rx="8" fill="#8B5CF6"/>
+  <text x="1068" y="630" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#FFFFFF">⬆️ Upload</text>
+  <rect x="1196" y="605" width="140" height="40" rx="8" fill="transparent" stroke="#3F3F46" stroke-width="1"/>
+  <text x="1220" y="630" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#E4E4E7">🛒 Browse</text>
+  <rect x="1040" y="655" width="140" height="40" rx="8" fill="transparent" stroke="#3F3F46" stroke-width="1"/>
+  <text x="1068" y="680" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#E4E4E7">💬 Sessions</text>
+  <rect x="1196" y="655" width="140" height="40" rx="8" fill="transparent" stroke="#3F3F46" stroke-width="1"/>
+  <text x="1220" y="680" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#E4E4E7">⚙️ Settings</text>
+</svg>

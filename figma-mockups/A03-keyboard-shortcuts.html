@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <title>SoundHub — Keyboard Shortcuts</title>
+  <link rel="stylesheet" href="design-system/shared.css">
+  <style>
+    body { display: flex; align-items: center; justify-content: center; min-height: 100vh; background: var(--bg-primary); }
+    .shortcuts-modal {
+      background: var(--bg-elevated); border: 1px solid var(--border-default);
+      border-radius: var(--radius-xl); width: 720px; max-height: 80vh; overflow-y: auto;
+    }
+    .shortcuts-header {
+      padding: 20px 24px; border-bottom: 1px solid var(--border-default);
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; background: var(--bg-elevated); z-index: 2;
+    }
+    .shortcuts-title { font-size: 16px; font-weight: 700; }
+    .close-btn {
+      width: 28px; height: 28px; border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: var(--text-muted); font-size: 16px;
+    }
+    .close-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
+    .shortcuts-body { padding: 20px 24px; }
+    .shortcut-section { margin-bottom: 24px; }
+    .shortcut-section:last-child { margin-bottom: 0; }
+    .shortcut-section-title {
+      font-size: 12px; font-weight: 700; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 10px;
+    }
+    .shortcut-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 0; border-bottom: 1px solid var(--border-default);
+    }
+    .shortcut-row:last-child { border-bottom: none; }
+    .shortcut-label { font-size: 13px; color: var(--text-secondary); }
+    .shortcut-keys { display: flex; gap: 4px; }
+    kbd {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-width: 24px; height: 24px; padding: 0 6px;
+      background: var(--bg-surface); border: 1px solid var(--border-default);
+      border-radius: 4px; font-size: 11px; font-family: var(--font-mono);
+      color: var(--text-primary); font-weight: 600;
+    }
+    .shortcut-search {
+      width: 100%; padding: 10px 14px; background: var(--bg-surface);
+      border: 1px solid var(--border-default); border-radius: var(--radius-md);
+      font-size: 13px; color: var(--text-primary); outline: none; margin-bottom: 20px;
+    }
+    .shortcut-search:focus { border-color: var(--brand-primary); }
+    .shortcut-search::placeholder { color: var(--text-muted); }
+  </style>
+</head>
+<body>
+  <div class="shortcuts-modal">
+    <div class="shortcuts-header">
+      <span class="shortcuts-title">⌨️ Keyboard Shortcuts</span>
+      <div class="close-btn">×</div>
+    </div>
+    <div class="shortcuts-body">
+      <input class="shortcut-search" type="text" placeholder="Search shortcuts...">
+
+      <div class="shortcut-section">
+        <div class="shortcut-section-title">General</div>
+        <div class="shortcut-row"><span class="shortcut-label">Open command palette</span><div class="shortcut-keys"><kbd>⌘</kbd><kbd>K</kbd></div></div>
+        <div class="shortcut-row"><span class="shortcut-label">Global search</span><div class="shortcut-keys"><kbd>⌘</kbd><kbd>/</kbd></div></div>
+        <div class="shortcut-row"><span class="shortcut-label">Toggle sidebar</span><div class="shortcut-keys"><kbd>⌘</kbd><kbd>B</kbd></div></div>
+        <div class="shortcut-row"><span class="shortcut-label">Go to Dashboard</span><div class="shortcut-keys"><kbd>G</kbd><kbd>D</kbd></div></div>
+        <div class="shortcut-row"><span class="shortcut-label">Go to Projects</span><div class="shortcut-keys"><kbd>G</kbd><kbd>P</kbd></div></div>
+        <div class="shortcut-row"><span class="shortcut-label">Go to Marketplace</span><div class="shortcut-keys"><kbd>G</kbd><kbd>M</kbd></div></div>
+      </div>
+
+      <div class="shortcut-section">
+        <div class="shortcut-section-title">Playback</div>
+        <div class="shortcut-row"><span class="shortcut-label">Play / Pause</span><div class="shortcut-keys"><kbd>Space</kbd></div></div>
+        <div class="shortcut-row"><span class="shortcut-label">Stop</span><div class="shortcut-keys"><kbd>⏎</kbd></div></div>
+        <div class="shortcut-row"><span class="shortcut-label">Skip forward 5s</span><div class="shortcut-keys"><kbd>→</kbd></div></div>
+        <div class="shortcut-row"><span class="shortcut-label">Skip back 5s</span><div class="shortcut-keys"><kbd>←</kbd></div></div>
+        <div class="shortcut-row"><span class="shortcut-label">Volume up</span><div class="shortcut-keys"><kbd>↑</kbd></div></div>
+        <div class="shortcut-row"><span class="shortcut-label">Volume down</span><div class="shortcut-keys"><kbd>↓</kbd></div></div>
+      </div>
+
+      <div class="shortcut-section">
+        <div class="shortcut-section-title">Project</div>
+        <div class="shortcut-row"><span class="shortcut-label">Create new project</span><div class="shortcut-keys"><kbd>⌘</kbd><kbd>N</kbd></div></div>
+        <div class="shortcut-row"><span class="shortcut-label">Upload files</span><div class="shortcut-keys"><kbd>⌘</kbd><kbd>U</kbd></div></div>
+        <div class="shortcut-row"><span class="shortcut-label">Save</span><div class="shortcut-keys"><kbd>⌘</kbd><kbd>S</kbd></div></div>
+        <div class="shortcut-row"><span class="shortcut-label">Delete selected</span><div class="shortcut-keys"><kbd>Del</kbd></div></div>
+        <div class="shortcut-row"><span class="shortcut-label">Select all</span><div class="shortcut-keys"><kbd>⌘</kbd><kbd>A</kbd></div></div>
+      </div>
+
+      <div class="shortcut-section">
+        <div class="shortcut-section-title">Reviews & Sessions</div>
+        <div class="shortcut-row"><span class="shortcut-label">New review session</span><div class="shortcut-keys"><kbd>⌘</kbd><kbd>R</kbd></div></div>
+        <div class="shortcut-row"><span class="shortcut-label">Approve version</span><div class="shortcut-keys"><kbd>⌘</kbd><kbd>⏎</kbd></div></div>
+        <div class="shortcut-row"><span class="shortcut-label">Add comment at playhead</span><div class="shortcut-keys"><kbd>C</kbd></div></div>
+        <div class="shortcut-row"><span class="shortcut-label">A/B compare mode</span><div class="shortcut-keys"><kbd>⌘</kbd><kbd>⇧</kbd><kbd>A</kbd></div></div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

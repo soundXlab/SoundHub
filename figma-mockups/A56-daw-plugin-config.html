@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <title>SoundHub — DAW Plugin Config</title>
+  <link rel="stylesheet" href="design-system/shared.css">
+  <style>
+    .plugin-card {
+      background: var(--bg-surface); border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 16px;
+    }
+    .plugin-header {
+      padding: 16px 20px; border-bottom: 1px solid var(--border-default);
+      display: flex; align-items: center; gap: 14px;
+    }
+    .plugin-icon {
+      width: 48px; height: 48px; border-radius: var(--radius-md);
+      display: flex; align-items: center; justify-content: center; font-size: 24px;
+    }
+    .plugin-name { font-size: 15px; font-weight: 700; }
+    .plugin-version { font-size: 11px; color: var(--text-muted); font-family: var(--font-mono); }
+    .plugin-status { margin-left: auto; }
+    .plugin-body { padding: 20px; }
+    .config-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 0; border-bottom: 1px solid var(--border-default);
+    }
+    .config-row:last-child { border-bottom: none; }
+    .config-label { font-size: 13px; font-weight: 600; }
+    .config-desc { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .config-input {
+      width: 200px; padding: 6px 10px; background: var(--bg-elevated);
+      border: 1px solid var(--border-default); border-radius: var(--radius-sm);
+      font-size: 12px; color: var(--text-primary);
+    }
+    .config-input.mono { font-family: var(--font-mono); font-size: 11px; }
+    .status-connected { background: rgba(34,197,94,0.12); color: var(--color-success); padding: 4px 10px; border-radius: 4px; font-size: 10px; font-weight: 600; }
+    .status-not-connected { background: rgba(113,113,122,0.12); color: var(--text-muted); padding: 4px 10px; border-radius: 4px; font-size: 10px; font-weight: 600; }
+    .test-result { padding: 8px 12px; border-radius: var(--radius-sm); font-size: 12px; margin-top: 12px; }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-logo"><div class="logo-icon">S</div><div class="logo-text">SoundHub</div></div>
+      <nav class="sidebar-nav">
+        <div class="sidebar-section-label">Main</div>
+        <a class="sidebar-item" href="#"><span class="icon">📊</span> Dashboard</a>
+        <a class="sidebar-item" href="#"><span class="icon">📁</span> Projects</a>
+        <div class="sidebar-section-label">DAW Integration</div>
+        <a class="sidebar-item active" href="#"><span class="icon">🎛️</span> Plugin Config</a>
+        <a class="sidebar-item" href="#"><span class="icon">💻</span> CLI</a>
+        <div class="sidebar-section-label">Account</div>
+        <a class="sidebar-item" href="#"><span class="icon">⚙️</span> Settings</a>
+      </nav>
+    </aside>
+    <div class="main-content">
+      <header class="topbar">
+        <div class="topbar-search"><span class="search-icon">🔍</span><input type="text" placeholder="Search..."></div>
+        <div class="topbar-right"><div class="topbar-icon-btn">🔔<span class="notif-dot"></span></div><div class="topbar-avatar">P</div></div>
+      </header>
+      <div class="page">
+        <h1 class="page-title" style="margin-bottom:4px">DAW Plugin Configuration</h1>
+        <p class="page-subtitle" style="margin-bottom:24px">Configure Max for Live, REAPER, and other DAW integrations</p>
+
+        <!-- Max for Live -->
+        <div class="plugin-card">
+          <div class="plugin-header">
+            <div class="plugin-icon" style="background:rgba(139,92,246,0.12)">🎵</div>
+            <div>
+              <div class="plugin-name">Max for Live Device</div>
+              <div class="plugin-version">v2.1.0 · Ableton Live 12</div>
+            </div>
+            <div class="plugin-status"><span class="status-connected">✓ Connected</span></div>
+          </div>
+          <div class="plugin-body">
+            <div class="config-row">
+              <div><div class="config-label">API Endpoint</div><div class="config-desc">SoundHub API server URL</div></div>
+              <input class="config-input mono" value="https://api.soundhub.app/v1">
+            </div>
+            <div class="config-row">
+              <div><div class="config-label">Auth Token</div><div class="config-desc">Your personal API token</div></div>
+              <input class="config-input mono" type="password" value="snd_••••••••••••••••">
+            </div>
+            <div class="config-row">
+              <div><div class="config-label">Auto-sync projects</div><div class="config-desc">Automatically sync project data on save</div></div>
+              <div class="toggle active"></div>
+            </div>
+            <div class="config-row">
+              <div><div class="config-label">Push on export</div><div class="config-desc">Auto-push stems when exporting from Ableton</div></div>
+              <div class="toggle active"></div>
+            </div>
+            <div class="config-row">
+              <div><div class="config-label">Waveform preview quality</div><div class="config-desc">Quality of inline waveform display</div></div>
+              <select class="form-select" style="width:140px"><option>Low</option><option selected>Medium</option><option>High</option></select>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:12px">
+              <button class="btn btn-secondary">🔍 Test Connection</button>
+              <button class="btn btn-secondary">📥 Check for Updates</button>
+            </div>
+            <div class="test-result" style="background:rgba(34,197,94,0.08);color:var(--color-success)">
+              ✓ Connection successful — API v1 reachable, latency 42ms
+            </div>
+          </div>
+        </div>
+
+        <!-- REAPER -->
+        <div class="plugin-card">
+          <div class="plugin-header">
+            <div class="plugin-icon" style="background:rgba(234,88,8,0.12)">🎸</div>
+            <div>
+              <div class="plugin-name">REAPER ReaScript</div>
+              <div class="plugin-version">v1.3.0 · REAPER 7</div>
+            </div>
+            <div class="plugin-status"><span class="status-not-connected">○ Not Installed</span></div>
+          </div>
+          <div class="plugin-body">
+            <div class="config-row">
+              <div><div class="config-label">Install ReaScript</div><div class="config-desc">Download and install the SoundHub script for REAPER</div></div>
+              <button class="btn btn-primary" style="font-size:11px">📥 Download Script</button>
+            </div>
+            <div class="config-row">
+              <div><div class="config-label">Script Path</div><div class="config-desc">Path to the installed ReaScript file</div></div>
+              <input class="config-input mono" placeholder="/path/to/soundhub_reaper.lua" style="width:280px">
+            </div>
+          </div>
+        </div>
+
+        <!-- FL Studio -->
+        <div class="plugin-card">
+          <div class="plugin-header">
+            <div class="plugin-icon" style="background:rgba(234,179,8,0.12)">🎹</div>
+            <div>
+              <div class="plugin-name">FL Studio Integration</div>
+              <div class="plugin-version">Coming Soon</div>
+            </div>
+            <div class="plugin-status"><span class="status-not-connected">○ Beta</span></div>
+          </div>
+          <div class="plugin-body">
+            <div style="text-align:center;padding:24px;color:var(--text-muted);font-size:13px">
+              FL Studio integration is currently in beta. Join the waitlist to get early access.
+              <div style="margin-top:12px"><button class="btn btn-secondary">Join Waitlist</button></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

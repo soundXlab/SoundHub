@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <title>SoundHub — Session Detail (DAW Style)</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', -apple-system, sans-serif; background: #0d0d0d; color: #e4e4e7; overflow: hidden; height: 100vh; }
+
+    /* ── Transport Bar ── */
+    .transport-bar {
+      height: 40px; background: #111113; border-bottom: 1px solid #27272a;
+      display: flex; align-items: center; padding: 0 12px; gap: 16px;
+      font-size: 11px; user-select: none;
+    }
+    .transport-logo { font-weight: 800; font-size: 13px; color: #ea5808; letter-spacing: -0.5px; }
+    .transport-logo span { color: #e4e4e7; }
+    .transport-divider { width: 1px; height: 20px; background: #27272a; }
+    .transport-group { display: flex; align-items: center; gap: 6px; }
+    .transport-label { color: #71717a; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .transport-value {
+      background: #0d0d0d; border: 1px solid #27272a; border-radius: 4px;
+      padding: 2px 8px; font-family: 'JetBrains Mono', monospace; font-size: 12px;
+      color: #22c55e; font-weight: 600; min-width: 60px; text-align: center;
+    }
+    .transport-spacer { flex: 1; }
+    .transport-time {
+      font-family: 'JetBrains Mono', monospace; font-size: 18px; font-weight: 700;
+      color: #e4e4e7; letter-spacing: 1px;
+    }
+
+    /* ── Main Layout ── */
+    .app-body { display: flex; height: calc(100vh - 40px); }
+
+    /* ── Left Sidebar ── */
+    .sidebar {
+      width: 240px; background: #111113; border-right: 1px solid #27272a;
+      display: flex; flex-direction: column; user-select: none;
+    }
+    .sidebar-search { padding: 8px; border-bottom: 1px solid #27272a; }
+    .sidebar-search input {
+      width: 100%; background: #0d0d0d; border: 1px solid #27272a; border-radius: 4px;
+      padding: 6px 8px 6px 28px; font-size: 11px; color: #e4e4e7; outline: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: 8px center;
+    }
+    .sidebar-search input::placeholder { color: #52525b; }
+    .sidebar-nav { flex: 1; overflow-y: auto; padding: 4px 0; }
+    .sidebar-section { padding: 8px 12px 4px; font-size: 9px; color: #52525b; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+    .sidebar-item {
+      padding: 6px 12px; font-size: 11px; font-weight: 500; color: #a1a1aa;
+      cursor: pointer; display: flex; align-items: center; gap: 8px;
+      border-left: 2px solid transparent; transition: all 0.1s;
+    }
+    .sidebar-item:hover { color: #e4e4e7; }
+    .sidebar-item.active { color: #ea5808; background: rgba(234,88,8,0.08); border-left-color: #ea5808; }
+    .sidebar-item .icon { width: 16px; text-align: center; }
+    .sidebar-badge {
+      margin-left: auto; background: #ea5808; color: #fff;
+      font-size: 9px; padding: 1px 5px; border-radius: 8px;
+    }
+
+    /* ── Content Area ── */
+    .content { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
+
+    /* ── Header ── */
+    .page-header {
+      padding: 16px 24px; border-bottom: 1px solid #27272a;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .page-title { font-size: 18px; font-weight: 700; color: #e4e4e7; }
+    .page-title span { color: #71717a; font-weight: 400; font-size: 14px; margin-left: 8px; }
+    .header-actions { display: flex; gap: 8px; }
+    .btn {
+      padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 600;
+      cursor: pointer; border: 1px solid #27272a; transition: all 0.15s;
+    }
+    .btn-primary { background: #ea5808; color: #fff; border-color: #ea5808; }
+    .btn-primary:hover { background: #c2410c; }
+    .btn-secondary { background: #1a1a1a; color: #e4e4e7; }
+    .btn-secondary:hover { background: #27272a; }
+    .btn-ghost { background: transparent; color: #71717a; border-color: transparent; }
+    .btn-ghost:hover { color: #e4e4e7; background: #1a1a1a; }
+    .btn-success { background: #22c55e; color: #fff; border-color: #22c55e; }
+    .btn-danger { background: transparent; color: #ef4444; border-color: #ef4444; }
+
+    /* ── Session Layout ── */
+    .session-layout { display: flex; flex: 1; overflow: hidden; }
+
+    /* ── Main Session ── */
+    .session-main { flex: 1; overflow-y: auto; padding: 24px; }
+
+    /* ── Waveform Player ── */
+    .waveform-player {
+      background: #111113; border: 1px solid #27272a; border-radius: 8px;
+      padding: 16px; margin-bottom: 20px;
+    }
+    .waveform-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .waveform-title { font-size: 14px; font-weight: 700; color: #e4e4e7; }
+    .waveform-meta { font-size: 11px; color: #71717a; }
+    .waveform-bars {
+      display: flex; align-items: flex-end; gap: 2px; height: 80px;
+    }
+    .wave-bar { flex: 1; border-radius: 1px; }
+    .waveform-controls {
+      display: flex; align-items: center; gap: 12px; margin-top: 12px;
+    }
+    .play-btn {
+      width: 36px; height: 36px; background: #ea5808; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 14px; cursor: pointer;
+      box-shadow: 0 2px 8px rgba(234,88,8,0.4);
+    }
+    .waveform-progress {
+      flex: 1; height: 6px; background: #27272a; border-radius: 3px;
+      position: relative; cursor: pointer;
+    }
+    .waveform-progress-fill {
+      position: absolute; left: 0; top: 0; height: 100%;
+      width: 35%; background: #ea5808; border-radius: 3px;
+    }
+    .waveform-progress-handle {
+      position: absolute; right: 0; top: -3px; width: 12px; height: 12px;
+      background: #fff; border-radius: 50%; box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+    }
+    .waveform-time {
+      font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #71717a;
+    }
+    .waveform-markers {
+      display: flex; gap: 8px; margin-top: 8px;
+    }
+    .marker {
+      display: flex; align-items: center; gap: 4px;
+      padding: 2px 8px; background: rgba(234,88,8,0.1); border: 1px solid rgba(234,88,8,0.3);
+      border-radius: 4px; font-size: 10px; color: #ea5808; font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* ── Round Tabs ── */
+    .round-tabs {
+      display: flex; gap: 0; border-bottom: 1px solid #27272a; margin-bottom: 16px;
+    }
+    .round-tab {
+      padding: 10px 16px; font-size: 12px; font-weight: 500; color: #71717a;
+      cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.1s;
+    }
+    .round-tab:hover { color: #e4e4e7; }
+    .round-tab.active { color: #ea5808; border-bottom-color: #ea5808; }
+    .round-tab .status {
+      padding: 2px 6px; border-radius: 4px; font-size: 9px;
+      font-weight: 600; text-transform: uppercase; margin-left: 6px;
+    }
+    .status-active { background: rgba(234,88,8,0.12); color: #ea5808; }
+    .status-complete { background: rgba(34,197,94,0.12); color: #22c55e; }
+
+    /* ── Comment Thread ── */
+    .comment-thread { margin-bottom: 20px; }
+    .comment {
+      display: flex; gap: 12px; padding: 14px; background: #0d0d0d;
+      border: 1px solid #27272a; border-radius: 8px; margin-bottom: 10px;
+    }
+    .comment.highlight { border-color: #ea5808; background: rgba(234,88,8,0.04); }
+    .comment-avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 700; color: #fff; flex-shrink: 0;
+    }
+    .comment-content { flex: 1; min-width: 0; }
+    .comment-header { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+    .comment-author { font-size: 12px; font-weight: 600; color: #e4e4e7; }
+    .comment-role {
+      padding: 2px 6px; background: #1a1a1a; border-radius: 4px;
+      font-size: 9px; color: #71717a; text-transform: uppercase;
+    }
+    .comment-time { font-size: 10px; color: #52525b; }
+    .comment-body { font-size: 12px; color: #a1a1aa; line-height: 1.6; }
+    .comment-timestamp {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 8px; background: rgba(234,88,8,0.1); border-radius: 4px;
+      font-size: 10px; color: #ea5808; font-family: 'JetBrains Mono', monospace;
+      margin-top: 8px;
+    }
+    .comment-actions { display: flex; gap: 12px; margin-top: 8px; }
+    .comment-action {
+      font-size: 10px; color: #52525b; cursor: pointer;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .comment-action:hover { color: #a1a1aa; }
+    .comment-attachment {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px; background: #111113; border: 1px solid #27272a;
+      border-radius: 6px; margin-top: 8px; font-size: 11px;
+    }
+
+    /* ── Feedback Form ── */
+    .feedback-form {
+      padding: 16px; background: #0d0d0d; border: 1px solid #27272a;
+      border-radius: 8px; margin-top: 16px;
+    }
+    .feedback-input {
+      width: 100%; background: #111113; border: 1px solid #27272a;
+      border-radius: 6px; padding: 10px 12px; font-size: 12px; color: #e4e4e7;
+      resize: none; outline: none; font-family: inherit;
+    }
+    .feedback-input::placeholder { color: #52525b; }
+    .feedback-input:focus { border-color: #ea5808; }
+    .feedback-actions {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-top: 10px;
+    }
+    .feedback-tools { display: flex; gap: 6px; }
+    .tool-btn {
+      width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
+      background: #111113; border: 1px solid #27272a; border-radius: 4px;
+      font-size: 12px; color: #71717a; cursor: pointer;
+    }
+    .tool-btn:hover { border-color: #3f3f46; color: #e4e4e7; }
+
+    /* ── Right Panel ── */
+    .right-panel {
+      width: 320px; background: #111113; border-left: 1px solid #27272a;
+      display: flex; flex-direction: column; user-select: none; overflow-y: auto;
+    }
+    .panel-section { padding: 16px; border-bottom: 1px solid #27272a; }
+    .panel-section-title {
+      font-size: 9px; color: #52525b; text-transform: uppercase;
+      letter-spacing: 1px; font-weight: 700; margin-bottom: 10px;
+    }
+    .panel-stat {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 6px 0; font-size: 12px;
+    }
+    .panel-stat-label { color: #71717a; }
+    .panel-stat-value { color: #e4e4e7; font-family: 'JetBrains Mono', monospace; font-weight: 600; }
+
+    /* ── Version Card ── */
+    .version-card {
+      padding: 12px; background: #0d0d0d; border: 1px solid #27272a;
+      border-radius: 6px;
+    }
+    .version-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+    .version-icon {
+      width: 32px; height: 32px; background: #1a1a1a; border-radius: 6px;
+      display: flex; align-items: center; justify-content: center; font-size: 14px;
+    }
+    .version-name { font-size: 12px; font-weight: 600; color: #e4e4e7; }
+    .version-meta { font-size: 10px; color: #71717a; }
+    .version-stats {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 8px;
+    }
+    .version-stat {
+      padding: 6px; background: #111113; border-radius: 4px;
+      text-align: center;
+    }
+    .version-stat-value { font-size: 12px; font-weight: 700; color: #e4e4e7; font-family: 'JetBrains Mono', monospace; }
+    .version-stat-label { font-size: 9px; color: #52525b; margin-top: 2px; }
+
+    /* ── Participants ── */
+    .participant {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 0; border-bottom: 1px solid #1a1a1a;
+    }
+    .participant:last-child { border-bottom: none; }
+    .participant-avatar {
+      width: 28px; height: 28px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; font-weight: 700; color: #fff;
+    }
+    .participant-name { font-size: 11px; font-weight: 600; color: #e4e4e7; }
+    .participant-role { font-size: 10px; color: #52525b; }
+    .participant-status {
+      margin-left: auto; width: 8px; height: 8px; border-radius: 50%;
+    }
+    .participant-status.online { background: #22c55e; box-shadow: 0 0 6px rgba(34,197,94,0.5); }
+    .participant-status.offline { background: #52525b; }
+
+    /* ── QC Metrics ── */
+    .qc-metrics { display: flex; flex-direction: column; gap: 8px; }
+    .qc-row {
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 11px;
+    }
+    .qc-label { color: #71717a; }
+    .qc-value { font-family: 'JetBrains Mono', monospace; font-weight: 600; }
+    .qc-pass { color: #22c55e; }
+    .qc-warn { color: #eab308; }
+
+    /* ── Timeline ── */
+    .timeline { display: flex; flex-direction: column; gap: 12px; }
+    .timeline-item {
+      display: flex; gap: 10px; font-size: 11px; color: #a1a1aa;
+    }
+    .timeline-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      margin-top: 4px; flex-shrink: 0;
+    }
+    .timeline-content { flex: 1; }
+    .timeline-time { font-size: 10px; color: #52525b; margin-top: 2px; }
+
+    /* ── Device Chain (Bottom) ── */
+    .device-chain {
+      height: 60px; background: #111113; border-top: 1px solid #27272a;
+      display: flex; align-items: center; padding: 0 16px; gap: 8px;
+    }
+    .device {
+      padding: 6px 12px; background: #0d0d0d; border: 1px solid #27272a;
+      border-radius: 4px; font-size: 10px; color: #a1a1aa;
+      display: flex; align-items: center; gap: 6px; cursor: pointer;
+      transition: all 0.1s;
+    }
+    .device:hover { border-color: #3f3f46; color: #e4e4e7; }
+    .device.active { border-color: #ea5808; color: #ea5808; background: rgba(234,88,8,0.08); }
+    .device .led { width: 6px; height: 6px; border-radius: 50%; background: #27272a; }
+    .device.active .led { background: #22c55e; box-shadow: 0 0 6px rgba(34,197,94,0.5); }
+    .device-chain-spacer { flex: 1; }
+    .device-chain-label {
+      font-size: 9px; color: #52525b; text-transform: uppercase;
+      letter-spacing: 0.5px; font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <!-- Transport Bar -->
+  <div class="transport-bar">
+    <div class="transport-logo">Sound<span>Hub</span></div>
+    <div class="transport-divider"></div>
+    <div class="transport-group">
+      <span class="transport-label">Round</span>
+      <div class="transport-value" style="color:#ea5808">2/3</div>
+    </div>
+    <div class="transport-group">
+      <span class="transport-label">Comments</span>
+      <div class="transport-value">8</div>
+    </div>
+    <div class="transport-group">
+      <span class="transport-label">Files</span>
+      <div class="transport-value">3</div>
+    </div>
+    <div class="transport-spacer"></div>
+    <div class="transport-time">SESSION</div>
+    <div class="transport-divider"></div>
+    <div class="transport-group">
+      <span class="transport-label">Status</span>
+      <div class="transport-value" style="color:#eab308">In Review</div>
+    </div>
+  </div>
+
+  <div class="app-body">
+    <!-- Left Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-search">
+        <input type="text" placeholder="Search sessions...">
+      </div>
+      <div class="sidebar-nav">
+        <div class="sidebar-section">Main</div>
+        <div class="sidebar-item"><span class="icon">📊</span> Dashboard</div>
+        <div class="sidebar-item"><span class="icon">📁</span> Projects</div>
+        <div class="sidebar-item"><span class="icon">🛒</span> Marketplace</div>
+        <div class="sidebar-section">Workspace</div>
+        <div class="sidebar-item"><span class="icon">💬</span> Reviews</div>
+        <div class="sidebar-item active"><span class="icon">📋</span> Sessions <span class="sidebar-badge">3</span></div>
+        <div class="sidebar-section">Account</div>
+        <div class="sidebar-item"><span class="icon">⚙️</span> Settings</div>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+      <!-- Page Header -->
+      <div class="page-header">
+        <div class="page-title">Neon Warehouse — Master Check <span>v3.2</span></div>
+        <div class="header-actions">
+          <button class="btn btn-ghost">↩ Back</button>
+          <button class="btn btn-secondary">📤 Export</button>
+          <button class="btn btn-success">✓ Approve</button>
+          <button class="btn btn-danger">✕ Reject</button>
+        </div>
+      </div>
+
+      <!-- Session Layout -->
+      <div class="session-layout">
+        <!-- Main Session -->
+        <div class="session-main">
+          <!-- Waveform Player -->
+          <div class="waveform-player">
+            <div class="waveform-header">
+              <div>
+                <div class="waveform-title">Neon Warehouse — Master v3.2</div>
+                <div class="waveform-meta">WAV 24bit · 48 kHz · 4.1 GB · 4:02</div>
+              </div>
+              <div style="display:flex;gap:6px">
+                <button class="btn btn-ghost" style="font-size:11px">🔍 Zoom In</button>
+                <button class="btn btn-ghost" style="font-size:11px">⊞ Fit</button>
+              </div>
+            </div>
+            <div class="waveform-bars">
+              <div class="wave-bar" style="height:30%;background:#ea5808"></div>
+              <div class="wave-bar" style="height:50%;background:#ea5808"></div>
+              <div class="wave-bar" style="height:70%;background:#ea5808"></div>
+              <div class="wave-bar" style="height:45%;background:#ea5808"></div>
+              <div class="wave-bar" style="height:85%;background:#ea5808"></div>
+              <div class="wave-bar" style="height:60%;background:#ea5808"></div>
+              <div class="wave-bar" style="height:75%;background:#ea5808"></div>
+              <div class="wave-bar" style="height:40%;background:#ea5808"></div>
+              <div class="wave-bar" style="height:65%;background:#ea5808"></div>
+              <div class="wave-bar" style="height:55%;background:#ea5808"></div>
+              <div class="wave-bar" style="height:80%;background:#ea5808"></div>
+              <div class="wave-bar" style="height:50%;background:#ea5808"></div>
+              <div class="wave-bar" style="height:70%;background:#ea5808"></div>
+              <div class="wave-bar" style="height:60%;background:#ea5808"></div>
+              <div class="wave-bar" style="height:45%;background:#ea5808"></div>
+              <div class="wave-bar" style="height:75%;background:#ea5808"></div>
+              <div class="wave-bar" style="height:55%;background:#ea5808"></div>
+              <div class="wave-bar" style="height:65%;background:#ea5808"></div>
+              <div class="wave-bar" style="height:80%;background:#ea5808"></div>
+              <div class="wave-bar" style="height:50%;background:#ea5808"></div>
+              <div class="wave-bar" style="height:70%;background:#ea5808"></div>
+              <div class="wave-bar" style="height:40%;background:#ea5808"></div>
+              <div class="wave-bar" style="height:60%;background:#ea5808"></div>
+              <div class="wave-bar" style="height:75%;background:#ea5808"></div>
+              <div class="wave-bar" style="height:55%;background:#ea5808"></div>
+              <div class="wave-bar" style="height:85%;background:#ea5808"></div>
+              <div class="wave-bar" style="height:45%;background:#ea5808"></div>
+              <div class="wave-bar" style="height:65%;background:#ea5808"></div>
+              <div class="wave-bar" style="height:50%;background:#ea5808"></div>
+              <div class="wave-bar" style="height:70%;background:#ea5808"></div>
+              <div class="wave-bar" style="height:60%;background:#ea5808"></div>
+              <div class="wave-bar" style="height:80%;background:#ea5808"></div>
+              <div class="wave-bar" style="height:35%;background:#ea5808"></div>
+              <div class="wave-bar" style="height:55%;background:#ea5808"></div>
+              <div class="wave-bar" style="height:45%;background:#ea5808"></div>
+              <div class="wave-bar" style="height:70%;background:#ea5808"></div>
+              <div class="wave-bar" style="height:60%;background:#ea5808"></div>
+              <div class="wave-bar" style="height:50%;background:#ea5808"></div>
+              <div class="wave-bar" style="height:75%;background:#ea5808"></div>
+              <div class="wave-bar" style="height:40%;background:#ea5808"></div>
+            </div>
+            <div class="waveform-controls">
+              <div class="play-btn">▶</div>
+              <div class="waveform-progress">
+                <div class="waveform-progress-fill">
+                  <div class="waveform-progress-handle"></div>
+                </div>
+              </div>
+              <div class="waveform-time">1:24 / 4:02</div>
+            </div>
+            <div class="waveform-markers">
+              <div class="marker">⏱ 0:00 — Start</div>
+              <div class="marker">⏱ 1:24 — Kick Entry</div>
+              <div class="marker">⏱ 2:48 — Bridge</div>
+              <div class="marker">⏱ 3:30 — Outro</div>
+            </div>
+          </div>
+
+          <!-- Round Tabs -->
+          <div class="round-tabs">
+            <div class="round-tab">Round 1 <span class="status status-complete">Complete</span></div>
+            <div class="round-tab active">Round 2 <span class="status status-active">Active</span></div>
+            <div class="round-tab">Round 3</div>
+          </div>
+
+          <!-- Comment Thread -->
+          <div class="comment-thread">
+            <div class="comment highlight">
+              <div class="comment-avatar" style="background:#ea5808">P</div>
+              <div class="comment-content">
+                <div class="comment-header">
+                  <span class="comment-author">@producer1</span>
+                  <span class="comment-role">Owner</span>
+                  <span class="comment-time">2h ago</span>
+                </div>
+                <div class="comment-body">Master ready for release. Loudness normalized to -14 LUFS. Please check the low-end on headphones.</div>
+                <div class="comment-timestamp">⏱ 0:00 — 4:02</div>
+                <div class="comment-actions">
+                  <span class="comment-action">↩ Reply</span>
+                  <span class="comment-action">👍 2</span>
+                  <span class="comment-action">📌 Pin</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="comment">
+              <div class="comment-avatar" style="background:#22c55e">R</div>
+              <div class="comment-content">
+                <div class="comment-header">
+                  <span class="comment-author">@reviewer</span>
+                  <span class="comment-role">Reviewer</span>
+                  <span class="comment-time">1h ago</span>
+                </div>
+                <div class="comment-body">Low-end sounds great on headphones. The kick at 1:24 is punchy and well-defined. 👍</div>
+                <div class="comment-timestamp">⏱ 1:24</div>
+                <div class="comment-actions">
+                  <span class="comment-action">↩ Reply</span>
+                  <span class="comment-action">👍 1</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="comment">
+              <div class="comment-avatar" style="background:#eab308">A</div>
+              <div class="comment-content">
+                <div class="comment-header">
+                  <span class="comment-author">@audioguy</span>
+                  <span class="comment-role">Reviewer</span>
+                  <span class="comment-time">45m ago</span>
+                </div>
+                <div class="comment-body">Dynamic range is a bit low at 8.1 LU. Consider backing off the limiter on the bridge section?</div>
+                <div class="comment-timestamp">⏱ 2:48</div>
+                <div class="comment-actions">
+                  <span class="comment-action">↩ Reply</span>
+                  <span class="comment-action">👍 0</span>
+                </div>
+                <div class="comment-attachment">
+                  <span>📎</span>
+                  <span style="color:#a1a1aa">comparison-v2-vs-v3.wav</span>
+                  <span style="margin-left:auto;color:#52525b">2.4 MB</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="comment">
+              <div class="comment-avatar" style="background:#3b82f6">M</div>
+              <div class="comment-content">
+                <div class="comment-header">
+                  <span class="comment-author">@mixmaster</span>
+                  <span class="comment-role">Reviewer</span>
+                  <span class="comment-time">30m ago</span>
+                </div>
+                <div class="comment-body">Agree with @audioguy. The bridge could use 1-2 dB less compression. Otherwise sounding great!</div>
+                <div class="comment-timestamp">⏱ 2:48</div>
+                <div class="comment-actions">
+                  <span class="comment-action">↩ Reply</span>
+                  <span class="comment-action">👍 1</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Feedback Form -->
+          <div class="feedback-form">
+            <textarea class="feedback-input" rows="3" placeholder="Add feedback... Use @timestamp to reference a specific point"></textarea>
+            <div class="feedback-actions">
+              <div class="feedback-tools">
+                <div class="tool-btn">📎</div>
+                <div class="tool-btn">⏱</div>
+                <div class="tool-btn">🎵</div>
+                <div class="tool-btn">📐</div>
+                <div class="tool-btn">🎤</div>
+              </div>
+              <div style="display:flex;gap:6px">
+                <button class="btn btn-secondary" style="font-size:11px">Save Draft</button>
+                <button class="btn btn-primary" style="font-size:11px">Submit</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Panel -->
+        <div class="right-panel">
+          <!-- Version Info -->
+          <div class="panel-section">
+            <div class="panel-section-title">Current Version</div>
+            <div class="version-card">
+              <div class="version-header">
+                <div class="version-icon">🎵</div>
+                <div>
+                  <div class="version-name">v3.2 — Master</div>
+                  <div class="version-meta">Uploaded 2h ago</div>
+                </div>
+              </div>
+              <div class="version-stats">
+                <div class="version-stat">
+                  <div class="version-stat-value">4.1 GB</div>
+                  <div class="version-stat-label">Size</div>
+                </div>
+                <div class="version-stat">
+                  <div class="version-stat-value">4:02</div>
+                  <div class="version-stat-label">Duration</div>
+                </div>
+                <div class="version-stat">
+                  <div class="version-stat-value">48 kHz</div>
+                  <div class="version-stat-label">Sample Rate</div>
+                </div>
+                <div class="version-stat">
+                  <div class="version-stat-value">24 bit</div>
+                  <div class="version-stat-label">Bit Depth</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Participants -->
+          <div class="panel-section">
+            <div class="panel-section-title">Participants (3)</div>
+            <div class="participant">
+              <div class="participant-avatar" style="background:#ea5808">P</div>
+              <div>
+                <div class="participant-name">@producer1</div>
+                <div class="participant-role">Owner</div>
+              </div>
+              <div class="participant-status online"></div>
+            </div>
+            <div class="participant">
+              <div class="participant-avatar" style="background:#22c55e">R</div>
+              <div>
+                <div class="participant-name">@reviewer</div>
+                <div class="participant-role">Reviewer</div>
+              </div>
+              <div class="participant-status online"></div>
+            </div>
+            <div class="participant">
+              <div class="participant-avatar" style="background:#eab308">A</div>
+              <div>
+                <div class="participant-name">@audioguy</div>
+                <div class="participant-role">Reviewer</div>
+              </div>
+              <div class="participant-status offline"></div>
+            </div>
+          </div>
+
+          <!-- QC Metrics -->
+          <div class="panel-section">
+            <div class="panel-section-title">QC Metrics</div>
+            <div class="qc-metrics">
+              <div class="qc-row">
+                <span class="qc-label">Loudness</span>
+                <span class="qc-value qc-pass">-14.2 LUFS ✓</span>
+              </div>
+              <div class="qc-row">
+                <span class="qc-label">True Peak</span>
+                <span class="qc-value qc-pass">-1.2 dBTP ✓</span>
+              </div>
+              <div class="qc-row">
+                <span class="qc-label">Dynamic Range</span>
+                <span class="qc-value qc-warn">8.1 LU ⚠</span>
+              </div>
+              <div class="qc-row">
+                <span class="qc-label">SNR</span>
+                <span class="qc-value qc-pass">42 dB ✓</span>
+              </div>
+              <div class="qc-row">
+                <span class="qc-label">Clipping</span>
+                <span class="qc-value qc-pass">None ✓</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Budget -->
+          <div class="panel-section">
+            <div class="panel-section-title">Budget</div>
+            <div class="panel-stat">
+              <span class="panel-stat-label">Rounds Used</span>
+              <span class="panel-stat-value">2 / 3</span>
+            </div>
+            <div class="panel-stat">
+              <span class="panel-stat-label">Remaining</span>
+              <span class="panel-stat-value" style="color:#22c55e">1 round</span>
+            </div>
+            <div style="width:100%;height:6px;background:#27272a;border-radius:3px;margin-top:8px;overflow:hidden">
+              <div style="width:66%;height:100%;background:#ea5808;border-radius:3px"></div>
+            </div>
+          </div>
+
+          <!-- Timeline -->
+          <div class="panel-section">
+            <div class="panel-section-title">Activity</div>
+            <div class="timeline">
+              <div class="timeline-item">
+                <div class="timeline-dot" style="background:#ea5808"></div>
+                <div class="timeline-content">
+                  <div>@mixmaster commented</div>
+                  <div class="timeline-time">30m ago</div>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-dot" style="background:#eab308"></div>
+                <div class="timeline-content">
+                  <div>@audioguy commented</div>
+                  <div class="timeline-time">45m ago</div>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-dot" style="background:#22c55e"></div>
+                <div class="timeline-content">
+                  <div>@reviewer commented</div>
+                  <div class="timeline-time">1h ago</div>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-dot" style="background:#ea5808"></div>
+                <div class="timeline-content">
+                  <div>@producer1 uploaded v3.2</div>
+                  <div class="timeline-time">2h ago</div>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-dot" style="background:#3b82f6"></div>
+                <div class="timeline-content">
+                  <div>Session started</div>
+                  <div class="timeline-time">3h ago</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Device Chain -->
+      <div class="device-chain">
+        <span class="device-chain-label">Now Playing:</span>
+        <div class="device active"><div class="led"></div> ▶ Neon Warehouse v3.2</div>
+        <div class="device"><div class="led"></div> Spectrogram</div>
+        <div class="device"><div class="led"></div> Loudness</div>
+        <div class="device"><div class="led"></div> A/B Compare</div>
+        <div class="device-chain-spacer"></div>
+        <span class="device-chain-label">Codec:</span>
+        <div class="device"><div class="led"></div> WAV 24bit</div>
+        <div class="device"><div class="led"></div> 48 kHz</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

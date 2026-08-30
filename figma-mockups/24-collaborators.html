@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <title>SoundHub — Collaborators</title>
+  <link rel="stylesheet" href="design-system/shared.css">
+  <style>
+    .collab-list { display: flex; flex-direction: column; gap: 8px; }
+    .collab-row { display: flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: var(--radius-md); }
+    .collab-avatar-lg { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; color: white; flex-shrink: 0; }
+    .collab-info { flex: 1; }
+    .collab-name { font-size: 14px; font-weight: 600; }
+    .collab-email { font-size: 11px; color: var(--text-muted); }
+    .role-select { padding: 6px 10px; background: var(--bg-input); border: 1px solid var(--border-default); border-radius: var(--radius-sm); font-size: 12px; color: var(--text-primary); font-family: var(--font-sans); }
+    .invite-card { background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: var(--radius-lg); padding: 20px; margin-bottom: 20px; }
+    .permission-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .perm-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: var(--bg-elevated); border-radius: var(--radius-sm); font-size: 12px; }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-logo"><div class="logo-icon">S</div><div class="logo-text">SoundHub</div></div>
+      <nav class="sidebar-nav">
+        <div class="sidebar-section-label">Main</div>
+        <a class="sidebar-item" href="#"><span class="icon">📊</span> Dashboard</a>
+        <a class="sidebar-item active" href="#"><span class="icon">📁</span> Projects</a>
+        <div class="sidebar-section-label">Workspace</div>
+        <a class="sidebar-item" href="#"><span class="icon">💬</span> Reviews</a>
+        <div class="sidebar-section-label">Account</div>
+        <a class="sidebar-item" href="#"><span class="icon">⚙️</span> Settings</a>
+      </nav>
+      <div class="sidebar-footer"><a class="sidebar-item" href="#"><span class="icon">❓</span> Help</a></div>
+    </aside>
+    <div class="main-content">
+      <header class="topbar">
+        <div style="display:flex;align-items:center;gap:12px">
+          <a href="#" style="color:var(--text-muted);text-decoration:none;font-size:13px">← Neon Warehouse</a>
+          <span style="color:var(--text-muted)">/</span>
+          <span style="font-size:14px;font-weight:600">Collaborators</span>
+        </div>
+        <div class="topbar-right"><div class="topbar-avatar">P</div></div>
+      </header>
+      <div class="page">
+        <div class="page-header">
+          <div><h1 class="page-title">Collaborators</h1><p class="page-subtitle">Neon Warehouse · 3 members</p></div>
+        </div>
+
+        <!-- Invite -->
+        <div class="invite-card">
+          <div style="font-size:14px;font-weight:600;margin-bottom:12px">Invite Collaborator</div>
+          <div style="display:flex;gap:8px">
+            <input class="form-input" placeholder="Email address or username" style="flex:1">
+            <select class="role-select"><option>Reviewer</option><option>Editor</option><option>Viewer</option></select>
+            <button class="btn btn-primary">Send Invite</button>
+          </div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:8px">Or share the review link: <span style="color:var(--brand-primary);font-family:var(--font-mono)">https://soundhub.io/review/abc123</span></div>
+        </div>
+
+        <!-- Members -->
+        <div class="collab-list">
+          <div class="collab-row">
+            <div class="collab-avatar-lg" style="background:var(--brand-gradient)">P</div>
+            <div class="collab-info">
+              <div class="collab-name">Producer <span class="badge badge-purple" style="font-size:9px;margin-left:6px">YOU</span></div>
+              <div class="collab-email">producer@soundhub.io</div>
+            </div>
+            <select class="role-select" disabled><option>Owner</option></select>
+            <button class="btn btn-ghost btn-sm" disabled>—</button>
+          </div>
+
+          <div class="collab-row">
+            <div class="collab-avatar-lg" style="background:var(--brand-secondary)">S</div>
+            <div class="collab-info">
+              <div class="collab-name">Sarah Chen</div>
+              <div class="collab-email">sarah@studio.com</div>
+            </div>
+            <select class="role-select"><option selected>Reviewer</option><option>Editor</option><option>Viewer</option></select>
+            <button class="btn btn-ghost btn-sm" style="color:var(--color-error)">Remove</button>
+          </div>
+
+          <div class="collab-row">
+            <div class="collab-avatar-lg" style="background:var(--color-warning)">A</div>
+            <div class="collab-info">
+              <div class="collab-name">Alex Rivera</div>
+              <div class="collab-email">alex@label.io</div>
+            </div>
+            <select class="role-select"><option>Reviewer</option><option selected>Editor</option><option>Viewer</option></select>
+            <button class="btn btn-ghost btn-sm" style="color:var(--color-error)">Remove</button>
+          </div>
+        </div>
+
+        <!-- Permissions -->
+        <div style="margin-top:32px">
+          <h2 style="font-size:16px;font-weight:700;margin-bottom:16px">Role Permissions</h2>
+          <div class="permission-grid">
+            <div class="perm-item"><span>Upload versions</span><span style="color:var(--color-success)">Owner, Editor</span></div>
+            <div class="perm-item"><span>Add comments</span><span style="color:var(--color-success)">All roles</span></div>
+            <div class="perm-item"><span>Approve versions</span><span style="color:var(--color-success)">Owner, Reviewer</span></div>
+            <div class="perm-item"><span>Request changes</span><span style="color:var(--color-success)">Owner, Reviewer</span></div>
+            <div class="perm-item"><span>Invite others</span><span style="color:var(--color-success)">Owner only</span></div>
+            <div class="perm-item"><span>Delete project</span><span style="color:var(--color-success)">Owner only</span></div>
+            <div class="perm-item"><span>Download files</span><span style="color:var(--color-success)">All roles</span></div>
+            <div class="perm-item"><span>View Audio CI</span><span style="color:var(--color-success)">All roles</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

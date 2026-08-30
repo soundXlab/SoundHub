@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <title>SoundHub — Public Review (Guest)</title>
+  <link rel="stylesheet" href="design-system/shared.css">
+  <style>
+    .guest-banner {
+      background: rgba(139,92,246,0.08); border-bottom: 1px solid var(--border-default);
+      padding: 10px 24px; font-size: 12px; color: var(--text-secondary);
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .guest-banner a { color: var(--brand-primary); text-decoration: none; font-weight: 600; }
+    .player-section { padding: 32px 24px; }
+    .player-waveform {
+      background: var(--bg-surface); border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg); padding: 24px; margin-bottom: 20px;
+    }
+    .waveform-bars {
+      display: flex; align-items: flex-end; gap: 2px; height: 80px; margin-bottom: 16px;
+    }
+    .waveform-bar { flex: 1; background: var(--brand-primary); border-radius: 1px; opacity: 0.5; }
+    .waveform-bar.played { opacity: 1; }
+    .player-controls { display: flex; align-items: center; gap: 16px; }
+    .play-btn {
+      width: 44px; height: 44px; border-radius: 50%; background: var(--brand-primary);
+      display: flex; align-items: center; justify-content: center; cursor: pointer;
+      color: #fff; font-size: 16px;
+    }
+    .player-time { font-family: var(--font-mono); font-size: 13px; color: var(--text-muted); }
+    .version-tabs { display: flex; gap: 4px; margin-bottom: 20px; }
+    .version-tab {
+      padding: 8px 16px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 600;
+      cursor: pointer; border: 1px solid var(--border-default); color: var(--text-secondary);
+      background: transparent; transition: all 0.15s;
+    }
+    .version-tab.active { background: var(--brand-primary); color: #fff; border-color: var(--brand-primary); }
+    .comment-list { display: flex; flex-direction: column; gap: 12px; }
+    .comment-item {
+      background: var(--bg-surface); border: 1px solid var(--border-default);
+      border-radius: var(--radius-md); padding: 14px;
+    }
+    .comment-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .comment-author { font-size: 12px; font-weight: 600; }
+    .comment-time { font-size: 10px; color: var(--text-muted); }
+    .comment-body { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+    .comment-timestamp {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 2px 8px; background: rgba(139,92,246,0.1); border-radius: 4px;
+      font-size: 10px; font-family: var(--font-mono); color: var(--brand-primary);
+      margin-bottom: 6px; cursor: pointer;
+    }
+    .guest-form {
+      background: var(--bg-surface); border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg); padding: 20px; margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="guest-banner">
+    🔗 You're viewing a public review session · <a href="#">Sign in</a> for full features
+  </div>
+
+  <div style="max-width: 800px; margin: 0 auto; padding: 24px;">
+    <div style="margin-bottom:24px">
+      <h1 style="font-size:22px;font-weight:800;margin-bottom:4px">Neon Warehouse — Master</h1>
+      <p style="font-size:13px;color:var(--text-muted)">by @producer1 · Round 2 of 3 · 8 comments</p>
+    </div>
+
+    <!-- Version Tabs -->
+    <div class="version-tabs">
+      <div class="version-tab active">v13 — Final Mix</div>
+      <div class="version-tab">v12 — Pre-master</div>
+      <div class="version-tab">v11 — Rough Mix</div>
+    </div>
+
+    <!-- Player -->
+    <div class="player-section" style="padding:0">
+      <div class="player-waveform">
+        <div class="waveform-bars">
+          <div class="waveform-bar played" style="height:40%"></div><div class="waveform-bar played" style="height:60%"></div>
+          <div class="waveform-bar played" style="height:80%"></div><div class="waveform-bar played" style="height:50%"></div>
+          <div class="waveform-bar played" style="height:90%"></div><div class="waveform-bar played" style="height:70%"></div>
+          <div class="waveform-bar played" style="height:45%"></div><div class="waveform-bar played" style="height:65%"></div>
+          <div class="waveform-bar" style="height:55%"></div><div class="waveform-bar" style="height:75%"></div>
+          <div class="waveform-bar" style="height:60%"></div><div class="waveform-bar" style="height:80%"></div>
+          <div class="waveform-bar" style="height:35%"></div><div class="waveform-bar" style="height:90%"></div>
+          <div class="waveform-bar" style="height:50%"></div><div class="waveform-bar" style="height:70%"></div>
+          <div class="waveform-bar" style="height:40%"></div><div class="waveform-bar" style="height:60%"></div>
+          <div class="waveform-bar" style="height:85%"></div><div class="waveform-bar" style="height:55%"></div>
+        </div>
+        <div class="player-controls">
+          <div class="play-btn">▶</div>
+          <span class="player-time">1:24</span>
+          <span class="player-time">/ 3:42</span>
+          <div style="flex:1"></div>
+          <span style="font-size:12px;color:var(--text-muted)">🔊 Volume</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Comments -->
+    <h3 style="font-size:14px;font-weight:700;margin-bottom:12px">💬 Comments (8)</h3>
+    <div class="comment-list">
+      <div class="comment-item">
+        <div class="comment-header">
+          <div class="comment-author" style="display:flex;align-items:center;gap:6px">
+            <span style="width:20px;height:20px;border-radius:50%;background:#22c55e;display:inline-flex;align-items:center;justify-content:center;font-size:9px;color:#fff;font-weight:700">R</span>
+            @remixer
+          </div>
+          <div class="comment-time">2h ago</div>
+        </div>
+        <div class="comment-timestamp">📍 1:24</div>
+        <div class="comment-body">The snare could use more room reverb here. It feels a bit dry compared to the rest of the mix.</div>
+      </div>
+      <div class="comment-item">
+        <div class="comment-header">
+          <div class="comment-author" style="display:flex;align-items:center;gap:6px">
+            <span style="width:20px;height:20px;border-radius:50%;background:#3b82f6;display:inline-flex;align-items:center;justify-content:center;font-size:9px;color:#fff;font-weight:700">M</span>
+            @mastering_guru
+          </div>
+          <div class="comment-time">1h ago</div>
+        </div>
+        <div class="comment-timestamp">📍 2:15</div>
+        <div class="comment-body">Stereo image widens nicely here. The sidechain compression is sitting well with the kick.</div>
+      </div>
+      <div class="comment-item">
+        <div class="comment-header">
+          <div class="comment-author" style="display:flex;align-items:center;gap:6px">
+            <span style="width:20px;height:20px;border-radius:50%;background:#eab308;display:inline-flex;align-items:center;justify-content:center;font-size:9px;color:#fff;font-weight:700">A</span>
+            @audiophile
+          </div>
+          <div class="comment-time">45m ago</div>
+        </div>
+        <div class="comment-timestamp">📍 3:01</div>
+        <div class="comment-body">The outro fade is too quick. Could we extend it by 2 bars?</div>
+      </div>
+    </div>
+
+    <!-- Guest Comment Form -->
+    <div class="guest-form">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+        <span style="font-size:12px;color:var(--text-muted)">💬 Add a comment (guest)</span>
+      </div>
+      <div style="display:flex;gap:8px">
+        <input class="form-input" placeholder="Your name..." style="width:160px;font-size:12px">
+        <input class="form-input" placeholder="Write a comment... (use @1:24 for timestamp)" style="flex:1;font-size:12px">
+        <button class="btn btn-primary" style="font-size:12px">Post</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

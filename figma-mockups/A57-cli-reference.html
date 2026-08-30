@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <title>SoundHub — CLI Reference</title>
+  <link rel="stylesheet" href="design-system/shared.css">
+  <style>
+    .cli-section { margin-bottom: 32px; }
+    .cli-title { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+    .cli-desc { font-size: 12px; color: var(--text-muted); margin-bottom: 12px; }
+    .cli-block {
+      background: #0d0d0d; border: 1px solid #27272a; border-radius: var(--radius-md);
+      padding: 16px; font-family: 'JetBrains Mono', 'Fira Code', monospace;
+      font-size: 12px; line-height: 1.8; overflow-x: auto; margin-bottom: 16px;
+    }
+    .cli-block .prompt { color: #22c55e; }
+    .cli-block .cmd { color: #e4e4e7; }
+    .cli-block .flag { color: #eab308; }
+    .cli-block .arg { color: #3b82f6; }
+    .cli-block .comment { color: #52525b; }
+    .cli-block .output { color: #71717a; }
+    .cli-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+    .cli-table th {
+      text-align: left; padding: 8px 12px; font-size: 11px; font-weight: 700;
+      color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--border-default);
+    }
+    .cli-table td {
+      padding: 8px 12px; font-size: 12px; border-bottom: 1px solid var(--border-default);
+    }
+    .cli-table code {
+      font-family: 'JetBrains Mono', monospace; font-size: 11px;
+      padding: 2px 6px; background: var(--bg-elevated); border-radius: 3px;
+      color: var(--brand-primary);
+    }
+    .install-tabs { display: flex; gap: 4px; margin-bottom: 16px; }
+    .install-tab {
+      padding: 8px 16px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 600;
+      cursor: pointer; border: 1px solid var(--border-default); color: var(--text-secondary);
+      background: transparent;
+    }
+    .install-tab.active { background: var(--brand-primary); color: #fff; border-color: var(--brand-primary); }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-logo"><div class="logo-icon">S</div><div class="logo-text">SoundHub</div></div>
+      <nav class="sidebar-nav">
+        <div class="sidebar-section-label">Main</div>
+        <a class="sidebar-item" href="#"><span class="icon">📊</span> Dashboard</a>
+        <a class="sidebar-item" href="#"><span class="icon">📁</span> Projects</a>
+        <div class="sidebar-section-label">DAW Integration</div>
+        <a class="sidebar-item" href="#"><span class="icon">🎛️</span> Plugin Config</a>
+        <a class="sidebar-item active" href="#"><span class="icon">💻</span> CLI</a>
+        <div class="sidebar-section-label">Account</div>
+        <a class="sidebar-item" href="#"><span class="icon">⚙️</span> Settings</a>
+      </nav>
+    </aside>
+    <div class="main-content">
+      <header class="topbar">
+        <div class="topbar-search"><span class="search-icon">🔍</span><input type="text" placeholder="Search commands..."></div>
+        <div class="topbar-right"><div class="topbar-icon-btn">🔔<span class="notif-dot"></span></div><div class="topbar-avatar">P</div></div>
+      </header>
+      <div class="page">
+        <h1 class="page-title" style="margin-bottom:4px">CLI Reference</h1>
+        <p class="page-subtitle" style="margin-bottom:24px">Command-line interface for SoundHub — <code style="font-family:var(--font-mono);padding:2px 6px;background:var(--bg-elevated);border-radius:3px">snd</code></p>
+
+        <!-- Installation -->
+        <div class="cli-section">
+          <div class="cli-title">📦 Installation</div>
+          <div class="cli-desc">Install the SoundHub CLI tool</div>
+          <div class="install-tabs">
+            <div class="install-tab active">npm</div>
+            <div class="install-tab">pip</div>
+            <div class="install-tab">brew</div>
+          </div>
+          <div class="cli-block">
+            <span class="prompt">$</span> <span class="cmd">npm install -g @soundhub/cli</span><br>
+            <span class="output"># or</span><br>
+            <span class="prompt">$</span> <span class="cmd">pip install soundhub-cli</span><br>
+            <span class="output"># or</span><br>
+            <span class="prompt">$</span> <span class="cmd">brew install soundhub/tap/snd</span>
+          </div>
+        </div>
+
+        <!-- Auth -->
+        <div class="cli-section">
+          <div class="cli-title">🔐 Authentication</div>
+          <div class="cli-desc">Login and manage API credentials</div>
+          <div class="cli-block">
+            <span class="comment"># Login with browser OAuth</span><br>
+            <span class="prompt">$</span> <span class="cmd">snd login</span><br><br>
+            <span class="comment"># Or set token directly</span><br>
+            <span class="prompt">$</span> <span class="cmd">snd auth</span> <span class="flag">--token</span> <span class="arg">snd_abc123...</span><br><br>
+            <span class="comment"># Check auth status</span><br>
+            <span class="prompt">$</span> <span class="cmd">snd whoami</span><br>
+            <span class="output">Logged in as @producer1 (plan: pro)</span>
+          </div>
+        </div>
+
+        <!-- Project Commands -->
+        <div class="cli-section">
+          <div class="cli-title">📁 Project Commands</div>
+          <div class="cli-desc">Create, list, and manage projects</div>
+          <table class="cli-table">
+            <thead><tr><th>Command</th><th>Description</th><th>Example</th></tr></thead>
+            <tbody>
+              <tr><td><code>snd project list</code></td><td>List all your projects</td><td><code>snd project list --format table</code></td></tr>
+              <tr><td><code>snd project create</code></td><td>Create a new project</td><td><code>snd project create "My Track" --daw ableton</code></td></tr>
+              <tr><td><code>snd project open</code></td><td>Open project in browser</td><td><code>snd project open neon-warehouse</code></td></tr>
+              <tr><td><code>snd project delete</code></td><td>Delete a project</td><td><code>snd project delete --confirm</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Push/Pull -->
+        <div class="cli-section">
+          <div class="cli-title">⬆️ Push & Pull</div>
+          <div class="cli-desc">Upload and download project files</div>
+          <div class="cli-block">
+            <span class="comment"># Push current directory to SoundHub</span><br>
+            <span class="prompt">$</span> <span class="cmd">snd push</span><br>
+            <span class="output">⟳ Analyzing project files...</span><br>
+            <span class="output">✓ Found 12 audio files (245 MB)</span><br>
+            <span class="output">⟳ Uploading v14...</span><br>
+            <span class="output">✓ Push complete — v14 published</span><br><br>
+            <span class="comment"># Push with message</span><br>
+            <span class="prompt">$</span> <span class="cmd">snd push</span> <span class="flag">-m</span> <span class="arg">"Added vocal stem"</span><br><br>
+            <span class="comment"># Pull latest version</span><br>
+            <span class="prompt">$</span> <span class="cmd">snd pull</span><br><br>
+            <span class="comment"># Pull specific version</span><br>
+            <span class="prompt">$</span> <span class="cmd">snd pull</span> <span class="flag">--version</span> <span class="arg">v12</span><br><br>
+            <span class="comment"># List remote versions</span><br>
+            <span class="prompt">$</span> <span class="cmd">snd versions</span><br>
+            <span class="output">v14  2h ago   142 MB  "Added vocal stem"</span><br>
+            <span class="output">v13  1d ago   138 MB  "Pre-master"</span><br>
+            <span class="output">v12  3d ago   135 MB  "Rough mix"</span>
+          </div>
+        </div>
+
+        <!-- Marketplace -->
+        <div class="cli-section">
+          <div class="cli-title">🛒 Marketplace</div>
+          <div class="cli-desc">Search, buy, and publish assets</div>
+          <div class="cli-block">
+            <span class="comment"># Search marketplace</span><br>
+            <span class="prompt">$</span> <span class="cmd">snd search</span> <span class="arg">"lo-fi drums"</span><br><br>
+            <span class="comment"># Download an asset</span><br>
+            <span class="prompt">$</span> <span class="cmd">snd buy</span> <span class="arg">lo-fi-drums-pack</span><br><br>
+            <span class="comment"># Publish your asset</span><br>
+            <span class="prompt">$</span> <span class="cmd">snd publish</span> <span class="flag">--price</span> <span class="arg">$9.99</span> <span class="flag">--tags</span> <span class="arg">lo-fi,drums</span>
+          </div>
+        </div>
+
+        <!-- Global Flags -->
+        <div class="cli-section">
+          <div class="cli-title">⚙️ Global Options</div>
+          <table class="cli-table">
+            <thead><tr><th>Flag</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><code>--verbose, -v</code></td><td>Enable verbose output</td></tr>
+              <tr><td><code>--json</code></td><td>Output results as JSON</td></tr>
+              <tr><td><code>--no-color</code></td><td>Disable colored output</td></tr>
+              <tr><td><code>--config &lt;path&gt;</code></td><td>Use custom config file</td></tr>
+              <tr><td><code>--help, -h</code></td><td>Show help for any command</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

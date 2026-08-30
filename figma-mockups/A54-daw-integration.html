@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SoundHub — DAW Integration</title>
+<link rel="stylesheet" href="design-system/shared.css">
+<style>
+  body { margin: 0; background: var(--bg-primary); color: var(--text-primary); font-family: 'Inter', system-ui, sans-serif; }
+  .hero { text-align: center; padding: 60px 20px 50px; background: var(--bg-panel); }
+  .badge-status { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px; background: rgba(34,197,94,0.1); font-size: 11px; font-weight: 600; color: var(--color-success); margin-bottom: 16px; }
+  .badge-status .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--color-success); }
+  .hero h1 { font-size: 40px; font-weight: 800; margin: 0 0 12px; }
+  .hero .tagline { font-size: 16px; color: var(--text-secondary); margin: 0 0 8px; }
+  .hero .intro { font-size: 13px; color: var(--text-muted); max-width: 600px; margin: 0 auto 24px; }
+  .cta { display: flex; gap: 12px; justify-content: center; }
+  .btn { padding: 12px 24px; border-radius: 6px; font-size: 13px; font-weight: 600; text-decoration: none; border: none; cursor: pointer; }
+  .btn-primary { background: var(--brand-primary); color: white; }
+  .btn-ghost { background: transparent; color: var(--text-secondary); border: 1px solid var(--border-default); }
+  .section { max-width: 1000px; margin: 0 auto; padding: 40px 20px; }
+  .section h2 { font-size: 22px; font-weight: 800; margin: 0 0 20px; }
+  .screenshot { background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: 12px; overflow: hidden; margin-bottom: 12px; }
+  .screenshot-bar { display: flex; align-items: center; gap: 6px; padding: 10px 12px; background: var(--bg-elevated); }
+  .screenshot-bar .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .screenshot-bar .url { font-size: 11px; color: var(--text-muted); margin-left: 8px; }
+  .screenshot-body { padding: 24px; }
+  .screenshot-body h3 { font-size: 18px; font-weight: 600; margin: 0 0 16px; }
+  .parsed-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .parsed-item .label { font-size: 10px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; }
+  .parsed-item .value { font-size: 14px; font-weight: 600; margin-top: 2px; }
+  .screenshot-cap { font-size: 12px; color: var(--text-muted); text-align: center; margin-top: 8px; }
+  .workflow { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .workflow-step { background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: 8px; padding: 12px 16px; display: flex; align-items: center; gap: 8px; }
+  .workflow-step .num { width: 24px; height: 24px; border-radius: 12px; background: var(--brand-primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; }
+  .workflow-step .label { font-size: 12px; font-weight: 600; }
+  .arrow { font-size: 16px; color: var(--text-muted); }
+  .formats { display: flex; gap: 8px; margin-top: 12px; }
+  .format-chip { padding: 6px 14px; border-radius: 6px; background: var(--bg-elevated); font-size: 12px; font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="hero">
+  <div class="badge-status"><span class="dot"></span>Beta</div>
+  <h1>Ableton Live</h1>
+  <p class="tagline">Push projects from Ableton to SoundHub review</p>
+  <p class="intro">Parse .als project files — extract tracks, plugins, tempo, key, and arrangement data.</p>
+  <div class="cta">
+    <a href="#parsed" class="btn btn-primary">See what we parse</a>
+    <a href="#" class="btn btn-ghost">← Back to SoundHub</a>
+  </div>
+</div>
+<div class="section">
+  <div class="screenshot">
+    <div class="screenshot-bar">
+      <div class="dot" style="background:var(--color-error)"></div>
+      <div class="dot" style="background:var(--color-warning)"></div>
+      <div class="dot" style="background:var(--color-success)"></div>
+      <span class="url">soundhub.app/projects/42</span>
+    </div>
+    <div class="screenshot-body">
+      <h3>🎵 Ableton Project Parsed</h3>
+      <div class="parsed-grid" id="parsed"></div>
+    </div>
+  </div>
+  <p class="screenshot-cap">Ableton Live project file parsed and displayed in SoundHub</p>
+</div>
+<div class="section">
+  <h2>Push from Ableton to review</h2>
+  <div class="workflow">
+    <div class="workflow-step"><div class="num">1</div><div class="label">snd push</div></div><span class="arrow">→</span>
+    <div class="workflow-step"><div class="num">2</div><div class="label">Parse .als</div></div><span class="arrow">→</span>
+    <div class="workflow-step"><div class="num">3</div><div class="label">Upload stems</div></div><span class="arrow">→</span>
+    <div class="workflow-step"><div class="num">4</div><div class="label">Create session</div></div><span class="arrow">→</span>
+    <div class="workflow-step"><div class="num">5</div><div class="label">Share link</div></div>
+  </div>
+</div>
+<div class="section">
+  <h2>Supported project files</h2>
+  <div class="formats">
+    <div class="format-chip">.als</div>
+    <div class="format-chip">.flp</div>
+    <div class="format-chip">.cpr</div>
+    <div class="format-chip">.rpp</div>
+  </div>
+</div>
+<script>
+const fields=[['Tracks','12'],['BPM','128'],['Key','Am'],['Duration','4:32'],['Plugins','Serum, FabFilter'],['Arrangement','Verse-Chorus'],['Sample Rate','48kHz'],['Bit Depth','24-bit']];
+const g=document.getElementById('parsed');
+fields.forEach(f=>{const d=document.createElement('div');d.className='parsed-item';d.innerHTML=`<div class="label">${f[0]}</div><div class="value">${f[1]}</div>`;g.appendChild(d)});
+</script>
+</body>
+</html>

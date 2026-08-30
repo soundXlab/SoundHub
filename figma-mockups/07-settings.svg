@@ -1,0 +1,121 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" width="1440" height="900">
+  <rect width="1440" height="900" fill="#0A0A0B"/>
+
+  <!-- Sidebar -->
+  <rect width="260" height="900" fill="#111113"/>
+  <line x1="260" y1="0" x2="260" y2="900" stroke="#1F1F23" stroke-width="1"/>
+  <text x="28" y="38" font-family="Inter, sans-serif" font-size="18" font-weight="800" fill="#FFFFFF">🎵 SoundHub</text>
+
+  <text x="28" y="90" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#52525B" letter-spacing="1">MAIN</text>
+  <text x="44" y="118" font-family="Inter, sans-serif" font-size="14" font-weight="500" fill="#A1A1AA">📊 Dashboard</text>
+  <text x="44" y="153" font-family="Inter, sans-serif" font-size="14" font-weight="500" fill="#A1A1AA">📁 Projects</text>
+  <text x="44" y="188" font-family="Inter, sans-serif" font-size="14" font-weight="500" fill="#A1A1AA">🎵 Sessions</text>
+  <text x="44" y="223" font-family="Inter, sans-serif" font-size="14" font-weight="500" fill="#A1A1AA">🛒 Marketplace</text>
+
+  <line x1="28" y1="250" x2="232" y2="250" stroke="#1F1F23" stroke-width="1"/>
+  <text x="28" y="280" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#52525B" letter-spacing="1">TOOLS</text>
+  <text x="44" y="308" font-family="Inter, sans-serif" font-size="14" font-weight="500" fill="#A1A1AA">⬆️ Upload</text>
+  <text x="44" y="343" font-family="Inter, sans-serif" font-size="14" font-weight="500" fill="#A1A1AA">📈 Analytics</text>
+
+  <line x1="28" y1="370" x2="232" y2="370" stroke="#1F1F23" stroke-width="1"/>
+  <text x="28" y="400" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#52525B" letter-spacing="1">ACCOUNT</text>
+  <text x="44" y="428" font-family="Inter, sans-serif" font-size="14" font-weight="500" fill="#A1A1AA">👤 Profile</text>
+  <rect x="16" y="438" width="228" height="36" rx="8" fill="#8B5CF6" opacity="0.12"/>
+  <text x="44" y="461" font-family="Inter, sans-serif" font-size="14" font-weight="600" fill="#8B5CF6">⚙️ Settings</text>
+  <text x="44" y="498" font-family="Inter, sans-serif" font-size="14" font-weight="500" fill="#A1A1AA">💳 Billing</text>
+
+  <!-- Main content -->
+  <rect x="260" y="0" width="1180" height="900" fill="#0A0A0B"/>
+
+  <!-- Top bar -->
+  <rect x="260" y="0" width="1180" height="60" fill="#0A0A0B" opacity="0.95"/>
+  <line x1="260" y1="60" x2="1440" y2="60" stroke="#1F1F23" stroke-width="1"/>
+
+  <!-- Page title -->
+  <text x="290" y="100" font-family="Inter, -apple-system, sans-serif" font-size="28" font-weight="800" fill="#FFFFFF">Settings</text>
+
+  <!-- Settings tabs -->
+  <rect x="290" y="120" width="80" height="32" rx="8" fill="#8B5CF6" opacity="0.12"/>
+  <text x="310" y="142" font-family="Inter, sans-serif" font-size="13" font-weight="600" fill="#8B5CF6">Profile</text>
+  <rect x="380" y="120" width="120" height="32" rx="8" fill="transparent"/>
+  <text x="404" y="142" font-family="Inter, sans-serif" font-size="13" fill="#71717A">Notifications</text>
+  <rect x="510" y="120" width="100" height="32" rx="8" fill="transparent"/>
+  <text x="532" y="142" font-family="Inter, sans-serif" font-size="13" fill="#71717A">Billing</text>
+  <rect x="620" y="120" width="130" height="32" rx="8" fill="transparent"/>
+  <text x="642" y="142" font-family="Inter, sans-serif" font-size="13" fill="#71717A">Connected</text>
+  <rect x="760" y="120" width="100" height="32" rx="8" fill="transparent"/>
+  <text x="782" y="142" font-family="Inter, sans-serif" font-size="13" fill="#71717A">Security</text>
+
+  <!-- Profile section -->
+  <text x="290" y="200" font-family="Inter, sans-serif" font-size="18" font-weight="700" fill="#FFFFFF">Profile</text>
+  <text x="290" y="224" font-family="Inter, sans-serif" font-size="14" fill="#71717A">Manage your public profile and personal information</text>
+
+  <!-- Avatar section -->
+  <rect x="290" y="240" width="1060" height="100" rx="12" fill="#111113" stroke="#27272A" stroke-width="1"/>
+  <circle cx="350" cy="290" r="36" fill="#8B5CF6" opacity="0.2" stroke="#8B5CF6" stroke-width="2"/>
+  <text x="350" y="299" text-anchor="middle" font-family="Inter, sans-serif" font-size="20" font-weight="800" fill="#8B5CF6">V</text>
+  <text x="400" y="280" font-family="Inter, sans-serif" font-size="14" font-weight="600" fill="#E4E4E7">Profile Photo</text>
+  <text x="400" y="300" font-family="Inter, sans-serif" font-size="12" fill="#71717A">JPG, PNG or GIF. Max 2MB.</text>
+  <rect x="400" y="310" width="100" height="28" rx="6" fill="transparent" stroke="#3F3F46" stroke-width="1"/>
+  <text x="418" y="329" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#E4E4E7">Upload</text>
+
+  <!-- Form fields -->
+  <rect x="290" y="360" width="510" height="80" rx="12" fill="#111113" stroke="#27272A" stroke-width="1"/>
+  <text x="310" y="385" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#A1A1AA">Display Name</text>
+  <rect x="310" y="395" width="470" height="32" rx="8" fill="#18181B" stroke="#27272A" stroke-width="1"/>
+  <text x="326" y="417" font-family="Inter, sans-serif" font-size="14" fill="#E4E4E7">Vasyl</text>
+
+  <rect x="820" y="360" width="530" height="80" rx="12" fill="#111113" stroke="#27272A" stroke-width="1"/>
+  <text x="840" y="385" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#A1A1AA">Username</text>
+  <rect x="840" y="395" width="490" height="32" rx="8" fill="#18181B" stroke="#27272A" stroke-width="1"/>
+  <text x="856" y="417" font-family="Inter, sans-serif" font-size="14" fill="#E4E4E7">@vasyl</text>
+
+  <rect x="290" y="450" width="1060" height="80" rx="12" fill="#111113" stroke="#27272A" stroke-width="1"/>
+  <text x="310" y="475" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#A1A1AA">Bio</text>
+  <rect x="310" y="485" width="1020" height="32" rx="8" fill="#18181B" stroke="#27272A" stroke-width="1"/>
+  <text x="326" y="507" font-family="Inter, sans-serif" font-size="14" fill="#E4E4E7">Electronic producer with 8+ years experience. Specializing in synthwave.</text>
+
+  <rect x="290" y="540" width="340" height="80" rx="12" fill="#111113" stroke="#27272A" stroke-width="1"/>
+  <text x="310" y="565" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#A1A1AA">Location</text>
+  <rect x="310" y="575" width="300" height="32" rx="8" fill="#18181B" stroke="#27272A" stroke-width="1"/>
+  <text x="326" y="597" font-family="Inter, sans-serif" font-size="14" fill="#E4E4E7">Berlin, DE</text>
+
+  <rect x="650" y="540" width="340" height="80" rx="12" fill="#111113" stroke="#27272A" stroke-width="1"/>
+  <text x="670" y="565" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#A1A1AA">Specialty</text>
+  <rect x="670" y="575" width="300" height="32" rx="8" fill="#18181B" stroke="#27272A" stroke-width="1"/>
+  <text x="686" y="597" font-family="Inter, sans-serif" font-size="14" fill="#E4E4E7">Mixing &amp; Mastering</text>
+
+  <rect x="1010" y="540" width="340" height="80" rx="12" fill="#111113" stroke="#27272A" stroke-width="1"/>
+  <text x="1030" y="565" font-family="Inter, sans-serif" font-size="12" font-weight="600" fill="#A1A1AA">Website</text>
+  <rect x="1030" y="575" width="300" height="32" rx="8" fill="#18181B" stroke="#27272A" stroke-width="1"/>
+  <text x="1046" y="597" font-family="Inter, sans-serif" font-size="14" fill="#E4E4E7">https://vasyl.io</text>
+
+  <!-- Notifications section -->
+  <text x="290" y="670" font-family="Inter, sans-serif" font-size="18" font-weight="700" fill="#FFFFFF">Notifications</text>
+  <text x="290" y="694" font-family="Inter, sans-serif" font-size="14" fill="#71717A">Choose what notifications you receive</text>
+
+  <rect x="290" y="710" width="1060" height="52" rx="10" fill="#111113" stroke="#27272A" stroke-width="1"/>
+  <text x="310" y="742" font-family="Inter, sans-serif" font-size="14" fill="#E4E4E7">Email notifications</text>
+  <text x="1200" y="742" font-family="Inter, sans-serif" font-size="14" fill="#71717A">📧</text>
+  <!-- Toggle ON -->
+  <rect x="1240" y="724" width="44" height="24" rx="12" fill="#8B5CF6"/>
+  <circle cx="1264" cy="736" r="8" fill="#FFFFFF"/>
+
+  <rect x="290" y="770" width="1060" height="52" rx="10" fill="#111113" stroke="#27272A" stroke-width="1"/>
+  <text x="310" y="802" font-family="Inter, sans-serif" font-size="14" fill="#E4E4E7">Push notifications</text>
+  <text x="1200" y="802" font-family="Inter, sans-serif" font-size="14" fill="#71717A">🔔</text>
+  <!-- Toggle ON -->
+  <rect x="1240" y="784" width="44" height="24" rx="12" fill="#8B5CF6"/>
+  <circle cx="1264" cy="796" r="8" fill="#FFFFFF"/>
+
+  <rect x="290" y="830" width="1060" height="52" rx="10" fill="#111113" stroke="#27272A" stroke-width="1"/>
+  <text x="310" y="862" font-family="Inter, sans-serif" font-size="14" fill="#E4E4E7">Weekly digest</text>
+  <text x="1200" y="862" font-family="Inter, sans-serif" font-size="14" fill="#71717A">📰</text>
+  <!-- Toggle OFF -->
+  <rect x="1240" y="844" width="44" height="24" rx="12" fill="#3F3F46"/>
+  <circle cx="1256" cy="856" r="8" fill="#71717A"/>
+
+  <!-- Save button -->
+  <rect x="1200" y="600" width="120" height="40" rx="10" fill="#8B5CF6"/>
+  <text x="1228" y="626" font-family="Inter, sans-serif" font-size="14" font-weight="700" fill="#FFFFFF">Save Changes</text>
+</svg>

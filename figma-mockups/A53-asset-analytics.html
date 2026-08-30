@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <title>SoundHub — Asset Analytics</title>
+  <link rel="stylesheet" href="design-system/shared.css">
+  <style>
+    .chart-card {
+      background: var(--bg-surface); border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg); padding: 20px; margin-bottom: 16px;
+    }
+    .chart-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .chart-title { font-size: 14px; font-weight: 700; }
+    .chart-bars { display: flex; align-items: flex-end; gap: 6px; height: 140px; padding: 0 8px; }
+    .chart-bar {
+      flex: 1; border-radius: 3px 3px 0 0; cursor: pointer; transition: all 0.15s;
+      position: relative;
+    }
+    .chart-bar:hover { opacity: 0.8; }
+    .chart-bar-label {
+      position: absolute; bottom: -16px; left: 50%; transform: translateX(-50%);
+      font-size: 9px; color: var(--text-muted); white-space: nowrap;
+    }
+    .asset-list { display: flex; flex-direction: column; gap: 8px; }
+    .asset-row {
+      display: flex; align-items: center; gap: 14px; padding: 12px 14px;
+      background: var(--bg-elevated); border: 1px solid var(--border-default);
+      border-radius: var(--radius-md); cursor: pointer; transition: all 0.15s;
+    }
+    .asset-row:hover { border-color: var(--border-hover); }
+    .asset-icon { width: 36px; height: 36px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 16px; }
+    .asset-info { flex: 1; }
+    .asset-name { font-size: 13px; font-weight: 600; }
+    .asset-meta { font-size: 10px; color: var(--text-muted); }
+    .asset-stat { text-align: right; min-width: 60px; }
+    .asset-stat-value { font-size: 13px; font-weight: 600; font-family: var(--font-mono); }
+    .asset-stat-label { font-size: 9px; color: var(--text-muted); }
+    .mini-chart { display: flex; align-items: flex-end; gap: 1px; height: 24px; }
+    .mini-bar { flex: 1; background: var(--brand-primary); border-radius: 1px; opacity: 0.6; }
+    .revenue-card {
+      background: var(--bg-surface); border: 1px solid var(--border-default);
+      border-radius: var(--radius-lg); padding: 20px; text-align: center;
+    }
+    .revenue-amount { font-size: 32px; font-weight: 800; font-family: var(--font-mono); margin: 8px 0; }
+    .revenue-label { font-size: 11px; color: var(--text-muted); }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-logo"><div class="logo-icon">S</div><div class="logo-text">SoundHub</div></div>
+      <nav class="sidebar-nav">
+        <div class="sidebar-section-label">Main</div>
+        <a class="sidebar-item" href="#"><span class="icon">📊</span> Dashboard</a>
+        <a class="sidebar-item" href="#"><span class="icon">📁</span> Projects</a>
+        <a class="sidebar-item" href="#"><span class="icon">🛒</span> Marketplace</a>
+        <div class="sidebar-section-label">Workspace</div>
+        <a class="sidebar-item active" href="#"><span class="icon">📈</span> Analytics</a>
+        <a class="sidebar-item" href="#"><span class="icon">💬</span> Reviews</a>
+        <div class="sidebar-section-label">Account</div>
+        <a class="sidebar-item" href="#"><span class="icon">⚙️</span> Settings</a>
+      </nav>
+    </aside>
+    <div class="main-content">
+      <header class="topbar">
+        <div class="topbar-search"><span class="search-icon">🔍</span><input type="text" placeholder="Search..."></div>
+        <div class="topbar-right"><div class="topbar-icon-btn">🔔<span class="notif-dot"></span></div><div class="topbar-avatar">P</div></div>
+      </header>
+      <div class="page">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
+          <div>
+            <h1 class="page-title" style="margin-bottom:4px">Asset Analytics</h1>
+            <p class="page-subtitle">Performance metrics for your marketplace assets</p>
+          </div>
+          <div style="display:flex;gap:4px">
+            <div style="padding:5px 10px;border-radius:4px;font-size:11px;font-weight:600;background:var(--brand-primary);color:#fff;cursor:pointer">30d</div>
+            <div style="padding:5px 10px;border-radius:4px;font-size:11px;color:var(--text-muted);cursor:pointer">90d</div>
+            <div style="padding:5px 10px;border-radius:4px;font-size:11px;color:var(--text-muted);cursor:pointer">All</div>
+          </div>
+        </div>
+
+        <!-- Revenue Cards -->
+        <div class="grid-4" style="margin-bottom:24px">
+          <div class="revenue-card">
+            <div class="revenue-label">Total Revenue</div>
+            <div class="revenue-amount" style="color:var(--color-success)">$482</div>
+            <div class="stat-change up">+$67 vs last month</div>
+          </div>
+          <div class="revenue-card">
+            <div class="revenue-label">Total Downloads</div>
+            <div class="revenue-amount">1,247</div>
+            <div class="stat-change up">+189 this month</div>
+          </div>
+          <div class="revenue-card">
+            <div class="revenue-label">Total Views</div>
+            <div class="revenue-amount">8,432</div>
+            <div class="stat-change up">+1,204 this month</div>
+          </div>
+          <div class="revenue-card">
+            <div class="revenue-label">Conversion Rate</div>
+            <div class="revenue-amount">14.8%</div>
+            <div class="stat-change up">+2.1% vs last month</div>
+          </div>
+        </div>
+
+        <div class="grid-2" style="gap:16px;margin-bottom:16px">
+          <!-- Downloads Chart -->
+          <div class="chart-card">
+            <div class="chart-header">
+              <span class="chart-title">📥 Downloads</span>
+              <span style="font-size:11px;color:var(--text-muted)">Per day (last 30 days)</span>
+            </div>
+            <div class="chart-bars" style="margin-bottom:16px">
+              <div class="chart-bar" style="height:30%;background:var(--brand-primary)"></div>
+              <div class="chart-bar" style="height:45%;background:var(--brand-primary)"></div>
+              <div class="chart-bar" style="height:35%;background:var(--brand-primary)"></div>
+              <div class="chart-bar" style="height:60%;background:var(--brand-primary)"></div>
+              <div class="chart-bar" style="height:50%;background:var(--brand-primary)"></div>
+              <div class="chart-bar" style="height:70%;background:var(--brand-primary)"></div>
+              <div class="chart-bar" style="height:40%;background:var(--brand-primary)"></div>
+              <div class="chart-bar" style="height:55%;background:var(--brand-primary)"></div>
+              <div class="chart-bar" style="height:65%;background:var(--brand-primary)"></div>
+              <div class="chart-bar" style="height:80%;background:var(--brand-primary)"></div>
+              <div class="chart-bar" style="height:45%;background:var(--brand-primary)"></div>
+              <div class="chart-bar" style="height:75%;background:var(--brand-primary)"></div>
+              <div class="chart-bar" style="height:90%;background:var(--brand-primary)"></div>
+              <div class="chart-bar" style="height:60%;background:var(--brand-primary)"></div>
+              <div class="chart-bar" style="height:50%;background:var(--brand-primary)"></div>
+            </div>
+            <div style="text-align:center;font-size:11px;color:var(--text-muted)">← Last 30 days →</div>
+          </div>
+
+          <!-- Revenue Chart -->
+          <div class="chart-card">
+            <div class="chart-header">
+              <span class="chart-title">💰 Revenue</span>
+              <span style="font-size:11px;color:var(--text-muted)">Per week (last 12 weeks)</span>
+            </div>
+            <div class="chart-bars" style="margin-bottom:16px">
+              <div class="chart-bar" style="height:25%;background:var(--color-success)"></div>
+              <div class="chart-bar" style="height:40%;background:var(--color-success)"></div>
+              <div class="chart-bar" style="height:35%;background:var(--color-success)"></div>
+              <div class="chart-bar" style="height:55%;background:var(--color-success)"></div>
+              <div class="chart-bar" style="height:50%;background:var(--color-success)"></div>
+              <div class="chart-bar" style="height:65%;background:var(--color-success)"></div>
+              <div class="chart-bar" style="height:45%;background:var(--color-success)"></div>
+              <div class="chart-bar" style="height:70%;background:var(--color-success)"></div>
+              <div class="chart-bar" style="height:60%;background:var(--color-success)"></div>
+              <div class="chart-bar" style="height:85%;background:var(--color-success)"></div>
+              <div class="chart-bar" style="height:75%;background:var(--color-success)"></div>
+              <div class="chart-bar" style="height:90%;background:var(--color-success)"></div>
+            </div>
+            <div style="text-align:center;font-size:11px;color:var(--text-muted)">← Last 12 weeks →</div>
+          </div>
+        </div>
+
+        <!-- Top Assets -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <span class="chart-title">🏆 Top Performing Assets</span>
+            <span style="font-size:11px;color:var(--text-muted)">Sorted by downloads</span>
+          </div>
+          <div class="asset-list">
+            <div class="asset-row">
+              <div class="asset-icon" style="background:rgba(139,92,246,0.12)">🎵</div>
+              <div class="asset-info">
+                <div class="asset-name">Lo-Fi Drums Pack</div>
+                <div class="asset-meta">WAV · 24bit · Free</div>
+              </div>
+              <div class="asset-stat"><div class="asset-stat-value">487</div><div class="asset-stat-label">downloads</div></div>
+              <div class="asset-stat"><div class="asset-stat-value">3.2k</div><div class="asset-stat-label">views</div></div>
+              <div class="asset-stat"><div class="asset-stat-value" style="color:var(--color-success)">15.2%</div><div class="asset-stat-label">conversion</div></div>
+              <div class="mini-chart"><div class="mini-bar" style="height:40%"></div><div class="mini-bar" style="height:60%"></div><div class="mini-bar" style="height:50%"></div><div class="mini-bar" style="height:80%"></div><div class="mini-bar" style="height:70%"></div><div class="mini-bar" style="height:90%"></div><div class="mini-bar" style="height:85%"></div></div>
+            </div>
+            <div class="asset-row">
+              <div class="asset-icon" style="background:rgba(6,182,212,0.12)">🎵</div>
+              <div class="asset-info">
+                <div class="asset-name">Ambient Pad Textures</div>
+                <div class="asset-meta">WAV · 16bit · $4.99</div>
+              </div>
+              <div class="asset-stat"><div class="asset-stat-value">312</div><div class="asset-stat-label">downloads</div></div>
+              <div class="asset-stat"><div class="asset-stat-value">2.1k</div><div class="asset-stat-label">views</div></div>
+              <div class="asset-stat"><div class="asset-stat-value" style="color:var(--color-success)">14.9%</div><div class="asset-stat-label">conversion</div></div>
+              <div class="mini-chart"><div class="mini-bar" style="height:30%"></div><div class="mini-bar" style="height:50%"></div><div class="mini-bar" style="height:45%"></div><div class="mini-bar" style="height:65%"></div><div class="mini-bar" style="height:55%"></div><div class="mini-bar" style="height:75%"></div><div class="mini-bar" style="height:70%"></div></div>
+            </div>
+            <div class="asset-row">
+              <div class="asset-icon" style="background:rgba(234,88,8,0.12)">🎵</div>
+              <div class="asset-info">
+                <div class="asset-name">808 Bass Kit</div>
+                <div class="asset-meta">WAV · 32bit · $9.99</div>
+              </div>
+              <div class="asset-stat"><div class="asset-stat-value">245</div><div class="asset-stat-label">downloads</div></div>
+              <div class="asset-stat"><div class="asset-stat-value">1.8k</div><div class="asset-stat-label">views</div></div>
+              <div class="asset-stat"><div class="asset-stat-value" style="color:var(--color-success)">13.6%</div><div class="asset-stat-label">conversion</div></div>
+              <div class="mini-chart"><div class="mini-bar" style="height:35%"></div><div class="mini-bar" style="height:55%"></div><div class="mini-bar" style="height:40%"></div><div class="mini-bar" style="height:70%"></div><div class="mini-bar" style="height:60%"></div><div class="mini-bar" style="height:80%"></div><div class="mini-bar" style="height:65%"></div></div>
+            </div>
+            <div class="asset-row">
+              <div class="asset-icon" style="background:rgba(234,179,8,0.12)">🎵</div>
+              <div class="asset-info">
+                <div class="asset-name">Vinyl Classics Vol.2</div>
+                <div class="asset-meta">Ableton · 24bit · $29.99</div>
+              </div>
+              <div class="asset-stat"><div class="asset-stat-value">89</div><div class="asset-stat-label">downloads</div></div>
+              <div class="asset-stat"><div class="asset-stat-value">890</div><div class="asset-stat-label">views</div></div>
+              <div class="asset-stat"><div class="asset-stat-value" style="color:var(--color-success)">10.0%</div><div class="asset-stat-label">conversion</div></div>
+              <div class="mini-chart"><div class="mini-bar" style="height:20%"></div><div class="mini-bar" style="height:35%"></div><div class="mini-bar" style="height:30%"></div><div class="mini-bar" style="height:50%"></div><div class="mini-bar" style="height:45%"></div><div class="mini-bar" style="height:60%"></div><div class="mini-bar" style="height:55%"></div></div>
+            </div>
+            <div class="asset-row">
+              <div class="asset-icon" style="background:rgba(34,197,94,0.12)">🎵</div>
+              <div class="asset-info">
+                <div class="asset-name">Organic Percussion</div>
+                <div class="asset-meta">FLAC · 24bit · $7.99</div>
+              </div>
+              <div class="asset-stat"><div class="asset-stat-value">114</div><div class="asset-stat-label">downloads</div></div>
+              <div class="asset-stat"><div class="asset-stat-value">1.1k</div><div class="asset-stat-label">views</div></div>
+              <div class="asset-stat"><div class="asset-stat-value" style="color:var(--color-success)">10.4%</div><div class="asset-stat-label">conversion</div></div>
+              <div class="mini-chart"><div class="mini-bar" style="height:25%"></div><div class="mini-bar" style="height:40%"></div><div class="mini-bar" style="height:35%"></div><div class="mini-bar" style="height:55%"></div><div class="mini-bar" style="height:50%"></div><div class="mini-bar" style="height:65%"></div><div class="mini-bar" style="height:60%"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Geographic / Device -->
+        <div class="grid-2" style="gap:16px">
+          <div class="chart-card">
+            <div class="chart-header">
+              <span class="chart-title">🌍 Top Countries</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;align-items:center;gap:10px"><span style="font-size:18px">🇺🇸</span><span style="flex:1;font-size:12px">United States</span><span style="font-size:12px;font-weight:600;font-family:var(--font-mono)">42%</span><div style="width:120px;height:6px;background:var(--bg-elevated);border-radius:3px"><div style="width:42%;height:100%;background:var(--brand-primary);border-radius:3px"></div></div></div>
+              <div style="display:flex;align-items:center;gap:10px"><span style="font-size:18px">🇬🇧</span><span style="flex:1;font-size:12px">United Kingdom</span><span style="font-size:12px;font-weight:600;font-family:var(--font-mono)">18%</span><div style="width:120px;height:6px;background:var(--bg-elevated);border-radius:3px"><div style="width:18%;height:100%;background:var(--brand-primary);border-radius:3px"></div></div></div>
+              <div style="display:flex;align-items:center;gap:10px"><span style="font-size:18px">🇩🇪</span><span style="flex:1;font-size:12px">Germany</span><span style="font-size:12px;font-weight:600;font-family:var(--font-mono)">12%</span><div style="width:120px;height:6px;background:var(--bg-elevated);border-radius:3px"><div style="width:12%;height:100%;background:var(--brand-primary);border-radius:3px"></div></div></div>
+              <div style="display:flex;align-items:center;gap:10px"><span style="font-size:18px">🇯🇵</span><span style="flex:1;font-size:12px">Japan</span><span style="font-size:12px;font-weight:600;font-family:var(--font-mono)">9%</span><div style="width:120px;height:6px;background:var(--bg-elevated);border-radius:3px"><div style="width:9%;height:100%;background:var(--brand-primary);border-radius:3px"></div></div></div>
+              <div style="display:flex;align-items:center;gap:10px"><span style="font-size:18px">🇧🇷</span><span style="flex:1;font-size:12px">Brazil</span><span style="font-size:12px;font-weight:600;font-family:var(--font-mono)">7%</span><div style="width:120px;height:6px;background:var(--bg-elevated);border-radius:3px"><div style="width:7%;height:100%;background:var(--brand-primary);border-radius:3px"></div></div></div>
+            </div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-header">
+              <span class="chart-title">📱 Top Sources</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;align-items:center;gap:10px"><span style="font-size:18px">🖥️</span><span style="flex:1;font-size:12px">Web Browser</span><span style="font-size:12px;font-weight:600;font-family:var(--font-mono)">54%</span><div style="width:120px;height:6px;background:var(--bg-elevated);border-radius:3px"><div style="width:54%;height:100%;background:var(--color-success);border-radius:3px"></div></div></div>
+              <div style="display:flex;align-items:center;gap:10px"><span style="font-size:18px">🎛️</span><span style="flex:1;font-size:12px">DAW Plugin</span><span style="font-size:12px;font-weight:600;font-family:var(--font-mono)">28%</span><div style="width:120px;height:6px;background:var(--bg-elevated);border-radius:3px"><div style="width:28%;height:100%;background:var(--color-success);border-radius:3px"></div></div></div>
+              <div style="display:flex;align-items:center;gap:10px"><span style="font-size:18px">💻</span><span style="flex:1;font-size:12px">CLI (snd)</span><span style="font-size:12px;font-weight:600;font-family:var(--font-mono)">12%</span><div style="width:120px;height:6px;background:var(--bg-elevated);border-radius:3px"><div style="width:12%;height:100%;background:var(--color-success);border-radius:3px"></div></div></div>
+              <div style="display:flex;align-items:center;gap:10px"><span style="font-size:18px">📱</span><span style="flex:1;font-size:12px">Mobile</span><span style="font-size:12px;font-weight:600;font-family:var(--font-mono)">6%</span><div style="width:120px;height:6px;background:var(--bg-elevated);border-radius:3px"><div style="width:6%;height:100%;background:var(--color-success);border-radius:3px"></div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

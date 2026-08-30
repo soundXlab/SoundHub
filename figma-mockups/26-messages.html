@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <title>SoundHub — Messages</title>
+  <link rel="stylesheet" href="design-system/shared.css">
+  <style>
+    .messages-layout { display: flex; height: calc(100vh - var(--topbar-height)); }
+    .conversations-list { width: 320px; border-right: 1px solid var(--border-default); display: flex; flex-direction: column; }
+    .conversations-header { padding: 16px; border-bottom: 1px solid var(--border-default); display: flex; align-items: center; justify-content: space-between; }
+    .conversations-search { padding: 12px 16px; border-bottom: 1px solid var(--border-default); }
+    .conversations-items { flex: 1; overflow-y: auto; }
+    .conv-item { display: flex; gap: 12px; padding: 12px 16px; cursor: pointer; transition: background 0.1s; border-bottom: 1px solid var(--border-default); }
+    .conv-item:hover { background: var(--bg-hover); }
+    .conv-item.active { background: rgba(139,92,246,0.08); border-left: 3px solid var(--brand-primary); }
+    .conv-avatar { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: white; flex-shrink: 0; }
+    .conv-info { flex: 1; min-width: 0; }
+    .conv-name { font-size: 13px; font-weight: 600; }
+    .conv-preview { font-size: 12px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .conv-time { font-size: 10px; color: var(--text-muted); flex-shrink: 0; }
+    .conv-unread { width: 8px; height: 8px; background: var(--brand-primary); border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+    .chat-area { flex: 1; display: flex; flex-direction: column; }
+    .chat-header { padding: 14px 20px; border-bottom: 1px solid var(--border-default); display: flex; align-items: center; gap: 12px; }
+    .chat-messages { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+    .msg { display: flex; gap: 10px; max-width: 70%; }
+    .msg.sent { margin-left: auto; flex-direction: row-reverse; }
+    .msg-avatar { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: white; flex-shrink: 0; }
+    .msg-bubble { padding: 10px 14px; border-radius: 12px; font-size: 13px; line-height: 1.5; }
+    .msg.received .msg-bubble { background: var(--bg-elevated); color: var(--text-primary); }
+    .msg.sent .msg-bubble { background: var(--brand-primary); color: white; }
+    .msg-time { font-size: 10px; color: var(--text-muted); margin-top: 4px; }
+    .msg.sent .msg-time { text-align: right; }
+    .chat-input { padding: 16px 20px; border-top: 1px solid var(--border-default); display: flex; gap: 10px; align-items: flex-end; }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-logo"><div class="logo-icon">S</div><div class="logo-text">SoundHub</div></div>
+      <nav class="sidebar-nav">
+        <div class="sidebar-section-label">Main</div>
+        <a class="sidebar-item" href="#"><span class="icon">📊</span> Dashboard</a>
+        <a class="sidebar-item" href="#"><span class="icon">📁</span> Projects</a>
+        <div class="sidebar-section-label">Workspace</div>
+        <a class="sidebar-item" href="#"><span class="icon">🔔</span> Notifications</a>
+        <a class="sidebar-item active" href="#"><span class="icon">💬</span> Messages <span class="badge">2</span></a>
+        <div class="sidebar-section-label">Account</div>
+        <a class="sidebar-item" href="#"><span class="icon">⚙️</span> Settings</a>
+      </nav>
+      <div class="sidebar-footer"><a class="sidebar-item" href="#"><span class="icon">❓</span> Help</a></div>
+    </aside>
+    <div class="main-content">
+      <header class="topbar">
+        <div style="font-size:14px;font-weight:600">Messages</div>
+        <div class="topbar-right"><div class="topbar-avatar">P</div></div>
+      </header>
+      <div class="messages-layout">
+        <!-- Conversations List -->
+        <div class="conversations-list">
+          <div class="conversations-header">
+            <span style="font-size:14px;font-weight:700">Conversations</span>
+            <button class="btn btn-ghost btn-sm">✏️</button>
+          </div>
+          <div class="conversations-search">
+            <input class="form-input" placeholder="🔍 Search messages..." style="width:100%;height:32px;font-size:12px">
+          </div>
+          <div class="conversations-items">
+            <div class="conv-item active">
+              <div class="conv-avatar" style="background:var(--brand-secondary)">S</div>
+              <div class="conv-info">
+                <div class="conv-name">Sarah Chen</div>
+                <div class="conv-preview">Great work on the mix! Let me know when...</div>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+                <span class="conv-time">2m</span>
+                <div class="conv-unread"></div>
+              </div>
+            </div>
+            <div class="conv-item">
+              <div class="conv-avatar" style="background:var(--color-warning)">A</div>
+              <div class="conv-info">
+                <div class="conv-name">Alex Rivera</div>
+                <div class="conv-preview">Can you send me the stems for...</div>
+              </div>
+              <span class="conv-time">1h</span>
+            </div>
+            <div class="conv-item">
+              <div class="conv-avatar" style="background:var(--brand-primary)">M</div>
+              <div class="conv-info">
+                <div class="conv-name">Maya Johnson</div>
+                <div class="conv-preview">Thanks for the feedback on my track!</div>
+              </div>
+              <span class="conv-time">3d</span>
+            </div>
+            <div class="conv-item">
+              <div class="conv-avatar" style="background:var(--color-info)">L</div>
+              <div class="conv-info">
+                <div class="conv-name">Label Contact</div>
+                <div class="conv-preview">We'd like to discuss the release...</div>
+              </div>
+              <span class="conv-time">5d</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chat Area -->
+        <div class="chat-area">
+          <div class="chat-header">
+            <div class="conv-avatar" style="background:var(--brand-secondary);width:32px;height:32px;font-size:12px">S</div>
+            <div><div style="font-size:13px;font-weight:600">Sarah Chen</div><div style="font-size:11px;color:var(--color-success)">● Online</div></div>
+            <div style="margin-left:auto;display:flex;gap:8px">
+              <button class="btn btn-ghost btn-sm">📞</button>
+              <button class="btn btn-ghost btn-sm">📎</button>
+            </div>
+          </div>
+
+          <div class="chat-messages">
+            <div class="msg received">
+              <div class="msg-avatar" style="background:var(--brand-secondary)">S</div>
+              <div>
+                <div class="msg-bubble">Hey! I just listened to v13 of Neon Warehouse. The new synth layer sounds amazing! 🎵</div>
+                <div class="msg-time">10:30 AM</div>
+              </div>
+            </div>
+            <div class="msg sent">
+              <div class="msg-avatar" style="background:var(--brand-primary)">P</div>
+              <div>
+                <div class="msg-bubble">Thanks! I spent a lot of time on that pad texture. Glad you like it.</div>
+                <div class="msg-time">10:32 AM</div>
+              </div>
+            </div>
+            <div class="msg received">
+              <div class="msg-avatar" style="background:var(--brand-secondary)">S</div>
+              <div>
+                <div class="msg-bubble">The only thing I'd flag is the hi-hats around 2:18. Can we boost them slightly? They feel a bit buried under the pad.</div>
+                <div class="msg-time">10:33 AM</div>
+              </div>
+            </div>
+            <div class="msg sent">
+              <div class="msg-avatar" style="background:var(--brand-primary)">P</div>
+              <div>
+                <div class="msg-bubble">Good catch! I'll address that in v14. I'll also add a bit more top-end presence.</div>
+                <div class="msg-time">10:35 AM</div>
+              </div>
+            </div>
+            <div class="msg received">
+              <div class="msg-avatar" style="background:var(--brand-secondary)">S</div>
+              <div>
+                <div class="msg-bubble">Perfect! Let me know when v14 is ready and I'll review again. Great work on the mix! 🔥</div>
+                <div class="msg-time">10:36 AM</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="chat-input">
+            <button class="btn btn-ghost btn-sm">📎</button>
+            <input class="form-input" placeholder="Type a message..." style="flex:1;height:36px">
+            <button class="btn btn-primary btn-sm">Send</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

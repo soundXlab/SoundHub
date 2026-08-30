@@ -1,0 +1,136 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 1000" width="1400" height="1000">
+  <rect width="1400" height="1000" fill="#0A0A0B"/>
+  
+  <!-- Title -->
+  <text x="40" y="40" font-family="Inter, sans-serif" font-size="24" font-weight="800" fill="#FFFFFF">Dashboard — Build Guide for Penpot</text>
+  <text x="40" y="65" font-family="Inter, sans-serif" font-size="12" fill="#71717A">Layout: TopBar (60px) + Sidebar (260px) + Content</text>
+  
+  <!-- TopBar -->
+  <rect x="40" y="80" width="1320" height="60" rx="0" fill="#111113"/>
+  <text x="60" y="115" font-family="Inter, sans-serif" font-size="18" font-weight="900" fill="#8B5CF6">⬡ SoundHub</text>
+  <rect x="200" y="92" width="400" height="36" rx="8" fill="#0A0A0B" stroke="#27272A" stroke-width="1"/>
+  <text x="220" y="115" font-family="Inter, sans-serif" font-size="13" fill="#52525B">🔍 Search projects, sounds, artists...</text>
+  <text x="1200" y="115" font-family="Inter, sans-serif" font-size="13" fill="#A1A1AA">🔔 3</text>
+  <text x="1260" y="115" font-family="Inter, sans-serif" font-size="13" fill="#A1A1AA">👤 Demo</text>
+  <text x="1320" y="115" font-family="Inter, sans-serif" font-size="13" fill="#71717A">⚙️</text>
+  
+  <!-- Sidebar -->
+  <rect x="40" y="140" width="260" height="820" fill="#111113"/>
+  <text x="60" y="180" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#52525B" letter-spacing="1">NAVIGATION</text>
+  
+  <!-- Nav Items -->
+  <rect x="50" y="195" width="240" height="40" rx="8" fill="#8B5CF6" opacity="0.15"/>
+  <text x="70" y="220" font-family="Inter, sans-serif" font-size="13" fill="#8B5CF6">📊 Dashboard</text>
+  
+  <rect x="50" y="245" width="240" height="40" rx="8" fill="transparent"/>
+  <text x="70" y="270" font-family="Inter, sans-serif" font-size="13" fill="#A1A1AA">📁 Projects</text>
+  
+  <rect x="50" y="295" width="240" height="40" rx="8" fill="transparent"/>
+  <text x="70" y="320" font-family="Inter, sans-serif" font-size="13" fill="#A1A1AA">🛒 Marketplace</text>
+  
+  <rect x="50" y="345" width="240" height="40" rx="8" fill="transparent"/>
+  <text x="70" y="370" font-family="Inter, sans-serif" font-size="13" fill="#A1A1AA">⬆️ Upload</text>
+  
+  <rect x="50" y="395" width="240" height="40" rx="8" fill="transparent"/>
+  <text x="70" y="420" font-family="Inter, sans-serif" font-size="13" fill="#A1A1AA">💬 Reviews</text>
+  
+  <rect x="50" y="445" width="240" height="40" rx="8" fill="transparent"/>
+  <text x="70" y="470" font-family="Inter, sans-serif" font-size="13" fill="#A1A1AA">⚙️ Settings</text>
+  
+  <!-- Sidebar Stats -->
+  <text x="60" y="530" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#52525B" letter-spacing="1">QUICK STATS</text>
+  <rect x="50" y="545" width="240" height="60" rx="8" fill="#0A0A0B"/>
+  <text x="70" y="570" font-family="Inter, sans-serif" font-size="11" fill="#71717A">Projects</text>
+  <text x="70" y="590" font-family="Inter, sans-serif" font-size="18" font-weight="700" fill="#FFFFFF">12</text>
+  <text x="150" y="570" font-family="Inter, sans-serif" font-size="11" fill="#71717A">Reviews</text>
+  <text x="150" y="590" font-family="Inter, sans-serif" font-size="18" font-weight="700" fill="#06B6D4">48</text>
+  <text x="230" y="570" font-family="Inter, sans-serif" font-size="11" fill="#71717A">Assets</text>
+  <text x="230" y="590" font-family="Inter, sans-serif" font-size="18" font-weight="700" fill="#8B5CF6">256</text>
+  
+  <!-- Content Area -->
+  <rect x="300" y="140" width="1060" height="820" fill="#0A0A0B"/>
+  
+  <!-- Stats Grid -->
+  <text x="320" y="180" font-family="Inter, sans-serif" font-size="18" font-weight="700" fill="#FFFFFF">Dashboard</text>
+  
+  <rect x="320" y="200" width="245" height="100" rx="12" fill="#111113" stroke="#27272A" stroke-width="1"/>
+  <text x="340" y="230" font-family="Inter, sans-serif" font-size="12" fill="#71717A">Projects</text>
+  <text x="340" y="260" font-family="Inter, sans-serif" font-size="28" font-weight="800" fill="#FFFFFF">12</text>
+  <text x="340" y="285" font-family="Inter, sans-serif" font-size="11" fill="#22C55E">+3 this week</text>
+  
+  <rect x="585" y="200" width="245" height="100" rx="12" fill="#111113" stroke="#27272A" stroke-width="1"/>
+  <text x="605" y="230" font-family="Inter, sans-serif" font-size="12" fill="#71717A">Reviews</text>
+  <text x="605" y="260" font-family="Inter, sans-serif" font-size="28" font-weight="800" fill="#06B6D4">48</text>
+  <text x="605" y="285" font-family="Inter, sans-serif" font-size="11" fill="#22C55E">+12 pending</text>
+  
+  <rect x="850" y="200" width="245" height="100" rx="12" fill="#111113" stroke="#27272A" stroke-width="1"/>
+  <text x="870" y="230" font-family="Inter, sans-serif" font-size="12" fill="#71717A">Downloads</text>
+  <text x="870" y="260" font-family="Inter, sans-serif" font-size="28" font-weight="800" fill="#8B5CF6">1.2K</text>
+  <text x="870" y="285" font-family="Inter, sans-serif" font-size="11" fill="#22C55E">+180 today</text>
+  
+  <rect x="1115" y="200" width="225" height="100" rx="12" fill="#111113" stroke="#27272A" stroke-width="1"/>
+  <text x="1135" y="230" font-family="Inter, sans-serif" font-size="12" fill="#71717A">Revenue</text>
+  <text x="1135" y="260" font-family="Inter, sans-serif" font-size="28" font-weight="800" fill="#22C55E">$2.4K</text>
+  <text x="1135" y="285" font-family="Inter, sans-serif" font-size="11" fill="#22C55E">+$320 this week</text>
+  
+  <!-- Projects Section -->
+  <text x="320" y="340" font-family="Inter, sans-serif" font-size="16" font-weight="700" fill="#FFFFFF">Recent Projects</text>
+  
+  <!-- Project Card 1 -->
+  <rect x="320" y="360" width="340" height="200" rx="12" fill="#111113" stroke="#27272A" stroke-width="1"/>
+  <rect x="320" y="360" width="340" height="80" rx="12" fill="#18181B"/>
+  <text x="340" y="400" font-family="JetBrains Mono, monospace" font-size="11" fill="#8B5CF6">BPM 128 · F# minor</text>
+  <text x="340" y="420" font-family="Inter, sans-serif" font-size="14" font-weight="700" fill="#FFFFFF">Vinyl Classics</text>
+  <text x="340" y="440" font-family="Inter, sans-serif" font-size="12" fill="#71717A">Zero-G · Ableton Live 9</text>
+  <rect x="340" y="460" width="60" height="20" rx="4" fill="#22C55E" opacity="0.15"/>
+  <text x="370" y="474" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#22C55E">Published</text>
+  <rect x="410" y="460" width="50" height="20" rx="4" fill="#8B5CF6" opacity="0.15"/>
+  <text x="435" y="474" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#8B5CF6">v3.2</text>
+  <text x="340" y="510" font-family="Inter, sans-serif" font-size="11" fill="#52525B">8 tracks · 10 samples · 483 MB</text>
+  <text x="340" y="545" font-family="Inter, sans-serif" font-size="11" fill="#71717A">🎵 12 tracks · Updated 2h ago</text>
+  
+  <!-- Project Card 2 -->
+  <rect x="680" y="360" width="340" height="200" rx="12" fill="#111113" stroke="#27272A" stroke-width="1"/>
+  <rect x="680" y="360" width="340" height="80" rx="12" fill="#18181B"/>
+  <text x="700" y="400" font-family="JetBrains Mono, monospace" font-size="11" fill="#06B6D4">BPM 140 · D minor</text>
+  <text x="700" y="420" font-family="Inter, sans-serif" font-size="14" font-weight="700" fill="#FFFFFF">The Forge</text>
+  <text x="700" y="440" font-family="Inter, sans-serif" font-size="12" fill="#71717A">Hecq · Ableton Live 9</text>
+  <rect x="700" y="460" width="70" height="20" rx="4" fill="#F59E0B" opacity="0.15"/>
+  <text x="735" y="474" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#F59E0B">In Review</text>
+  <text x="700" y="510" font-family="Inter, sans-serif" font-size="11" fill="#52525B">6 tracks · 8 samples · 312 MB</text>
+  <text x="700" y="545" font-family="Inter, sans-serif" font-size="11" fill="#71717A">🎵 6 tracks · Updated 5h ago</text>
+  
+  <!-- Project Card 3 -->
+  <rect x="1040" y="360" width="300" height="200" rx="12" fill="#111113" stroke="#27272A" stroke-width="1"/>
+  <rect x="1040" y="360" width="300" height="80" rx="12" fill="#18181B"/>
+  <text x="1060" y="400" font-family="JetBrains Mono, monospace" font-size="11" fill="#F59E0B">BPM 120 · C major</text>
+  <text x="1060" y="420" font-family="Inter, sans-serif" font-size="14" font-weight="700" fill="#FFFFFF">Grand Piano</text>
+  <text x="1060" y="440" font-family="Inter, sans-serif" font-size="12" fill="#71717A">In-house · Ableton Live 9</text>
+  <rect x="1060" y="460" width="60" height="20" rx="4" fill="#EF4444" opacity="0.15"/>
+  <text x="1090" y="474" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#EF4444">Draft</text>
+  <text x="1060" y="510" font-family="Inter, sans-serif" font-size="11" fill="#52525B">4 tracks · 2 samples · 89 MB</text>
+  <text x="1060" y="545" font-family="Inter, sans-serif" font-size="11" fill="#71717A">🎵 4 tracks · Updated 1d ago</text>
+  
+  <!-- Activity Feed -->
+  <text x="320" y="600" font-family="Inter, sans-serif" font-size="16" font-weight="700" fill="#FFFFFF">Recent Activity</text>
+  
+  <rect x="320" y="620" width="700" height="50" rx="8" fill="#111113"/>
+  <circle cx="350" cy="645" r="12" fill="#8B5CF6" opacity="0.2"/>
+  <text x="350" y="649" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#8B5CF6">⬆</text>
+  <text x="375" y="640" font-family="Inter, sans-serif" font-size="12" fill="#FFFFFF">Uploaded "Vinyl Classics" v3.2</text>
+  <text x="375" y="658" font-family="Inter, sans-serif" font-size="11" fill="#71717A">2 hours ago</text>
+  
+  <rect x="320" y="680" width="700" height="50" rx="8" fill="#111113"/>
+  <circle cx="350" cy="705" r="12" fill="#06B6D4" opacity="0.2"/>
+  <text x="350" y="709" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#06B6D4">💬</text>
+  <text x="375" y="700" font-family="Inter, sans-serif" font-size="12" fill="#FFFFFF">New review on "The Forge"</text>
+  <text x="375" y="718" font-family="Inter, sans-serif" font-size="11" fill="#71717A">5 hours ago</text>
+  
+  <!-- Specs Panel -->
+  <text x="320" y="780" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#52525B" letter-spacing="1">LAYOUT SPECS</text>
+  <text x="320" y="805" font-family="JetBrains Mono, monospace" font-size="11" fill="#A1A1AA">TopBar: 1320 × 60px, #111113</text>
+  <text x="320" y="825" font-family="JetBrains Mono, monospace" font-size="11" fill="#A1A1AA">Sidebar: 260 × 820px, #111113</text>
+  <text x="320" y="845" font-family="JetBrains Mono, monospace" font-size="11" fill="#A1A1AA">Content: 1060 × 820px, #0A0A0B</text>
+  <text x="320" y="865" font-family="JetBrains Mono, monospace" font-size="11" fill="#A1A1AA">Cards: 340 × 200px, Radius 12, #111113</text>
+  <text x="320" y="885" font-family="JetBrains Mono, monospace" font-size="11" fill="#A1A1AA">Stats: 245 × 100px, Radius 12</text>
+</svg>
