@@ -6,172 +6,120 @@
   <title>SoundHub — Audio CI Settings</title>
   <link rel="stylesheet" href="design-system/shared.css">
   <style>
-    .ci-section {
-      background: var(--bg-surface); border: 1px solid var(--border-default);
-      border-radius: var(--radius-lg); padding: 24px; margin-bottom: 16px;
-    }
-    .ci-section-title { font-size: 15px; font-weight: 700; margin-bottom: 16px; }
-    .threshold-row {
-      display: flex; align-items: center; gap: 16px; padding: 12px 0;
-      border-bottom: 1px solid var(--border-default);
-    }
-    .threshold-row:last-child { border-bottom: none; }
-    .threshold-label { flex: 1; }
-    .threshold-name { font-size: 13px; font-weight: 600; }
-    .threshold-desc { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
-    .threshold-inputs { display: flex; align-items: center; gap: 8px; }
-    .threshold-input {
-      width: 72px; padding: 6px 10px; background: var(--bg-elevated);
-      border: 1px solid var(--border-default); border-radius: var(--radius-sm);
-      font-size: 12px; font-family: var(--font-mono); text-align: center;
-      color: var(--text-primary);
-    }
-    .threshold-unit { font-size: 11px; color: var(--text-muted); }
-    .rule-card {
-      display: flex; align-items: center; gap: 12px; padding: 12px;
-      background: var(--bg-elevated); border: 1px solid var(--border-default);
-      border-radius: var(--radius-md); margin-bottom: 8px;
-    }
-    .rule-icon { font-size: 18px; }
-    .rule-body { flex: 1; }
-    .rule-name { font-size: 12px; font-weight: 600; }
-    .rule-desc { font-size: 11px; color: var(--text-muted); }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Inter',-apple-system,sans-serif; background:var(--bg-primary); color:var(--text-primary); overflow:hidden; height:100vh; }
+    .transport-bar { height:40px; background:var(--bg-panel); border-bottom:1px solid var(--border-default); display:flex; align-items:center; padding:0 12px; gap:16px; font-size:11px; }
+    .transport-logo { font-weight:800; font-size:13px; color:var(--brand-accent); }
+    .transport-logo span { color:var(--text-primary); }
+    .transport-divider { width:1px; height:20px; background:var(--border-default); }
+    .transport-spacer { flex:1; }
+    .app-body { display:flex; height:calc(100vh - 40px); }
+    .sidebar { width:var(--sidebar-width); background:var(--bg-panel); border-right:1px solid var(--border-default); display:flex; flex-direction:column; }
+    .sidebar-search { padding:8px; border-bottom:1px solid var(--border-default); }
+    .sidebar-search input { width:100%; background:var(--bg-input); border:1px solid var(--border-default); border-radius:var(--radius-sm); padding:6px 8px 6px 28px; font-size:11px; color:var(--text-primary); outline:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2352525b' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:8px center; }
+    .sidebar-nav { flex:1; overflow-y:auto; padding:4px 0; }
+    .sidebar-section { padding:8px 12px 4px; font-size:9px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; font-weight:700; }
+    .sidebar-item { padding:6px 12px; font-size:11px; font-weight:500; color:var(--text-secondary); cursor:pointer; display:flex; align-items:center; gap:8px; border-left:2px solid transparent; transition:all 0.1s; }
+    .sidebar-item:hover { color:var(--text-primary); }
+    .sidebar-item.active { color:var(--brand-accent); background:rgba(234,88,8,0.08); border-left-color:var(--brand-accent); }
+    .content { flex:1; display:flex; flex-direction:column; min-width:0; overflow:hidden; }
+    .page-header { padding:16px 24px; border-bottom:1px solid var(--border-default); display:flex; align-items:center; justify-content:space-between; }
+    .page-title { font-size:18px; font-weight:700; }
+    .page-scroll { flex:1; overflow-y:auto; padding:24px; }
+    .ci-section { background:var(--bg-surface); border:1px solid var(--border-default); border-radius:var(--radius-md); padding:20px; margin-bottom:14px; }
+    .ci-section-title { font-size:13px; font-weight:700; margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+    .threshold-row { display:flex; align-items:center; gap:16px; padding:11px 0; border-bottom:1px solid rgba(39,39,42,0.5); }
+    .threshold-row:last-child { border-bottom:none; }
+    .threshold-label { flex:1; }
+    .threshold-name { font-size:12px; font-weight:600; }
+    .threshold-desc { font-size:10px; color:var(--text-muted); margin-top:2px; }
+    .threshold-inputs { display:flex; align-items:center; gap:6px; }
+    .threshold-input { width:72px; padding:6px 8px; background:var(--bg-input); border:1px solid var(--border-default); border-radius:var(--radius-sm); font-size:11px; font-family:var(--font-mono); text-align:center; color:var(--text-primary); outline:none; }
+    .threshold-input:focus { border-color:var(--brand-accent); }
+    .threshold-unit { font-size:10px; color:var(--text-muted); font-family:var(--font-mono); }
+    .toggle { width:36px; height:20px; border-radius:10px; background:var(--border-default); position:relative; cursor:pointer; transition:all 0.2s; flex-shrink:0; }
+    .toggle.active { background:var(--brand-accent); }
+    .toggle::after { content:''; position:absolute; width:14px; height:14px; border-radius:50%; background:#fff; top:3px; left:3px; transition:all 0.2s; }
+    .toggle.active::after { left:19px; }
+    .toggle:hover { filter:brightness(1.1); }
+    .rule-card { display:flex; align-items:center; gap:12px; padding:10px 12px; background:var(--bg-elevated); border:1px solid var(--border-default); border-radius:var(--radius-sm); margin-bottom:6px; transition:border-color 0.15s; }
+    .rule-card:hover { border-color:var(--border-hover); }
+    .rule-icon { font-size:16px; }
+    .rule-body { flex:1; }
+    .rule-name { font-size:11px; font-weight:600; }
+    .rule-desc { font-size:10px; color:var(--text-muted); }
+    .btn { padding:6px 14px; border-radius:var(--radius-sm); font-size:11px; font-weight:600; cursor:pointer; border:1px solid var(--border-default); transition:all 0.15s; }
+    .btn-primary { background:var(--brand-accent); color:#fff; border-color:var(--brand-accent); }
+    .btn-primary:hover { filter:brightness(1.1); }
   </style>
 </head>
 <body>
-  <div class="app-layout">
-    <aside class="sidebar">
-      <div class="sidebar-logo"><div class="logo-icon">S</div><div class="logo-text">SoundHub</div></div>
-      <nav class="sidebar-nav">
-        <div class="sidebar-section-label">Main</div>
-        <a class="sidebar-item" href="#"><span class="icon">📊</span> Dashboard</a>
-        <a class="sidebar-item" href="#"><span class="icon">📁</span> Projects</a>
-        <div class="sidebar-section-label">Workspace</div>
-        <a class="sidebar-item" href="#"><span class="icon">🔬</span> Audio CI</a>
-        <a class="sidebar-item active" href="#"><span class="icon">⚙️</span> CI Settings</a>
-        <div class="sidebar-section-label">Account</div>
-        <a class="sidebar-item" href="#"><span class="icon">⚙️</span> Settings</a>
-      </nav>
-    </aside>
-    <div class="main-content">
-      <header class="topbar">
-        <div class="topbar-search"><span class="search-icon">🔍</span><input type="text" placeholder="Search..."></div>
-        <div class="topbar-right"><div class="topbar-icon-btn">🔔<span class="notif-dot"></span></div><div class="topbar-avatar">P</div></div>
-      </header>
-      <div class="page">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
-          <div>
-            <h1 class="page-title" style="margin-bottom:4px">Audio CI Settings</h1>
-            <p class="page-subtitle">Configure analysis thresholds and quality rules</p>
-          </div>
-          <button class="btn btn-primary">💾 Save Settings</button>
-        </div>
-
-        <!-- Loudness Targets -->
+  <div class="transport-bar">
+    <div class="transport-logo">Sound<span>Hub</span></div>
+    <div class="transport-divider"></div>
+    <div style="font-size:11px;color:var(--text-muted)">AUDIO CI SETTINGS</div>
+    <div class="transport-spacer"></div>
+    <div style="padding:5px 14px;background:var(--brand-accent);color:#fff;border-radius:4px;font-size:11px;font-weight:600;cursor:pointer">💾 Save</div>
+  </div>
+  <div class="app-body">
+    <div class="sidebar">
+      <div class="sidebar-search"><input type="text" placeholder="Search..."></div>
+      <div class="sidebar-nav">
+        <div class="sidebar-section">Main</div>
+        <div class="sidebar-item"><span class="icon">📊</span> Dashboard</div>
+        <div class="sidebar-item"><span class="icon">📁</span> Projects</div>
+        <div class="sidebar-section">Workspace</div>
+        <div class="sidebar-item"><span class="icon">🔬</span> Audio CI</div>
+        <div class="sidebar-item active"><span class="icon">⚙️</span> CI Settings</div>
+        <div class="sidebar-section">Account</div>
+        <div class="sidebar-item"><span class="icon">⚙️</span> Settings</div>
+      </div>
+    </div>
+    <div class="content">
+      <div class="page-header"><div class="page-title">Audio CI Settings</div></div>
+      <div class="page-scroll">
         <div class="ci-section">
           <div class="ci-section-title">🎚️ Loudness Targets</div>
           <div class="threshold-row">
-            <div class="threshold-label">
-              <div class="threshold-name">Integrated Loudness (Target)</div>
-              <div class="threshold-desc">Target LUFS for streaming platforms</div>
-            </div>
-            <div class="threshold-inputs">
-              <input class="threshold-input" type="text" value="-14.0">
-              <span class="threshold-unit">LUFS</span>
-            </div>
+            <div class="threshold-label"><div class="threshold-name">Integrated Loudness (Target)</div><div class="threshold-desc">Target LUFS for streaming platforms (Spotify: -14, Apple: -16)</div></div>
+            <div class="threshold-inputs"><input class="threshold-input" value="-14.0"><span class="threshold-unit">LUFS</span></div>
           </div>
           <div class="threshold-row">
-            <div class="threshold-label">
-              <div class="threshold-name">Loudness Range (Max)</div>
-              <div class="threshold-desc">Maximum allowed loudness range</div>
-            </div>
-            <div class="threshold-inputs">
-              <input class="threshold-input" type="text" value="12">
-              <span class="threshold-unit">LU</span>
-            </div>
+            <div class="threshold-label"><div class="threshold-name">Loudness Range (Max)</div><div class="threshold-desc">Maximum allowed loudness range (LRA)</div></div>
+            <div class="threshold-inputs"><input class="threshold-input" value="12"><span class="threshold-unit">LU</span></div>
           </div>
           <div class="threshold-row">
-            <div class="threshold-label">
-              <div class="threshold-name">Short-term Loudness (Max)</div>
-              <div class="threshold-desc">Maximum short-term loudness</div>
-            </div>
-            <div class="threshold-inputs">
-              <input class="threshold-input" type="text" value="-8.0">
-              <span class="threshold-unit">LUFS</span>
-            </div>
+            <div class="threshold-label"><div class="threshold-name">Short-term Loudness (Max)</div><div class="threshold-desc">Maximum short-term loudness</div></div>
+            <div class="threshold-inputs"><input class="threshold-input" value="-8.0"><span class="threshold-unit">LUFS</span></div>
           </div>
         </div>
-
-        <!-- Peak Levels -->
         <div class="ci-section">
           <div class="ci-section-title">📊 Peak Levels</div>
           <div class="threshold-row">
-            <div class="threshold-label">
-              <div class="threshold-name">True Peak Ceiling</div>
-              <div class="threshold-desc">Maximum allowed true peak level</div>
-            </div>
-            <div class="threshold-inputs">
-              <input class="threshold-input" type="text" value="-1.0">
-              <span class="threshold-unit">dBTP</span>
-            </div>
+            <div class="threshold-label"><div class="threshold-name">True Peak Ceiling</div><div class="threshold-desc">Maximum allowed true peak (EBU R128: -1.0 dBTP)</div></div>
+            <div class="threshold-inputs"><input class="threshold-input" value="-1.0"><span class="threshold-unit">dBTP</span></div>
           </div>
           <div class="threshold-row">
-            <div class="threshold-label">
-              <div class="threshold-name">Sample Peak Ceiling</div>
-              <div class="threshold-desc">Maximum sample peak level</div>
-            </div>
-            <div class="threshold-inputs">
-              <input class="threshold-input" type="text" value="-0.5">
-              <span class="threshold-unit">dBFS</span>
-            </div>
+            <div class="threshold-label"><div class="threshold-name">Sample Peak Ceiling</div><div class="threshold-desc">Maximum sample peak level</div></div>
+            <div class="threshold-inputs"><input class="threshold-input" value="-0.5"><span class="threshold-unit">dBFS</span></div>
           </div>
         </div>
-
-        <!-- Analysis Rules -->
         <div class="ci-section">
           <div class="ci-section-title">📋 Analysis Rules</div>
-          <div class="rule-card">
-            <div class="rule-icon">🔇</div>
-            <div class="rule-body"><div class="rule-name">Silence Detection</div><div class="rule-desc">Flag tracks with >3s of silence at start/end</div></div>
-            <div class="toggle active"></div>
-          </div>
-          <div class="rule-card">
-            <div class="rule-icon">📏</div>
-            <div class="rule-body"><div class="rule-name">Clipping Detection</div><div class="rule-desc">Flag audio with inter-sample peaks above ceiling</div></div>
-            <div class="toggle active"></div>
-          </div>
-          <div class="rule-card">
-            <div class="rule-icon">🎵</div>
-            <div class="rule-body"><div class="rule-name">Key Detection</div><div class="rule-desc">Auto-detect musical key and flag mismatches</div></div>
-            <div class="toggle"></div>
-          </div>
-          <div class="rule-card">
-            <div class="rule-icon">⏱️</div>
-            <div class="rule-body"><div class="rule-name">Duration Check</div><div class="rule-desc">Flag tracks shorter than 30s or longer than 15min</div></div>
-            <div class="toggle active"></div>
-          </div>
-          <div class="rule-card">
-            <div class="rule-icon">📦</div>
-            <div class="rule-body"><div class="rule-name">Format Validation</div><div class="rule-desc">Verify sample rate and bit depth match requirements</div></div>
-            <div class="toggle active"></div>
-          </div>
+          <div class="rule-card"><div class="rule-icon">🔇</div><div class="rule-body"><div class="rule-name">Silence Detection</div><div class="rule-desc">Flag tracks with >3s of silence at start/end</div></div><div class="toggle active"></div></div>
+          <div class="rule-card"><div class="rule-icon">📏</div><div class="rule-body"><div class="rule-name">Clipping Detection</div><div class="rule-desc">Flag audio with inter-sample peaks above ceiling</div></div><div class="toggle active"></div></div>
+          <div class="rule-card"><div class="rule-icon">🎵</div><div class="rule-body"><div class="rule-name">Key Detection</div><div class="rule-desc">Auto-detect musical key and flag mismatches</div></div><div class="toggle"></div></div>
+          <div class="rule-card"><div class="rule-icon">⏱️</div><div class="rule-body"><div class="rule-name">Duration Check</div><div class="rule-desc">Flag tracks shorter than 30s or longer than 15min</div></div><div class="toggle active"></div></div>
+          <div class="rule-card"><div class="rule-icon">📦</div><div class="rule-body"><div class="rule-name">Format Validation</div><div class="rule-desc">Verify sample rate and bit depth match requirements</div></div><div class="toggle active"></div></div>
         </div>
-
-        <!-- Notification -->
         <div class="ci-section">
           <div class="ci-section-title">🔔 Notifications</div>
           <div class="threshold-row">
-            <div class="threshold-label">
-              <div class="threshold-name">Email on failure</div>
-              <div class="threshold-desc">Send email when analysis fails</div>
-            </div>
+            <div class="threshold-label"><div class="threshold-name">Email on failure</div><div class="threshold-desc">Send email when analysis fails</div></div>
             <div class="toggle active"></div>
           </div>
           <div class="threshold-row">
-            <div class="threshold-label">
-              <div class="threshold-name">Slack webhook</div>
-              <div class="threshold-desc">Post results to Slack channel</div>
-            </div>
+            <div class="threshold-label"><div class="threshold-name">Slack webhook</div><div class="threshold-desc">Post results to Slack channel</div></div>
             <div class="toggle"></div>
           </div>
         </div>

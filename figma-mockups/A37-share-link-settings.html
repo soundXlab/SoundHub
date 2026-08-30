@@ -6,151 +6,132 @@
   <title>SoundHub — Share Link Settings</title>
   <link rel="stylesheet" href="design-system/shared.css">
   <style>
-    .share-card {
-      background: var(--bg-surface); border: 1px solid var(--border-default);
-      border-radius: var(--radius-lg); padding: 24px; margin-bottom: 16px;
-    }
-    .share-url-box {
-      display: flex; align-items: center; gap: 8px; padding: 10px 14px;
-      background: var(--bg-elevated); border: 1px solid var(--border-default);
-      border-radius: var(--radius-md); margin-bottom: 16px;
-    }
-    .share-url {
-      flex: 1; font-family: var(--font-mono); font-size: 12px; color: var(--text-secondary);
-      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-    }
-    .share-perm {
-      display: flex; align-items: center; gap: 12px; padding: 12px;
-      background: var(--bg-elevated); border: 1px solid var(--border-default);
-      border-radius: var(--radius-md); margin-bottom: 8px;
-    }
-    .perm-icon { font-size: 20px; }
-    .perm-body { flex: 1; }
-    .perm-name { font-size: 13px; font-weight: 600; }
-    .perm-desc { font-size: 11px; color: var(--text-muted); }
-    .link-list { margin-top: 12px; }
-    .link-item {
-      display: flex; align-items: center; gap: 12px; padding: 10px 14px;
-      border-bottom: 1px solid var(--border-default); font-size: 12px;
-    }
-    .link-item:last-child { border-bottom: none; }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Inter',-apple-system,sans-serif; background:var(--bg-primary); color:var(--text-primary); overflow:hidden; height:100vh; }
+    .transport-bar { height:40px; background:var(--bg-panel); border-bottom:1px solid var(--border-default); display:flex; align-items:center; padding:0 12px; gap:16px; font-size:11px; }
+    .transport-logo { font-weight:800; font-size:13px; color:var(--brand-accent); }
+    .transport-logo span { color:var(--text-primary); }
+    .transport-divider { width:1px; height:20px; background:var(--border-default); }
+    .transport-spacer { flex:1; }
+    .app-body { display:flex; height:calc(100vh - 40px); }
+    .sidebar { width:var(--sidebar-width); background:var(--bg-panel); border-right:1px solid var(--border-default); display:flex; flex-direction:column; }
+    .sidebar-search { padding:8px; border-bottom:1px solid var(--border-default); }
+    .sidebar-search input { width:100%; background:var(--bg-input); border:1px solid var(--border-default); border-radius:var(--radius-sm); padding:6px 8px 6px 28px; font-size:11px; color:var(--text-primary); outline:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2352525b' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:8px center; }
+    .sidebar-nav { flex:1; overflow-y:auto; padding:4px 0; }
+    .sidebar-section { padding:8px 12px 4px; font-size:9px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; font-weight:700; }
+    .sidebar-item { padding:6px 12px; font-size:11px; font-weight:500; color:var(--text-secondary); cursor:pointer; display:flex; align-items:center; gap:8px; border-left:2px solid transparent; transition:all 0.1s; }
+    .sidebar-item:hover { color:var(--text-primary); }
+    .sidebar-item.active { color:var(--brand-accent); background:rgba(234,88,8,0.08); border-left-color:var(--brand-accent); }
+    .content { flex:1; display:flex; flex-direction:column; min-width:0; overflow:hidden; }
+    .page-header { padding:16px 24px; border-bottom:1px solid var(--border-default); display:flex; align-items:center; justify-content:space-between; }
+    .page-title { font-size:18px; font-weight:700; }
+    .page-scroll { flex:1; overflow-y:auto; padding:24px; }
+    .share-card { background:var(--bg-surface); border:1px solid var(--border-default); border-radius:var(--radius-md); padding:20px; margin-bottom:14px; }
+    .url-box { display:flex; align-items:center; gap:8px; padding:10px 14px; background:var(--bg-input); border:1px solid var(--border-default); border-radius:var(--radius-sm); margin-bottom:14px; transition:border-color 0.15s; }
+    .url-box:hover { border-color:var(--border-hover); }
+    .url-text { flex:1; font-family:var(--font-mono); font-size:11px; color:var(--text-secondary); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .copy-btn { padding:4px 10px; background:var(--bg-surface); border:1px solid var(--border-default); border-radius:4px; font-size:10px; font-weight:600; color:var(--text-secondary); cursor:pointer; transition:all 0.15s; }
+    .copy-btn:hover { background:var(--bg-hover); color:var(--text-primary); }
+    .toggle { width:36px; height:20px; border-radius:10px; background:var(--border-default); position:relative; cursor:pointer; transition:all 0.2s; flex-shrink:0; }
+    .toggle.active { background:var(--brand-accent); }
+    .toggle::after { content:''; position:absolute; width:14px; height:14px; border-radius:50%; background:#fff; top:3px; left:3px; transition:all 0.2s; }
+    .toggle.active::after { left:19px; }
+    .toggle:hover { filter:brightness(1.1); }
+    .perm-row { display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px solid rgba(39,39,42,0.5); font-size:12px; }
+    .perm-row:last-child { border-bottom:none; }
+    .link-table { width:100%; border-collapse:collapse; }
+    .link-table th { text-align:left; padding:8px 12px; font-size:10px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; border-bottom:1px solid var(--border-default); }
+    .link-table td { padding:10px 12px; font-size:11px; border-bottom:1px solid rgba(39,39,42,0.5); }
+    .link-table tr:hover td { background:rgba(234,88,8,0.03); }
+    .btn { padding:6px 14px; border-radius:var(--radius-sm); font-size:11px; font-weight:600; cursor:pointer; border:1px solid var(--border-default); transition:all 0.15s; }
+    .btn-primary { background:var(--brand-accent); color:#fff; border-color:var(--brand-accent); }
+    .btn-primary:hover { filter:brightness(1.1); }
+    .btn-secondary { background:var(--bg-surface); color:var(--text-primary); }
+    .btn-secondary:hover { background:var(--bg-hover); }
+    .stat-box { text-align:center; padding:12px; background:var(--bg-elevated); border:1px solid var(--border-default); border-radius:var(--radius-sm); }
+    .stat-box-value { font-size:20px; font-weight:800; font-family:var(--font-mono); }
+    .stat-box-label { font-size:9px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-top:2px; }
   </style>
 </head>
 <body>
-  <div class="app-layout">
-    <aside class="sidebar">
-      <div class="sidebar-logo"><div class="logo-icon">S</div><div class="logo-text">SoundHub</div></div>
-      <nav class="sidebar-nav">
-        <div class="sidebar-section-label">Main</div>
-        <a class="sidebar-item" href="#"><span class="icon">📊</span> Dashboard</a>
-        <a class="sidebar-item" href="#"><span class="icon">📁</span> Projects</a>
-        <div class="sidebar-section-label">Workspace</div>
-        <a class="sidebar-item active" href="#"><span class="icon">🔗</span> Share Links</a>
-        <a class="sidebar-item" href="#"><span class="icon">💬</span> Reviews</a>
-        <div class="sidebar-section-label">Account</div>
-        <a class="sidebar-item" href="#"><span class="icon">⚙️</span> Settings</a>
-      </nav>
-    </aside>
-    <div class="main-content">
-      <header class="topbar">
-        <div class="topbar-search"><span class="search-icon">🔍</span><input type="text" placeholder="Search..."></div>
-        <div class="topbar-right"><div class="topbar-icon-btn">🔔<span class="notif-dot"></span></div><div class="topbar-avatar">P</div></div>
-      </header>
-      <div class="page">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
-          <div>
-            <h1 class="page-title" style="margin-bottom:4px">Share Link Settings</h1>
-            <p class="page-subtitle">Manage public links for your projects and assets</p>
+  <div class="transport-bar">
+    <div class="transport-logo">Sound<span>Hub</span></div>
+    <div class="transport-divider"></div>
+    <div class="transport-group"><span style="color:var(--text-muted);font-size:10px">LINKS</span><div style="background:var(--bg-primary);border:1px solid var(--border-default);border-radius:4px;padding:2px 8px;font-family:var(--font-mono);font-size:12px;color:var(--brand-accent);font-weight:600">3</div></div>
+    <div class="transport-group"><span style="color:var(--text-muted);font-size:10px">ACTIVE</span><div style="background:var(--bg-primary);border:1px solid var(--border-default);border-radius:4px;padding:2px 8px;font-family:var(--font-mono);font-size:12px;color:var(--color-success);font-weight:600">2</div></div>
+    <div class="transport-spacer"></div>
+    <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted)">SHARE LINKS</div>
+  </div>
+  <div class="app-body">
+    <div class="sidebar">
+      <div class="sidebar-search"><input type="text" placeholder="Search..."></div>
+      <div class="sidebar-nav">
+        <div class="sidebar-section">Main</div>
+        <div class="sidebar-item"><span class="icon">📊</span> Dashboard</div>
+        <div class="sidebar-item"><span class="icon">📁</span> Projects</div>
+        <div class="sidebar-section">Workspace</div>
+        <div class="sidebar-item active"><span class="icon">🔗</span> Share Links</div>
+        <div class="sidebar-item"><span class="icon">💬</span> Reviews</div>
+        <div class="sidebar-section">Account</div>
+        <div class="sidebar-item"><span class="icon">⚙️</span> Settings</div>
+      </div>
+    </div>
+    <div class="content">
+      <div class="page-header">
+        <div class="page-title">Share Link Settings</div>
+        <button class="btn btn-primary">+ Create Link</button>
+      </div>
+      <div class="page-scroll">
+        <div class="share-card" style="border-color:rgba(234,88,8,0.3)">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+            <span style="font-size:13px;font-weight:700">🔗 Delivery Link — Neon Warehouse</span>
+            <span class="badge badge-success" style="font-size:9px">ACTIVE</span>
           </div>
-          <button class="btn btn-primary">+ Create Link</button>
+          <div class="url-box">
+            <span class="url-text">https://soundhub.app/d/abc123def456</span>
+            <button class="copy-btn">📋 Copy</button>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px">
+            <div class="stat-box"><div class="stat-box-value">👁️</div><div class="stat-box-label">Anyone with link</div></div>
+            <div class="stat-box"><div class="stat-box-value" style="font-size:14px">Sep 15</div><div class="stat-box-label">Expires (16 days)</div></div>
+            <div class="stat-box"><div class="stat-box-value">24</div><div class="stat-box-label">Views · 3 downloads</div></div>
+          </div>
+          <div class="perm-row"><span>Allow download</span><div class="toggle active"></div></div>
+          <div class="perm-row"><span>Require email to download</span><div class="toggle active"></div></div>
+          <div class="perm-row"><span>Watermark audio files</span><div class="toggle"></div></div>
+          <div class="perm-row"><span>Track downloads</span><div class="toggle active"></div></div>
         </div>
-
-        <!-- Active Link -->
-        <div class="share-card" style="border-color:var(--brand-primary)">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-            <span style="font-size:14px;font-weight:700">🔗 Delivery Link — Neon Warehouse</span>
-            <span class="badge badge-purple" style="font-size:10px">ACTIVE</span>
-          </div>
-          <div class="share-url-box">
-            <span class="share-url">https://soundhub.app/d/abc123def456</span>
-            <button class="btn btn-secondary" style="font-size:11px">📋 Copy</button>
-          </div>
-
-          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px">
-            <div class="share-perm">
-              <div class="perm-icon">👁️</div>
-              <div class="perm-body">
-                <div class="perm-name">Visibility</div>
-                <div class="perm-desc">Anyone with link</div>
-              </div>
-            </div>
-            <div class="share-perm">
-              <div class="perm-icon">⏰</div>
-              <div class="perm-body">
-                <div class="perm-name">Expires</div>
-                <div class="perm-desc">Sep 15, 2026 (16 days)</div>
-              </div>
-            </div>
-            <div class="share-perm">
-              <div class="perm-icon">📊</div>
-              <div class="perm-body">
-                <div class="perm-name">Views</div>
-                <div class="perm-desc">24 views · 3 downloads</div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Link Options -->
-          <div style="display:flex;flex-direction:column;gap:10px">
-            <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border-default)">
-              <span style="font-size:12px">Allow download</span>
-              <div class="toggle active"></div>
-            </div>
-            <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border-default)">
-              <span style="font-size:12px">Require email to download</span>
-              <div class="toggle active"></div>
-            </div>
-            <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border-default)">
-              <span style="font-size:12px">Watermark audio files</span>
-              <div class="toggle"></div>
-            </div>
-            <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0">
-              <span style="font-size:12px">Track downloads</span>
-              <div class="toggle active"></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- All Links -->
-        <h3 style="font-size:14px;font-weight:700;margin-bottom:12px">All Share Links</h3>
-        <div style="background:var(--bg-surface);border:1px solid var(--border-default);border-radius:var(--radius-lg);overflow:hidden">
-          <div class="link-item" style="background:var(--bg-elevated);font-weight:700;color:var(--text-muted);font-size:10px;text-transform:uppercase;letter-spacing:0.5px">
-            <span style="flex:1">Link</span><span style="width:120px">Project</span><span style="width:80px">Views</span><span style="width:100px">Expires</span><span style="width:80px">Status</span><span style="width:40px"></span>
-          </div>
-          <div class="link-item">
-            <span style="flex:1;font-family:var(--font-mono);font-size:11px;color:var(--brand-primary)">/d/abc123def456</span>
-            <span style="width:120px">Neon Warehouse</span>
-            <span style="width:80px">24</span>
-            <span style="width:100px;color:var(--text-muted)">Sep 15</span>
-            <span style="width:80px"><span class="badge badge-purple" style="font-size:9px">Active</span></span>
-            <span style="width:40px"><button class="btn btn-ghost" style="font-size:11px">⋯</button></span>
-          </div>
-          <div class="link-item">
-            <span style="flex:1;font-family:var(--font-mono);font-size:11px;color:var(--text-secondary)">/d/xyz789ghi012</span>
-            <span style="width:120px">Midnight EP</span>
-            <span style="width:80px">156</span>
-            <span style="width:100px;color:var(--text-muted)">Aug 20</span>
-            <span style="width:80px"><span class="badge badge-muted" style="font-size:9px">Expired</span></span>
-            <span style="width:40px"><button class="btn btn-ghost" style="font-size:11px">⋯</button></span>
-          </div>
-          <div class="link-item">
-            <span style="flex:1;font-family:var(--font-mono);font-size:11px;color:var(--text-secondary)">/d/uvw345rst678</span>
-            <span style="width:120px">Summer Album</span>
-            <span style="width:80px">8</span>
-            <span style="width:100px;color:var(--text-muted)">Oct 01</span>
-            <span style="width:80px"><span class="badge badge-purple" style="font-size:9px">Active</span></span>
-            <span style="width:40px"><button class="btn btn-ghost" style="font-size:11px">⋯</button></span>
-          </div>
+        <h3 style="font-size:13px;font-weight:700;margin-bottom:10px;color:var(--text-muted)">All Share Links</h3>
+        <div style="background:var(--bg-surface);border:1px solid var(--border-default);border-radius:var(--radius-md);overflow:hidden">
+          <table class="link-table">
+            <thead><tr><th>Link</th><th>Project</th><th>Views</th><th>Expires</th><th>Status</th><th></th></tr></thead>
+            <tbody>
+              <tr>
+                <td style="font-family:var(--font-mono);font-size:10px;color:var(--brand-accent)">/d/abc123def456</td>
+                <td style="color:var(--text-secondary)">Neon Warehouse</td>
+                <td style="font-family:var(--font-mono)">24</td>
+                <td style="color:var(--text-muted)">Sep 15</td>
+                <td><span class="badge badge-success" style="font-size:9px">Active</span></td>
+                <td><span class="row-actions" style="opacity:1;color:var(--text-muted);cursor:pointer">⋯</span></td>
+              </tr>
+              <tr>
+                <td style="font-family:var(--font-mono);font-size:10px;color:var(--text-secondary)">/d/xyz789ghi012</td>
+                <td style="color:var(--text-secondary)">Midnight EP</td>
+                <td style="font-family:var(--font-mono)">156</td>
+                <td style="color:var(--text-muted)">Aug 20</td>
+                <td><span class="badge badge-muted" style="font-size:9px">Expired</span></td>
+                <td><span class="row-actions" style="opacity:1;color:var(--text-muted);cursor:pointer">⋯</span></td>
+              </tr>
+              <tr>
+                <td style="font-family:var(--font-mono);font-size:10px;color:var(--text-secondary)">/d/uvw345rst678</td>
+                <td style="color:var(--text-secondary)">Summer Album</td>
+                <td style="font-family:var(--font-mono)">8</td>
+                <td style="color:var(--text-muted)">Oct 01</td>
+                <td><span class="badge badge-success" style="font-size:9px">Active</span></td>
+                <td><span class="row-actions" style="opacity:1;color:var(--text-muted);cursor:pointer">⋯</span></td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

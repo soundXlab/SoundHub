@@ -6,216 +6,144 @@
   <title>SoundHub — Project Analytics</title>
   <link rel="stylesheet" href="design-system/shared.css">
   <style>
-    .chart-card {
-      background: var(--bg-surface); border: 1px solid var(--border-default);
-      border-radius: var(--radius-lg); padding: 20px; margin-bottom: 16px;
-    }
-    .chart-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-    .chart-title { font-size: 14px; font-weight: 700; }
-    .chart-placeholder {
-      height: 200px; background: var(--bg-elevated); border: 1px solid var(--border-default);
-      border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center;
-      position: relative; overflow: hidden;
-    }
-    .chart-bars { display: flex; align-items: flex-end; gap: 6px; height: 140px; padding: 0 20px; }
-    .chart-bar {
-      flex: 1; border-radius: 3px 3px 0 0; transition: all 0.15s;
-      position: relative; cursor: pointer;
-    }
-    .chart-bar:hover { opacity: 0.8; }
-    .chart-bar-label {
-      position: absolute; bottom: -18px; left: 50%; transform: translateX(-50%);
-      font-size: 9px; color: var(--text-muted); white-space: nowrap;
-    }
-    .chart-line {
-      position: relative; height: 140px; padding: 0 20px;
-    }
-    .chart-line svg { width: 100%; height: 100%; }
-    .stat-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border-default); }
-    .stat-row:last-child { border-bottom: none; }
-    .stat-label { font-size: 12px; color: var(--text-secondary); }
-    .stat-value { font-size: 13px; font-weight: 600; font-family: var(--font-mono); }
-    .stat-change { font-size: 10px; font-weight: 600; }
-    .stat-change.up { color: var(--color-success); }
-    .stat-change.down { color: var(--color-error); }
-    .version-timeline { display: flex; flex-direction: column; gap: 8px; }
-    .version-row { display: flex; align-items: center; gap: 10px; padding: 8px 12px; background: var(--bg-elevated); border-radius: var(--radius-sm); }
-    .version-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Inter',-apple-system,sans-serif; background:var(--bg-primary); color:var(--text-primary); overflow:hidden; height:100vh; }
+    .transport-bar { height:40px; background:var(--bg-panel); border-bottom:1px solid var(--border-default); display:flex; align-items:center; padding:0 12px; gap:16px; font-size:11px; }
+    .transport-logo { font-weight:800; font-size:13px; color:var(--brand-accent); }
+    .transport-logo span { color:var(--text-primary); }
+    .transport-divider { width:1px; height:20px; background:var(--border-default); }
+    .transport-group { display:flex; align-items:center; gap:6px; }
+    .transport-label { color:var(--text-muted); font-size:10px; text-transform:uppercase; letter-spacing:0.5px; }
+    .transport-value { background:var(--bg-primary); border:1px solid var(--border-default); border-radius:4px; padding:2px 8px; font-family:var(--font-mono); font-size:12px; font-weight:600; min-width:40px; text-align:center; }
+    .transport-spacer { flex:1; }
+    .app-body { display:flex; height:calc(100vh - 40px); }
+    .sidebar { width:var(--sidebar-width); background:var(--bg-panel); border-right:1px solid var(--border-default); display:flex; flex-direction:column; }
+    .sidebar-search { padding:8px; border-bottom:1px solid var(--border-default); }
+    .sidebar-search input { width:100%; background:var(--bg-input); border:1px solid var(--border-default); border-radius:var(--radius-sm); padding:6px 8px 6px 28px; font-size:11px; color:var(--text-primary); outline:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2352525b' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:8px center; }
+    .sidebar-nav { flex:1; overflow-y:auto; padding:4px 0; }
+    .sidebar-section { padding:8px 12px 4px; font-size:9px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; font-weight:700; }
+    .sidebar-item { padding:6px 12px; font-size:11px; font-weight:500; color:var(--text-secondary); cursor:pointer; display:flex; align-items:center; gap:8px; border-left:2px solid transparent; transition:all 0.1s; }
+    .sidebar-item:hover { color:var(--text-primary); }
+    .sidebar-item.active { color:var(--brand-accent); background:rgba(234,88,8,0.08); border-left-color:var(--brand-accent); }
+    .content { flex:1; display:flex; flex-direction:column; min-width:0; overflow:hidden; }
+    .page-header { padding:16px 24px; border-bottom:1px solid var(--border-default); display:flex; align-items:center; justify-content:space-between; }
+    .page-title { font-size:18px; font-weight:700; }
+    .page-scroll { flex:1; overflow-y:auto; padding:24px; }
+    .stat-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:20px; }
+    .stat-card { background:var(--bg-surface); border:1px solid var(--border-default); border-radius:var(--radius-md); padding:14px 16px; }
+    .stat-label { font-size:10px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px; }
+    .stat-value { font-size:22px; font-weight:800; font-family:var(--font-mono); }
+    .stat-change { font-size:10px; margin-top:4px; }
+    .chart-card { background:var(--bg-surface); border:1px solid var(--border-default); border-radius:var(--radius-md); padding:16px; }
+    .chart-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+    .chart-title { font-size:13px; font-weight:700; }
+    .chart-bars { display:flex; align-items:flex-end; gap:4px; height:110px; }
+    .chart-bar { flex:1; border-radius:2px 2px 0 0; cursor:pointer; transition:all 0.15s; position:relative; }
+    .chart-bar:hover { filter:brightness(1.3); }
+    .chart-bar:hover::after { content:attr(data-val); position:absolute; top:-18px; left:50%; transform:translateX(-50%); padding:2px 5px; background:var(--bg-elevated); border:1px solid var(--border-default); border-radius:3px; font-size:9px; color:var(--text-primary); white-space:nowrap; font-family:var(--font-mono); }
+    .version-row { display:flex; align-items:center; gap:10px; padding:8px 12px; border-radius:4px; transition:background 0.1s; }
+    .version-row:hover { background:var(--bg-hover); }
+    .version-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+    .stat-row { display:flex; align-items:center; justify-content:space-between; padding:8px 0; border-bottom:1px solid rgba(39,39,42,0.5); font-size:12px; }
+    .stat-row:last-child { border-bottom:none; }
+    .badge { padding:2px 8px; border-radius:10px; font-size:9px; font-weight:600; }
+    .badge-success { background:rgba(34,197,94,0.12); color:var(--color-success); }
+    .badge-warning { background:rgba(234,179,8,0.12); color:var(--color-warning); }
+    .badge-purple { background:rgba(139,92,246,0.12); color:var(--brand-primary); }
   </style>
 </head>
 <body>
-  <div class="app-layout">
-    <aside class="sidebar">
-      <div class="sidebar-logo"><div class="logo-icon">S</div><div class="logo-text">SoundHub</div></div>
-      <nav class="sidebar-nav">
-        <div class="sidebar-section-label">Main</div>
-        <a class="sidebar-item" href="#"><span class="icon">📊</span> Dashboard</a>
-        <a class="sidebar-item" href="#"><span class="icon">📁</span> Projects</a>
-        <a class="sidebar-section-label">Workspace</div>
-        <a class="sidebar-item active" href="#"><span class="icon">📈</span> Analytics</a>
-        <a class="sidebar-item" href="#"><span class="icon">💬</span> Reviews</a>
-        <div class="sidebar-section-label">Account</div>
-        <a class="sidebar-item" href="#"><span class="icon">⚙️</span> Settings</a>
-      </nav>
-    </aside>
-    <div class="main-content">
-      <header class="topbar">
-        <div class="topbar-search"><span class="search-icon">🔍</span><input type="text" placeholder="Search..."></div>
-        <div class="topbar-right"><div class="topbar-icon-btn">🔔<span class="notif-dot"></span></div><div class="topbar-avatar">P</div></div>
-      </header>
-      <div class="page">
-        <!-- Project Selector -->
-        <div style="display:flex;align-items:center;gap:16px;margin-bottom:24px">
-          <div>
-            <h1 class="page-title" style="margin-bottom:4px">Project Analytics</h1>
-            <p class="page-subtitle">Performance metrics for Neon Warehouse</p>
-          </div>
-          <div style="flex:1"></div>
-          <select class="form-select" style="width:200px">
-            <option selected>🎵 Neon Warehouse</option>
-            <option>🎵 Midnight EP</option>
-            <option>🎵 Summer Album</option>
-            <option>🎵 Deep Collection</option>
-          </select>
-          <div style="display:flex;gap:4px">
-            <div style="padding:5px 10px;border-radius:4px;font-size:11px;font-weight:600;background:var(--brand-primary);color:#fff;cursor:pointer">30d</div>
-            <div style="padding:5px 10px;border-radius:4px;font-size:11px;color:var(--text-muted);cursor:pointer">90d</div>
-            <div style="padding:5px 10px;border-radius:4px;font-size:11px;color:var(--text-muted);cursor:pointer">All</div>
-          </div>
+  <div class="transport-bar">
+    <div class="transport-logo">Sound<span>Hub</span></div>
+    <div class="transport-divider"></div>
+    <div class="transport-group"><span class="transport-label">Versions</span><div class="transport-value">14</div></div>
+    <div class="transport-group"><span class="transport-label">Sessions</span><div class="transport-value">6</div></div>
+    <div class="transport-group"><span class="transport-label">Collaborators</span><div class="transport-value">4</div></div>
+    <div class="transport-spacer"></div>
+    <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted)">PROJECT ANALYTICS — NEON WAREHOUSE</div>
+  </div>
+  <div class="app-body">
+    <div class="sidebar">
+      <div class="sidebar-search"><input type="text" placeholder="Search..."></div>
+      <div class="sidebar-nav">
+        <div class="sidebar-section">Main</div>
+        <div class="sidebar-item"><span class="icon">📊</span> Dashboard</div>
+        <div class="sidebar-item"><span class="icon">📁</span> Projects</div>
+        <div class="sidebar-section">Workspace</div>
+        <div class="sidebar-item active"><span class="icon">📈</span> Analytics</div>
+        <div class="sidebar-item"><span class="icon">💬</span> Reviews</div>
+        <div class="sidebar-section">Account</div>
+        <div class="sidebar-item"><span class="icon">⚙️</span> Settings</div>
+      </div>
+    </div>
+    <div class="content">
+      <div class="page-header">
+        <div class="page-title">Project Analytics</div>
+        <div style="display:flex;gap:4px">
+          <div style="padding:5px 10px;border-radius:4px;font-size:10px;font-weight:600;background:var(--brand-accent);color:#fff;cursor:pointer">30d</div>
+          <div style="padding:5px 10px;border-radius:4px;font-size:10px;color:var(--text-muted);cursor:pointer;border:1px solid var(--border-default)">90d</div>
+          <div style="padding:5px 10px;border-radius:4px;font-size:10px;color:var(--text-muted);cursor:pointer;border:1px solid var(--border-default)">All</div>
         </div>
-
-        <!-- Summary Stats -->
-        <div class="grid-4" style="margin-bottom:24px">
-          <div class="stat-card"><div class="stat-label">Total Versions</div><div class="stat-value">14</div><div class="stat-change up">+3 this month</div></div>
-          <div class="stat-card"><div class="stat-label">Review Sessions</div><div class="stat-value">6</div><div class="stat-change up">+2 this month</div></div>
-          <div class="stat-card"><div class="stat-label">Collaborators</div><div class="stat-value">4</div><div class="stat-change up">+1 this month</div></div>
-          <div class="stat-card"><div class="stat-label">Storage Used</div><div class="stat-value">1.2 GB</div><div class="stat-change">of 10 GB</div></div>
+      </div>
+      <div class="page-scroll">
+        <div class="stat-grid">
+          <div class="stat-card"><div class="stat-label">Total Versions</div><div class="stat-value">14</div><div class="stat-change" style="color:var(--color-success)">+3 this month</div></div>
+          <div class="stat-card"><div class="stat-label">Review Sessions</div><div class="stat-value">6</div><div class="stat-change" style="color:var(--color-success)">+2 this month</div></div>
+          <div class="stat-card"><div class="stat-label">Collaborators</div><div class="stat-value">4</div><div class="stat-change" style="color:var(--color-success)">+1 this month</div></div>
+          <div class="stat-card"><div class="stat-label">Storage Used</div><div class="stat-value">1.2 <span style="font-size:12px;color:var(--text-muted)">GB</span></div><div class="stat-change" style="color:var(--text-muted)">of 10 GB</div></div>
         </div>
-
-        <div class="grid-2" style="gap:16px">
-          <!-- Version Activity Chart -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
           <div class="chart-card">
-            <div class="chart-header">
-              <span class="chart-title">📊 Version Activity</span>
-              <span style="font-size:11px;color:var(--text-muted)">Uploads per week</span>
-            </div>
-            <div class="chart-bars" style="margin-bottom:20px">
-              <div class="chart-bar" style="height:30%;background:var(--brand-primary)"><div class="chart-bar-label">W1</div></div>
-              <div class="chart-bar" style="height:50%;background:var(--brand-primary)"><div class="chart-bar-label">W2</div></div>
-              <div class="chart-bar" style="height:40%;background:var(--brand-primary)"><div class="chart-bar-label">W3</div></div>
-              <div class="chart-bar" style="height:70%;background:var(--brand-primary)"><div class="chart-bar-label">W4</div></div>
-              <div class="chart-bar" style="height:60%;background:var(--brand-primary)"><div class="chart-bar-label">W5</div></div>
-              <div class="chart-bar" style="height:85%;background:var(--brand-primary)"><div class="chart-bar-label">W6</div></div>
-              <div class="chart-bar" style="height:45%;background:var(--brand-primary)"><div class="chart-bar-label">W7</div></div>
-              <div class="chart-bar" style="height:90%;background:var(--brand-primary)"><div class="chart-bar-label">W8</div></div>
-              <div class="chart-bar" style="height:65%;background:var(--brand-primary)"><div class="chart-bar-label">W9</div></div>
-              <div class="chart-bar" style="height:75%;background:var(--brand-primary)"><div class="chart-bar-label">W10</div></div>
+            <div class="chart-header"><span class="chart-title">📊 Version Activity</span><span style="font-size:10px;color:var(--text-muted)">Uploads per week</span></div>
+            <div class="chart-bars">
+              <div class="chart-bar" style="height:30%;background:var(--brand-accent)" data-val="2"></div>
+              <div class="chart-bar" style="height:50%;background:var(--brand-accent)" data-val="4"></div>
+              <div class="chart-bar" style="height:40%;background:var(--brand-accent)" data-val="3"></div>
+              <div class="chart-bar" style="height:70%;background:var(--brand-accent)" data-val="5"></div>
+              <div class="chart-bar" style="height:60%;background:var(--brand-accent)" data-val="4"></div>
+              <div class="chart-bar" style="height:85%;background:var(--brand-accent)" data-val="6"></div>
+              <div class="chart-bar" style="height:45%;background:var(--brand-accent)" data-val="3"></div>
+              <div class="chart-bar" style="height:90%;background:var(--brand-accent)" data-val="7"></div>
+              <div class="chart-bar" style="height:65%;background:var(--brand-accent)" data-val="5"></div>
+              <div class="chart-bar" style="height:75%;background:var(--brand-accent)" data-val="6"></div>
             </div>
           </div>
-
-          <!-- Review Rounds -->
           <div class="chart-card">
-            <div class="chart-header">
-              <span class="chart-title">💬 Review Activity</span>
-              <span style="font-size:11px;color:var(--text-muted)">Comments & approvals</span>
-            </div>
-            <div class="chart-bars" style="margin-bottom:20px">
-              <div class="chart-bar" style="height:20%;background:var(--color-success)"><div class="chart-bar-label">W1</div></div>
-              <div class="chart-bar" style="height:45%;background:var(--color-success)"><div class="chart-bar-label">W2</div></div>
-              <div class="chart-bar" style="height:35%;background:var(--color-success)"><div class="chart-bar-label">W3</div></div>
-              <div class="chart-bar" style="height:60%;background:var(--color-success)"><div class="chart-bar-label">W4</div></div>
-              <div class="chart-bar" style="height:55%;background:var(--color-success)"><div class="chart-bar-label">W5</div></div>
-              <div class="chart-bar" style="height:80%;background:var(--color-success)"><div class="chart-bar-label">W6</div></div>
-              <div class="chart-bar" style="height:40%;background:var(--color-success)"><div class="chart-bar-label">W7</div></div>
-              <div class="chart-bar" style="height:70%;background:var(--color-success)"><div class="chart-bar-label">W8</div></div>
-              <div class="chart-bar" style="height:50%;background:var(--color-success)"><div class="chart-bar-label">W9</div></div>
-              <div class="chart-bar" style="height:90%;background:var(--color-success)"><div class="chart-bar-label">W10</div></div>
+            <div class="chart-header"><span class="chart-title">💬 Review Activity</span><span style="font-size:10px;color:var(--text-muted)">Comments & approvals</span></div>
+            <div class="chart-bars">
+              <div class="chart-bar" style="height:20%;background:var(--color-success)" data-val="3"></div>
+              <div class="chart-bar" style="height:45%;background:var(--color-success)" data-val="7"></div>
+              <div class="chart-bar" style="height:35%;background:var(--color-success)" data-val="5"></div>
+              <div class="chart-bar" style="height:60%;background:var(--color-success)" data-val="9"></div>
+              <div class="chart-bar" style="height:55%;background:var(--color-success)" data-val="8"></div>
+              <div class="chart-bar" style="height:80%;background:var(--color-success)" data-val="12"></div>
+              <div class="chart-bar" style="height:40%;background:var(--color-success)" data-val="6"></div>
+              <div class="chart-bar" style="height:70%;background:var(--color-success)" data-val="10"></div>
+              <div class="chart-bar" style="height:50%;background:var(--color-success)" data-val="7"></div>
+              <div class="chart-bar" style="height:90%;background:var(--color-success)" data-val="14"></div>
             </div>
           </div>
         </div>
-
-        <div class="grid-2" style="gap:16px">
-          <!-- Detailed Stats -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
           <div class="chart-card">
-            <div class="chart-header">
-              <span class="chart-title">📋 Project Statistics</span>
-            </div>
-            <div class="stat-row">
-              <span class="stat-label">Created</span>
-              <span class="stat-value">Jul 10, 2026</span>
-            </div>
-            <div class="stat-row">
-              <span class="stat-label">Last Updated</span>
-              <span class="stat-value">2 hours ago</span>
-            </div>
-            <div class="stat-row">
-              <span class="stat-label">Total Size</span>
-              <span class="stat-value">1.2 GB</span>
-            </div>
-            <div class="stat-row">
-              <span class="stat-label">Audio Duration</span>
-              <span class="stat-value">3:42 (final)</span>
-            </div>
-            <div class="stat-row">
-              <span class="stat-label">BPM</span>
-              <span class="stat-value">128</span>
-            </div>
-            <div class="stat-row">
-              <span class="stat-label">Key</span>
-              <span class="stat-value">Am</span>
-            </div>
-            <div class="stat-row">
-              <span class="stat-label">Review Sessions</span>
-              <span class="stat-value">6</span>
-            </div>
-            <div class="stat-row">
-              <span class="stat-label">Approval Rate</span>
-              <span class="stat-value" style="color:var(--color-success)">83%</span>
-            </div>
+            <div class="chart-header"><span class="chart-title">📋 Project Statistics</span></div>
+            <div class="stat-row"><span style="color:var(--text-muted)">Created</span><span style="font-weight:600;font-family:var(--font-mono);font-size:11px">Jul 10, 2026</span></div>
+            <div class="stat-row"><span style="color:var(--text-muted)">Last Updated</span><span style="font-weight:600;font-size:11px">2 hours ago</span></div>
+            <div class="stat-row"><span style="color:var(--text-muted)">Total Size</span><span style="font-weight:600;font-family:var(--font-mono);font-size:11px">1.2 GB</span></div>
+            <div class="stat-row"><span style="color:var(--text-muted)">Audio Duration</span><span style="font-weight:600;font-family:var(--font-mono);font-size:11px">3:42 (final)</span></div>
+            <div class="stat-row"><span style="color:var(--text-muted)">BPM</span><span style="font-weight:600;font-family:var(--font-mono);font-size:11px">128</span></div>
+            <div class="stat-row"><span style="color:var(--text-muted)">Key</span><span style="font-weight:600;font-family:var(--font-mono);font-size:11px">Am</span></div>
+            <div class="stat-row"><span style="color:var(--text-muted)">Approval Rate</span><span style="font-weight:600;font-family:var(--font-mono);font-size:11px;color:var(--color-success)">83%</span></div>
           </div>
-
-          <!-- Version History -->
           <div class="chart-card">
-            <div class="chart-header">
-              <span class="chart-title">🔄 Version Timeline</span>
-              <span style="font-size:11px;color:var(--text-muted)">14 versions</span>
-            </div>
-            <div class="version-timeline">
-              <div class="version-row">
-                <div class="version-dot" style="background:var(--brand-primary)"></div>
-                <span style="font-size:12px;font-weight:600;flex:1">v14 — Added vocal stem</span>
-                <span style="font-size:10px;color:var(--text-muted)">2h ago</span>
-                <span class="badge badge-purple" style="font-size:9px">Latest</span>
-              </div>
-              <div class="version-row">
-                <div class="version-dot" style="background:var(--color-success)"></div>
-                <span style="font-size:12px;font-weight:600;flex:1">v13 — Final Mix</span>
-                <span style="font-size:10px;color:var(--text-muted)">1d ago</span>
-                <span class="badge badge-success" style="font-size:9px">Approved</span>
-              </div>
-              <div class="version-row">
-                <div class="version-dot" style="background:var(--color-success)"></div>
-                <span style="font-size:12px;font-weight:600;flex:1">v12 — Pre-master</span>
-                <span style="font-size:10px;color:var(--text-muted)">3d ago</span>
-                <span class="badge badge-success" style="font-size:9px">Approved</span>
-              </div>
-              <div class="version-row">
-                <div class="version-dot" style="background:var(--color-warning)"></div>
-                <span style="font-size:12px;font-weight:600;flex:1">v11 — Rough Mix</span>
-                <span style="font-size:10px;color:var(--text-muted)">5d ago</span>
-                <span class="badge badge-warning" style="font-size:9px">Declined</span>
-              </div>
-              <div class="version-row">
-                <div class="version-dot" style="background:var(--color-success)"></div>
-                <span style="font-size:12px;font-weight:600;flex:1">v10 — Stem Check</span>
-                <span style="font-size:10px;color:var(--text-muted)">1w ago</span>
-                <span class="badge badge-success" style="font-size:9px">Approved</span>
-              </div>
-              <div class="version-row">
-                <div class="version-dot" style="background:var(--text-muted)"></div>
-                <span style="font-size:12px;font-weight:600;flex:1">v1 — Initial Recording</span>
-                <span style="font-size:10px;color:var(--text-muted)">7w ago</span>
-              </div>
+            <div class="chart-header"><span class="chart-title">🔄 Version Timeline</span><span style="font-size:10px;color:var(--text-muted)">14 versions</span></div>
+            <div>
+              <div class="version-row"><div class="version-dot" style="background:var(--brand-accent)"></div><span style="font-size:11px;font-weight:600;flex:1">v14 — Added vocal stem</span><span style="font-size:9px;color:var(--text-muted);font-family:var(--font-mono)">2h ago</span><span class="badge badge-purple">Latest</span></div>
+              <div class="version-row"><div class="version-dot" style="background:var(--color-success)"></div><span style="font-size:11px;font-weight:600;flex:1">v13 — Final Mix</span><span style="font-size:9px;color:var(--text-muted);font-family:var(--font-mono)">1d ago</span><span class="badge badge-success">Approved</span></div>
+              <div class="version-row"><div class="version-dot" style="background:var(--color-success)"></div><span style="font-size:11px;font-weight:600;flex:1">v12 — Pre-master</span><span style="font-size:9px;color:var(--text-muted);font-family:var(--font-mono)">3d ago</span><span class="badge badge-success">Approved</span></div>
+              <div class="version-row"><div class="version-dot" style="background:var(--color-warning)"></div><span style="font-size:11px;font-weight:600;flex:1">v11 — Rough Mix</span><span style="font-size:9px;color:var(--text-muted);font-family:var(--font-mono)">5d ago</span><span class="badge badge-warning">Declined</span></div>
+              <div class="version-row"><div class="version-dot" style="background:var(--color-success)"></div><span style="font-size:11px;font-weight:600;flex:1">v10 — Stem Check</span><span style="font-size:9px;color:var(--text-muted);font-family:var(--font-mono)">1w ago</span><span class="badge badge-success">Approved</span></div>
+              <div class="version-row"><div class="version-dot" style="background:var(--border-default)"></div><span style="font-size:11px;font-weight:600;flex:1;color:var(--text-muted)">v1 — Initial Recording</span><span style="font-size:9px;color:var(--text-muted);font-family:var(--font-mono)">7w ago</span></div>
             </div>
           </div>
         </div>

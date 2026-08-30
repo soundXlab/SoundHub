@@ -6,132 +6,132 @@
   <title>SoundHub — Activity Feed</title>
   <link rel="stylesheet" href="design-system/shared.css">
   <style>
-    .feed-list { display: flex; flex-direction: column; }
-    .feed-item {
-      display: flex; gap: 14px; padding: 16px 0;
-      border-bottom: 1px solid var(--border-default);
-    }
-    .feed-avatar {
-      width: 36px; height: 36px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 14px; font-weight: 700; color: #fff; flex-shrink: 0;
-    }
-    .feed-body { flex: 1; }
-    .feed-text { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
-    .feed-text strong { color: var(--text-primary); font-weight: 600; }
-    .feed-time { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
-    .feed-tags { display: flex; gap: 6px; margin-top: 8px; }
-    .feed-tag {
-      padding: 3px 8px; background: var(--bg-elevated); border: 1px solid var(--border-default);
-      border-radius: 4px; font-size: 10px; color: var(--text-muted);
-    }
-    .feed-filter-bar {
-      display: flex; gap: 8px; align-items: center; margin-bottom: 20px;
-      padding: 10px 16px; background: var(--bg-surface); border: 1px solid var(--border-default);
-      border-radius: var(--radius-lg);
-    }
-    .feed-filter-btn {
-      padding: 5px 10px; border-radius: 4px; font-size: 11px; font-weight: 500;
-      cursor: pointer; border: 1px solid var(--border-default); background: transparent;
-      color: var(--text-muted); transition: all 0.1s;
-    }
-    .feed-filter-btn.active { background: var(--brand-primary); color: #fff; border-color: var(--brand-primary); }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Inter',-apple-system,sans-serif; background:var(--bg-primary); color:var(--text-primary); overflow:hidden; height:100vh; }
+    .transport-bar { height:40px; background:var(--bg-panel); border-bottom:1px solid var(--border-default); display:flex; align-items:center; padding:0 12px; gap:16px; font-size:11px; }
+    .transport-logo { font-weight:800; font-size:13px; color:var(--brand-accent); }
+    .transport-logo span { color:var(--text-primary); }
+    .transport-divider { width:1px; height:20px; background:var(--border-default); }
+    .transport-spacer { flex:1; }
+    .app-body { display:flex; height:calc(100vh - 40px); }
+    .sidebar { width:var(--sidebar-width); background:var(--bg-panel); border-right:1px solid var(--border-default); display:flex; flex-direction:column; }
+    .sidebar-search { padding:8px; border-bottom:1px solid var(--border-default); }
+    .sidebar-search input { width:100%; background:var(--bg-input); border:1px solid var(--border-default); border-radius:var(--radius-sm); padding:6px 8px 6px 28px; font-size:11px; color:var(--text-primary); outline:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2352525b' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:8px center; }
+    .sidebar-nav { flex:1; overflow-y:auto; padding:4px 0; }
+    .sidebar-section { padding:8px 12px 4px; font-size:9px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; font-weight:700; }
+    .sidebar-item { padding:6px 12px; font-size:11px; font-weight:500; color:var(--text-secondary); cursor:pointer; display:flex; align-items:center; gap:8px; border-left:2px solid transparent; transition:all 0.1s; }
+    .sidebar-item:hover { color:var(--text-primary); }
+    .sidebar-item.active { color:var(--brand-accent); background:rgba(234,88,8,0.08); border-left-color:var(--brand-accent); }
+    .content { flex:1; display:flex; flex-direction:column; min-width:0; overflow:hidden; }
+    .page-header { padding:16px 24px; border-bottom:1px solid var(--border-default); display:flex; align-items:center; justify-content:space-between; }
+    .page-title { font-size:18px; font-weight:700; }
+    .page-scroll { flex:1; overflow-y:auto; padding:24px; }
+    .filter-bar { display:flex; gap:6px; margin-bottom:20px; padding:10px 14px; background:var(--bg-surface); border:1px solid var(--border-default); border-radius:var(--radius-md); }
+    .filter-btn { padding:5px 10px; border-radius:4px; font-size:10px; font-weight:600; cursor:pointer; border:1px solid var(--border-default); background:transparent; color:var(--text-muted); transition:all 0.1s; }
+    .filter-btn:hover { color:var(--text-primary); border-color:var(--border-hover); }
+    .filter-btn.active { background:var(--brand-accent); color:#fff; border-color:var(--brand-accent); }
+    .feed-item { display:flex; gap:14px; padding:14px 0; border-bottom:1px solid rgba(39,39,42,0.5); transition:background 0.1s; }
+    .feed-item:hover { background:rgba(234,88,8,0.02); }
+    .feed-avatar { width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:700; color:#fff; flex-shrink:0; }
+    .feed-body { flex:1; }
+    .feed-text { font-size:12px; color:var(--text-secondary); line-height:1.5; }
+    .feed-text strong { color:var(--text-primary); font-weight:600; }
+    .feed-time { font-size:10px; color:var(--text-muted); margin-top:4px; display:flex; align-items:center; gap:8px; }
+    .feed-tags { display:flex; gap:4px; margin-top:6px; flex-wrap:wrap; }
+    .feed-tag { padding:2px 7px; background:var(--bg-elevated); border:1px solid var(--border-default); border-radius:3px; font-size:9px; color:var(--text-muted); transition:border-color 0.15s; cursor:pointer; }
+    .feed-tag:hover { border-color:var(--border-hover); color:var(--text-secondary); }
+    .feed-icon { font-size:10px; }
   </style>
 </head>
 <body>
-  <div class="app-layout">
-    <aside class="sidebar">
-      <div class="sidebar-logo"><div class="logo-icon">S</div><div class="logo-text">SoundHub</div></div>
-      <nav class="sidebar-nav">
-        <div class="sidebar-section-label">Main</div>
-        <a class="sidebar-item" href="#"><span class="icon">📊</span> Dashboard</a>
-        <a class="sidebar-item" href="#"><span class="icon">📁</span> Projects</a>
-        <a class="sidebar-item" href="#"><span class="icon">🛒</span> Marketplace</a>
-        <div class="sidebar-section-label">Workspace</div>
-        <a class="sidebar-item" href="#"><span class="icon">💬</span> Reviews</a>
-        <a class="sidebar-item active" href="#"><span class="icon">📋</span> Activity</a>
-        <div class="sidebar-section-label">Account</div>
-        <a class="sidebar-item" href="#"><span class="icon">⚙️</span> Settings</a>
-      </nav>
-    </aside>
-    <div class="main-content">
-      <header class="topbar">
-        <div class="topbar-search"><span class="search-icon">🔍</span><input type="text" placeholder="Search activity..."></div>
-        <div class="topbar-right"><div class="topbar-icon-btn">🔔<span class="notif-dot"></span></div><div class="topbar-avatar">P</div></div>
-      </header>
-      <div class="page">
-        <h1 class="page-title" style="margin-bottom:16px">Activity Feed</h1>
-
-        <!-- Filter Bar -->
-        <div class="feed-filter-bar">
-          <div class="feed-filter-btn active">All</div>
-          <div class="feed-filter-btn">Uploads</div>
-          <div class="feed-filter-btn">Reviews</div>
-          <div class="feed-filter-btn">Comments</div>
-          <div class="feed-filter-btn">Approvals</div>
-          <div class="feed-filter-btn">Marketplace</div>
-          <div style="flex:1"></div>
-          <span style="font-size:11px;color:var(--text-muted)">Last 7 days</span>
+  <div class="transport-bar">
+    <div class="transport-logo">Sound<span>Hub</span></div>
+    <div class="transport-divider"></div>
+    <div style="font-size:11px;color:var(--text-muted)">ACTIVITY FEED</div>
+    <div class="transport-spacer"></div>
+    <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted)">LAST 7 DAYS</div>
+  </div>
+  <div class="app-body">
+    <div class="sidebar">
+      <div class="sidebar-search"><input type="text" placeholder="Search activity..."></div>
+      <div class="sidebar-nav">
+        <div class="sidebar-section">Main</div>
+        <div class="sidebar-item"><span class="icon">📊</span> Dashboard</div>
+        <div class="sidebar-item"><span class="icon">📁</span> Projects</div>
+        <div class="sidebar-item"><span class="icon">🛒</span> Marketplace</div>
+        <div class="sidebar-section">Workspace</div>
+        <div class="sidebar-item"><span class="icon">💬</span> Reviews</div>
+        <div class="sidebar-item active"><span class="icon">📋</span> Activity</div>
+        <div class="sidebar-section">Account</div>
+        <div class="sidebar-item"><span class="icon">⚙️</span> Settings</div>
+      </div>
+    </div>
+    <div class="content">
+      <div class="page-header"><div class="page-title">Activity Feed</div></div>
+      <div class="page-scroll">
+        <div class="filter-bar">
+          <div class="filter-btn active">All</div>
+          <div class="filter-btn">Uploads</div>
+          <div class="filter-btn">Reviews</div>
+          <div class="filter-btn">Comments</div>
+          <div class="filter-btn">Approvals</div>
+          <div class="filter-btn">Marketplace</div>
         </div>
-
-        <!-- Feed Items -->
-        <div style="background:var(--bg-surface);border:1px solid var(--border-default);border-radius:var(--radius-lg);padding:16px 20px">
-          <div class="feed-list">
-            <div class="feed-item">
-              <div class="feed-avatar" style="background:#ea5808">P</div>
-              <div class="feed-body">
-                <div class="feed-text"><strong>@producer1</strong> uploaded <strong>v13 — Final Mix</strong> to <strong>Neon Warehouse</strong></div>
-                <div class="feed-time">2 hours ago</div>
-                <div class="feed-tags"><span class="feed-tag">📁 Neon Warehouse</span><span class="feed-tag">⬆️ Upload</span></div>
-              </div>
+        <div style="background:var(--bg-surface);border:1px solid var(--border-default);border-radius:var(--radius-md);padding:14px 18px">
+          <div class="feed-item">
+            <div class="feed-avatar" style="background:linear-gradient(135deg,var(--brand-accent),#f97316)">P</div>
+            <div class="feed-body">
+              <div class="feed-text"><strong>@producer1</strong> uploaded <strong>v13 — Final Mix</strong> to <strong>Neon Warehouse</strong></div>
+              <div class="feed-time"><span class="feed-icon">🕐</span> 2 hours ago</div>
+              <div class="feed-tags"><span class="feed-tag">📁 Neon Warehouse</span><span class="feed-tag">⬆️ Upload</span></div>
             </div>
-            <div class="feed-item">
-              <div class="feed-avatar" style="background:#22c55e">R</div>
-              <div class="feed-body">
-                <div class="feed-text"><strong>@remixer</strong> approved <strong>v13 — Final Mix</strong> of <strong>Neon Warehouse</strong></div>
-                <div class="feed-time">1 hour ago</div>
-                <div class="feed-tags"><span class="feed-tag">📁 Neon Warehouse</span><span class="feed-tag">✅ Approval</span></div>
-              </div>
+          </div>
+          <div class="feed-item">
+            <div class="feed-avatar" style="background:linear-gradient(135deg,var(--color-success),#16a34a)">R</div>
+            <div class="feed-body">
+              <div class="feed-text"><strong>@remixer</strong> approved <strong>v13 — Final Mix</strong> of <strong>Neon Warehouse</strong></div>
+              <div class="feed-time"><span class="feed-icon">🕐</span> 1 hour ago</div>
+              <div class="feed-tags"><span class="feed-tag">📁 Neon Warehouse</span><span class="feed-tag">✅ Approval</span></div>
             </div>
-            <div class="feed-item">
-              <div class="feed-avatar" style="background:#3b82f6">M</div>
-              <div class="feed-body">
-                <div class="feed-text"><strong>@mastering_guru</strong> commented on <strong>Midnight Drive — Mix Review</strong> at <span style="font-family:var(--font-mono);font-size:11px;color:var(--brand-primary)">2:15</span></div>
-                <div class="feed-time">3 hours ago</div>
-                <div class="feed-tags"><span class="feed-tag">📁 Midnight EP</span><span class="feed-tag">💬 Comment</span></div>
-              </div>
+          </div>
+          <div class="feed-item">
+            <div class="feed-avatar" style="background:linear-gradient(135deg,var(--color-info),#6366f1)">M</div>
+            <div class="feed-body">
+              <div class="feed-text"><strong>@mastering_guru</strong> commented on <strong>Midnight Drive — Mix Review</strong> at <span style="font-family:var(--font-mono);font-size:10px;color:var(--brand-accent);background:rgba(234,88,8,0.1);padding:1px 5px;border-radius:3px">2:15</span></div>
+              <div class="feed-time"><span class="feed-icon">🕐</span> 3 hours ago</div>
+              <div class="feed-tags"><span class="feed-tag">📁 Midnight EP</span><span class="feed-tag">💬 Comment</span></div>
             </div>
-            <div class="feed-item">
-              <div class="feed-avatar" style="background:#eab308">A</div>
-              <div class="feed-body">
-                <div class="feed-text"><strong>@audiophile</strong> purchased <strong>Lo-Fi Drums Pack</strong> on the Marketplace</div>
-                <div class="feed-time">5 hours ago</div>
-                <div class="feed-tags"><span class="feed-tag">🛒 Marketplace</span><span class="feed-tag">💰 Sale</span></div>
-              </div>
+          </div>
+          <div class="feed-item">
+            <div class="feed-avatar" style="background:linear-gradient(135deg,var(--color-warning),#f59e0b)">A</div>
+            <div class="feed-body">
+              <div class="feed-text"><strong>@audiophile</strong> purchased <strong>Lo-Fi Drums Pack</strong> on the Marketplace</div>
+              <div class="feed-time"><span class="feed-icon">🕐</span> 5 hours ago</div>
+              <div class="feed-tags"><span class="feed-tag">🛒 Marketplace</span><span class="feed-tag">💰 Sale</span></div>
             </div>
-            <div class="feed-item">
-              <div class="feed-avatar" style="background:#ea5808">P</div>
-              <div class="feed-body">
-                <div class="feed-text"><strong>@producer1</strong> created review session <strong>Summer Vibes — Stem Check</strong></div>
-                <div class="feed-time">1 day ago</div>
-                <div class="feed-tags"><span class="feed-tag">📁 Summer Album</span><span class="feed-tag">💬 Review</span></div>
-              </div>
+          </div>
+          <div class="feed-item">
+            <div class="feed-avatar" style="background:linear-gradient(135deg,var(--brand-accent),#f97316)">P</div>
+            <div class="feed-body">
+              <div class="feed-text"><strong>@producer1</strong> created review session <strong>Summer Vibes — Stem Check</strong></div>
+              <div class="feed-time"><span class="feed-icon">🕐</span> 1 day ago</div>
+              <div class="feed-tags"><span class="feed-tag">📁 Summer Album</span><span class="feed-tag">💬 Review</span></div>
             </div>
-            <div class="feed-item">
-              <div class="feed-avatar" style="background:#8b5cf6">J</div>
-              <div class="feed-body">
-                <div class="feed-text"><strong>@jazzcat</strong> published <strong>Organic Percussion</strong> to the Marketplace</div>
-                <div class="feed-time">2 days ago</div>
-                <div class="feed-tags"><span class="feed-tag">🛒 Marketplace</span><span class="feed-tag">📦 Publish</span></div>
-              </div>
+          </div>
+          <div class="feed-item">
+            <div class="feed-avatar" style="background:linear-gradient(135deg,#8b5cf6,#a855f7)">J</div>
+            <div class="feed-body">
+              <div class="feed-text"><strong>@jazzcat</strong> published <strong>Organic Percussion</strong> to the Marketplace</div>
+              <div class="feed-time"><span class="feed-icon">🕐</span> 2 days ago</div>
+              <div class="feed-tags"><span class="feed-tag">🛒 Marketplace</span><span class="feed-tag">📦 Publish</span></div>
             </div>
-            <div class="feed-item">
-              <div class="feed-avatar" style="background:#22c55e">R</div>
-              <div class="feed-body">
-                <div class="feed-text"><strong>@remixer</strong> declined <strong>v11 — Rough Mix</strong> of <strong>Neon Warehouse</strong>: "Need more low-end"</div>
-                <div class="feed-time">3 days ago</div>
-                <div class="feed-tags"><span class="feed-tag">📁 Neon Warehouse</span><span class="feed-tag">💬 Comment</span></div>
-              </div>
+          </div>
+          <div class="feed-item">
+            <div class="feed-avatar" style="background:linear-gradient(135deg,var(--color-success),#16a34a)">R</div>
+            <div class="feed-body">
+              <div class="feed-text"><strong>@remixer</strong> declined <strong>v11 — Rough Mix</strong> of <strong>Neon Warehouse</strong>: "Need more low-end"</div>
+              <div class="feed-time"><span class="feed-icon">🕐</span> 3 days ago</div>
+              <div class="feed-tags"><span class="feed-tag">📁 Neon Warehouse</span><span class="feed-tag">💬 Comment</span></div>
             </div>
           </div>
         </div>
