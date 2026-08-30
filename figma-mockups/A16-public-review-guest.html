@@ -6,147 +6,182 @@
   <title>SoundHub — Public Review (Guest)</title>
   <link rel="stylesheet" href="design-system/shared.css">
   <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Inter',-apple-system,sans-serif; background:var(--bg-primary); color:var(--text-primary); }
     .guest-banner {
-      background: rgba(139,92,246,0.08); border-bottom: 1px solid var(--border-default);
-      padding: 10px 24px; font-size: 12px; color: var(--text-secondary);
-      display: flex; align-items: center; justify-content: center; gap: 8px;
+      background:rgba(234,88,8,0.08); border-bottom:1px solid #27272a;
+      padding:10px 24px; font-size:12px; color:#a1a1aa;
+      display:flex; align-items:center; justify-content:center; gap:8px;
     }
-    .guest-banner a { color: var(--brand-primary); text-decoration: none; font-weight: 600; }
-    .player-section { padding: 32px 24px; }
+    .guest-banner a { color:#ea5808; text-decoration:none; font-weight:600; }
+    .guest-banner a:hover { text-decoration:underline; }
+    .container { max-width:800px; margin:0 auto; padding:32px 24px; }
+    .player-section { margin-bottom:24px; }
     .player-waveform {
-      background: var(--bg-surface); border: 1px solid var(--border-default);
-      border-radius: var(--radius-lg); padding: 24px; margin-bottom: 20px;
+      background:#111113; border:1px solid #27272a; border-radius:8px; padding:20px; position:relative;
     }
-    .waveform-bars {
-      display: flex; align-items: flex-end; gap: 2px; height: 80px; margin-bottom: 16px;
+    .waveform-display { position:relative; height:80px; margin-bottom:12px; cursor:pointer; }
+    .waveform-bars { display:flex; align-items:flex-end; gap:1px; height:80px; }
+    .waveform-bar { flex:1; background:#ea5808; border-radius:1px; opacity:0.4; transition:opacity 0.1s; }
+    .waveform-bar.played { opacity:1; }
+    .waveform-bar:hover { opacity:1 !important; }
+    .waveform-progress {
+      position:absolute; top:0; left:0; width:35%; height:100%;
+      border-right:2px solid #ea5808; pointer-events:none;
     }
-    .waveform-bar { flex: 1; background: var(--brand-primary); border-radius: 1px; opacity: 0.5; }
-    .waveform-bar.played { opacity: 1; }
-    .player-controls { display: flex; align-items: center; gap: 16px; }
+    .waveform-time-marker {
+      position:absolute; top:-18px; padding:1px 5px; background:#ea5808; color:#fff;
+      font-size:9px; font-family:'JetBrains Mono',monospace; border-radius:3px;
+      pointer-events:none;
+    }
+    .comment-marker {
+      position:absolute; bottom:-6px; width:10px; height:10px;
+      border-radius:50%; border:2px solid #0d0d0d; cursor:pointer;
+      transition:transform 0.15s; z-index:2;
+    }
+    .comment-marker:hover { transform:scale(1.3); }
+    .player-controls { display:flex; align-items:center; gap:12px; }
     .play-btn {
-      width: 44px; height: 44px; border-radius: 50%; background: var(--brand-primary);
-      display: flex; align-items: center; justify-content: center; cursor: pointer;
-      color: #fff; font-size: 16px;
+      width:40px; height:40px; border-radius:50%; background:#ea5808;
+      display:flex; align-items:center; justify-content:center; cursor:pointer;
+      color:#fff; font-size:14px; transition:all 0.15s;
     }
-    .player-time { font-family: var(--font-mono); font-size: 13px; color: var(--text-muted); }
-    .version-tabs { display: flex; gap: 4px; margin-bottom: 20px; }
+    .play-btn:hover { filter:brightness(1.1); transform:scale(1.05); }
+    .player-time { font-family:'JetBrains Mono',monospace; font-size:12px; color:#52525b; }
+    .version-tabs { display:flex; gap:4px; margin-bottom:16px; }
     .version-tab {
-      padding: 8px 16px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 600;
-      cursor: pointer; border: 1px solid var(--border-default); color: var(--text-secondary);
-      background: transparent; transition: all 0.15s;
+      padding:7px 14px; border-radius:4px; font-size:11px; font-weight:600;
+      cursor:pointer; border:1px solid #27272a; color:#71717a;
+      background:transparent; transition:all 0.15s;
     }
-    .version-tab.active { background: var(--brand-primary); color: #fff; border-color: var(--brand-primary); }
-    .comment-list { display: flex; flex-direction: column; gap: 12px; }
+    .version-tab:hover { color:#e4e4e7; border-color:#3f3f46; }
+    .version-tab.active { background:#ea5808; color:#fff; border-color:#ea5808; }
     .comment-item {
-      background: var(--bg-surface); border: 1px solid var(--border-default);
-      border-radius: var(--radius-md); padding: 14px;
+      background:#111113; border:1px solid #27272a; border-radius:6px;
+      padding:14px; margin-bottom:8px; transition:border-color 0.15s;
     }
-    .comment-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
-    .comment-author { font-size: 12px; font-weight: 600; }
-    .comment-time { font-size: 10px; color: var(--text-muted); }
-    .comment-body { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
+    .comment-item:hover { border-color:#3f3f46; }
+    .comment-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; }
+    .comment-author { display:flex; align-items:center; gap:8px; }
+    .comment-avatar {
+      width:24px; height:24px; border-radius:50%; display:flex;
+      align-items:center; justify-content:center; font-size:10px; font-weight:700; color:#fff;
+    }
+    .comment-name { font-size:12px; font-weight:600; color:#e4e4e7; }
+    .comment-time { font-size:10px; color:#52525b; }
     .comment-timestamp {
-      display: inline-flex; align-items: center; gap: 4px;
-      padding: 2px 8px; background: rgba(139,92,246,0.1); border-radius: 4px;
-      font-size: 10px; font-family: var(--font-mono); color: var(--brand-primary);
-      margin-bottom: 6px; cursor: pointer;
+      display:inline-flex; align-items:center; gap:3px;
+      padding:2px 7px; background:rgba(234,88,8,0.1); border-radius:3px;
+      font-size:9px; font-family:'JetBrains Mono',monospace; color:#ea5808;
+      margin-bottom:6px; cursor:pointer; transition:background 0.15s;
     }
+    .comment-timestamp:hover { background:rgba(234,88,8,0.2); }
+    .comment-body { font-size:12px; color:#a1a1aa; line-height:1.5; }
     .guest-form {
-      background: var(--bg-surface); border: 1px solid var(--border-default);
-      border-radius: var(--radius-lg); padding: 20px; margin-top: 20px;
+      background:#111113; border:1px solid #27272a; border-radius:8px; padding:16px; margin-top:20px;
     }
+    .guest-form-title { font-size:12px; color:#52525b; margin-bottom:10px; display:flex; align-items:center; gap:6px; }
+    .guest-form-row { display:flex; gap:8px; }
+    .guest-form input {
+      flex:1; padding:8px 12px; background:#0d0d0d; border:1px solid #27272a;
+      border-radius:4px; font-size:12px; color:#e4e4e7; outline:none;
+    }
+    .guest-form input:focus { border-color:#ea5808; }
+    .guest-form input::placeholder { color:#52525b; }
+    .guest-form button {
+      padding:8px 16px; background:#ea5808; color:#fff; border:none;
+      border-radius:4px; font-size:12px; font-weight:600; cursor:pointer;
+    }
+    .guest-form button:hover { filter:brightness(1.1); }
   </style>
 </head>
 <body>
   <div class="guest-banner">
     🔗 You're viewing a public review session · <a href="#">Sign in</a> for full features
   </div>
-
-  <div style="max-width: 800px; margin: 0 auto; padding: 24px;">
-    <div style="margin-bottom:24px">
+  <div class="container">
+    <div style="margin-bottom:20px">
       <h1 style="font-size:22px;font-weight:800;margin-bottom:4px">Neon Warehouse — Master</h1>
-      <p style="font-size:13px;color:var(--text-muted)">by @producer1 · Round 2 of 3 · 8 comments</p>
+      <p style="font-size:12px;color:#52525b">by @producer1 · Round 2 of 3 · 8 comments · Last updated 2h ago</p>
     </div>
-
-    <!-- Version Tabs -->
     <div class="version-tabs">
       <div class="version-tab active">v13 — Final Mix</div>
       <div class="version-tab">v12 — Pre-master</div>
       <div class="version-tab">v11 — Rough Mix</div>
     </div>
-
-    <!-- Player -->
-    <div class="player-section" style="padding:0">
+    <div class="player-section">
       <div class="player-waveform">
-        <div class="waveform-bars">
-          <div class="waveform-bar played" style="height:40%"></div><div class="waveform-bar played" style="height:60%"></div>
-          <div class="waveform-bar played" style="height:80%"></div><div class="waveform-bar played" style="height:50%"></div>
-          <div class="waveform-bar played" style="height:90%"></div><div class="waveform-bar played" style="height:70%"></div>
-          <div class="waveform-bar played" style="height:45%"></div><div class="waveform-bar played" style="height:65%"></div>
-          <div class="waveform-bar" style="height:55%"></div><div class="waveform-bar" style="height:75%"></div>
-          <div class="waveform-bar" style="height:60%"></div><div class="waveform-bar" style="height:80%"></div>
-          <div class="waveform-bar" style="height:35%"></div><div class="waveform-bar" style="height:90%"></div>
-          <div class="waveform-bar" style="height:50%"></div><div class="waveform-bar" style="height:70%"></div>
-          <div class="waveform-bar" style="height:40%"></div><div class="waveform-bar" style="height:60%"></div>
-          <div class="waveform-bar" style="height:85%"></div><div class="waveform-bar" style="height:55%"></div>
+        <div class="waveform-display">
+          <div class="waveform-progress">
+            <div class="waveform-time-marker" style="right:-4px">1:24</div>
+          </div>
+          <div class="waveform-bars">
+            <div class="waveform-bar played" style="height:40%"></div><div class="waveform-bar played" style="height:60%"></div>
+            <div class="waveform-bar played" style="height:80%"></div><div class="waveform-bar played" style="height:50%"></div>
+            <div class="waveform-bar played" style="height:90%"></div><div class="waveform-bar played" style="height:70%"></div>
+            <div class="waveform-bar played" style="height:45%"></div><div class="waveform-bar played" style="height:65%"></div>
+            <div class="waveform-bar" style="height:55%"></div><div class="waveform-bar" style="height:75%"></div>
+            <div class="waveform-bar" style="height:60%"></div><div class="waveform-bar" style="height:80%"></div>
+            <div class="waveform-bar" style="height:35%"></div><div class="waveform-bar" style="height:90%"></div>
+            <div class="waveform-bar" style="height:50%"></div><div class="waveform-bar" style="height:70%"></div>
+            <div class="waveform-bar" style="height:40%"></div><div class="waveform-bar" style="height:60%"></div>
+            <div class="waveform-bar" style="height:85%"></div><div class="waveform-bar" style="height:55%"></div>
+          </div>
+          <div class="comment-marker" style="left:35%;background:#22c55e" title="@remixer — 1:24"></div>
+          <div class="comment-marker" style="left:58%;background:#3b82f6" title="@mastering_guru — 2:15"></div>
+          <div class="comment-marker" style="left:82%;background:#eab308" title="@audiophile — 3:01"></div>
         </div>
         <div class="player-controls">
           <div class="play-btn">▶</div>
           <span class="player-time">1:24</span>
           <span class="player-time">/ 3:42</span>
           <div style="flex:1"></div>
-          <span style="font-size:12px;color:var(--text-muted)">🔊 Volume</span>
+          <span style="font-size:12px;color:#52525b;cursor:pointer">🔊</span>
         </div>
       </div>
     </div>
-
-    <!-- Comments -->
-    <h3 style="font-size:14px;font-weight:700;margin-bottom:12px">💬 Comments (8)</h3>
-    <div class="comment-list">
+    <h3 style="font-size:13px;font-weight:700;margin-bottom:10px;color:#a1a1aa">💬 Comments (8)</h3>
+    <div style="margin-bottom:16px">
       <div class="comment-item">
         <div class="comment-header">
-          <div class="comment-author" style="display:flex;align-items:center;gap:6px">
-            <span style="width:20px;height:20px;border-radius:50%;background:#22c55e;display:inline-flex;align-items:center;justify-content:center;font-size:9px;color:#fff;font-weight:700">R</span>
-            @remixer
+          <div class="comment-author">
+            <div class="comment-avatar" style="background:linear-gradient(135deg,#22c55e,#16a34a)">R</div>
+            <span class="comment-name">@remixer</span>
           </div>
           <div class="comment-time">2h ago</div>
         </div>
         <div class="comment-timestamp">📍 1:24</div>
-        <div class="comment-body">The snare could use more room reverb here. It feels a bit dry compared to the rest of the mix.</div>
+        <div class="comment-body">The snare could use more room reverb here. It feels a bit dry compared to the rest of the mix. Maybe try a plate reverb with a longer decay?</div>
       </div>
       <div class="comment-item">
         <div class="comment-header">
-          <div class="comment-author" style="display:flex;align-items:center;gap:6px">
-            <span style="width:20px;height:20px;border-radius:50%;background:#3b82f6;display:inline-flex;align-items:center;justify-content:center;font-size:9px;color:#fff;font-weight:700">M</span>
-            @mastering_guru
+          <div class="comment-author">
+            <div class="comment-avatar" style="background:linear-gradient(135deg,#3b82f6,#6366f1)">M</div>
+            <span class="comment-name">@mastering_guru</span>
           </div>
           <div class="comment-time">1h ago</div>
         </div>
         <div class="comment-timestamp">📍 2:15</div>
-        <div class="comment-body">Stereo image widens nicely here. The sidechain compression is sitting well with the kick.</div>
+        <div class="comment-body">Stereo image widens nicely here. The sidechain compression is sitting well with the kick. Good work on the low-end balance.</div>
       </div>
       <div class="comment-item">
         <div class="comment-header">
-          <div class="comment-author" style="display:flex;align-items:center;gap:6px">
-            <span style="width:20px;height:20px;border-radius:50%;background:#eab308;display:inline-flex;align-items:center;justify-content:center;font-size:9px;color:#fff;font-weight:700">A</span>
-            @audiophile
+          <div class="comment-author">
+            <div class="comment-avatar" style="background:linear-gradient(135deg,#eab308,#f59e0b)">A</div>
+            <span class="comment-name">@audiophile</span>
           </div>
           <div class="comment-time">45m ago</div>
         </div>
         <div class="comment-timestamp">📍 3:01</div>
-        <div class="comment-body">The outro fade is too quick. Could we extend it by 2 bars?</div>
+        <div class="comment-body">The outro fade is too quick. Could we extend it by 2 bars? Also the reverb tail on the vocal gets cut off abruptly.</div>
       </div>
     </div>
-
-    <!-- Guest Comment Form -->
     <div class="guest-form">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
-        <span style="font-size:12px;color:var(--text-muted)">💬 Add a comment (guest)</span>
-      </div>
-      <div style="display:flex;gap:8px">
-        <input class="form-input" placeholder="Your name..." style="width:160px;font-size:12px">
-        <input class="form-input" placeholder="Write a comment... (use @1:24 for timestamp)" style="flex:1;font-size:12px">
-        <button class="btn btn-primary" style="font-size:12px">Post</button>
+      <div class="guest-form-title">💬 Add a comment as guest</div>
+      <div class="guest-form-row">
+        <input placeholder="Your name..." style="width:140px;flex:none">
+        <input placeholder="Write a comment... (use @1:24 for timestamp)">
+        <button>Post</button>
       </div>
     </div>
   </div>

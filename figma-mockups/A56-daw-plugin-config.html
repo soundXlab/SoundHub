@@ -6,82 +6,108 @@
   <title>SoundHub — DAW Plugin Config</title>
   <link rel="stylesheet" href="design-system/shared.css">
   <style>
-    .plugin-card {
-      background: var(--bg-surface); border: 1px solid var(--border-default);
-      border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 16px;
-    }
-    .plugin-header {
-      padding: 16px 20px; border-bottom: 1px solid var(--border-default);
-      display: flex; align-items: center; gap: 14px;
-    }
-    .plugin-icon {
-      width: 48px; height: 48px; border-radius: var(--radius-md);
-      display: flex; align-items: center; justify-content: center; font-size: 24px;
-    }
-    .plugin-name { font-size: 15px; font-weight: 700; }
-    .plugin-version { font-size: 11px; color: var(--text-muted); font-family: var(--font-mono); }
-    .plugin-status { margin-left: auto; }
-    .plugin-body { padding: 20px; }
-    .config-row {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 12px 0; border-bottom: 1px solid var(--border-default);
-    }
-    .config-row:last-child { border-bottom: none; }
-    .config-label { font-size: 13px; font-weight: 600; }
-    .config-desc { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Inter',-apple-system,sans-serif; background:var(--bg-primary); color:var(--text-primary); overflow:hidden; height:100vh; }
+    .transport-bar { height:40px; background:#111113; border-bottom:1px solid #27272a; display:flex; align-items:center; padding:0 12px; gap:16px; font-size:11px; }
+    .transport-logo { font-weight:800; font-size:13px; color:#ea5808; }
+    .transport-logo span { color:#e4e4e7; }
+    .transport-divider { width:1px; height:20px; background:#27272a; }
+    .transport-spacer { flex:1; }
+    .app-body { display:flex; height:calc(100vh - 40px); }
+    .sidebar { width:240px; background:#111113; border-right:1px solid #27272a; display:flex; flex-direction:column; }
+    .sidebar-search { padding:8px; border-bottom:1px solid #27272a; }
+    .sidebar-search input { width:100%; background:#0d0d0d; border:1px solid #27272a; border-radius:4px; padding:6px 8px 6px 28px; font-size:11px; color:#e4e4e7; outline:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:8px center; }
+    .sidebar-nav { flex:1; overflow-y:auto; padding:4px 0; }
+    .sidebar-section { padding:8px 12px 4px; font-size:9px; color:#52525b; text-transform:uppercase; letter-spacing:1px; font-weight:700; }
+    .sidebar-item { padding:6px 12px; font-size:11px; font-weight:500; color:#a1a1aa; cursor:pointer; display:flex; align-items:center; gap:8px; border-left:2px solid transparent; transition:all 0.1s; }
+    .sidebar-item:hover { color:#e4e4e7; }
+    .sidebar-item.active { color:#ea5808; background:rgba(234,88,8,0.08); border-left-color:#ea5808; }
+    .content { flex:1; display:flex; flex-direction:column; min-width:0; overflow:hidden; }
+    .page-header { padding:16px 24px; border-bottom:1px solid #27272a; display:flex; align-items:center; justify-content:space-between; }
+    .page-title { font-size:18px; font-weight:700; color:#e4e4e7; }
+    .page-scroll { flex:1; overflow-y:auto; padding:24px; }
+    .plugin-card { background:#111113; border:1px solid #27272a; border-radius:8px; overflow:hidden; margin-bottom:16px; transition:border-color 0.15s; }
+    .plugin-card:hover { border-color:#3f3f46; }
+    .plugin-header { padding:16px 20px; border-bottom:1px solid #27272a; display:flex; align-items:center; gap:14px; }
+    .plugin-icon { width:48px; height:48px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:24px; }
+    .plugin-name { font-size:14px; font-weight:700; color:#e4e4e7; }
+    .plugin-version { font-size:10px; color:#52525b; font-family:'JetBrains Mono',monospace; }
+    .plugin-body { padding:20px; }
+    .config-row { display:flex; align-items:center; justify-content:space-between; padding:12px 0; border-bottom:1px solid #1a1a1a; }
+    .config-row:last-child { border-bottom:none; }
+    .config-label { font-size:12px; font-weight:600; color:#e4e4e7; }
+    .config-desc { font-size:10px; color:#52525b; margin-top:2px; }
     .config-input {
-      width: 200px; padding: 6px 10px; background: var(--bg-elevated);
-      border: 1px solid var(--border-default); border-radius: var(--radius-sm);
-      font-size: 12px; color: var(--text-primary);
+      width:220px; padding:6px 10px; background:#0d0d0d; border:1px solid #27272a;
+      border-radius:4px; font-size:11px; color:#e4e4e7; outline:none; font-family:'JetBrains Mono',monospace;
     }
-    .config-input.mono { font-family: var(--font-mono); font-size: 11px; }
-    .status-connected { background: rgba(34,197,94,0.12); color: var(--color-success); padding: 4px 10px; border-radius: 4px; font-size: 10px; font-weight: 600; }
-    .status-not-connected { background: rgba(113,113,122,0.12); color: var(--text-muted); padding: 4px 10px; border-radius: 4px; font-size: 10px; font-weight: 600; }
-    .test-result { padding: 8px 12px; border-radius: var(--radius-sm); font-size: 12px; margin-top: 12px; }
+    .config-input:focus { border-color:#ea5808; }
+    .led { width:8px; height:8px; border-radius:50%; display:inline-block; margin-right:6px; }
+    .led-green { background:#22c55e; box-shadow:0 0 6px rgba(34,197,94,0.5); }
+    .led-red { background:#ef4444; }
+    .led-gray { background:#52525b; }
+    .status-badge { padding:4px 10px; border-radius:4px; font-size:10px; font-weight:600; }
+    .status-connected { background:rgba(34,197,94,0.12); color:#22c55e; }
+    .status-not-connected { background:rgba(82,82,91,0.12); color:#71717a; }
+    .status-beta { background:rgba(234,179,8,0.12); color:#eab308; }
+    .toggle { width:36px; height:20px; border-radius:10px; background:#27272a; position:relative; cursor:pointer; transition:all 0.2s; flex-shrink:0; }
+    .toggle.active { background:#ea5808; }
+    .toggle::after { content:''; position:absolute; width:14px; height:14px; border-radius:50%; background:#fff; top:3px; left:3px; transition:all 0.2s; }
+    .toggle.active::after { left:19px; }
+    .test-result { padding:10px 14px; border-radius:4px; font-size:11px; margin-top:12px; display:flex; align-items:center; gap:8px; }
+    .btn { padding:6px 14px; border-radius:4px; font-size:11px; font-weight:600; cursor:pointer; border:1px solid #27272a; transition:all 0.15s; }
+    .btn-primary { background:#ea5808; color:#fff; border-color:#ea5808; }
+    .btn-primary:hover { background:#c2410c; }
+    .btn-secondary { background:#1a1a1a; color:#e4e4e7; }
+    .btn-secondary:hover { background:#27272a; }
+    select.form-select { padding:6px 10px; background:#0d0d0d; border:1px solid #27272a; border-radius:4px; font-size:11px; color:#e4e4e7; outline:none; cursor:pointer; }
   </style>
 </head>
 <body>
-  <div class="app-layout">
-    <aside class="sidebar">
-      <div class="sidebar-logo"><div class="logo-icon">S</div><div class="logo-text">SoundHub</div></div>
-      <nav class="sidebar-nav">
-        <div class="sidebar-section-label">Main</div>
-        <a class="sidebar-item" href="#"><span class="icon">📊</span> Dashboard</a>
-        <a class="sidebar-item" href="#"><span class="icon">📁</span> Projects</a>
-        <div class="sidebar-section-label">DAW Integration</div>
-        <a class="sidebar-item active" href="#"><span class="icon">🎛️</span> Plugin Config</a>
-        <a class="sidebar-item" href="#"><span class="icon">💻</span> CLI</a>
-        <div class="sidebar-section-label">Account</div>
-        <a class="sidebar-item" href="#"><span class="icon">⚙️</span> Settings</a>
-      </nav>
-    </aside>
-    <div class="main-content">
-      <header class="topbar">
-        <div class="topbar-search"><span class="search-icon">🔍</span><input type="text" placeholder="Search..."></div>
-        <div class="topbar-right"><div class="topbar-icon-btn">🔔<span class="notif-dot"></span></div><div class="topbar-avatar">P</div></div>
-      </header>
-      <div class="page">
-        <h1 class="page-title" style="margin-bottom:4px">DAW Plugin Configuration</h1>
-        <p class="page-subtitle" style="margin-bottom:24px">Configure Max for Live, REAPER, and other DAW integrations</p>
-
+  <div class="transport-bar">
+    <div class="transport-logo">Sound<span>Hub</span></div>
+    <div class="transport-divider"></div>
+    <div style="font-size:11px;color:#71717a">DAW PLUGIN CONFIG</div>
+    <div class="transport-spacer"></div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#71717a">INTEGRATIONS</div>
+  </div>
+  <div class="app-body">
+    <div class="sidebar">
+      <div class="sidebar-search"><input type="text" placeholder="Search..."></div>
+      <div class="sidebar-nav">
+        <div class="sidebar-section">Main</div>
+        <div class="sidebar-item"><span class="icon">📊</span> Dashboard</div>
+        <div class="sidebar-item"><span class="icon">📁</span> Projects</div>
+        <div class="sidebar-section">DAW Integration</div>
+        <div class="sidebar-item active"><span class="icon">🎛️</span> Plugin Config</div>
+        <div class="sidebar-item"><span class="icon">💻</span> CLI</div>
+        <div class="sidebar-section">Account</div>
+        <div class="sidebar-item"><span class="icon">⚙️</span> Settings</div>
+      </div>
+    </div>
+    <div class="content">
+      <div class="page-header">
+        <div class="page-title">DAW Plugin Configuration</div>
+      </div>
+      <div class="page-scroll">
         <!-- Max for Live -->
-        <div class="plugin-card">
+        <div class="plugin-card" style="border-color:rgba(34,197,94,0.3)">
           <div class="plugin-header">
-            <div class="plugin-icon" style="background:rgba(139,92,246,0.12)">🎵</div>
+            <div class="plugin-icon" style="background:rgba(234,88,8,0.12)">🎵</div>
             <div>
-              <div class="plugin-name">Max for Live Device</div>
-              <div class="plugin-version">v2.1.0 · Ableton Live 12</div>
+              <div class="plugin-name"><span class="led led-green"></span>Max for Live Device</div>
+              <div class="plugin-version">v2.1.0 · Ableton Live 12 · Installed 3d ago</div>
             </div>
-            <div class="plugin-status"><span class="status-connected">✓ Connected</span></div>
+            <div class="status-badge status-connected" style="margin-left:auto">✓ Connected</div>
           </div>
           <div class="plugin-body">
             <div class="config-row">
               <div><div class="config-label">API Endpoint</div><div class="config-desc">SoundHub API server URL</div></div>
-              <input class="config-input mono" value="https://api.soundhub.app/v1">
+              <input class="config-input" value="https://api.soundhub.app/v1">
             </div>
             <div class="config-row">
               <div><div class="config-label">Auth Token</div><div class="config-desc">Your personal API token</div></div>
-              <input class="config-input mono" type="password" value="snd_••••••••••••••••">
+              <input class="config-input" type="password" value="snd_••••••••••••••••">
             </div>
             <div class="config-row">
               <div><div class="config-label">Auto-sync projects</div><div class="config-desc">Automatically sync project data on save</div></div>
@@ -93,14 +119,14 @@
             </div>
             <div class="config-row">
               <div><div class="config-label">Waveform preview quality</div><div class="config-desc">Quality of inline waveform display</div></div>
-              <select class="form-select" style="width:140px"><option>Low</option><option selected>Medium</option><option>High</option></select>
+              <select class="form-select" style="width:120px"><option>Low</option><option selected>Medium</option><option>High</option></select>
             </div>
-            <div style="display:flex;gap:8px;margin-top:12px">
+            <div style="display:flex;gap:8px;margin-top:14px">
               <button class="btn btn-secondary">🔍 Test Connection</button>
               <button class="btn btn-secondary">📥 Check for Updates</button>
             </div>
-            <div class="test-result" style="background:rgba(34,197,94,0.08);color:var(--color-success)">
-              ✓ Connection successful — API v1 reachable, latency 42ms
+            <div class="test-result" style="background:rgba(34,197,94,0.06);color:#22c55e">
+              <span class="led led-green"></span> Connection successful — API v1 reachable, latency 42ms
             </div>
           </div>
         </div>
@@ -110,19 +136,19 @@
           <div class="plugin-header">
             <div class="plugin-icon" style="background:rgba(234,88,8,0.12)">🎸</div>
             <div>
-              <div class="plugin-name">REAPER ReaScript</div>
+              <div class="plugin-name"><span class="led led-gray"></span>REAPER ReaScript</div>
               <div class="plugin-version">v1.3.0 · REAPER 7</div>
             </div>
-            <div class="plugin-status"><span class="status-not-connected">○ Not Installed</span></div>
+            <div class="status-badge status-not-connected" style="margin-left:auto"><span class="led led-gray" style="margin-right:4px"></span>Not Installed</div>
           </div>
           <div class="plugin-body">
             <div class="config-row">
               <div><div class="config-label">Install ReaScript</div><div class="config-desc">Download and install the SoundHub script for REAPER</div></div>
-              <button class="btn btn-primary" style="font-size:11px">📥 Download Script</button>
+              <button class="btn btn-primary">📥 Download Script</button>
             </div>
             <div class="config-row">
               <div><div class="config-label">Script Path</div><div class="config-desc">Path to the installed ReaScript file</div></div>
-              <input class="config-input mono" placeholder="/path/to/soundhub_reaper.lua" style="width:280px">
+              <input class="config-input" placeholder="/path/to/soundhub_reaper.lua" style="width:280px">
             </div>
           </div>
         </div>
@@ -132,13 +158,13 @@
           <div class="plugin-header">
             <div class="plugin-icon" style="background:rgba(234,179,8,0.12)">🎹</div>
             <div>
-              <div class="plugin-name">FL Studio Integration</div>
+              <div class="plugin-name"><span class="led led-gray"></span>FL Studio Integration</div>
               <div class="plugin-version">Coming Soon</div>
             </div>
-            <div class="plugin-status"><span class="status-not-connected">○ Beta</span></div>
+            <div class="status-badge status-beta" style="margin-left:auto">Beta</div>
           </div>
           <div class="plugin-body">
-            <div style="text-align:center;padding:24px;color:var(--text-muted);font-size:13px">
+            <div style="text-align:center;padding:20px;color:#52525b;font-size:12px">
               FL Studio integration is currently in beta. Join the waitlist to get early access.
               <div style="margin-top:12px"><button class="btn btn-secondary">Join Waitlist</button></div>
             </div>

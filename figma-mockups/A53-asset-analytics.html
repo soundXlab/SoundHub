@@ -6,244 +6,275 @@
   <title>SoundHub — Asset Analytics</title>
   <link rel="stylesheet" href="design-system/shared.css">
   <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Inter',-apple-system,sans-serif; background:var(--bg-primary); color:var(--text-primary); overflow:hidden; height:100vh; }
+    .transport-bar {
+      height:40px; background:#111113; border-bottom:1px solid #27272a;
+      display:flex; align-items:center; padding:0 12px; gap:16px; font-size:11px;
+    }
+    .transport-logo { font-weight:800; font-size:13px; color:#ea5808; }
+    .transport-logo span { color:#e4e4e7; }
+    .transport-divider { width:1px; height:20px; background:#27272a; }
+    .transport-group { display:flex; align-items:center; gap:6px; }
+    .transport-label { color:#71717a; font-size:10px; text-transform:uppercase; letter-spacing:0.5px; }
+    .transport-value {
+      background:#0d0d0d; border:1px solid #27272a; border-radius:4px;
+      padding:2px 8px; font-family:'JetBrains Mono',monospace; font-size:12px;
+      font-weight:600; min-width:60px; text-align:center;
+    }
+    .transport-spacer { flex:1; }
+    .app-body { display:flex; height:calc(100vh - 40px); }
+    .sidebar {
+      width:240px; background:#111113; border-right:1px solid #27272a;
+      display:flex; flex-direction:column;
+    }
+    .sidebar-search { padding:8px; border-bottom:1px solid #27272a; }
+    .sidebar-search input {
+      width:100%; background:#0d0d0d; border:1px solid #27272a; border-radius:4px;
+      padding:6px 8px 6px 28px; font-size:11px; color:#e4e4e7; outline:none;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");
+      background-repeat:no-repeat; background-position:8px center;
+    }
+    .sidebar-nav { flex:1; overflow-y:auto; padding:4px 0; }
+    .sidebar-section { padding:8px 12px 4px; font-size:9px; color:#52525b; text-transform:uppercase; letter-spacing:1px; font-weight:700; }
+    .sidebar-item {
+      padding:6px 12px; font-size:11px; font-weight:500; color:#a1a1aa;
+      cursor:pointer; display:flex; align-items:center; gap:8px;
+      border-left:2px solid transparent; transition:all 0.1s;
+    }
+    .sidebar-item:hover { color:#e4e4e7; }
+    .sidebar-item.active { color:#ea5808; background:rgba(234,88,8,0.08); border-left-color:#ea5808; }
+    .content { flex:1; display:flex; flex-direction:column; min-width:0; overflow:hidden; }
+    .page-header {
+      padding:16px 24px; border-bottom:1px solid #27272a;
+      display:flex; align-items:center; justify-content:space-between;
+    }
+    .page-title { font-size:18px; font-weight:700; color:#e4e4e7; }
+    .page-scroll { flex:1; overflow-y:auto; padding:24px; }
+    .filter-bar { display:flex; gap:4px; margin-bottom:20px; }
+    .filter-btn {
+      padding:5px 10px; border-radius:4px; font-size:11px; font-weight:500;
+      cursor:pointer; border:1px solid #27272a; background:transparent;
+      color:#71717a; transition:all 0.1s;
+    }
+    .filter-btn:hover { color:#e4e4e7; border-color:#3f3f46; }
+    .filter-btn.active { background:#ea5808; color:#fff; border-color:#ea5808; }
+    /* Revenue cards */
+    .rev-card {
+      background:#111113; border:1px solid #27272a; border-radius:8px;
+      padding:16px; text-align:center; transition:all 0.15s; cursor:pointer;
+    }
+    .rev-card:hover { border-color:#3f3f46; transform:translateY(-1px); }
+    .rev-label { font-size:10px; color:#71717a; text-transform:uppercase; letter-spacing:0.5px; }
+    .rev-amount { font-size:28px; font-weight:800; font-family:'JetBrains Mono',monospace; margin:6px 0; }
+    .rev-change { font-size:10px; font-weight:600; }
+    .rev-change.up { color:#22c55e; }
+    /* Chart */
     .chart-card {
-      background: var(--bg-surface); border: 1px solid var(--border-default);
-      border-radius: var(--radius-lg); padding: 20px; margin-bottom: 16px;
+      background:#111113; border:1px solid #27272a; border-radius:8px; padding:16px;
     }
-    .chart-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-    .chart-title { font-size: 14px; font-weight: 700; }
-    .chart-bars { display: flex; align-items: flex-end; gap: 6px; height: 140px; padding: 0 8px; }
+    .chart-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+    .chart-title { font-size:13px; font-weight:700; color:#e4e4e7; }
+    .chart-bars { display:flex; align-items:flex-end; gap:4px; height:120px; }
     .chart-bar {
-      flex: 1; border-radius: 3px 3px 0 0; cursor: pointer; transition: all 0.15s;
-      position: relative;
+      flex:1; border-radius:2px 2px 0 0; cursor:pointer; transition:all 0.15s;
+      position:relative;
     }
-    .chart-bar:hover { opacity: 0.8; }
-    .chart-bar-label {
-      position: absolute; bottom: -16px; left: 50%; transform: translateX(-50%);
-      font-size: 9px; color: var(--text-muted); white-space: nowrap;
+    .chart-bar:hover { filter:brightness(1.3); }
+    .chart-bar:hover::after {
+      content:attr(data-value); position:absolute; top:-20px; left:50%; transform:translateX(-50%);
+      padding:2px 6px; background:#27272a; border-radius:3px; font-size:9px; color:#e4e4e7;
+      white-space:nowrap; font-family:'JetBrains Mono',monospace;
     }
-    .asset-list { display: flex; flex-direction: column; gap: 8px; }
+    /* Asset list */
     .asset-row {
-      display: flex; align-items: center; gap: 14px; padding: 12px 14px;
-      background: var(--bg-elevated); border: 1px solid var(--border-default);
-      border-radius: var(--radius-md); cursor: pointer; transition: all 0.15s;
+      display:flex; align-items:center; gap:14px; padding:10px 14px;
+      background:#0d0d0d; border:1px solid #27272a; border-radius:6px;
+      margin-bottom:6px; cursor:pointer; transition:all 0.15s;
     }
-    .asset-row:hover { border-color: var(--border-hover); }
-    .asset-icon { width: 36px; height: 36px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 16px; }
-    .asset-info { flex: 1; }
-    .asset-name { font-size: 13px; font-weight: 600; }
-    .asset-meta { font-size: 10px; color: var(--text-muted); }
-    .asset-stat { text-align: right; min-width: 60px; }
-    .asset-stat-value { font-size: 13px; font-weight: 600; font-family: var(--font-mono); }
-    .asset-stat-label { font-size: 9px; color: var(--text-muted); }
-    .mini-chart { display: flex; align-items: flex-end; gap: 1px; height: 24px; }
-    .mini-bar { flex: 1; background: var(--brand-primary); border-radius: 1px; opacity: 0.6; }
-    .revenue-card {
-      background: var(--bg-surface); border: 1px solid var(--border-default);
-      border-radius: var(--radius-lg); padding: 20px; text-align: center;
+    .asset-row:hover { border-color:#3f3f46; background:#141414; }
+    .asset-icon {
+      width:36px; height:36px; border-radius:4px; display:flex;
+      align-items:center; justify-content:center; font-size:16px; flex-shrink:0;
     }
-    .revenue-amount { font-size: 32px; font-weight: 800; font-family: var(--font-mono); margin: 8px 0; }
-    .revenue-label { font-size: 11px; color: var(--text-muted); }
+    .asset-info { flex:1; }
+    .asset-name { font-size:12px; font-weight:600; color:#e4e4e7; }
+    .asset-meta { font-size:10px; color:#52525b; }
+    .asset-stat { text-align:right; min-width:60px; }
+    .asset-stat-value { font-size:12px; font-weight:600; font-family:'JetBrains Mono',monospace; color:#e4e4e7; }
+    .asset-stat-label { font-size:9px; color:#52525b; }
+    .sparkline { display:flex; align-items:flex-end; gap:1px; height:24px; }
+    .spark-bar { flex:1; background:#ea5808; border-radius:1px; opacity:0.6; transition:opacity 0.15s; }
+    .asset-row:hover .spark-bar { opacity:1; }
+    /* Country */
+    .country-row { display:flex; align-items:center; gap:10px; padding:6px 0; }
+    .country-bar-bg { width:120px; height:5px; background:#1a1a1a; border-radius:3px; }
+    .country-bar-fill { height:100%; border-radius:3px; }
   </style>
 </head>
 <body>
-  <div class="app-layout">
-    <aside class="sidebar">
-      <div class="sidebar-logo"><div class="logo-icon">S</div><div class="logo-text">SoundHub</div></div>
-      <nav class="sidebar-nav">
-        <div class="sidebar-section-label">Main</div>
-        <a class="sidebar-item" href="#"><span class="icon">📊</span> Dashboard</a>
-        <a class="sidebar-item" href="#"><span class="icon">📁</span> Projects</a>
-        <a class="sidebar-item" href="#"><span class="icon">🛒</span> Marketplace</a>
-        <div class="sidebar-section-label">Workspace</div>
-        <a class="sidebar-item active" href="#"><span class="icon">📈</span> Analytics</a>
-        <a class="sidebar-item" href="#"><span class="icon">💬</span> Reviews</a>
-        <div class="sidebar-section-label">Account</div>
-        <a class="sidebar-item" href="#"><span class="icon">⚙️</span> Settings</a>
-      </nav>
-    </aside>
-    <div class="main-content">
-      <header class="topbar">
-        <div class="topbar-search"><span class="search-icon">🔍</span><input type="text" placeholder="Search..."></div>
-        <div class="topbar-right"><div class="topbar-icon-btn">🔔<span class="notif-dot"></span></div><div class="topbar-avatar">P</div></div>
-      </header>
-      <div class="page">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
-          <div>
-            <h1 class="page-title" style="margin-bottom:4px">Asset Analytics</h1>
-            <p class="page-subtitle">Performance metrics for your marketplace assets</p>
-          </div>
-          <div style="display:flex;gap:4px">
-            <div style="padding:5px 10px;border-radius:4px;font-size:11px;font-weight:600;background:var(--brand-primary);color:#fff;cursor:pointer">30d</div>
-            <div style="padding:5px 10px;border-radius:4px;font-size:11px;color:var(--text-muted);cursor:pointer">90d</div>
-            <div style="padding:5px 10px;border-radius:4px;font-size:11px;color:var(--text-muted);cursor:pointer">All</div>
-          </div>
+  <div class="transport-bar">
+    <div class="transport-logo">Sound<span>Hub</span></div>
+    <div class="transport-divider"></div>
+    <div class="transport-group"><span class="transport-label">Revenue</span><div class="transport-value" style="color:#22c55e">$482</div></div>
+    <div class="transport-group"><span class="transport-label">Downloads</span><div class="transport-value">1,247</div></div>
+    <div class="transport-group"><span class="transport-label">Views</span><div class="transport-value">8,432</div></div>
+    <div class="transport-spacer"></div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#71717a">ASSET ANALYTICS</div>
+  </div>
+  <div class="app-body">
+    <div class="sidebar">
+      <div class="sidebar-search"><input type="text" placeholder="Search..."></div>
+      <div class="sidebar-nav">
+        <div class="sidebar-section">Main</div>
+        <div class="sidebar-item"><span class="icon">📊</span> Dashboard</div>
+        <div class="sidebar-item"><span class="icon">📁</span> Projects</div>
+        <div class="sidebar-item"><span class="icon">🛒</span> Marketplace</div>
+        <div class="sidebar-section">Workspace</div>
+        <div class="sidebar-item active"><span class="icon">📈</span> Analytics</div>
+        <div class="sidebar-item"><span class="icon">💬</span> Reviews</div>
+        <div class="sidebar-section">Account</div>
+        <div class="sidebar-item"><span class="icon">⚙️</span> Settings</div>
+      </div>
+    </div>
+    <div class="content">
+      <div class="page-header">
+        <div class="page-title">Asset Analytics</div>
+        <div class="filter-bar" style="margin:0">
+          <div class="filter-btn active">30d</div>
+          <div class="filter-btn">90d</div>
+          <div class="filter-btn">All</div>
         </div>
-
+      </div>
+      <div class="page-scroll">
         <!-- Revenue Cards -->
-        <div class="grid-4" style="margin-bottom:24px">
-          <div class="revenue-card">
-            <div class="revenue-label">Total Revenue</div>
-            <div class="revenue-amount" style="color:var(--color-success)">$482</div>
-            <div class="stat-change up">+$67 vs last month</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px">
+          <div class="rev-card">
+            <div class="rev-label">Total Revenue</div>
+            <div class="rev-amount" style="color:#22c55e">$482</div>
+            <div class="rev-change up">+$67 vs last month</div>
           </div>
-          <div class="revenue-card">
-            <div class="revenue-label">Total Downloads</div>
-            <div class="revenue-amount">1,247</div>
-            <div class="stat-change up">+189 this month</div>
+          <div class="rev-card">
+            <div class="rev-label">Total Downloads</div>
+            <div class="rev-amount" style="color:#e4e4e7">1,247</div>
+            <div class="rev-change up">+189 this month</div>
           </div>
-          <div class="revenue-card">
-            <div class="revenue-label">Total Views</div>
-            <div class="revenue-amount">8,432</div>
-            <div class="stat-change up">+1,204 this month</div>
+          <div class="rev-card">
+            <div class="rev-label">Total Views</div>
+            <div class="rev-amount" style="color:#e4e4e7">8,432</div>
+            <div class="rev-change up">+1,204 this month</div>
           </div>
-          <div class="revenue-card">
-            <div class="revenue-label">Conversion Rate</div>
-            <div class="revenue-amount">14.8%</div>
-            <div class="stat-change up">+2.1% vs last month</div>
+          <div class="rev-card">
+            <div class="rev-label">Conversion Rate</div>
+            <div class="rev-amount" style="color:#eab308">14.8%</div>
+            <div class="rev-change up">+2.1% vs last month</div>
           </div>
         </div>
 
-        <div class="grid-2" style="gap:16px;margin-bottom:16px">
-          <!-- Downloads Chart -->
+        <!-- Charts -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
           <div class="chart-card">
             <div class="chart-header">
               <span class="chart-title">📥 Downloads</span>
-              <span style="font-size:11px;color:var(--text-muted)">Per day (last 30 days)</span>
+              <span style="font-size:10px;color:#52525b">Per day (last 30d)</span>
             </div>
-            <div class="chart-bars" style="margin-bottom:16px">
-              <div class="chart-bar" style="height:30%;background:var(--brand-primary)"></div>
-              <div class="chart-bar" style="height:45%;background:var(--brand-primary)"></div>
-              <div class="chart-bar" style="height:35%;background:var(--brand-primary)"></div>
-              <div class="chart-bar" style="height:60%;background:var(--brand-primary)"></div>
-              <div class="chart-bar" style="height:50%;background:var(--brand-primary)"></div>
-              <div class="chart-bar" style="height:70%;background:var(--brand-primary)"></div>
-              <div class="chart-bar" style="height:40%;background:var(--brand-primary)"></div>
-              <div class="chart-bar" style="height:55%;background:var(--brand-primary)"></div>
-              <div class="chart-bar" style="height:65%;background:var(--brand-primary)"></div>
-              <div class="chart-bar" style="height:80%;background:var(--brand-primary)"></div>
-              <div class="chart-bar" style="height:45%;background:var(--brand-primary)"></div>
-              <div class="chart-bar" style="height:75%;background:var(--brand-primary)"></div>
-              <div class="chart-bar" style="height:90%;background:var(--brand-primary)"></div>
-              <div class="chart-bar" style="height:60%;background:var(--brand-primary)"></div>
-              <div class="chart-bar" style="height:50%;background:var(--brand-primary)"></div>
+            <div class="chart-bars">
+              <div class="chart-bar" style="height:30%;background:#ea5808" data-value="12"></div>
+              <div class="chart-bar" style="height:45%;background:#ea5808" data-value="18"></div>
+              <div class="chart-bar" style="height:35%;background:#ea5808" data-value="14"></div>
+              <div class="chart-bar" style="height:60%;background:#ea5808" data-value="24"></div>
+              <div class="chart-bar" style="height:50%;background:#ea5808" data-value="20"></div>
+              <div class="chart-bar" style="height:70%;background:#ea5808" data-value="28"></div>
+              <div class="chart-bar" style="height:40%;background:#ea5808" data-value="16"></div>
+              <div class="chart-bar" style="height:55%;background:#ea5808" data-value="22"></div>
+              <div class="chart-bar" style="height:65%;background:#ea5808" data-value="26"></div>
+              <div class="chart-bar" style="height:80%;background:#ea5808" data-value="32"></div>
+              <div class="chart-bar" style="height:45%;background:#ea5808" data-value="18"></div>
+              <div class="chart-bar" style="height:75%;background:#ea5808" data-value="30"></div>
+              <div class="chart-bar" style="height:90%;background:#ea5808" data-value="36"></div>
+              <div class="chart-bar" style="height:60%;background:#ea5808" data-value="24"></div>
+              <div class="chart-bar" style="height:50%;background:#ea5808" data-value="20"></div>
             </div>
-            <div style="text-align:center;font-size:11px;color:var(--text-muted)">← Last 30 days →</div>
           </div>
-
-          <!-- Revenue Chart -->
           <div class="chart-card">
             <div class="chart-header">
               <span class="chart-title">💰 Revenue</span>
-              <span style="font-size:11px;color:var(--text-muted)">Per week (last 12 weeks)</span>
+              <span style="font-size:10px;color:#52525b">Per week (last 12 weeks)</span>
             </div>
-            <div class="chart-bars" style="margin-bottom:16px">
-              <div class="chart-bar" style="height:25%;background:var(--color-success)"></div>
-              <div class="chart-bar" style="height:40%;background:var(--color-success)"></div>
-              <div class="chart-bar" style="height:35%;background:var(--color-success)"></div>
-              <div class="chart-bar" style="height:55%;background:var(--color-success)"></div>
-              <div class="chart-bar" style="height:50%;background:var(--color-success)"></div>
-              <div class="chart-bar" style="height:65%;background:var(--color-success)"></div>
-              <div class="chart-bar" style="height:45%;background:var(--color-success)"></div>
-              <div class="chart-bar" style="height:70%;background:var(--color-success)"></div>
-              <div class="chart-bar" style="height:60%;background:var(--color-success)"></div>
-              <div class="chart-bar" style="height:85%;background:var(--color-success)"></div>
-              <div class="chart-bar" style="height:75%;background:var(--color-success)"></div>
-              <div class="chart-bar" style="height:90%;background:var(--color-success)"></div>
+            <div class="chart-bars">
+              <div class="chart-bar" style="height:25%;background:#22c55e" data-value="$24"></div>
+              <div class="chart-bar" style="height:40%;background:#22c55e" data-value="$38"></div>
+              <div class="chart-bar" style="height:35%;background:#22c55e" data-value="$32"></div>
+              <div class="chart-bar" style="height:55%;background:#22c55e" data-value="$52"></div>
+              <div class="chart-bar" style="height:50%;background:#22c55e" data-value="$48"></div>
+              <div class="chart-bar" style="height:65%;background:#22c55e" data-value="$62"></div>
+              <div class="chart-bar" style="height:45%;background:#22c55e" data-value="$42"></div>
+              <div class="chart-bar" style="height:70%;background:#22c55e" data-value="$67"></div>
+              <div class="chart-bar" style="height:60%;background:#22c55e" data-value="$58"></div>
+              <div class="chart-bar" style="height:85%;background:#22c55e" data-value="$82"></div>
+              <div class="chart-bar" style="height:75%;background:#22c55e" data-value="$72"></div>
+              <div class="chart-bar" style="height:90%;background:#22c55e" data-value="$88"></div>
             </div>
-            <div style="text-align:center;font-size:11px;color:var(--text-muted)">← Last 12 weeks →</div>
           </div>
         </div>
 
         <!-- Top Assets -->
-        <div class="chart-card">
+        <div class="chart-card" style="margin-bottom:20px">
           <div class="chart-header">
             <span class="chart-title">🏆 Top Performing Assets</span>
-            <span style="font-size:11px;color:var(--text-muted)">Sorted by downloads</span>
+            <span style="font-size:10px;color:#52525b">Sorted by downloads</span>
           </div>
-          <div class="asset-list">
-            <div class="asset-row">
-              <div class="asset-icon" style="background:rgba(139,92,246,0.12)">🎵</div>
-              <div class="asset-info">
-                <div class="asset-name">Lo-Fi Drums Pack</div>
-                <div class="asset-meta">WAV · 24bit · Free</div>
-              </div>
-              <div class="asset-stat"><div class="asset-stat-value">487</div><div class="asset-stat-label">downloads</div></div>
-              <div class="asset-stat"><div class="asset-stat-value">3.2k</div><div class="asset-stat-label">views</div></div>
-              <div class="asset-stat"><div class="asset-stat-value" style="color:var(--color-success)">15.2%</div><div class="asset-stat-label">conversion</div></div>
-              <div class="mini-chart"><div class="mini-bar" style="height:40%"></div><div class="mini-bar" style="height:60%"></div><div class="mini-bar" style="height:50%"></div><div class="mini-bar" style="height:80%"></div><div class="mini-bar" style="height:70%"></div><div class="mini-bar" style="height:90%"></div><div class="mini-bar" style="height:85%"></div></div>
+          <div class="asset-row">
+            <div class="asset-icon" style="background:rgba(234,88,8,0.12)">🎵</div>
+            <div class="asset-info">
+              <div class="asset-name">Lo-Fi Drums Pack</div>
+              <div class="asset-meta">WAV · 24bit · Free · ★ 4.8</div>
             </div>
-            <div class="asset-row">
-              <div class="asset-icon" style="background:rgba(6,182,212,0.12)">🎵</div>
-              <div class="asset-info">
-                <div class="asset-name">Ambient Pad Textures</div>
-                <div class="asset-meta">WAV · 16bit · $4.99</div>
-              </div>
-              <div class="asset-stat"><div class="asset-stat-value">312</div><div class="asset-stat-label">downloads</div></div>
-              <div class="asset-stat"><div class="asset-stat-value">2.1k</div><div class="asset-stat-label">views</div></div>
-              <div class="asset-stat"><div class="asset-stat-value" style="color:var(--color-success)">14.9%</div><div class="asset-stat-label">conversion</div></div>
-              <div class="mini-chart"><div class="mini-bar" style="height:30%"></div><div class="mini-bar" style="height:50%"></div><div class="mini-bar" style="height:45%"></div><div class="mini-bar" style="height:65%"></div><div class="mini-bar" style="height:55%"></div><div class="mini-bar" style="height:75%"></div><div class="mini-bar" style="height:70%"></div></div>
+            <div class="asset-stat"><div class="asset-stat-value" style="color:#22c55e">487</div><div class="asset-stat-label">downloads</div></div>
+            <div class="asset-stat"><div class="asset-stat-value">3.2k</div><div class="asset-stat-label">views</div></div>
+            <div class="asset-stat"><div class="asset-stat-value" style="color:#22c55e">15.2%</div><div class="asset-stat-label">conversion</div></div>
+            <div class="sparkline"><div class="spark-bar" style="height:40%"></div><div class="spark-bar" style="height:60%"></div><div class="spark-bar" style="height:50%"></div><div class="spark-bar" style="height:80%"></div><div class="spark-bar" style="height:70%"></div><div class="spark-bar" style="height:90%"></div><div class="spark-bar" style="height:85%"></div></div>
+          </div>
+          <div class="asset-row">
+            <div class="asset-icon" style="background:rgba(6,182,212,0.12)">🎵</div>
+            <div class="asset-info">
+              <div class="asset-name">Ambient Pad Textures</div>
+              <div class="asset-meta">WAV · 16bit · $4.99 · ★ 4.6</div>
             </div>
-            <div class="asset-row">
-              <div class="asset-icon" style="background:rgba(234,88,8,0.12)">🎵</div>
-              <div class="asset-info">
-                <div class="asset-name">808 Bass Kit</div>
-                <div class="asset-meta">WAV · 32bit · $9.99</div>
-              </div>
-              <div class="asset-stat"><div class="asset-stat-value">245</div><div class="asset-stat-label">downloads</div></div>
-              <div class="asset-stat"><div class="asset-stat-value">1.8k</div><div class="asset-stat-label">views</div></div>
-              <div class="asset-stat"><div class="asset-stat-value" style="color:var(--color-success)">13.6%</div><div class="asset-stat-label">conversion</div></div>
-              <div class="mini-chart"><div class="mini-bar" style="height:35%"></div><div class="mini-bar" style="height:55%"></div><div class="mini-bar" style="height:40%"></div><div class="mini-bar" style="height:70%"></div><div class="mini-bar" style="height:60%"></div><div class="mini-bar" style="height:80%"></div><div class="mini-bar" style="height:65%"></div></div>
+            <div class="asset-stat"><div class="asset-stat-value" style="color:#22c55e">312</div><div class="asset-stat-label">downloads</div></div>
+            <div class="asset-stat"><div class="asset-stat-value">2.1k</div><div class="asset-stat-label">views</div></div>
+            <div class="asset-stat"><div class="asset-stat-value" style="color:#22c55e">14.9%</div><div class="asset-stat-label">conversion</div></div>
+            <div class="sparkline"><div class="spark-bar" style="height:30%;background:#06b6d4"></div><div class="spark-bar" style="height:50%;background:#06b6d4"></div><div class="spark-bar" style="height:45%;background:#06b6d4"></div><div class="spark-bar" style="height:65%;background:#06b6d4"></div><div class="spark-bar" style="height:55%;background:#06b6d4"></div><div class="spark-bar" style="height:75%;background:#06b6d4"></div><div class="spark-bar" style="height:70%;background:#06b6d4"></div></div>
+          </div>
+          <div class="asset-row">
+            <div class="asset-icon" style="background:rgba(234,88,8,0.12)">🎵</div>
+            <div class="asset-info">
+              <div class="asset-name">808 Bass Kit</div>
+              <div class="asset-meta">WAV · 32bit · $9.99 · ★ 4.9</div>
             </div>
-            <div class="asset-row">
-              <div class="asset-icon" style="background:rgba(234,179,8,0.12)">🎵</div>
-              <div class="asset-info">
-                <div class="asset-name">Vinyl Classics Vol.2</div>
-                <div class="asset-meta">Ableton · 24bit · $29.99</div>
-              </div>
-              <div class="asset-stat"><div class="asset-stat-value">89</div><div class="asset-stat-label">downloads</div></div>
-              <div class="asset-stat"><div class="asset-stat-value">890</div><div class="asset-stat-label">views</div></div>
-              <div class="asset-stat"><div class="asset-stat-value" style="color:var(--color-success)">10.0%</div><div class="asset-stat-label">conversion</div></div>
-              <div class="mini-chart"><div class="mini-bar" style="height:20%"></div><div class="mini-bar" style="height:35%"></div><div class="mini-bar" style="height:30%"></div><div class="mini-bar" style="height:50%"></div><div class="mini-bar" style="height:45%"></div><div class="mini-bar" style="height:60%"></div><div class="mini-bar" style="height:55%"></div></div>
-            </div>
-            <div class="asset-row">
-              <div class="asset-icon" style="background:rgba(34,197,94,0.12)">🎵</div>
-              <div class="asset-info">
-                <div class="asset-name">Organic Percussion</div>
-                <div class="asset-meta">FLAC · 24bit · $7.99</div>
-              </div>
-              <div class="asset-stat"><div class="asset-stat-value">114</div><div class="asset-stat-label">downloads</div></div>
-              <div class="asset-stat"><div class="asset-stat-value">1.1k</div><div class="asset-stat-label">views</div></div>
-              <div class="asset-stat"><div class="asset-stat-value" style="color:var(--color-success)">10.4%</div><div class="asset-stat-label">conversion</div></div>
-              <div class="mini-chart"><div class="mini-bar" style="height:25%"></div><div class="mini-bar" style="height:40%"></div><div class="mini-bar" style="height:35%"></div><div class="mini-bar" style="height:55%"></div><div class="mini-bar" style="height:50%"></div><div class="mini-bar" style="height:65%"></div><div class="mini-bar" style="height:60%"></div></div>
-            </div>
+            <div class="asset-stat"><div class="asset-stat-value" style="color:#22c55e">245</div><div class="asset-stat-label">downloads</div></div>
+            <div class="asset-stat"><div class="asset-stat-value">1.8k</div><div class="asset-stat-label">views</div></div>
+            <div class="asset-stat"><div class="asset-stat-value" style="color:#22c55e">13.6%</div><div class="asset-stat-label">conversion</div></div>
+            <div class="sparkline"><div class="spark-bar" style="height:35%"></div><div class="spark-bar" style="height:55%"></div><div class="spark-bar" style="height:40%"></div><div class="spark-bar" style="height:70%"></div><div class="spark-bar" style="height:60%"></div><div class="spark-bar" style="height:80%"></div><div class="spark-bar" style="height:65%"></div></div>
           </div>
         </div>
 
-        <!-- Geographic / Device -->
-        <div class="grid-2" style="gap:16px">
+        <!-- Geographic -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
           <div class="chart-card">
-            <div class="chart-header">
-              <span class="chart-title">🌍 Top Countries</span>
-            </div>
-            <div style="display:flex;flex-direction:column;gap:8px">
-              <div style="display:flex;align-items:center;gap:10px"><span style="font-size:18px">🇺🇸</span><span style="flex:1;font-size:12px">United States</span><span style="font-size:12px;font-weight:600;font-family:var(--font-mono)">42%</span><div style="width:120px;height:6px;background:var(--bg-elevated);border-radius:3px"><div style="width:42%;height:100%;background:var(--brand-primary);border-radius:3px"></div></div></div>
-              <div style="display:flex;align-items:center;gap:10px"><span style="font-size:18px">🇬🇧</span><span style="flex:1;font-size:12px">United Kingdom</span><span style="font-size:12px;font-weight:600;font-family:var(--font-mono)">18%</span><div style="width:120px;height:6px;background:var(--bg-elevated);border-radius:3px"><div style="width:18%;height:100%;background:var(--brand-primary);border-radius:3px"></div></div></div>
-              <div style="display:flex;align-items:center;gap:10px"><span style="font-size:18px">🇩🇪</span><span style="flex:1;font-size:12px">Germany</span><span style="font-size:12px;font-weight:600;font-family:var(--font-mono)">12%</span><div style="width:120px;height:6px;background:var(--bg-elevated);border-radius:3px"><div style="width:12%;height:100%;background:var(--brand-primary);border-radius:3px"></div></div></div>
-              <div style="display:flex;align-items:center;gap:10px"><span style="font-size:18px">🇯🇵</span><span style="flex:1;font-size:12px">Japan</span><span style="font-size:12px;font-weight:600;font-family:var(--font-mono)">9%</span><div style="width:120px;height:6px;background:var(--bg-elevated);border-radius:3px"><div style="width:9%;height:100%;background:var(--brand-primary);border-radius:3px"></div></div></div>
-              <div style="display:flex;align-items:center;gap:10px"><span style="font-size:18px">🇧🇷</span><span style="flex:1;font-size:12px">Brazil</span><span style="font-size:12px;font-weight:600;font-family:var(--font-mono)">7%</span><div style="width:120px;height:6px;background:var(--bg-elevated);border-radius:3px"><div style="width:7%;height:100%;background:var(--brand-primary);border-radius:3px"></div></div></div>
-            </div>
+            <div class="chart-header"><span class="chart-title">🌍 Top Countries</span></div>
+            <div class="country-row"><span style="font-size:16px">🇺🇸</span><span style="flex:1;font-size:11px;color:#a1a1aa">United States</span><span style="font-size:11px;font-weight:600;font-family:'JetBrains Mono',monospace;color:#e4e4e7">42%</span><div class="country-bar-bg"><div class="country-bar-fill" style="width:42%;background:#ea5808"></div></div></div>
+            <div class="country-row"><span style="font-size:16px">🇬🇧</span><span style="flex:1;font-size:11px;color:#a1a1aa">United Kingdom</span><span style="font-size:11px;font-weight:600;font-family:'JetBrains Mono',monospace;color:#e4e4e7">18%</span><div class="country-bar-bg"><div class="country-bar-fill" style="width:18%;background:#ea5808"></div></div></div>
+            <div class="country-row"><span style="font-size:16px">🇩🇪</span><span style="flex:1;font-size:11px;color:#a1a1aa">Germany</span><span style="font-size:11px;font-weight:600;font-family:'JetBrains Mono',monospace;color:#e4e4e7">12%</span><div class="country-bar-bg"><div class="country-bar-fill" style="width:12%;background:#ea5808"></div></div></div>
+            <div class="country-row"><span style="font-size:16px">🇯🇵</span><span style="flex:1;font-size:11px;color:#a1a1aa">Japan</span><span style="font-size:11px;font-weight:600;font-family:'JetBrains Mono',monospace;color:#e4e4e7">9%</span><div class="country-bar-bg"><div class="country-bar-fill" style="width:9%;background:#ea5808"></div></div></div>
+            <div class="country-row"><span style="font-size:16px">🇧🇷</span><span style="flex:1;font-size:11px;color:#a1a1aa">Brazil</span><span style="font-size:11px;font-weight:600;font-family:'JetBrains Mono',monospace;color:#e4e4e7">7%</span><div class="country-bar-bg"><div class="country-bar-fill" style="width:7%;background:#ea5808"></div></div></div>
           </div>
           <div class="chart-card">
-            <div class="chart-header">
-              <span class="chart-title">📱 Top Sources</span>
-            </div>
-            <div style="display:flex;flex-direction:column;gap:8px">
-              <div style="display:flex;align-items:center;gap:10px"><span style="font-size:18px">🖥️</span><span style="flex:1;font-size:12px">Web Browser</span><span style="font-size:12px;font-weight:600;font-family:var(--font-mono)">54%</span><div style="width:120px;height:6px;background:var(--bg-elevated);border-radius:3px"><div style="width:54%;height:100%;background:var(--color-success);border-radius:3px"></div></div></div>
-              <div style="display:flex;align-items:center;gap:10px"><span style="font-size:18px">🎛️</span><span style="flex:1;font-size:12px">DAW Plugin</span><span style="font-size:12px;font-weight:600;font-family:var(--font-mono)">28%</span><div style="width:120px;height:6px;background:var(--bg-elevated);border-radius:3px"><div style="width:28%;height:100%;background:var(--color-success);border-radius:3px"></div></div></div>
-              <div style="display:flex;align-items:center;gap:10px"><span style="font-size:18px">💻</span><span style="flex:1;font-size:12px">CLI (snd)</span><span style="font-size:12px;font-weight:600;font-family:var(--font-mono)">12%</span><div style="width:120px;height:6px;background:var(--bg-elevated);border-radius:3px"><div style="width:12%;height:100%;background:var(--color-success);border-radius:3px"></div></div></div>
-              <div style="display:flex;align-items:center;gap:10px"><span style="font-size:18px">📱</span><span style="flex:1;font-size:12px">Mobile</span><span style="font-size:12px;font-weight:600;font-family:var(--font-mono)">6%</span><div style="width:120px;height:6px;background:var(--bg-elevated);border-radius:3px"><div style="width:6%;height:100%;background:var(--color-success);border-radius:3px"></div></div></div>
-            </div>
+            <div class="chart-header"><span class="chart-title">📱 Top Sources</span></div>
+            <div class="country-row"><span style="font-size:16px">🖥️</span><span style="flex:1;font-size:11px;color:#a1a1aa">Web Browser</span><span style="font-size:11px;font-weight:600;font-family:'JetBrains Mono',monospace;color:#e4e4e7">54%</span><div class="country-bar-bg"><div class="country-bar-fill" style="width:54%;background:#22c55e"></div></div></div>
+            <div class="country-row"><span style="font-size:16px">🎛️</span><span style="flex:1;font-size:11px;color:#a1a1aa">DAW Plugin</span><span style="font-size:11px;font-weight:600;font-family:'JetBrains Mono',monospace;color:#e4e4e7">28%</span><div class="country-bar-bg"><div class="country-bar-fill" style="width:28%;background:#22c55e"></div></div></div>
+            <div class="country-row"><span style="font-size:16px">💻</span><span style="flex:1;font-size:11px;color:#a1a1aa">CLI (snd)</span><span style="font-size:11px;font-weight:600;font-family:'JetBrains Mono',monospace;color:#e4e4e7">12%</span><div class="country-bar-bg"><div class="country-bar-fill" style="width:12%;background:#22c55e"></div></div></div>
+            <div class="country-row"><span style="font-size:16px">📱</span><span style="flex:1;font-size:11px;color:#a1a1aa">Mobile</span><span style="font-size:11px;font-weight:600;font-family:'JetBrains Mono',monospace;color:#e4e4e7">6%</span><div class="country-bar-bg"><div class="country-bar-fill" style="width:6%;background:#22c55e"></div></div></div>
           </div>
         </div>
       </div>

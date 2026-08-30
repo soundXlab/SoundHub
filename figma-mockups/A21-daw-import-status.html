@@ -6,119 +6,119 @@
   <title>SoundHub — DAW Import Status</title>
   <link rel="stylesheet" href="design-system/shared.css">
   <style>
-    .import-card {
-      background: var(--bg-surface); border: 1px solid var(--border-default);
-      border-radius: var(--radius-lg); padding: 20px; margin-bottom: 12px;
-    }
-    .import-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-    .import-file { display: flex; align-items: center; gap: 10px; }
-    .import-icon { width: 40px; height: 40px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 18px; }
-    .import-name { font-size: 13px; font-weight: 600; }
-    .import-meta { font-size: 11px; color: var(--text-muted); }
-    .import-progress { margin-bottom: 12px; }
-    .progress-track { width: 100%; height: 6px; background: var(--bg-elevated); border-radius: 3px; overflow: hidden; }
-    .progress-fill { height: 100%; border-radius: 3px; transition: width 0.3s; }
-    .import-steps { display: flex; gap: 8px; flex-wrap: wrap; }
-    .import-step {
-      display: flex; align-items: center; gap: 6px; padding: 4px 10px;
-      background: var(--bg-elevated); border-radius: 4px; font-size: 11px;
-      color: var(--text-muted);
-    }
-    .import-step.done { color: var(--color-success); }
-    .import-step.active { color: var(--brand-primary); background: rgba(139,92,246,0.08); }
-    .import-step.failed { color: var(--color-error); }
-    .track-list { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-default); }
-    .track-row { display: flex; align-items: center; gap: 10px; padding: 6px 0; font-size: 12px; }
-    .track-name { flex: 1; color: var(--text-secondary); }
-    .track-info { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Inter',-apple-system,sans-serif; background:var(--bg-primary); color:var(--text-primary); overflow:hidden; height:100vh; }
+    .transport-bar { height:40px; background:#111113; border-bottom:1px solid #27272a; display:flex; align-items:center; padding:0 12px; gap:16px; font-size:11px; }
+    .transport-logo { font-weight:800; font-size:13px; color:#ea5808; }
+    .transport-logo span { color:#e4e4e7; }
+    .transport-divider { width:1px; height:20px; background:#27272a; }
+    .transport-spacer { flex:1; }
+    .app-body { display:flex; height:calc(100vh - 40px); }
+    .sidebar { width:240px; background:#111113; border-right:1px solid #27272a; display:flex; flex-direction:column; }
+    .sidebar-search { padding:8px; border-bottom:1px solid #27272a; }
+    .sidebar-search input { width:100%; background:#0d0d0d; border:1px solid #27272a; border-radius:4px; padding:6px 8px 6px 28px; font-size:11px; color:#e4e4e7; outline:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:8px center; }
+    .sidebar-nav { flex:1; overflow-y:auto; padding:4px 0; }
+    .sidebar-section { padding:8px 12px 4px; font-size:9px; color:#52525b; text-transform:uppercase; letter-spacing:1px; font-weight:700; }
+    .sidebar-item { padding:6px 12px; font-size:11px; font-weight:500; color:#a1a1aa; cursor:pointer; display:flex; align-items:center; gap:8px; border-left:2px solid transparent; transition:all 0.1s; }
+    .sidebar-item:hover { color:#e4e4e7; }
+    .sidebar-item.active { color:#ea5808; background:rgba(234,88,8,0.08); border-left-color:#ea5808; }
+    .content { flex:1; display:flex; flex-direction:column; min-width:0; overflow:hidden; }
+    .page-header { padding:16px 24px; border-bottom:1px solid #27272a; display:flex; align-items:center; justify-content:space-between; }
+    .page-title { font-size:18px; font-weight:700; color:#e4e4e7; }
+    .page-scroll { flex:1; overflow-y:auto; padding:24px; }
+    .import-card { background:#111113; border:1px solid #27272a; border-radius:8px; padding:16px; margin-bottom:12px; transition:border-color 0.15s; }
+    .import-card:hover { border-color:#3f3f46; }
+    .import-header { display:flex; align-items:center; gap:12px; margin-bottom:12px; }
+    .import-icon { width:40px; height:40px; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
+    .import-name { font-size:13px; font-weight:600; color:#e4e4e7; }
+    .import-meta { font-size:10px; color:#52525b; }
+    .import-badge { padding:3px 8px; border-radius:4px; font-size:9px; font-weight:600; }
+    .progress-track { width:100%; height:6px; background:#1a1a1a; border-radius:3px; overflow:hidden; margin-top:8px; }
+    .progress-fill { height:100%; border-radius:3px; transition:width 0.3s; }
+    .step-row { display:flex; gap:6px; flex-wrap:wrap; margin-top:12px; }
+    .step { display:flex; align-items:center; gap:5px; padding:4px 10px; background:#0d0d0d; border:1px solid #27272a; border-radius:4px; font-size:10px; color:#52525b; transition:all 0.15s; }
+    .step.done { color:#22c55e; border-color:rgba(34,197,94,0.3); background:rgba(34,197,94,0.05); }
+    .step.active { color:#ea5808; border-color:rgba(234,88,8,0.3); background:rgba(234,88,8,0.05); animation:pulse-step 1.5s infinite; }
+    .step.failed { color:#ef4444; border-color:rgba(239,68,68,0.3); }
+    @keyframes pulse-step { 0%,100%{opacity:1} 50%{opacity:0.6} }
+    .track-row { display:flex; align-items:center; gap:10px; padding:6px 0; font-size:11px; border-bottom:1px solid #1a1a1a; }
+    .track-row:last-child { border-bottom:none; }
+    .track-name { flex:1; color:#a1a1aa; }
+    .track-info { font-family:'JetBrains Mono',monospace; font-size:10px; color:#52525b; }
+    .error-box { padding:10px 14px; background:rgba(239,68,68,0.05); border:1px solid rgba(239,68,68,0.2); border-radius:4px; font-size:11px; color:#ef4444; margin-top:10px; }
   </style>
 </head>
 <body>
-  <div class="app-layout">
-    <aside class="sidebar">
-      <div class="sidebar-logo"><div class="logo-icon">S</div><div class="logo-text">SoundHub</div></div>
-      <nav class="sidebar-nav">
-        <div class="sidebar-section-label">Main</div>
-        <a class="sidebar-item" href="#"><span class="icon">📊</span> Dashboard</a>
-        <a class="sidebar-item" href="#"><span class="icon">📁</span> Projects</a>
-        <a class="sidebar-item active" href="#"><span class="icon">⬆️</span> Upload</a>
-        <div class="sidebar-section-label">Workspace</div>
-        <a class="sidebar-item" href="#"><span class="icon">💬</span> Reviews</a>
-        <div class="sidebar-section-label">Account</div>
-        <a class="sidebar-item" href="#"><span class="icon">⚙️</span> Settings</a>
-      </nav>
-    </aside>
-    <div class="main-content">
-      <header class="topbar">
-        <div class="topbar-search"><span class="search-icon">🔍</span><input type="text" placeholder="Search..."></div>
-        <div class="topbar-right"><div class="topbar-icon-btn">🔔<span class="notif-dot"></span></div><div class="topbar-avatar">P</div></div>
-      </header>
-      <div class="page">
-        <h1 class="page-title" style="margin-bottom:4px">DAW Import Status</h1>
-        <p class="page-subtitle" style="margin-bottom:24px">Track parsing and import progress for uploaded DAW projects</p>
-
+  <div class="transport-bar">
+    <div class="transport-logo">Sound<span>Hub</span></div>
+    <div class="transport-divider"></div>
+    <div class="transport-group"><span style="color:#71717a;font-size:10px">IMPORTING</span><div style="background:#0d0d0d;border:1px solid #27272a;border-radius:4px;padding:2px 8px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#ea5808;font-weight:600">1</div></div>
+    <div class="transport-group"><span style="color:#71717a;font-size:10px">COMPLETE</span><div style="background:#0d0d0d;border:1px solid #27272a;border-radius:4px;padding:2px 8px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#22c55e;font-weight:600">2</div></div>
+    <div class="transport-group"><span style="color:#71717a;font-size:10px">FAILED</span><div style="background:#0d0d0d;border:1px solid #27272a;border-radius:4px;padding:2px 8px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#ef4444;font-weight:600">1</div></div>
+    <div class="transport-spacer"></div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#71717a">DAW IMPORT</div>
+  </div>
+  <div class="app-body">
+    <div class="sidebar">
+      <div class="sidebar-search"><input type="text" placeholder="Search..."></div>
+      <div class="sidebar-nav">
+        <div class="sidebar-section">Main</div>
+        <div class="sidebar-item"><span class="icon">📊</span> Dashboard</div>
+        <div class="sidebar-item"><span class="icon">📁</span> Projects</div>
+        <div class="sidebar-item active"><span class="icon">⬆️</span> Upload</div>
+        <div class="sidebar-section">Workspace</div>
+        <div class="sidebar-item"><span class="icon">💬</span> Reviews</div>
+        <div class="sidebar-section">Account</div>
+        <div class="sidebar-item"><span class="icon">⚙️</span> Settings</div>
+      </div>
+    </div>
+    <div class="content">
+      <div class="page-header"><div class="page-title">DAW Import Status</div></div>
+      <div class="page-scroll">
         <!-- Active Import -->
-        <div class="import-card" style="border-color:var(--brand-primary)">
+        <div class="import-card" style="border-color:rgba(234,88,8,0.3)">
           <div class="import-header">
-            <div class="import-file">
-              <div class="import-icon" style="background:rgba(139,92,246,0.12)">🎵</div>
-              <div><div class="import-name">Neon_Warehouse_v13.als</div><div class="import-meta">Ableton Live 12 · 142 MB · Uploading...</div></div>
-            </div>
-            <span class="badge badge-purple" style="font-size:10px">IMPORTING</span>
+            <div class="import-icon" style="background:rgba(234,88,8,0.12)">🎵</div>
+            <div style="flex:1"><div class="import-name">Neon_Warehouse_v13.als</div><div class="import-meta">Ableton Live 12 · 142 MB · Started 2m ago</div></div>
+            <div class="import-badge" style="background:rgba(234,88,8,0.12);color:#ea5808">IMPORTING</div>
           </div>
-          <div class="import-progress">
-            <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px">
-              <span style="color:var(--text-muted)">Uploading to cloud...</span>
-              <span style="color:var(--brand-primary);font-weight:600">67%</span>
-            </div>
-            <div class="progress-track"><div class="progress-fill" style="width:67%;background:var(--brand-primary)"></div></div>
+          <div class="progress-track"><div class="progress-fill" style="width:67%;background:#ea5808"></div></div>
+          <div style="display:flex;justify-content:space-between;font-size:10px;margin-top:6px"><span style="color:#52525b">Uploading to cloud...</span><span style="color:#ea5808;font-weight:600;font-family:'JetBrains Mono',monospace">67%</span></div>
+          <div class="step-row">
+            <div class="step done">✓ Upload</div>
+            <div class="step active">⟳ Parse .als</div>
+            <div class="step">Extract tracks</div>
+            <div class="step">Analyze audio</div>
+            <div class="step">Generate preview</div>
           </div>
-          <div class="import-steps">
-            <div class="import-step done">✓ Upload</div>
-            <div class="import-step active">⟳ Parse .als</div>
-            <div class="import-step">Extract tracks</div>
-            <div class="import-step">Analyze audio</div>
-            <div class="import-step">Generate preview</div>
-          </div>
-          <div class="track-list">
-            <div class="track-row"><span style="color:var(--color-success)">✓</span><span class="track-name">Drums — Kick</span><span class="track-info">44.1kHz · 24bit · 3:42</span></div>
-            <div class="track-row"><span style="color:var(--color-success)">✓</span><span class="track-name">Drums — Snare</span><span class="track-info">44.1kHz · 24bit · 3:42</span></div>
-            <div class="track-row"><span style="color:var(--brand-primary)">⟳</span><span class="track-name">Bass — Synth</span><span class="track-info">Analyzing...</span></div>
-            <div class="track-row"><span style="color:var(--text-muted)">○</span><span class="track-name">Lead — Vocal</span><span class="track-info">Queued</span></div>
-            <div class="track-row"><span style="color:var(--text-muted)">○</span><span class="track-name">FX — Risers</span><span class="track-info">Queued</span></div>
+          <div style="margin-top:12px;padding-top:12px;border-top:1px solid #1a1a1a">
+            <div style="font-size:10px;color:#52525b;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;font-weight:700">Extracted Tracks</div>
+            <div class="track-row"><span style="color:#22c55e">✓</span><span class="track-name">Drums — Kick</span><span class="track-info">44.1kHz · 24bit · 3:42</span></div>
+            <div class="track-row"><span style="color:#22c55e">✓</span><span class="track-name">Drums — Snare</span><span class="track-info">44.1kHz · 24bit · 3:42</span></div>
+            <div class="track-row"><span style="color:#ea5808">⟳</span><span class="track-name">Bass — Synth</span><span class="track-info" style="color:#ea5808">Analyzing...</span></div>
+            <div class="track-row"><span style="color:#52525b">○</span><span class="track-name">Lead — Vocal</span><span class="track-info">Queued</span></div>
+            <div class="track-row"><span style="color:#52525b">○</span><span class="track-name">FX — Risers</span><span class="track-info">Queued</span></div>
           </div>
         </div>
-
-        <!-- Completed Import -->
+        <!-- Completed -->
         <div class="import-card">
           <div class="import-header">
-            <div class="import-file">
-              <div class="import-icon" style="background:rgba(34,197,94,0.12)">🎵</div>
-              <div><div class="import-name">Summer_Vibes_stems.als</div><div class="import-meta">Ableton Live 12 · 324 MB · Completed 1d ago</div></div>
-            </div>
-            <span class="badge badge-success" style="font-size:10px">DONE</span>
+            <div class="import-icon" style="background:rgba(34,197,94,0.12)">🎵</div>
+            <div style="flex:1"><div class="import-name">Summer_Vibes_stems.als</div><div class="import-meta">Ableton Live 12 · 324 MB · Completed 1d ago</div></div>
+            <div class="import-badge" style="background:rgba(34,197,94,0.12);color:#22c55e">DONE</div>
           </div>
-          <div class="import-steps">
-            <div class="import-step done">✓ Upload</div>
-            <div class="import-step done">✓ Parse .als</div>
-            <div class="import-step done">✓ Extract tracks</div>
-            <div class="import-step done">✓ Analyze audio</div>
-            <div class="import-step done">✓ Generate preview</div>
+          <div class="step-row">
+            <div class="step done">✓ Upload</div><div class="step done">✓ Parse .als</div><div class="step done">✓ Extract tracks</div><div class="step done">✓ Analyze audio</div><div class="step done">✓ Generate preview</div>
           </div>
         </div>
-
-        <!-- Failed Import -->
-        <div class="import-card" style="border-color:rgba(239,68,68,0.3)">
+        <!-- Failed -->
+        <div class="import-card" style="border-color:rgba(239,68,68,0.2)">
           <div class="import-header">
-            <div class="import-file">
-              <div class="import-icon" style="background:rgba(239,68,68,0.12)">⚠️</div>
-              <div><div class="import-name">corrupted_file.flp</div><div class="import-meta">FL Studio · 12 MB · Failed 2d ago</div></div>
-            </div>
-            <span class="badge" style="font-size:10px;background:rgba(239,68,68,0.12);color:var(--color-error)">FAILED</span>
+            <div class="import-icon" style="background:rgba(239,68,68,0.12)">⚠️</div>
+            <div style="flex:1"><div class="import-name" style="color:#ef4444">corrupted_file.flp</div><div class="import-meta">FL Studio · 12 MB · Failed 2d ago</div></div>
+            <div class="import-badge" style="background:rgba(239,68,68,0.12);color:#ef4444">FAILED</div>
           </div>
-          <div style="padding:10px;background:rgba(239,68,68,0.06);border-radius:var(--radius-sm);font-size:12px;color:var(--color-error)">
-            Error: Unable to parse FL Studio project file. The file may be corrupted or from an unsupported version.
-          </div>
+          <div class="error-box">Error: Unable to parse FL Studio project file. The file may be corrupted or from an unsupported version.</div>
         </div>
       </div>
     </div>

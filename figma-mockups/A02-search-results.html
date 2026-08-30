@@ -6,49 +6,97 @@
   <title>SoundHub — Search Results</title>
   <link rel="stylesheet" href="design-system/shared.css">
   <style>
-    .search-hero { text-align: center; padding: 40px 0 24px; }
-    .search-hero h1 { font-size: 24px; font-weight: 800; margin-bottom: 16px; }
-    .search-box { max-width: 640px; margin: 0 auto; position: relative; }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Inter',-apple-system,sans-serif; background:var(--bg-primary); color:var(--text-primary); overflow-x:hidden; }
+
+    /* ── Search Hero ── */
+    .search-hero { text-align:center; padding:48px 0 28px; }
+    .search-hero h1 { font-size:26px; font-weight:800; margin-bottom:18px; letter-spacing:-0.5px; }
+    .search-box { max-width:640px; margin:0 auto; position:relative; }
     .search-box input {
-      width: 100%; padding: 14px 20px 14px 48px; font-size: 16px;
-      background: var(--bg-surface); border: 2px solid var(--border-default);
-      border-radius: var(--radius-lg); color: var(--text-primary); outline: none;
+      width:100%; padding:14px 140px 14px 48px; font-size:15px; font-weight:500;
+      background:var(--bg-surface); border:2px solid var(--border-default);
+      border-radius:var(--radius-lg); color:var(--text-primary); outline:none;
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
-    .search-box input:focus { border-color: var(--brand-primary); }
-    .search-box .icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); font-size: 18px; }
-    .search-tabs { display: flex; gap: 4px; justify-content: center; margin: 20px 0; }
+    .search-box input:focus { border-color:var(--brand-primary); box-shadow:0 0 0 3px rgba(139,92,246,0.15); }
+    .search-box .icon { position:absolute; left:18px; top:50%; transform:translateY(-50%); font-size:18px; pointer-events:none; }
+    .search-box .shortcut-hint {
+      position:absolute; right:14px; top:50%; transform:translateY(-50%);
+      display:flex; gap:3px; pointer-events:none;
+    }
+    .search-box kbd {
+      display:inline-flex; align-items:center; justify-content:center;
+      min-width:22px; height:22px; padding:0 5px;
+      background:var(--bg-elevated); border:1px solid var(--border-default);
+      border-radius:4px; font-size:10px; font-family:var(--font-mono); color:var(--text-muted);
+    }
+
+    /* ── Tabs ── */
+    .search-tabs { display:flex; gap:4px; justify-content:center; margin:22px 0 28px; }
     .search-tab {
-      padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: 600;
-      cursor: pointer; color: var(--text-secondary); border: 1px solid var(--border-default);
-      background: transparent; transition: all 0.15s;
+      padding:8px 18px; border-radius:20px; font-size:12px; font-weight:600;
+      cursor:pointer; color:var(--text-secondary); border:1px solid var(--border-default);
+      background:transparent; transition:all 0.15s; user-select:none;
     }
-    .search-tab:hover { color: var(--text-primary); }
-    .search-tab.active { background: var(--brand-primary); color: #fff; border-color: var(--brand-primary); }
-    .results-section { margin-bottom: 32px; }
+    .search-tab:hover { color:var(--text-primary); border-color:var(--border-hover); background:var(--bg-hover); }
+    .search-tab.active { background:var(--brand-primary); color:#fff; border-color:var(--brand-primary); }
+
+    /* ── Results ── */
+    .results-section { margin-bottom:32px; }
     .results-header {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border-default);
+      display:flex; align-items:center; justify-content:space-between;
+      margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid var(--border-default);
     }
-    .results-title { font-size: 14px; font-weight: 700; color: var(--text-primary); }
-    .results-count { font-size: 12px; color: var(--text-muted); }
+    .results-title { font-size:14px; font-weight:700; color:var(--text-primary); display:flex; align-items:center; gap:8px; }
+    .results-count { font-size:12px; color:var(--text-muted); }
     .result-item {
-      display: flex; align-items: center; gap: 14px; padding: 14px;
-      background: var(--bg-surface); border: 1px solid var(--border-default);
-      border-radius: var(--radius-md); margin-bottom: 8px; cursor: pointer;
-      transition: all 0.15s;
+      display:flex; align-items:center; gap:14px; padding:14px 16px;
+      background:var(--bg-surface); border:1px solid var(--border-default);
+      border-radius:var(--radius-md); margin-bottom:8px; cursor:pointer;
+      transition:all 0.15s; position:relative;
     }
-    .result-item:hover { border-color: var(--border-hover); transform: translateY(-1px); }
+    .result-item:hover { border-color:var(--border-hover); transform:translateY(-1px); box-shadow:0 4px 12px rgba(0,0,0,0.08); }
     .result-icon {
-      width: 40px; height: 40px; border-radius: var(--radius-sm);
-      display: flex; align-items: center; justify-content: center; font-size: 18px;
-      flex-shrink: 0;
+      width:42px; height:42px; border-radius:var(--radius-sm);
+      display:flex; align-items:center; justify-content:center; font-size:18px;
+      flex-shrink:0; transition:transform 0.15s;
     }
-    .result-body { flex: 1; min-width: 0; }
-    .result-name { font-size: 13px; font-weight: 600; color: var(--text-primary); }
-    .result-name mark { background: rgba(234,88,8,0.25); color: var(--text-primary); border-radius: 2px; padding: 0 2px; }
-    .result-meta { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
-    .result-tags { display: flex; gap: 4px; margin-top: 4px; }
-    .result-actions { display: flex; gap: 6px; flex-shrink: 0; }
+    .result-item:hover .result-icon { transform:scale(1.05); }
+    .result-body { flex:1; min-width:0; }
+    .result-name { font-size:13px; font-weight:600; color:var(--text-primary); }
+    .result-name mark { background:rgba(234,88,8,0.2); color:var(--text-primary); border-radius:2px; padding:0 2px; }
+    .result-meta { font-size:11px; color:var(--text-muted); margin-top:3px; }
+    .result-tags { display:flex; gap:4px; margin-top:5px; flex-wrap:wrap; }
+    .result-actions { display:flex; gap:6px; flex-shrink:0; opacity:0; transition:opacity 0.15s; }
+    .result-item:hover .result-actions { opacity:1; }
+
+    /* ── Avatar ── */
+    .avatar {
+      width:28px; height:28px; border-radius:50%; display:inline-flex;
+      align-items:center; justify-content:center; font-size:10px; font-weight:700; color:#fff;
+    }
+
+    /* ── Pagination ── */
+    .pagination { display:flex; align-items:center; justify-content:center; gap:4px; margin-top:32px; }
+    .page-btn {
+      width:32px; height:32px; display:flex; align-items:center; justify-content:center;
+      border-radius:var(--radius-sm); font-size:12px; font-weight:500; color:var(--text-secondary);
+      cursor:pointer; transition:all 0.15s; border:1px solid transparent;
+    }
+    .page-btn:hover { background:var(--bg-hover); color:var(--text-primary); }
+    .page-btn.active { background:var(--brand-primary); color:#fff; }
+
+    /* ── Recent Searches ── */
+    .recent { margin-top:16px; padding:12px 16px; background:var(--bg-surface); border:1px solid var(--border-default); border-radius:var(--radius-md); }
+    .recent-title { font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; }
+    .recent-list { display:flex; flex-wrap:wrap; gap:6px; }
+    .recent-chip {
+      padding:4px 10px; background:var(--bg-elevated); border:1px solid var(--border-default);
+      border-radius:16px; font-size:11px; color:var(--text-secondary); cursor:pointer;
+      transition:all 0.15s;
+    }
+    .recent-chip:hover { border-color:var(--brand-primary); color:var(--brand-primary); }
   </style>
 </head>
 <body>
@@ -64,6 +112,7 @@
         <div class="sidebar-section-label">Workspace</div>
         <a class="sidebar-item" href="#"><span class="icon">💬</span> Reviews</a>
         <a class="sidebar-item" href="#"><span class="icon">📋</span> Sessions</a>
+        <a class="sidebar-item" href="#"><span class="icon">📈</span> Analytics</a>
         <div class="sidebar-section-label">Account</div>
         <a class="sidebar-item" href="#"><span class="icon">⚙️</span> Settings</a>
       </nav>
@@ -71,16 +120,23 @@
     <div class="main-content">
       <header class="topbar">
         <div class="topbar-search"><span class="search-icon">🔍</span><input type="text" value="lo-fi drums"></div>
-        <div class="topbar-right"><div class="topbar-icon-btn">🔔<span class="notif-dot"></span></div><div class="topbar-avatar">P</div></div>
+        <div class="topbar-right">
+          <div class="topbar-icon-btn" style="position:relative">🔔<span class="notif-dot" style="position:absolute;top:2px;right:2px;width:6px;height:6px;background:var(--color-error);border-radius:50%"></span></div>
+          <div class="topbar-avatar" style="width:28px;height:28px;border-radius:50%;background:var(--brand-primary);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff">P</div>
+        </div>
       </header>
       <div class="page">
+        <!-- Search Hero -->
         <div class="search-hero">
           <h1>Search Results</h1>
           <div class="search-box">
             <span class="icon">🔍</span>
-            <input type="text" value="lo-fi drums" style="font-size:16px">
+            <input type="text" value="lo-fi drums" style="font-size:15px">
+            <div class="shortcut-hint"><kbd>ESC</kbd></div>
           </div>
         </div>
+
+        <!-- Tabs -->
         <div class="search-tabs">
           <div class="search-tab active">All (24)</div>
           <div class="search-tab">Assets (12)</div>
@@ -91,76 +147,116 @@
 
         <!-- Assets -->
         <div class="results-section">
-          <div class="results-header"><span class="results-title">🎵 Assets</span><span class="results-count">12 results</span></div>
+          <div class="results-header">
+            <span class="results-title">🎵 Assets</span>
+            <span class="results-count">12 results · 0.03s</span>
+          </div>
           <div class="result-item">
-            <div class="result-icon" style="background:rgba(139,92,246,0.12)">🎵</div>
+            <div class="result-icon" style="background:linear-gradient(135deg,rgba(139,92,246,0.15),rgba(6,182,212,0.1))">🎵</div>
             <div class="result-body">
               <div class="result-name">Lo-Fi <mark>Drums</mark> Pack</div>
-              <div class="result-meta">by @producer1 · WAV · 24bit · Free</div>
-              <div class="result-tags"><span class="badge badge-purple" style="font-size:9px">lo-fi</span><span class="badge badge-muted" style="font-size:9px">drums</span></div>
+              <div class="result-meta">by <strong>@producer1</strong> · WAV · 24bit · Free · ★ 4.8 (124)</div>
+              <div class="result-tags"><span class="badge badge-purple" style="font-size:9px">lo-fi</span><span class="badge badge-muted" style="font-size:9px">drums</span><span class="badge badge-muted" style="font-size:9px">chill</span></div>
             </div>
-            <div class="result-actions"><button class="btn btn-secondary" style="font-size:11px">▶ Preview</button></div>
+            <div class="result-actions"><button class="btn btn-secondary" style="font-size:11px;padding:5px 12px">▶ Preview</button></div>
           </div>
           <div class="result-item">
-            <div class="result-icon" style="background:rgba(6,182,212,0.12)">🎵</div>
+            <div class="result-icon" style="background:linear-gradient(135deg,rgba(6,182,212,0.15),rgba(34,197,94,0.1))">🎵</div>
             <div class="result-body">
               <div class="result-name">Chill <mark>Lo-Fi</mark> Beats Vol.3</div>
-              <div class="result-meta">by @beatsmith · WAV · 16bit · $4.99</div>
-              <div class="result-tags"><span class="badge badge-purple" style="font-size:9px">lo-fi</span><span class="badge badge-muted" style="font-size:9px">beats</span></div>
+              <div class="result-meta">by <strong>@beatsmith</strong> · WAV · 16bit · $4.99 · ★ 4.6 (87)</div>
+              <div class="result-tags"><span class="badge badge-purple" style="font-size:9px">lo-fi</span><span class="badge badge-muted" style="font-size:9px">beats</span><span class="badge badge-muted" style="font-size:9px">chill</span></div>
             </div>
-            <div class="result-actions"><button class="btn btn-secondary" style="font-size:11px">▶ Preview</button></div>
+            <div class="result-actions"><button class="btn btn-secondary" style="font-size:11px;padding:5px 12px">▶ Preview</button></div>
           </div>
           <div class="result-item">
-            <div class="result-icon" style="background:rgba(234,88,8,0.12)">🎵</div>
+            <div class="result-icon" style="background:linear-gradient(135deg,rgba(234,88,8,0.15),rgba(234,179,8,0.1))">🎵</div>
             <div class="result-body">
               <div class="result-name">Vinyl <mark>Drums</mark> Collection</div>
-              <div class="result-meta">by @vintage_sounds · FLAC · 24bit · $7.99</div>
-              <div class="result-tags"><span class="badge badge-muted" style="font-size:9px">drums</span><span class="badge badge-muted" style="font-size:9px">vinyl</span></div>
+              <div class="result-meta">by <strong>@vintage_sounds</strong> · FLAC · 24bit · $7.99 · ★ 4.7 (64)</div>
+              <div class="result-tags"><span class="badge badge-muted" style="font-size:9px">drums</span><span class="badge badge-muted" style="font-size:9px">vinyl</span><span class="badge badge-muted" style="font-size:9px">vintage</span></div>
             </div>
-            <div class="result-actions"><button class="btn btn-secondary" style="font-size:11px">▶ Preview</button></div>
+            <div class="result-actions"><button class="btn btn-secondary" style="font-size:11px;padding:5px 12px">▶ Preview</button></div>
+          </div>
+          <div class="result-item">
+            <div class="result-icon" style="background:linear-gradient(135deg,rgba(34,197,94,0.15),rgba(6,182,212,0.1))">🎵</div>
+            <div class="result-body">
+              <div class="result-name">Lo-Fi <mark>Drums</mark> & Percussion</div>
+              <div class="result-meta">by <strong>@organic_sounds</strong> · WAV · 32bit · $12.99 · ★ 4.9 (203)</div>
+              <div class="result-tags"><span class="badge badge-purple" style="font-size:9px">lo-fi</span><span class="badge badge-muted" style="font-size:9px">drums</span><span class="badge badge-muted" style="font-size:9px">organic</span></div>
+            </div>
+            <div class="result-actions"><button class="btn btn-secondary" style="font-size:11px;padding:5px 12px">▶ Preview</button></div>
           </div>
         </div>
 
         <!-- Projects -->
         <div class="results-section">
-          <div class="results-header"><span class="results-title">📁 Projects</span><span class="results-count">6 results</span></div>
+          <div class="results-header">
+            <span class="results-title">📁 Projects</span>
+            <span class="results-count">6 results</span>
+          </div>
           <div class="result-item">
             <div class="result-icon" style="background:rgba(139,92,246,0.12)">📁</div>
             <div class="result-body">
               <div class="result-name">Lo-Fi <mark>Drums</mark> Toolkit</div>
-              <div class="result-meta">Private · 14 versions · Updated 2h ago</div>
+              <div class="result-meta">Private · 14 versions · 4 collaborators · Updated 2h ago</div>
             </div>
-            <div class="result-actions"><button class="btn btn-secondary" style="font-size:11px">Open</button></div>
+            <div class="result-actions"><button class="btn btn-secondary" style="font-size:11px;padding:5px 12px">Open</button></div>
           </div>
           <div class="result-item">
             <div class="result-icon" style="background:rgba(34,197,94,0.12)">📁</div>
             <div class="result-body">
               <div class="result-name">Chill <mark>Lo-Fi</mark> Album</div>
-              <div class="result-meta">Public · 8 versions · Updated 1d ago</div>
+              <div class="result-meta">Public · 8 versions · 2 collaborators · Updated 1d ago</div>
             </div>
-            <div class="result-actions"><button class="btn btn-secondary" style="font-size:11px">Open</button></div>
+            <div class="result-actions"><button class="btn btn-secondary" style="font-size:11px;padding:5px 12px">Open</button></div>
           </div>
         </div>
 
         <!-- Users -->
         <div class="results-section">
-          <div class="results-header"><span class="results-title">👤 Users</span><span class="results-count">4 results</span></div>
+          <div class="results-header">
+            <span class="results-title">👤 Users</span>
+            <span class="results-count">4 results</span>
+          </div>
           <div class="result-item">
-            <div class="result-icon" style="background:rgba(139,92,246,0.12);border-radius:50%;color:#fff;font-size:14px;font-weight:700">P</div>
+            <div class="avatar" style="background:linear-gradient(135deg,#ea5808,#f97316);width:42px;height:42px;font-size:16px;flex-shrink:0">P</div>
             <div class="result-body">
               <div class="result-name">@producer1</div>
-              <div class="result-meta">48 assets · 1.2k downloads · Joined Mar 2025</div>
+              <div class="result-meta">48 assets · 1.2k downloads · ★ 4.8 avg · Joined Mar 2025</div>
             </div>
-            <div class="result-actions"><button class="btn btn-secondary" style="font-size:11px">Profile</button></div>
+            <div class="result-actions"><button class="btn btn-secondary" style="font-size:11px;padding:5px 12px">Profile</button></div>
           </div>
           <div class="result-item">
-            <div class="result-icon" style="background:rgba(234,88,8,0.12);border-radius:50%;color:#fff;font-size:14px;font-weight:700">D</div>
+            <div class="avatar" style="background:linear-gradient(135deg,#3b82f6,#6366f1);width:42px;height:42px;font-size:16px;flex-shrink:0">D</div>
             <div class="result-body">
               <div class="result-name">@drum_lo_fi</div>
-              <div class="result-meta">12 assets · 890 downloads · Joined Jan 2026</div>
+              <div class="result-meta">12 assets · 890 downloads · ★ 4.5 avg · Joined Jan 2026</div>
             </div>
-            <div class="result-actions"><button class="btn btn-secondary" style="font-size:11px">Profile</button></div>
+            <div class="result-actions"><button class="btn btn-secondary" style="font-size:11px;padding:5px 12px">Profile</button></div>
           </div>
+        </div>
+
+        <!-- Recent Searches -->
+        <div class="recent">
+          <div class="recent-title">Recent Searches</div>
+          <div class="recent-list">
+            <span class="recent-chip">synth pads</span>
+            <span class="recent-chip">808 bass</span>
+            <span class="recent-chip">ambient textures</span>
+            <span class="recent-chip">vocal chops</span>
+          </div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination">
+          <div class="page-btn">←</div>
+          <div class="page-btn active">1</div>
+          <div class="page-btn">2</div>
+          <div class="page-btn">3</div>
+          <div class="page-btn" style="color:var(--text-muted)">…</div>
+          <div class="page-btn">8</div>
+          <div class="page-btn">→</div>
         </div>
       </div>
     </div>

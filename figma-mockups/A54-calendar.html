@@ -6,147 +6,205 @@
   <title>SoundHub — Calendar</title>
   <link rel="stylesheet" href="design-system/shared.css">
   <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Inter',-apple-system,sans-serif; background:var(--bg-primary); color:var(--text-primary); overflow:hidden; height:100vh; }
+    .transport-bar {
+      height:40px; background:#111113; border-bottom:1px solid #27272a;
+      display:flex; align-items:center; padding:0 12px; gap:16px; font-size:11px;
+    }
+    .transport-logo { font-weight:800; font-size:13px; color:#ea5808; }
+    .transport-logo span { color:#e4e4e7; }
+    .transport-divider { width:1px; height:20px; background:#27272a; }
+    .transport-group { display:flex; align-items:center; gap:6px; }
+    .transport-label { color:#71717a; font-size:10px; text-transform:uppercase; letter-spacing:0.5px; }
+    .transport-value {
+      background:#0d0d0d; border:1px solid #27272a; border-radius:4px;
+      padding:2px 8px; font-family:'JetBrains Mono',monospace; font-size:12px;
+      font-weight:600; min-width:40px; text-align:center;
+    }
+    .transport-spacer { flex:1; }
+    .app-body { display:flex; height:calc(100vh - 40px); }
+    .sidebar {
+      width:240px; background:#111113; border-right:1px solid #27272a;
+      display:flex; flex-direction:column;
+    }
+    .sidebar-search { padding:8px; border-bottom:1px solid #27272a; }
+    .sidebar-search input {
+      width:100%; background:#0d0d0d; border:1px solid #27272a; border-radius:4px;
+      padding:6px 8px 6px 28px; font-size:11px; color:#e4e4e7; outline:none;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");
+      background-repeat:no-repeat; background-position:8px center;
+    }
+    .sidebar-nav { flex:1; overflow-y:auto; padding:4px 0; }
+    .sidebar-section { padding:8px 12px 4px; font-size:9px; color:#52525b; text-transform:uppercase; letter-spacing:1px; font-weight:700; }
+    .sidebar-item {
+      padding:6px 12px; font-size:11px; font-weight:500; color:#a1a1aa;
+      cursor:pointer; display:flex; align-items:center; gap:8px;
+      border-left:2px solid transparent; transition:all 0.1s;
+    }
+    .sidebar-item:hover { color:#e4e4e7; }
+    .sidebar-item.active { color:#ea5808; background:rgba(234,88,8,0.08); border-left-color:#ea5808; }
+    .content { flex:1; display:flex; flex-direction:column; min-width:0; overflow:hidden; }
+    .page-header { padding:16px 24px; border-bottom:1px solid #27272a; display:flex; align-items:center; justify-content:space-between; }
+    .page-title { font-size:18px; font-weight:700; color:#e4e4e7; }
+    .cal-nav { display:flex; align-items:center; gap:12px; }
+    .cal-nav-btn {
+      width:30px; height:30px; border-radius:4px; display:flex;
+      align-items:center; justify-content:center; cursor:pointer;
+      border:1px solid #27272a; background:transparent; color:#71717a;
+      transition:all 0.15s; font-size:12px;
+    }
+    .cal-nav-btn:hover { background:#27272a; color:#e4e4e7; }
+    .cal-legend {
+      padding:10px 24px; display:flex; gap:16px; border-bottom:1px solid #27272a;
+    }
+    .cal-legend-item { display:flex; align-items:center; gap:6px; font-size:10px; color:#71717a; }
+    .legend-dot { width:8px; height:8px; border-radius:2px; }
+    .calendar-container { flex:1; overflow-y:auto; padding:16px 24px; }
     .calendar-grid {
-      display: grid; grid-template-columns: repeat(7, 1fr);
-      border: 1px solid var(--border-default); border-radius: var(--radius-lg); overflow: hidden;
+      display:grid; grid-template-columns:repeat(7,1fr);
+      border:1px solid #27272a; border-radius:6px; overflow:hidden;
     }
     .calendar-header-cell {
-      padding: 10px; text-align: center; font-size: 11px; font-weight: 700;
-      color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;
-      background: var(--bg-elevated); border-bottom: 1px solid var(--border-default);
+      padding:10px; text-align:center; font-size:10px; font-weight:700;
+      color:#52525b; text-transform:uppercase; letter-spacing:0.5px;
+      background:#111113; border-bottom:1px solid #27272a;
     }
     .calendar-cell {
-      min-height: 100px; padding: 8px; background: var(--bg-surface);
-      border-right: 1px solid var(--border-default); border-bottom: 1px solid var(--border-default);
-      cursor: pointer; transition: background 0.1s;
+      min-height:100px; padding:6px 8px; background:#0d0d0d;
+      border-right:1px solid #1a1a1a; border-bottom:1px solid #1a1a1a;
+      cursor:pointer; transition:background 0.1s; position:relative;
     }
-    .calendar-cell:nth-child(7n) { border-right: none; }
-    .calendar-cell:hover { background: var(--bg-hover); }
-    .calendar-cell.today { background: rgba(139,92,246,0.06); }
-    .calendar-cell.other-month { opacity: 0.4; }
-    .calendar-day { font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px; }
-    .calendar-cell.today .calendar-day { color: var(--brand-primary); font-weight: 700; }
+    .calendar-cell:nth-child(7n) { border-right:none; }
+    .calendar-cell:hover { background:#141414; }
+    .calendar-cell.today { background:rgba(234,88,8,0.06); }
+    .calendar-cell.today .calendar-day { color:#ea5808; font-weight:700; }
+    .calendar-cell.past { opacity:0.5; }
+    .calendar-day { font-size:12px; font-weight:600; color:#a1a1aa; margin-bottom:4px; }
     .calendar-event {
-      padding: 2px 6px; border-radius: 3px; font-size: 9px; font-weight: 600;
-      margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      padding:2px 6px; border-radius:3px; font-size:9px; font-weight:600;
+      margin-bottom:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+      transition:filter 0.15s;
     }
-    .event-deadline { background: rgba(239,68,68,0.12); color: var(--color-error); }
-    .event-review { background: rgba(234,179,8,0.12); color: var(--color-warning); }
-    .event-release { background: rgba(34,197,94,0.12); color: var(--color-success); }
-    .event-meeting { background: rgba(139,92,246,0.12); color: var(--brand-primary); }
-    .cal-nav { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
-    .cal-nav-btn {
-      width: 32px; height: 32px; border-radius: var(--radius-sm); display: flex;
-      align-items: center; justify-content: center; cursor: pointer;
-      border: 1px solid var(--border-default); background: transparent;
-      color: var(--text-secondary); transition: all 0.15s;
+    .calendar-event:hover { filter:brightness(1.2); }
+    .event-deadline { background:rgba(239,68,68,0.12); color:#ef4444; }
+    .event-review { background:rgba(234,179,8,0.12); color:#eab308; }
+    .event-release { background:rgba(34,197,94,0.12); color:#22c55e; }
+    .event-meeting { background:rgba(139,92,246,0.12); color:#a78bfa; }
+    .event-dot { width:4px; height:4px; border-radius:50%; display:inline-block; margin-right:4px; }
+    .today-marker {
+      position:absolute; top:4px; right:4px; width:6px; height:6px;
+      border-radius:50%; background:#ea5808; box-shadow:0 0 6px rgba(234,88,8,0.5);
     }
-    .cal-nav-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
-    .cal-legend { display: flex; gap: 16px; margin-bottom: 16px; }
-    .cal-legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-muted); }
-    .legend-dot { width: 8px; height: 8px; border-radius: 2px; }
   </style>
 </head>
 <body>
-  <div class="app-layout">
-    <aside class="sidebar">
-      <div class="sidebar-logo"><div class="logo-icon">S</div><div class="logo-text">SoundHub</div></div>
-      <nav class="sidebar-nav">
-        <div class="sidebar-section-label">Main</div>
-        <a class="sidebar-item" href="#"><span class="icon">📊</span> Dashboard</a>
-        <a class="sidebar-item" href="#"><span class="icon">📁</span> Projects</a>
-        <a class="sidebar-item" href="#"><span class="icon">🛒</span> Marketplace</a>
-        <div class="sidebar-section-label">Workspace</div>
-        <a class="sidebar-item" href="#"><span class="icon">💬</span> Reviews</a>
-        <a class="sidebar-item active" href="#"><span class="icon">📅</span> Calendar</a>
-        <div class="sidebar-section-label">Account</div>
-        <a class="sidebar-item" href="#"><span class="icon">⚙️</span> Settings</a>
-      </nav>
-    </aside>
-    <div class="main-content">
-      <header class="topbar">
-        <div class="topbar-search"><span class="search-icon">🔍</span><input type="text" placeholder="Search..."></div>
-        <div class="topbar-right"><div class="topbar-icon-btn">🔔<span class="notif-dot"></span></div><div class="topbar-avatar">P</div></div>
-      </header>
-      <div class="page">
+  <div class="transport-bar">
+    <div class="transport-logo">Sound<span>Hub</span></div>
+    <div class="transport-divider"></div>
+    <div class="transport-group">
+      <span class="transport-label">Upcoming</span>
+      <div class="transport-value" style="color:#ef4444">3</div>
+    </div>
+    <div class="transport-group">
+      <span class="transport-label">This Week</span>
+      <div class="transport-value" style="color:#eab308">2</div>
+    </div>
+    <div class="transport-spacer"></div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#71717a">AUGUST 2026</div>
+  </div>
+  <div class="app-body">
+    <div class="sidebar">
+      <div class="sidebar-search"><input type="text" placeholder="Search events..."></div>
+      <div class="sidebar-nav">
+        <div class="sidebar-section">Main</div>
+        <div class="sidebar-item"><span class="icon">📊</span> Dashboard</div>
+        <div class="sidebar-item"><span class="icon">📁</span> Projects</div>
+        <div class="sidebar-item"><span class="icon">🛒</span> Marketplace</div>
+        <div class="sidebar-section">Workspace</div>
+        <div class="sidebar-item"><span class="icon">💬</span> Reviews</div>
+        <div class="sidebar-item active"><span class="icon">📅</span> Calendar</div>
+        <div class="sidebar-item"><span class="icon">🎯</span> Milestones</div>
+        <div class="sidebar-section">Account</div>
+        <div class="sidebar-item"><span class="icon">⚙️</span> Settings</div>
+      </div>
+    </div>
+    <div class="content">
+      <div class="page-header">
         <div class="cal-nav">
           <button class="cal-nav-btn">◀</button>
-          <h1 class="page-title" style="margin:0">August 2026</h1>
+          <div class="page-title">August 2026</div>
           <button class="cal-nav-btn">▶</button>
-          <div style="flex:1"></div>
-          <button class="btn btn-secondary">Today</button>
-          <button class="btn btn-primary">+ Add Event</button>
         </div>
-
-        <div class="cal-legend">
-          <div class="cal-legend-item"><div class="legend-dot" style="background:var(--color-error)"></div>Deadline</div>
-          <div class="cal-legend-item"><div class="legend-dot" style="background:var(--color-warning)"></div>Review Due</div>
-          <div class="cal-legend-item"><div class="legend-dot" style="background:var(--color-success)"></div>Release</div>
-          <div class="cal-legend-item"><div class="legend-dot" style="background:var(--brand-primary)"></div>Meeting</div>
+        <div style="display:flex;gap:8px">
+          <button class="btn" style="background:#1a1a1a;color:#e4e4e7;border:1px solid #27272a">Today</button>
+          <button class="btn" style="background:#ea5808;color:#fff;border-color:#ea5808">+ Add Event</button>
         </div>
-
+      </div>
+      <div class="cal-legend">
+        <div class="cal-legend-item"><div class="legend-dot" style="background:#ef4444"></div>Deadline</div>
+        <div class="cal-legend-item"><div class="legend-dot" style="background:#eab308"></div>Review Due</div>
+        <div class="cal-legend-item"><div class="legend-dot" style="background:#22c55e"></div>Release</div>
+        <div class="cal-legend-item"><div class="legend-dot" style="background:#a78bfa"></div>Meeting</div>
+      </div>
+      <div class="calendar-container">
         <div class="calendar-grid">
-          <div class="calendar-header-cell">Mon</div>
-          <div class="calendar-header-cell">Tue</div>
-          <div class="calendar-header-cell">Wed</div>
-          <div class="calendar-header-cell">Thu</div>
-          <div class="calendar-header-cell">Fri</div>
-          <div class="calendar-header-cell">Sat</div>
+          <div class="calendar-header-cell">Mon</div><div class="calendar-header-cell">Tue</div>
+          <div class="calendar-header-cell">Wed</div><div class="calendar-header-cell">Thu</div>
+          <div class="calendar-header-cell">Fri</div><div class="calendar-header-cell">Sat</div>
           <div class="calendar-header-cell">Sun</div>
-
           <!-- Week 1 -->
-          <div class="calendar-cell other-month"><div class="calendar-day">27</div></div>
-          <div class="calendar-cell other-month"><div class="calendar-day">28</div></div>
-          <div class="calendar-cell other-month"><div class="calendar-day">29</div></div>
-          <div class="calendar-cell other-month"><div class="calendar-day">30</div></div>
-          <div class="calendar-cell other-month"><div class="calendar-day">31</div></div>
-          <div class="calendar-cell"><div class="calendar-day">1</div></div>
-          <div class="calendar-cell"><div class="calendar-day">2</div></div>
-
+          <div class="calendar-cell past"><div class="calendar-day">27</div></div>
+          <div class="calendar-cell past"><div class="calendar-day">28</div></div>
+          <div class="calendar-cell past"><div class="calendar-day">29</div></div>
+          <div class="calendar-cell past"><div class="calendar-day">30</div></div>
+          <div class="calendar-cell past"><div class="calendar-day">31</div></div>
+          <div class="calendar-cell past"><div class="calendar-day">1</div></div>
+          <div class="calendar-cell past"><div class="calendar-day">2</div></div>
           <!-- Week 2 -->
-          <div class="calendar-cell"><div class="calendar-day">3</div></div>
-          <div class="calendar-cell"><div class="calendar-day">4</div><div class="calendar-event event-deadline">Neon Wh. Deadline</div></div>
-          <div class="calendar-cell"><div class="calendar-day">5</div></div>
-          <div class="calendar-cell"><div class="calendar-day">6</div><div class="calendar-event event-review">Mix Review Due</div></div>
-          <div class="calendar-cell"><div class="calendar-day">7</div></div>
-          <div class="calendar-cell"><div class="calendar-day">8</div><div class="calendar-event event-meeting">Team Sync</div></div>
-          <div class="calendar-cell"><div class="calendar-day">9</div></div>
-
+          <div class="calendar-cell past"><div class="calendar-day">3</div></div>
+          <div class="calendar-cell past"><div class="calendar-day">4</div><div class="calendar-event event-deadline">🔴 Neon Wh. Deadline</div></div>
+          <div class="calendar-cell past"><div class="calendar-day">5</div></div>
+          <div class="calendar-cell past"><div class="calendar-day">6</div><div class="calendar-event event-review">🟡 Mix Review Due</div></div>
+          <div class="calendar-cell past"><div class="calendar-day">7</div></div>
+          <div class="calendar-cell past"><div class="calendar-day">8</div><div class="calendar-event event-meeting">🟣 Team Sync</div></div>
+          <div class="calendar-cell past"><div class="calendar-day">9</div></div>
           <!-- Week 3 -->
-          <div class="calendar-cell"><div class="calendar-day">10</div></div>
-          <div class="calendar-cell"><div class="calendar-day">11</div></div>
-          <div class="calendar-cell"><div class="calendar-day">12</div><div class="calendar-event event-release">Summer EP Release</div></div>
-          <div class="calendar-cell"><div class="calendar-day">13</div></div>
-          <div class="calendar-cell"><div class="calendar-day">14</div></div>
-          <div class="calendar-cell"><div class="calendar-day">15</div></div>
-          <div class="calendar-cell"><div class="calendar-day">16</div></div>
-
-          <!-- Week 4 -->
-          <div class="calendar-cell today"><div class="calendar-day">17</div><div class="calendar-event event-review">Master Review Due</div></div>
+          <div class="calendar-cell past"><div class="calendar-day">10</div></div>
+          <div class="calendar-cell past"><div class="calendar-day">11</div></div>
+          <div class="calendar-cell past"><div class="calendar-day">12</div><div class="calendar-event event-release">🟢 Summer EP Release</div></div>
+          <div class="calendar-cell past"><div class="calendar-day">13</div></div>
+          <div class="calendar-cell past"><div class="calendar-day">14</div></div>
+          <div class="calendar-cell past"><div class="calendar-day">15</div></div>
+          <div class="calendar-cell past"><div class="calendar-day">16</div></div>
+          <!-- Week 4 (current) -->
+          <div class="calendar-cell today">
+            <div class="today-marker"></div>
+            <div class="calendar-day">17</div>
+            <div class="calendar-event event-review">🟡 Master Review Due</div>
+          </div>
           <div class="calendar-cell"><div class="calendar-day">18</div></div>
-          <div class="calendar-cell"><div class="calendar-day">19</div><div class="calendar-event event-meeting">Client Call</div></div>
+          <div class="calendar-cell"><div class="calendar-day">19</div><div class="calendar-event event-meeting">🟣 Client Call</div></div>
           <div class="calendar-cell"><div class="calendar-day">20</div></div>
-          <div class="calendar-cell"><div class="calendar-day">21</div><div class="calendar-event event-deadline">Deep House Deadline</div></div>
+          <div class="calendar-cell"><div class="calendar-day">21</div><div class="calendar-event event-deadline">🔴 Deep House Deadline</div></div>
           <div class="calendar-cell"><div class="calendar-day">22</div></div>
           <div class="calendar-cell"><div class="calendar-day">23</div></div>
-
           <!-- Week 5 -->
           <div class="calendar-cell"><div class="calendar-day">24</div></div>
           <div class="calendar-cell"><div class="calendar-day">25</div></div>
-          <div class="calendar-cell"><div class="calendar-day">26</div><div class="calendar-event event-release">Acoustic EP Release</div></div>
+          <div class="calendar-cell"><div class="calendar-day">26</div><div class="calendar-event event-release">🟢 Acoustic EP Release</div></div>
           <div class="calendar-cell"><div class="calendar-day">27</div></div>
           <div class="calendar-cell"><div class="calendar-day">28</div></div>
           <div class="calendar-cell"><div class="calendar-day">29</div></div>
           <div class="calendar-cell"><div class="calendar-day">30</div></div>
-
           <!-- Week 6 -->
           <div class="calendar-cell"><div class="calendar-day">31</div></div>
-          <div class="calendar-cell other-month"><div class="calendar-day">1</div></div>
-          <div class="calendar-cell other-month"><div class="calendar-day">2</div></div>
-          <div class="calendar-cell other-month"><div class="calendar-day">3</div></div>
-          <div class="calendar-cell other-month"><div class="calendar-day">4</div></div>
-          <div class="calendar-cell other-month"><div class="calendar-day">5</div></div>
-          <div class="calendar-cell other-month"><div class="calendar-day">6</div></div>
+          <div class="calendar-cell" style="opacity:0.3"><div class="calendar-day">1</div></div>
+          <div class="calendar-cell" style="opacity:0.3"><div class="calendar-day">2</div></div>
+          <div class="calendar-cell" style="opacity:0.3"><div class="calendar-day">3</div></div>
+          <div class="calendar-cell" style="opacity:0.3"><div class="calendar-day">4</div></div>
+          <div class="calendar-cell" style="opacity:0.3"><div class="calendar-day">5</div></div>
+          <div class="calendar-cell" style="opacity:0.3"><div class="calendar-day">6</div></div>
         </div>
       </div>
     </div>

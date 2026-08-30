@@ -6,42 +6,85 @@
   <title>SoundHub — Approval Confirmation</title>
   <link rel="stylesheet" href="design-system/shared.css">
   <style>
-    body { display: flex; align-items: center; justify-content: center; min-height: 100vh; background: var(--bg-primary); }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Inter',-apple-system,sans-serif; background:var(--bg-primary); display:flex; align-items:center; justify-content:center; min-height:100vh; }
     .approval-card {
-      background: var(--bg-elevated); border: 1px solid var(--border-default);
-      border-radius: var(--radius-xl); width: 480px; text-align: center; padding: 40px 32px;
+      background:var(--bg-elevated); border:1px solid var(--border-default);
+      border-radius:var(--radius-xl); width:500px; text-align:center;
+      padding:40px 32px; box-shadow:0 20px 60px rgba(0,0,0,0.3);
     }
-    .approval-icon { font-size: 64px; margin-bottom: 20px; }
-    .approval-title { font-size: 20px; font-weight: 800; margin-bottom: 8px; }
-    .approval-desc { font-size: 13px; color: var(--text-secondary); margin-bottom: 28px; line-height: 1.5; }
+    .approval-icon {
+      width:80px; height:80px; border-radius:50%; margin:0 auto 20px;
+      display:flex; align-items:center; justify-content:center; font-size:40px;
+      background:rgba(34,197,94,0.1); border:3px solid rgba(34,197,94,0.2);
+      animation:pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%,100% { box-shadow:0 0 0 0 rgba(34,197,94,0.2); }
+      50% { box-shadow:0 0 0 12px rgba(34,197,94,0); }
+    }
+    .approval-title { font-size:22px; font-weight:800; margin-bottom:8px; }
+    .approval-desc { font-size:13px; color:var(--text-secondary); margin-bottom:28px; line-height:1.6; }
     .approval-meta {
-      background: var(--bg-surface); border: 1px solid var(--border-default);
-      border-radius: var(--radius-md); padding: 16px; margin-bottom: 24px; text-align: left;
+      background:var(--bg-surface); border:1px solid var(--border-default);
+      border-radius:var(--radius-md); padding:16px; margin-bottom:24px; text-align:left;
     }
     .meta-row {
-      display: flex; justify-content: space-between; padding: 6px 0;
-      font-size: 12px;
+      display:flex; justify-content:space-between; padding:7px 0; font-size:12px;
+      border-bottom:1px solid var(--border-default);
     }
-    .meta-label { color: var(--text-muted); }
-    .meta-value { font-weight: 600; color: var(--text-primary); }
-    .approval-actions { display: flex; gap: 10px; justify-content: center; }
+    .meta-row:last-child { border-bottom:none; }
+    .meta-label { color:var(--text-muted); }
+    .meta-value { font-weight:600; color:var(--text-primary); }
+
+    /* Reviewer status */
+    .reviewer-status-section { text-align:left; margin-bottom:24px; }
+    .reviewer-status-title {
+      font-size:11px; font-weight:700; color:var(--text-muted);
+      text-transform:uppercase; letter-spacing:0.5px; margin-bottom:10px;
+    }
+    .reviewer-status {
+      display:flex; align-items:center; gap:10px; padding:10px 12px;
+      margin-bottom:6px; border-radius:var(--radius-sm); font-size:12px;
+      transition:background 0.15s;
+    }
+    .reviewer-status:hover { filter:brightness(1.1); }
+    .status-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+    .status-approved { background:var(--color-success); box-shadow:0 0 6px rgba(34,197,94,0.4); }
+    .status-pending { background:var(--color-warning); animation:blink 1.5s infinite; }
+    .status-your { background:var(--brand-primary); box-shadow:0 0 6px rgba(139,92,246,0.4); }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.5} }
+    .reviewer-avatar {
+      width:24px; height:24px; border-radius:50%; display:flex;
+      align-items:center; justify-content:center; font-size:10px; font-weight:700; color:#fff;
+    }
+    .reviewer-name { flex:1; font-weight:600; }
+    .reviewer-label { font-size:10px; font-weight:600; }
+
+    /* Progress ring */
+    .progress-ring { position:relative; width:56px; height:56px; margin:0 auto 16px; }
+    .progress-ring svg { transform:rotate(-90deg); }
+    .progress-ring circle { fill:none; stroke-width:4; }
+    .progress-ring .bg { stroke:var(--bg-elevated); }
+    .progress-ring .fg { stroke:var(--color-success); stroke-linecap:round; transition:stroke-dashoffset 0.5s; }
+    .progress-ring .text {
+      position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+      font-size:14px; font-weight:800; color:var(--text-primary);
+    }
+
+    .approval-actions { display:flex; gap:10px; justify-content:center; }
     .btn-approve {
-      padding: 12px 32px; background: var(--color-success); color: #fff;
-      border: none; border-radius: var(--radius-sm); font-size: 14px; font-weight: 700;
-      cursor: pointer; transition: all 0.15s;
+      padding:12px 32px; background:var(--color-success); color:#fff;
+      border:none; border-radius:var(--radius-sm); font-size:14px; font-weight:700;
+      cursor:pointer; transition:all 0.15s;
     }
-    .btn-approve:hover { opacity: 0.9; transform: translateY(-1px); }
+    .btn-approve:hover { filter:brightness(1.1); transform:translateY(-1px); box-shadow:0 4px 12px rgba(34,197,94,0.3); }
     .btn-decline {
-      padding: 12px 32px; background: transparent; color: var(--text-secondary);
-      border: 1px solid var(--border-default); border-radius: var(--radius-sm);
-      font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.15s;
+      padding:12px 32px; background:transparent; color:var(--text-secondary);
+      border:1px solid var(--border-default); border-radius:var(--radius-sm);
+      font-size:14px; font-weight:600; cursor:pointer; transition:all 0.15s;
     }
-    .btn-decline:hover { border-color: var(--color-error); color: var(--color-error); }
-    .reviewer-status { display: flex; align-items: center; gap: 8px; padding: 8px 12px; margin-bottom: 6px; border-radius: var(--radius-sm); font-size: 12px; }
-    .status-dot { width: 8px; height: 8px; border-radius: 50%; }
-    .status-approved { background: var(--color-success); }
-    .status-pending { background: var(--color-warning); }
-    .status-declined { background: var(--color-error); }
+    .btn-decline:hover { border-color:var(--color-error); color:var(--color-error); }
   </style>
 </head>
 <body>
@@ -53,29 +96,42 @@
       This will mark the version as approved and notify all collaborators.
     </div>
 
+    <!-- Progress Ring: 2/3 approved -->
+    <div class="progress-ring">
+      <svg width="56" height="56">
+        <circle class="bg" cx="28" cy="28" r="24"/>
+        <circle class="fg" cx="28" cy="28" r="24" stroke-dasharray="150.8" stroke-dashoffset="50.3"/>
+      </svg>
+      <div class="text">2/3</div>
+    </div>
+
     <div class="approval-meta">
       <div class="meta-row"><span class="meta-label">Project</span><span class="meta-value">Neon Warehouse</span></div>
       <div class="meta-row"><span class="meta-label">Version</span><span class="meta-value">v13 — Final Mix</span></div>
       <div class="meta-row"><span class="meta-label">Session</span><span class="meta-value">Master Review — Round 2/3</span></div>
       <div class="meta-row"><span class="meta-label">Uploaded</span><span class="meta-value">2 hours ago</span></div>
+      <div class="meta-row"><span class="meta-label">Size</span><span class="meta-value">142 MB · WAV 24bit · 44.1kHz</span></div>
     </div>
 
-    <div style="text-align:left;margin-bottom:20px">
-      <div style="font-size:12px;font-weight:600;margin-bottom:8px;color:var(--text-muted)">REVIEWER STATUS</div>
-      <div class="reviewer-status" style="background:rgba(34,197,94,0.08)">
+    <div class="reviewer-status-section">
+      <div class="reviewer-status-title">Reviewer Status</div>
+      <div class="reviewer-status" style="background:rgba(34,197,94,0.06)">
         <div class="status-dot status-approved"></div>
-        <span style="font-weight:600">@remixer</span>
-        <span style="margin-left:auto;color:var(--color-success);font-size:11px">Approved</span>
+        <div class="reviewer-avatar" style="background:linear-gradient(135deg,#22c55e,#16a34a)">R</div>
+        <span class="reviewer-name">@remixer</span>
+        <span class="reviewer-label" style="color:var(--color-success)">✓ Approved</span>
       </div>
-      <div class="reviewer-status" style="background:rgba(234,179,8,0.08)">
+      <div class="reviewer-status" style="background:rgba(234,179,8,0.06)">
         <div class="status-dot status-pending"></div>
-        <span style="font-weight:600">@mastering_guru</span>
-        <span style="margin-left:auto;color:var(--color-warning);font-size:11px">Pending</span>
+        <div class="reviewer-avatar" style="background:linear-gradient(135deg,#3b82f6,#6366f1)">M</div>
+        <span class="reviewer-name">@mastering_guru</span>
+        <span class="reviewer-label" style="color:var(--color-warning)">⟳ Pending</span>
       </div>
-      <div class="reviewer-status" style="background:rgba(113,113,122,0.08)">
-        <div class="status-dot" style="background:var(--brand-primary)"></div>
-        <span style="font-weight:600">@you</span>
-        <span style="margin-left:auto;color:var(--brand-primary);font-size:11px">Your turn</span>
+      <div class="reviewer-status" style="background:rgba(139,92,246,0.06)">
+        <div class="status-dot status-your"></div>
+        <div class="reviewer-avatar" style="background:linear-gradient(135deg,#ea5808,#f97316)">P</div>
+        <span class="reviewer-name">@you (Producer)</span>
+        <span class="reviewer-label" style="color:var(--brand-primary)">● Your turn</span>
       </div>
     </div>
 

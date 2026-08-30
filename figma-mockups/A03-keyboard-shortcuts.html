@@ -6,74 +6,91 @@
   <title>SoundHub — Keyboard Shortcuts</title>
   <link rel="stylesheet" href="design-system/shared.css">
   <style>
-    body { display: flex; align-items: center; justify-content: center; min-height: 100vh; background: var(--bg-primary); }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Inter',-apple-system,sans-serif; background:var(--bg-primary); display:flex; align-items:center; justify-content:center; min-height:100vh; }
     .shortcuts-modal {
-      background: var(--bg-elevated); border: 1px solid var(--border-default);
-      border-radius: var(--radius-xl); width: 720px; max-height: 80vh; overflow-y: auto;
+      background:var(--bg-elevated); border:1px solid var(--border-default);
+      border-radius:var(--radius-xl); width:720px; max-height:80vh; overflow-y:auto;
+      box-shadow:0 20px 60px rgba(0,0,0,0.3);
     }
+    .shortcuts-modal::-webkit-scrollbar { width:6px; }
+    .shortcuts-modal::-webkit-scrollbar-track { background:transparent; }
+    .shortcuts-modal::-webkit-scrollbar-thumb { background:var(--border-default); border-radius:3px; }
     .shortcuts-header {
-      padding: 20px 24px; border-bottom: 1px solid var(--border-default);
-      display: flex; align-items: center; justify-content: space-between;
-      position: sticky; top: 0; background: var(--bg-elevated); z-index: 2;
+      padding:20px 24px; border-bottom:1px solid var(--border-default);
+      display:flex; align-items:center; justify-content:space-between;
+      position:sticky; top:0; background:var(--bg-elevated); z-index:2;
     }
-    .shortcuts-title { font-size: 16px; font-weight: 700; }
+    .shortcuts-title { font-size:16px; font-weight:700; display:flex; align-items:center; gap:8px; }
     .close-btn {
-      width: 28px; height: 28px; border-radius: var(--radius-sm);
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; color: var(--text-muted); font-size: 16px;
+      width:28px; height:28px; border-radius:var(--radius-sm);
+      display:flex; align-items:center; justify-content:center;
+      cursor:pointer; color:var(--text-muted); font-size:16px; transition:all 0.15s;
     }
-    .close-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
-    .shortcuts-body { padding: 20px 24px; }
-    .shortcut-section { margin-bottom: 24px; }
-    .shortcut-section:last-child { margin-bottom: 0; }
+    .close-btn:hover { background:var(--bg-hover); color:var(--text-primary); }
+    .shortcuts-body { padding:20px 24px; }
+    .shortcut-search {
+      width:100%; padding:10px 14px 10px 36px; background:var(--bg-surface);
+      border:1px solid var(--border-default); border-radius:var(--radius-md);
+      font-size:13px; color:var(--text-primary); outline:none; margin-bottom:20px;
+      transition:border-color 0.15s;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");
+      background-repeat:no-repeat; background-position:12px center;
+    }
+    .shortcut-search:focus { border-color:var(--brand-primary); }
+    .shortcut-search::placeholder { color:var(--text-muted); }
+    .shortcut-section { margin-bottom:24px; }
+    .shortcut-section:last-child { margin-bottom:0; }
     .shortcut-section-title {
-      font-size: 12px; font-weight: 700; color: var(--text-muted);
-      text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 10px;
+      font-size:11px; font-weight:700; color:var(--text-muted);
+      text-transform:uppercase; letter-spacing:0.8px; margin-bottom:10px;
+      display:flex; align-items:center; gap:6px;
     }
     .shortcut-row {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 8px 0; border-bottom: 1px solid var(--border-default);
+      display:flex; align-items:center; justify-content:space-between;
+      padding:9px 12px; border-radius:var(--radius-sm); transition:background 0.1s;
     }
-    .shortcut-row:last-child { border-bottom: none; }
-    .shortcut-label { font-size: 13px; color: var(--text-secondary); }
-    .shortcut-keys { display: flex; gap: 4px; }
+    .shortcut-row:hover { background:var(--bg-hover); }
+    .shortcut-label { font-size:13px; color:var(--text-secondary); }
+    .shortcut-keys { display:flex; gap:3px; }
     kbd {
-      display: inline-flex; align-items: center; justify-content: center;
-      min-width: 24px; height: 24px; padding: 0 6px;
-      background: var(--bg-surface); border: 1px solid var(--border-default);
-      border-radius: 4px; font-size: 11px; font-family: var(--font-mono);
-      color: var(--text-primary); font-weight: 600;
+      display:inline-flex; align-items:center; justify-content:center;
+      min-width:24px; height:24px; padding:0 6px;
+      background:var(--bg-surface); border:1px solid var(--border-default);
+      border-bottom-width:2px; border-radius:4px;
+      font-size:11px; font-family:var(--font-mono); color:var(--text-primary); font-weight:600;
     }
-    .shortcut-search {
-      width: 100%; padding: 10px 14px; background: var(--bg-surface);
-      border: 1px solid var(--border-default); border-radius: var(--radius-md);
-      font-size: 13px; color: var(--text-primary); outline: none; margin-bottom: 20px;
+    .shortcut-section-divider {
+      height:1px; background:var(--border-default); margin:4px 0 20px;
     }
-    .shortcut-search:focus { border-color: var(--brand-primary); }
-    .shortcut-search::placeholder { color: var(--text-muted); }
+    .search-results-count { font-size:11px; color:var(--text-muted); text-align:center; margin-top:12px; }
   </style>
 </head>
 <body>
   <div class="shortcuts-modal">
     <div class="shortcuts-header">
       <span class="shortcuts-title">⌨️ Keyboard Shortcuts</span>
-      <div class="close-btn">×</div>
+      <div class="close-btn" title="Close (ESC)">×</div>
     </div>
     <div class="shortcuts-body">
-      <input class="shortcut-search" type="text" placeholder="Search shortcuts...">
+      <input class="shortcut-search" type="text" placeholder="Search shortcuts... (⌘K)">
+      <div class="search-results-count">Showing all 20 shortcuts</div>
 
       <div class="shortcut-section">
-        <div class="shortcut-section-title">General</div>
+        <div class="shortcut-section-title">🧭 Navigation</div>
         <div class="shortcut-row"><span class="shortcut-label">Open command palette</span><div class="shortcut-keys"><kbd>⌘</kbd><kbd>K</kbd></div></div>
         <div class="shortcut-row"><span class="shortcut-label">Global search</span><div class="shortcut-keys"><kbd>⌘</kbd><kbd>/</kbd></div></div>
         <div class="shortcut-row"><span class="shortcut-label">Toggle sidebar</span><div class="shortcut-keys"><kbd>⌘</kbd><kbd>B</kbd></div></div>
         <div class="shortcut-row"><span class="shortcut-label">Go to Dashboard</span><div class="shortcut-keys"><kbd>G</kbd><kbd>D</kbd></div></div>
         <div class="shortcut-row"><span class="shortcut-label">Go to Projects</span><div class="shortcut-keys"><kbd>G</kbd><kbd>P</kbd></div></div>
         <div class="shortcut-row"><span class="shortcut-label">Go to Marketplace</span><div class="shortcut-keys"><kbd>G</kbd><kbd>M</kbd></div></div>
+        <div class="shortcut-row"><span class="shortcut-label">Go to Reviews</span><div class="shortcut-keys"><kbd>G</kbd><kbd>R</kbd></div></div>
       </div>
 
+      <div class="shortcut-section-divider"></div>
+
       <div class="shortcut-section">
-        <div class="shortcut-section-title">Playback</div>
+        <div class="shortcut-section-title">▶️ Playback</div>
         <div class="shortcut-row"><span class="shortcut-label">Play / Pause</span><div class="shortcut-keys"><kbd>Space</kbd></div></div>
         <div class="shortcut-row"><span class="shortcut-label">Stop</span><div class="shortcut-keys"><kbd>⏎</kbd></div></div>
         <div class="shortcut-row"><span class="shortcut-label">Skip forward 5s</span><div class="shortcut-keys"><kbd>→</kbd></div></div>
@@ -82,8 +99,10 @@
         <div class="shortcut-row"><span class="shortcut-label">Volume down</span><div class="shortcut-keys"><kbd>↓</kbd></div></div>
       </div>
 
+      <div class="shortcut-section-divider"></div>
+
       <div class="shortcut-section">
-        <div class="shortcut-section-title">Project</div>
+        <div class="shortcut-section-title">📁 Project</div>
         <div class="shortcut-row"><span class="shortcut-label">Create new project</span><div class="shortcut-keys"><kbd>⌘</kbd><kbd>N</kbd></div></div>
         <div class="shortcut-row"><span class="shortcut-label">Upload files</span><div class="shortcut-keys"><kbd>⌘</kbd><kbd>U</kbd></div></div>
         <div class="shortcut-row"><span class="shortcut-label">Save</span><div class="shortcut-keys"><kbd>⌘</kbd><kbd>S</kbd></div></div>
@@ -91,8 +110,10 @@
         <div class="shortcut-row"><span class="shortcut-label">Select all</span><div class="shortcut-keys"><kbd>⌘</kbd><kbd>A</kbd></div></div>
       </div>
 
+      <div class="shortcut-section-divider"></div>
+
       <div class="shortcut-section">
-        <div class="shortcut-section-title">Reviews & Sessions</div>
+        <div class="shortcut-section-title">💬 Reviews & Sessions</div>
         <div class="shortcut-row"><span class="shortcut-label">New review session</span><div class="shortcut-keys"><kbd>⌘</kbd><kbd>R</kbd></div></div>
         <div class="shortcut-row"><span class="shortcut-label">Approve version</span><div class="shortcut-keys"><kbd>⌘</kbd><kbd>⏎</kbd></div></div>
         <div class="shortcut-row"><span class="shortcut-label">Add comment at playhead</span><div class="shortcut-keys"><kbd>C</kbd></div></div>

@@ -6,37 +6,95 @@
   <title>SoundHub — Create Review</title>
   <link rel="stylesheet" href="design-system/shared.css">
   <style>
-    body { display: flex; align-items: center; justify-content: center; min-height: 100vh; background: var(--bg-primary); }
-    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 100; }
-    .modal { background: var(--bg-elevated); border: 1px solid var(--border-default); border-radius: var(--radius-xl); width: 560px; max-height: 90vh; overflow-y: auto; }
-    .modal-header { padding: 20px 24px; border-bottom: 1px solid var(--border-default); display: flex; align-items: center; justify-content: space-between; }
-    .modal-title { font-size: 16px; font-weight: 700; }
-    .modal-close { width: 28px; height: 28px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-muted); font-size: 16px; }
-    .modal-close:hover { background: var(--bg-hover); color: var(--text-primary); }
-    .modal-body { padding: 24px; }
-    .modal-footer { padding: 16px 24px; border-top: 1px solid var(--border-default); display: flex; justify-content: flex-end; gap: 8px; }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Inter',-apple-system,sans-serif; background:var(--bg-primary); display:flex; align-items:center; justify-content:center; min-height:100vh; }
+    .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(4px); display:flex; align-items:center; justify-content:center; z-index:100; }
+    .modal {
+      background:var(--bg-elevated); border:1px solid var(--border-default);
+      border-radius:var(--radius-xl); width:560px; max-height:90vh; overflow-y:auto;
+      box-shadow:0 20px 60px rgba(0,0,0,0.3);
+    }
+    .modal::-webkit-scrollbar { width:6px; }
+    .modal::-webkit-scrollbar-thumb { background:var(--border-default); border-radius:3px; }
+    .modal-header {
+      padding:20px 24px; border-bottom:1px solid var(--border-default);
+      display:flex; align-items:center; justify-content:space-between;
+      position:sticky; top:0; background:var(--bg-elevated); z-index:2;
+    }
+    .modal-title { font-size:16px; font-weight:700; }
+    .modal-close {
+      width:28px; height:28px; border-radius:var(--radius-sm);
+      display:flex; align-items:center; justify-content:center;
+      cursor:pointer; color:var(--text-muted); font-size:16px; transition:all 0.15s;
+    }
+    .modal-close:hover { background:var(--bg-hover); color:var(--text-primary); }
+    .modal-body { padding:24px; }
+    .modal-footer {
+      padding:16px 24px; border-top:1px solid var(--border-default);
+      display:flex; justify-content:flex-end; gap:8px;
+      position:sticky; bottom:0; background:var(--bg-elevated);
+    }
+    .form-group { margin-bottom:16px; }
+    .form-group:last-child { margin-bottom:0; }
+    .form-label { display:block; font-size:12px; font-weight:600; color:var(--text-secondary); margin-bottom:6px; }
+
+    /* Version cards */
     .version-option {
-      padding: 12px; border: 1px solid var(--border-default); border-radius: var(--radius-md);
-      margin-bottom: 8px; cursor: pointer; transition: all 0.15s;
+      padding:12px 14px; border:1px solid var(--border-default); border-radius:var(--radius-md);
+      margin-bottom:8px; cursor:pointer; transition:all 0.15s; display:flex; align-items:center; gap:12px;
     }
-    .version-option:hover { border-color: var(--border-hover); }
-    .version-option.active { border-color: var(--brand-primary); background: rgba(139,92,246,0.08); }
-    .version-name { font-size: 13px; font-weight: 600; }
-    .version-meta { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .version-option:hover { border-color:var(--border-hover); background:var(--bg-hover); }
+    .version-option.active { border-color:var(--brand-primary); background:rgba(139,92,246,0.06); }
+    .version-mini-wave {
+      display:flex; align-items:flex-end; gap:1px; height:28px; width:60px; flex-shrink:0;
+    }
+    .version-mini-bar { flex:1; background:var(--brand-primary); border-radius:1px; opacity:0.5; }
+    .version-option.active .version-mini-bar { opacity:0.8; }
+    .version-info { flex:1; }
+    .version-name { font-size:13px; font-weight:600; }
+    .version-meta { font-size:10px; color:var(--text-muted); margin-top:2px; }
+    .version-radio {
+      width:16px; height:16px; border-radius:50%; border:2px solid var(--border-default);
+      display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:all 0.15s;
+    }
+    .version-option.active .version-radio { border-color:var(--brand-primary); }
+    .version-option.active .version-radio::after {
+      content:''; width:8px; height:8px; border-radius:50%; background:var(--brand-primary);
+    }
+
+    /* Reviewer chips */
     .reviewer-chip {
-      display: inline-flex; align-items: center; gap: 6px;
-      padding: 6px 12px; background: var(--bg-surface); border: 1px solid var(--border-default);
-      border-radius: 20px; font-size: 12px; margin: 4px 4px 4px 0;
+      display:inline-flex; align-items:center; gap:6px;
+      padding:5px 12px 5px 5px; background:var(--bg-surface); border:1px solid var(--border-default);
+      border-radius:20px; font-size:12px; margin:4px 4px 4px 0;
+      transition:all 0.15s;
     }
-    .reviewer-chip .remove { cursor: pointer; opacity: 0.6; }
-    .reviewer-chip .remove:hover { opacity: 1; }
+    .reviewer-chip:hover { border-color:var(--border-hover); }
+    .reviewer-chip .avatar-sm {
+      width:20px; height:20px; border-radius:50%; display:inline-flex;
+      align-items:center; justify-content:center; font-size:9px; font-weight:700; color:#fff;
+    }
+    .reviewer-chip .remove {
+      cursor:pointer; opacity:0.5; font-size:12px; transition:opacity 0.15s; margin-left:2px;
+    }
+    .reviewer-chip .remove:hover { opacity:1; color:var(--color-error); }
     .add-reviewer {
-      display: inline-flex; align-items: center; gap: 4px;
-      padding: 6px 12px; border: 1px dashed var(--border-default);
-      border-radius: 20px; font-size: 12px; color: var(--text-muted);
-      cursor: pointer; margin: 4px 0;
+      display:inline-flex; align-items:center; gap:4px;
+      padding:5px 12px; border:1px dashed var(--border-default);
+      border-radius:20px; font-size:12px; color:var(--text-muted);
+      cursor:pointer; margin:4px 0; transition:all 0.15s;
     }
-    .add-reviewer:hover { border-color: var(--brand-primary); color: var(--brand-primary); }
+    .add-reviewer:hover { border-color:var(--brand-primary); color:var(--brand-primary); border-style:solid; }
+
+    /* Options */
+    .option-row {
+      display:flex; align-items:center; gap:8px; padding:6px 0; font-size:13px; color:var(--text-secondary);
+      cursor:pointer;
+    }
+    .option-row input[type=checkbox] {
+      width:16px; height:16px; accent-color:var(--brand-primary); cursor:pointer;
+    }
+    textarea.form-input { resize:vertical; min-height:60px; }
   </style>
 </head>
 <body>
@@ -44,7 +102,7 @@
     <div class="modal">
       <div class="modal-header">
         <span class="modal-title">💬 Create Review Session</span>
-        <div class="modal-close">×</div>
+        <div class="modal-close" title="Close (ESC)">×</div>
       </div>
       <div class="modal-body">
         <div style="display:flex;flex-direction:column;gap:20px">
@@ -58,16 +116,42 @@
           <div class="form-group">
             <label class="form-label">Select Version</label>
             <div class="version-option active">
-              <div class="version-name">v13 — Final Mix (latest)</div>
-              <div class="version-meta">Uploaded 2h ago · 142 MB · Ableton 12</div>
+              <div class="version-radio"></div>
+              <div class="version-mini-wave">
+                <div class="version-mini-bar" style="height:40%"></div><div class="version-mini-bar" style="height:70%"></div>
+                <div class="version-mini-bar" style="height:55%"></div><div class="version-mini-bar" style="height:85%"></div>
+                <div class="version-mini-bar" style="height:60%"></div><div class="version-mini-bar" style="height:45%"></div>
+              </div>
+              <div class="version-info">
+                <div class="version-name">v13 — Final Mix (latest)</div>
+                <div class="version-meta">Uploaded 2h ago · 142 MB · Ableton 12</div>
+              </div>
+              <span class="badge badge-purple" style="font-size:9px">Latest</span>
             </div>
             <div class="version-option">
-              <div class="version-name">v12 — Pre-master</div>
-              <div class="version-meta">Uploaded 1d ago · 138 MB · Ableton 12</div>
+              <div class="version-radio"></div>
+              <div class="version-mini-wave">
+                <div class="version-mini-bar" style="height:35%"></div><div class="version-mini-bar" style="height:65%"></div>
+                <div class="version-mini-bar" style="height:50%"></div><div class="version-mini-bar" style="height:80%"></div>
+                <div class="version-mini-bar" style="height:55%"></div><div class="version-mini-bar" style="height:40%"></div>
+              </div>
+              <div class="version-info">
+                <div class="version-name">v12 — Pre-master</div>
+                <div class="version-meta">Uploaded 1d ago · 138 MB · Ableton 12</div>
+              </div>
             </div>
             <div class="version-option">
-              <div class="version-name">v11 — Rough Mix</div>
-              <div class="version-meta">Uploaded 3d ago · 135 MB · Ableton 12</div>
+              <div class="version-radio"></div>
+              <div class="version-mini-wave">
+                <div class="version-mini-bar" style="height:30%"></div><div class="version-mini-bar" style="height:55%"></div>
+                <div class="version-mini-bar" style="height:45%"></div><div class="version-mini-bar" style="height:70%"></div>
+                <div class="version-mini-bar" style="height:50%"></div><div class="version-mini-bar" style="height:35%"></div>
+              </div>
+              <div class="version-info">
+                <div class="version-name">v11 — Rough Mix</div>
+                <div class="version-meta">Uploaded 3d ago · 135 MB · Ableton 12</div>
+              </div>
+              <span class="badge badge-muted" style="font-size:9px">Declined</span>
             </div>
           </div>
 
@@ -75,14 +159,22 @@
           <div class="form-group">
             <label class="form-label">Invite Reviewers</label>
             <div>
-              <span class="reviewer-chip"><span style="width:18px;height:18px;border-radius:50%;background:#22c55e;display:inline-flex;align-items:center;justify-content:center;font-size:9px;color:#fff;font-weight:700">R</span> @remixer <span class="remove">×</span></span>
-              <span class="reviewer-chip"><span style="width:18px;height:18px;border-radius:50%;background:#3b82f6;display:inline-flex;align-items:center;justify-content:center;font-size:9px;color:#fff;font-weight:700">M</span> @mastering_guru <span class="remove">×</span></span>
+              <span class="reviewer-chip">
+                <span class="avatar-sm" style="background:linear-gradient(135deg,#22c55e,#16a34a)">R</span>
+                @remixer
+                <span class="remove">×</span>
+              </span>
+              <span class="reviewer-chip">
+                <span class="avatar-sm" style="background:linear-gradient(135deg,#3b82f6,#6366f1)">M</span>
+                @mastering_guru
+                <span class="remove">×</span>
+              </span>
               <span class="add-reviewer">+ Add reviewer</span>
             </div>
           </div>
 
-          <!-- Rounds -->
-          <div class="grid-2">
+          <!-- Rounds & Deadline -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
             <div class="form-group">
               <label class="form-label">Max Rounds</label>
               <select class="form-select" style="width:100%"><option>2 rounds</option><option selected>3 rounds</option><option>5 rounds</option><option>Unlimited</option></select>
@@ -96,23 +188,15 @@
           <!-- Options -->
           <div class="form-group">
             <label class="form-label">Options</label>
-            <div style="display:flex;flex-direction:column;gap:8px;font-size:13px">
-              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;color:var(--text-secondary)">
-                <input type="checkbox" checked> Enable timestamped comments
-              </label>
-              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;color:var(--text-secondary)">
-                <input type="checkbox" checked> Notify reviewers by email
-              </label>
-              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;color:var(--text-secondary)">
-                <input type="checkbox"> Allow anonymous feedback
-              </label>
-            </div>
+            <label class="option-row"><input type="checkbox" checked> Enable timestamped comments</label>
+            <label class="option-row"><input type="checkbox" checked> Notify reviewers by email</label>
+            <label class="option-row"><input type="checkbox"> Allow anonymous feedback</label>
           </div>
 
           <!-- Message -->
           <div class="form-group">
             <label class="form-label">Message (optional)</label>
-            <textarea class="form-input" rows="3" placeholder="Any notes for reviewers..." style="resize:vertical">Please focus on the low-end balance and stereo width. Let me know if the vocal sits well in the mix.</textarea>
+            <textarea class="form-input" rows="3" placeholder="Any notes for reviewers...">Please focus on the low-end balance and stereo width. Let me know if the vocal sits well in the mix.</textarea>
           </div>
         </div>
       </div>
