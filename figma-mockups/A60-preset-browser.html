@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <title>SoundHub — Preset Browser</title>
+  <link rel="stylesheet" href="design-system/shared.css">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Inter',-apple-system,sans-serif; background:var(--bg-primary); color:var(--text-primary); overflow:hidden; height:100vh; }
+    .transport-bar { height:40px; background:var(--bg-panel); border-bottom:1px solid var(--border-default); display:flex; align-items:center; padding:0 12px; gap:16px; font-size:11px; }
+    .transport-logo { font-weight:800; font-size:13px; color:var(--brand-accent); }
+    .transport-logo span { color:var(--text-primary); }
+    .transport-divider { width:1px; height:20px; background:var(--border-default); }
+    .transport-group { display:flex; align-items:center; gap:6px; }
+    .transport-label { color:var(--text-muted); font-size:10px; text-transform:uppercase; letter-spacing:0.5px; }
+    .transport-value { background:var(--bg-primary); border:1px solid var(--border-default); border-radius:4px; padding:2px 8px; font-family:var(--font-mono); font-size:12px; font-weight:600; }
+    .transport-spacer { flex:1; }
+    .app-body { display:flex; height:calc(100vh - 40px); }
+
+    /* ── Sidebar (left: categories) ── */
+    .cat-sidebar { width:200px; background:var(--bg-panel); border-right:1px solid var(--border-default); display:flex; flex-direction:column; overflow-y:auto; }
+    .cat-header { padding:12px 14px; border-bottom:1px solid var(--border-default); font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; }
+    .cat-tree { padding:6px 0; }
+    .cat-item { padding:6px 14px; font-size:11px; color:var(--text-secondary); cursor:pointer; display:flex; align-items:center; gap:6px; transition:all 0.1s; border-left:2px solid transparent; }
+    .cat-item:hover { color:var(--text-primary); background:rgba(255,255,255,0.02); }
+    .cat-item.active { color:var(--brand-accent); background:rgba(234,88,8,0.06); border-left-color:var(--brand-accent); }
+    .cat-item .count { margin-left:auto; font-size:9px; color:var(--text-muted); font-family:var(--font-mono); }
+    .cat-sub { padding-left:20px; }
+    .cat-sub .cat-item { font-size:10px; padding:4px 14px; }
+
+    /* ── Main sidebar ── */
+    .main-sidebar { width:var(--sidebar-width); background:var(--bg-panel); border-right:1px solid var(--border-default); display:flex; flex-direction:column; }
+    .sidebar-search { padding:8px; border-bottom:1px solid var(--border-default); }
+    .sidebar-search input { width:100%; background:var(--bg-input); border:1px solid var(--border-default); border-radius:var(--radius-sm); padding:6px 8px 6px 28px; font-size:11px; color:var(--text-primary); outline:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2352525b' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:8px center; }
+    .sidebar-nav { flex:1; overflow-y:auto; padding:4px 0; }
+    .sidebar-section { padding:8px 12px 4px; font-size:9px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; font-weight:700; }
+    .sidebar-item { padding:6px 12px; font-size:11px; font-weight:500; color:var(--text-secondary); cursor:pointer; display:flex; align-items:center; gap:8px; border-left:2px solid transparent; transition:all 0.1s; }
+    .sidebar-item:hover { color:var(--text-primary); }
+    .sidebar-item.active { color:var(--brand-accent); background:rgba(234,88,8,0.08); border-left-color:var(--brand-accent); }
+
+    /* ── Content ── */
+    .content { flex:1; display:flex; flex-direction:column; min-width:0; overflow:hidden; }
+    .page-header { padding:14px 20px; border-bottom:1px solid var(--border-default); display:flex; align-items:center; gap:12px; }
+    .page-title { font-size:15px; font-weight:700; display:flex; align-items:center; gap:8px; }
+    .page-scroll { flex:1; overflow-y:auto; }
+
+    /* ── Filter bar ── */
+    .filter-row { display:flex; gap:6px; align-items:center; padding:10px 20px; border-bottom:1px solid var(--border-default); background:var(--bg-surface); }
+    .filter-chip { padding:4px 10px; border-radius:4px; font-size:10px; font-weight:600; cursor:pointer; border:1px solid var(--border-default); background:transparent; color:var(--text-muted); transition:all 0.1s; }
+    .filter-chip:hover { color:var(--text-primary); border-color:var(--border-hover); }
+    .filter-chip.active { background:var(--brand-accent); color:#fff; border-color:var(--brand-accent); }
+
+    /* ── Preset list ── */
+    .preset-header { display:grid; grid-template-columns:40px 1fr 100px 80px 60px 60px; gap:10px; padding:8px 20px; font-size:9px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; border-bottom:1px solid var(--border-default); background:var(--bg-panel); position:sticky; top:0; z-index:1; }
+    .preset-row { display:grid; grid-template-columns:40px 1fr 100px 80px 60px 60px; gap:10px; padding:10px 20px; align-items:center; border-bottom:1px solid rgba(39,39,42,0.4); cursor:pointer; transition:background 0.1s; }
+    .preset-row:hover { background:rgba(234,88,8,0.03); }
+    .preset-play { width:32px; height:32px; border-radius:50%; background:var(--brand-accent); display:flex; align-items:center; justify-content:center; font-size:11px; color:#fff; transition:all 0.15s; }
+    .preset-play:hover { filter:brightness(1.2); transform:scale(1.05); }
+    .preset-name { font-size:12px; font-weight:600; color:var(--text-primary); }
+    .preset-creator { font-size:10px; color:var(--text-muted); }
+    .preset-tag-list { display:flex; gap:3px; flex-wrap:wrap; }
+    .mini-tag { padding:1px 5px; background:var(--bg-elevated); border-radius:2px; font-size:8px; color:var(--text-muted); }
+    .preset-bpm { font-size:10px; color:var(--text-muted); font-family:var(--font-mono); }
+    .preset-key { font-size:10px; color:var(--text-muted); font-family:var(--font-mono); }
+    .preset-price { font-size:11px; font-weight:600; font-family:var(--font-mono); }
+    .preset-price.free { color:var(--color-success); }
+    .preset-rating { font-size:10px; color:var(--color-warning); }
+
+    /* ── Waveform preview ── */
+    .wave-preview { height:32px; display:flex; align-items:flex-end; gap:1px; }
+    .wave-mini { flex:1; background:var(--brand-accent); border-radius:1px; opacity:0.5; }
+    .preset-row:hover .wave-mini { opacity:0.8; }
+
+    .btn { padding:5px 12px; border-radius:var(--radius-sm); font-size:11px; font-weight:600; cursor:pointer; border:1px solid var(--border-default); transition:all 0.15s; }
+    .btn-primary { background:var(--brand-accent); color:#fff; border-color:var(--brand-accent); }
+    .btn-secondary { background:var(--bg-surface); color:var(--text-primary); }
+  </style>
+</head>
+<body>
+  <div class="transport-bar">
+    <div class="transport-logo">Sound<span>Hub</span></div>
+    <div class="transport-divider"></div>
+    <div class="transport-group"><span class="transport-label">Instrument</span><div class="transport-value" style="color:var(--brand-accent)">Serum</div></div>
+    <div class="transport-group"><span class="transport-label">Presets</span><div class="transport-value">342</div></div>
+    <div class="transport-group"><span class="transport-label">Free</span><div class="transport-value" style="color:var(--color-success)">47</div></div>
+    <div class="transport-spacer"></div>
+    <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted)">PRESET BROWSER</div>
+  </div>
+  <div class="app-body">
+    <!-- Category sidebar -->
+    <div class="cat-sidebar">
+      <div class="cat-header">📁 Categories</div>
+      <div class="cat-tree">
+        <div class="cat-item active">All Presets <span class="count">342</span></div>
+        <div class="cat-item">Bass <span class="count">89</span></div>
+        <div class="cat-sub">
+          <div class="cat-item">Sub Bass <span class="count">24</span></div>
+          <div class="cat-item">Reese Bass <span class="count">18</span></div>
+          <div class="cat-item">Wobble Bass <span class="count">31</span></div>
+          <div class="cat-item">808 <span class="count">16</span></div>
+        </div>
+        <div class="cat-item">Lead <span class="count">78</span></div>
+        <div class="cat-sub">
+          <div class="cat-item">Saw Lead <span class="count">22</span></div>
+          <div class="cat-item">Square Lead <span class="count">15</span></div>
+          <div class="cat-item">FM Lead <span class="count">19</span></div>
+        </div>
+        <div class="cat-item">Pad <span class="count">64</span></div>
+        <div class="cat-item">Pluck <span class="count">42</span></div>
+        <div class="cat-item">Keys <span class="count">35</span></div>
+        <div class="cat-item">FX <span class="count">28</span></div>
+        <div class="cat-item">Arp <span class="count">18</span></div>
+        <div class="cat-item">Sequence <span class="count">12</span></div>
+        <div class="cat-item">Drone <span class="count">8</span></div>
+        <div class="cat-item">Vocal <span class="count">8</span></div>
+      </div>
+    </div>
+
+    <!-- Main sidebar -->
+    <div class="main-sidebar">
+      <div class="sidebar-search"><input type="text" placeholder="Search presets..."></div>
+      <div class="sidebar-nav">
+        <div class="sidebar-section">Main</div>
+        <div class="sidebar-item"><span class="icon">📊</span> Dashboard</div>
+        <div class="sidebar-item"><span class="icon">📁</span> Projects</div>
+        <div class="sidebar-section">Instruments</div>
+        <div class="sidebar-item"><span class="icon">🎹</span> VST Instruments</div>
+        <div class="sidebar-item active"><span class="icon">🎛️</span> Presets</div>
+        <div class="sidebar-section">Account</div>
+        <div class="sidebar-item"><span class="icon">⚙️</span> Settings</div>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+      <div class="page-header">
+        <div class="page-title">🎛️ Presets for Serum</div>
+        <div style="flex:1"></div>
+        <button class="btn btn-secondary">📥 Export</button>
+        <button class="btn btn-primary">+ Publish Preset</button>
+      </div>
+      <div class="filter-row">
+        <div class="filter-chip active">All</div>
+        <div class="filter-chip">Bass</div>
+        <div class="filter-chip">Lead</div>
+        <div class="filter-chip">Pad</div>
+        <div class="filter-chip">Pluck</div>
+        <div class="filter-chip">Keys</div>
+        <div class="filter-chip">FX</div>
+        <div class="filter-chip">Arp</div>
+        <div style="flex:1"></div>
+        <div class="filter-chip">Free only</div>
+        <div class="filter-chip">★ 4+</div>
+      </div>
+      <div class="page-scroll">
+        <div class="preset-header">
+          <span></span><span>Name</span><span>Tags</span><span>BPM</span><span>Key</span><span>Price</span>
+        </div>
+        <div class="preset-row">
+          <div class="preset-play">▶</div>
+          <div><div class="preset-name">Dark Bass — Deep Impact</div><div class="preset-creator">by @bassDesigner</div></div>
+          <div class="preset-tag-list"><span class="mini-tag">bass</span><span class="mini-tag">dark</span><span class="mini-tag">sub</span></div>
+          <div class="preset-bpm">128</div>
+          <div class="preset-key">Am</div>
+          <div class="preset-price">$2.99</div>
+        </div>
+        <div class="preset-row">
+          <div class="preset-play">▶</div>
+          <div><div class="preset-name">Neon Lead — Saw Stack</div><div class="preset-creator">by @synthlord</div></div>
+          <div class="preset-tag-list"><span class="mini-tag">lead</span><span class="mini-tag">saw</span><span class="mini-tag">bright</span></div>
+          <div class="preset-bpm">140</div>
+          <div class="preset-key">Cm</div>
+          <div class="preset-price">$1.99</div>
+        </div>
+        <div class="preset-row">
+          <div class="preset-play">▶</div>
+          <div><div class="preset-name">Ambient Pad — Celestial</div><div class="preset-creator">by @padmaster</div></div>
+          <div class="preset-tag-list"><span class="mini-tag">pad</span><span class="mini-tag">ambient</span><span class="mini-tag">lush</span></div>
+          <div class="preset-bpm">—</div>
+          <div class="preset-key">Fm</div>
+          <div class="preset-price free">Free</div>
+        </div>
+        <div class="preset-row">
+          <div class="preset-play">▶</div>
+          <div><div class="preset-name">Reese Bass — Filthy</div><div class="preset-creator">by @dnb_producer</div></div>
+          <div class="preset-tag-list"><span class="mini-tag">bass</span><span class="mini-tag">reese</span><span class="mini-tag">dnb</span></div>
+          <div class="preset-bpm">174</div>
+          <div class="preset-key">Gm</div>
+          <div class="preset-price">$2.49</div>
+        </div>
+        <div class="preset-row">
+          <div class="preset-play">▶</div>
+          <div><div class="preset-name">Pluck — Tropical</div><div class="preset-creator">by @plucksound</div></div>
+          <div class="preset-tag-list"><span class="mini-tag">pluck</span><span class="mini-tag">tropical</span><span class="mini-tag">house</span></div>
+          <div class="preset-bpm">124</div>
+          <div class="preset-key">Dm</div>
+          <div class="preset-price">$1.49</div>
+        </div>
+        <div class="preset-row">
+          <div class="preset-play">▶</div>
+          <div><div class="preset-name">Wobble Bass — Dubstep</div><div class="preset-creator">by @wobbleking</div></div>
+          <div class="preset-tag-list"><span class="mini-tag">bass</span><span class="mini-tag">wobble</span><span class="mini-tag">dubstep</span></div>
+          <div class="preset-bpm">150</div>
+          <div class="preset-key">Bm</div>
+          <div class="preset-price">$3.49</div>
+        </div>
+        <div class="preset-row">
+          <div class="preset-play">▶</div>
+          <div><div class="preset-name">FM Bell — Crystal</div><div class="preset-creator">by @fm_designer</div></div>
+          <div class="preset-tag-list"><span class="mini-tag">keys</span><span class="mini-tag">bell</span><span class="mini-tag">fm</span></div>
+          <div class="preset-bpm">—</div>
+          <div class="preset-key">Em</div>
+          <div class="preset-price free">Free</div>
+        </div>
+        <div class="preset-row">
+          <div class="preset-play">▶</div>
+          <div><div class="preset-name">Arp Sequence — Neon</div><div class="preset-creator">by @arp_master</div></div>
+          <div class="preset-tag-list"><span class="mini-tag">arp</span><span class="mini-tag">sequence</span><span class="mini-tag">neon</span></div>
+          <div class="preset-bpm">132</div>
+          <div class="preset-key">Am</div>
+          <div class="preset-price">$1.99</div>
+        </div>
+        <div class="preset-row">
+          <div class="preset-play">▶</div>
+          <div><div class="preset-name">Vocal Chop — Ethereal</div><div class="preset-creator">by @vocal_chops</div></div>
+          <div class="preset-tag-list"><span class="mini-tag">vocal</span><span class="mini-tag">ethereal</span><span class="mini-tag">future</span></div>
+          <div class="preset-bpm">126</div>
+          <div class="preset-key">Cm</div>
+          <div class="preset-price">$2.99</div>
+        </div>
+        <div class="preset-row">
+          <div class="preset-play">▶</div>
+          <div><div class="preset-name">Drone — Cinematic</div><div class="preset-creator">by @sound_designer</div></div>
+          <div class="preset-tag-list"><span class="mini-tag">drone</span><span class="mini-tag">cinematic</span><span class="mini-tag">dark</span></div>
+          <div class="preset-bpm">—</div>
+          <div class="preset-key">Dm</div>
+          <div class="preset-price">$1.99</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

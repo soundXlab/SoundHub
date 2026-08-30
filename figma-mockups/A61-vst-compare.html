@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <title>SoundHub — Compare Instruments</title>
+  <link rel="stylesheet" href="design-system/shared.css">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Inter',-apple-system,sans-serif; background:var(--bg-primary); color:var(--text-primary); overflow:hidden; height:100vh; }
+    .transport-bar { height:40px; background:var(--bg-panel); border-bottom:1px solid var(--border-default); display:flex; align-items:center; padding:0 12px; gap:16px; font-size:11px; }
+    .transport-logo { font-weight:800; font-size:13px; color:var(--brand-accent); }
+    .transport-logo span { color:var(--text-primary); }
+    .transport-divider { width:1px; height:20px; background:var(--border-default); }
+    .transport-spacer { flex:1; }
+    .app-body { display:flex; height:calc(100vh - 40px); }
+    .sidebar { width:var(--sidebar-width); background:var(--bg-panel); border-right:1px solid var(--border-default); display:flex; flex-direction:column; }
+    .sidebar-search { padding:8px; border-bottom:1px solid var(--border-default); }
+    .sidebar-search input { width:100%; background:var(--bg-input); border:1px solid var(--border-default); border-radius:var(--radius-sm); padding:6px 8px 6px 28px; font-size:11px; color:var(--text-primary); outline:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2352525b' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:8px center; }
+    .sidebar-nav { flex:1; overflow-y:auto; padding:4px 0; }
+    .sidebar-section { padding:8px 12px 4px; font-size:9px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; font-weight:700; }
+    .sidebar-item { padding:6px 12px; font-size:11px; font-weight:500; color:var(--text-secondary); cursor:pointer; display:flex; align-items:center; gap:8px; border-left:2px solid transparent; transition:all 0.1s; }
+    .sidebar-item:hover { color:var(--text-primary); }
+    .sidebar-item.active { color:var(--brand-accent); background:rgba(234,88,8,0.08); border-left-color:var(--brand-accent); }
+    .content { flex:1; display:flex; flex-direction:column; min-width:0; overflow:hidden; }
+    .page-header { padding:16px 24px; border-bottom:1px solid var(--border-default); display:flex; align-items:center; justify-content:space-between; }
+    .page-title { font-size:18px; font-weight:700; }
+    .page-scroll { flex:1; overflow-y:auto; padding:24px; }
+
+    /* ── Compare Grid ── */
+    .compare-header { display:grid; grid-template-columns:200px 1fr 1fr; gap:0; margin-bottom:0; }
+    .compare-col-label { padding:16px 20px; background:var(--bg-panel); border:1px solid var(--border-default); font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; display:flex; align-items:center; }
+    .compare-col { padding:20px; background:var(--bg-surface); border:1px solid var(--border-default); text-align:center; }
+    .compare-col-icon { font-size:48px; margin-bottom:8px; }
+    .compare-col-name { font-size:16px; font-weight:700; margin-bottom:2px; }
+    .compare-col-maker { font-size:11px; color:var(--text-muted); margin-bottom:10px; }
+    .compare-col-price { font-size:22px; font-weight:800; font-family:var(--font-mono); }
+    .compare-col-price.free { color:var(--color-success); }
+    .compare-col-rating { font-size:12px; color:var(--color-warning); margin-top:4px; }
+
+    /* ── Compare Rows ── */
+    .compare-row { display:grid; grid-template-columns:200px 1fr 1fr; gap:0; }
+    .compare-row-label { padding:10px 20px; background:var(--bg-panel); border:1px solid var(--border-default); border-top:none; font-size:11px; font-weight:600; color:var(--text-muted); display:flex; align-items:center; }
+    .compare-row-cell { padding:10px 20px; background:var(--bg-surface); border:1px solid var(--border-default); border-top:none; font-size:12px; color:var(--text-secondary); display:flex; align-items:center; justify-content:center; text-align:center; }
+    .compare-row-cell.highlight { color:var(--color-success); font-weight:600; }
+    .compare-row-cell.better { position:relative; }
+    .compare-row-cell.better::before { content:'✓'; position:absolute; left:8px; font-size:10px; color:var(--color-success); }
+    .compare-check { display:inline-flex; align-items:center; gap:4px; }
+    .check-yes { color:var(--color-success); }
+    .check-no { color:var(--text-muted); }
+
+    /* ── Feature bars ── */
+    .feature-bar { display:flex; align-items:center; gap:8px; }
+    .feature-bar-track { flex:1; height:4px; background:var(--bg-elevated); border-radius:2px; }
+    .feature-bar-fill { height:100%; border-radius:2px; }
+    .feature-bar-label { font-size:10px; font-family:var(--font-mono); color:var(--text-muted); min-width:30px; text-align:right; }
+
+    .btn { padding:8px 16px; border-radius:var(--radius-sm); font-size:12px; font-weight:600; cursor:pointer; border:1px solid var(--border-default); transition:all 0.15s; display:inline-flex; align-items:center; gap:6px; }
+    .btn-primary { background:var(--brand-accent); color:#fff; border-color:var(--brand-accent); }
+    .btn-secondary { background:var(--bg-surface); color:var(--text-primary); }
+  </style>
+</head>
+<body>
+  <div class="transport-bar">
+    <div class="transport-logo">Sound<span>Hub</span></div>
+    <div class="transport-divider"></div>
+    <div style="font-size:11px;color:var(--text-muted)">COMPARE: SERUM vs VITAL</div>
+    <div class="transport-spacer"></div>
+    <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted)">INSTRUMENT COMPARE</div>
+  </div>
+  <div class="app-body">
+    <div class="sidebar">
+      <div class="sidebar-search"><input type="text" placeholder="Search..."></div>
+      <div class="sidebar-nav">
+        <div class="sidebar-section">Main</div>
+        <div class="sidebar-item"><span class="icon">📊</span> Dashboard</div>
+        <div class="sidebar-item"><span class="icon">📁</span> Projects</div>
+        <div class="sidebar-section">Instruments</div>
+        <div class="sidebar-item active"><span class="icon">🎹</span> Compare</div>
+        <div class="sidebar-item"><span class="icon">🛒</span> Marketplace</div>
+        <div class="sidebar-section">Account</div>
+        <div class="sidebar-item"><span class="icon">⚙️</span> Settings</div>
+      </div>
+    </div>
+    <div class="content">
+      <div class="page-header">
+        <div class="page-title">⚖️ Compare Instruments</div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-secondary">+ Add Instrument</button>
+          <button class="btn btn-primary">📥 Export Comparison</button>
+        </div>
+      </div>
+      <div class="page-scroll">
+        <!-- Header -->
+        <div class="compare-header">
+          <div class="compare-col-label">Feature</div>
+          <div class="compare-col">
+            <div class="compare-col-icon">🌊</div>
+            <div class="compare-col-name">Serum</div>
+            <div class="compare-col-maker">by Xfer Records</div>
+            <div class="compare-col-price">$189</div>
+            <div class="compare-col-rating">★ 4.9 (342 presets)</div>
+          </div>
+          <div class="compare-col">
+            <div class="compare-col-icon">🔮</div>
+            <div class="compare-col-name">Vital</div>
+            <div class="compare-col-maker">by Matt Tytel</div>
+            <div class="compare-col-price free">Free</div>
+            <div class="compare-col-rating">★ 4.8 (128 presets)</div>
+          </div>
+        </div>
+
+        <!-- Basic Info -->
+        <div class="compare-row"><div class="compare-row-label">Type</div><div class="compare-row-cell">Wavetable Synth</div><div class="compare-row-cell">Spectral Wavetable Synth</div></div>
+        <div class="compare-row"><div class="compare-row-label">Price</div><div class="compare-row-cell">$189</div><div class="compare-row-cell highlight">Free</div></div>
+        <div class="compare-row"><div class="compare-row-label">Format</div><div class="compare-row-cell">VST3 / AU / AAX</div><div class="compare-row-cell">VST3 / AU / CLAP</div></div>
+        <div class="compare-row"><div class="compare-row-label">Platform</div><div class="compare-row-cell">macOS / Windows</div><div class="compare-row-cell">macOS / Windows / Linux</div></div>
+        <div class="compare-row"><div class="compare-row-label">DAW Support</div><div class="compare-row-cell">All major DAWs</div><div class="compare-row-cell">All major DAWs</div></div>
+
+        <!-- Sound Engine -->
+        <div class="compare-row"><div class="compare-row-label" style="color:var(--brand-accent);font-weight:700">Sound Engine</div><div class="compare-row-cell" style="background:rgba(234,88,8,0.03)"></div><div class="compare-row-cell" style="background:rgba(234,88,8,0.03)"></div></div>
+        <div class="compare-row"><div class="compare-row-label">Oscillators</div><div class="compare-row-cell better">2 Wavetable + Sub + Noise</div><div class="compare-row-cell">3 Wavetable + Sampler</div></div>
+        <div class="compare-row"><div class="compare-row-label">Wavetable Editor</div><div class="compare-row-cell better">Yes (GPU-accelerated)</div><div class="compare-row-cell">Yes (spectral)</div></div>
+        <div class="compare-row"><div class="compare-row-label">Filters</div><div class="compare-row-cell">Multi-mode (LP/HP/BP)</div><div class="compare-row-cell">Multi-mode (LP/HP/BP + Comb)</div></div>
+        <div class="compare-row"><div class="compare-row-label">Effects</div><div class="compare-row-cell better">10 built-in FX</div><div class="compare-row-cell">8 built-in FX</div></div>
+
+        <!-- Modulation -->
+        <div class="compare-row"><div class="compare-row-label" style="color:var(--brand-accent);font-weight:700">Modulation</div><div class="compare-row-cell" style="background:rgba(234,88,8,0.03)"></div><div class="compare-row-cell" style="background:rgba(234,88,8,0.03)"></div></div>
+        <div class="compare-row"><div class="compare-row-label">LFOs</div><div class="compare-row-cell">4</div><div class="compare-row-cell highlight">Unlimited</div></div>
+        <div class="compare-row"><div class="compare-row-label">Envelopes</div><div class="compare-row-cell">4</div><div class="compare-row-cell highlight">Unlimited</div></div>
+        <div class="compare-row"><div class="compare-row-label">Mod Matrix</div><div class="compare-row-cell">Drag & Drop</div><div class="compare-row-cell">Drag & Drop</div></div>
+        <div class="compare-row"><div class="compare-row-label">Mod Sources</div><div class="compare-row-cell">16 routings</div><div class="compare-row-cell highlight">Unlimited</div></div>
+
+        <!-- Features -->
+        <div class="compare-row"><div class="compare-row-label" style="color:var(--brand-accent);font-weight:700">Features</div><div class="compare-row-cell" style="background:rgba(234,88,8,0.03)"></div><div class="compare-row-cell" style="background:rgba(234,88,8,0.03)"></div></div>
+        <div class="compare-row"><div class="compare-row-label">Arpeggiator</div><div class="compare-row-cell"><span class="compare-check check-yes">✓ Yes</span></div><div class="compare-row-cell"><span class="compare-check check-yes">✓ Yes</span></div></div>
+        <div class="compare-row"><div class="compare-row-label">Serum Skin Support</div><div class="compare-row-cell"><span class="compare-check check-yes">✓ Native</span></div><div class="compare-row-cell"><span class="compare-check check-no">✕ No</span></div></div>
+        <div class="compare-row"><div class="compare-row-label">Preset Sharing</div><div class="compare-row-cell"><span class="compare-check check-yes">✓ Yes</span></div><div class="compare-row-cell"><span class="compare-check check-yes">✓ Yes</span></div></div>
+        <div class="compare-row"><div class="compare-row-label">MPE Support</div><div class="compare-row-cell"><span class="compare-check check-yes">✓ Yes</span></div><div class="compare-row-cell"><span class="compare-check check-yes">✓ Yes</span></div></div>
+        <div class="compare-row"><div class="compare-row-label">CPU Usage</div><div class="compare-row-cell">Low (GPU)</div><div class="compare-row-cell highlight">Low (optimized)</div></div>
+
+        <!-- Community -->
+        <div class="compare-row"><div class="compare-row-label" style="color:var(--brand-accent);font-weight:700">Community</div><div class="compare-row-cell" style="background:rgba(234,88,8,0.03)"></div><div class="compare-row-cell" style="background:rgba(234,88,8,0.03)"></div></div>
+        <div class="compare-row"><div class="compare-row-label">SoundHub Presets</div><div class="compare-row-cell highlight">342</div><div class="compare-row-cell">128</div></div>
+        <div class="compare-row"><div class="compare-row-label">Rating</div><div class="compare-row-cell highlight">★ 4.9</div><div class="compare-row-cell">★ 4.8</div></div>
+        <div class="compare-row"><div class="compare-row-label">Downloads</div><div class="compare-row-cell highlight">12,400</div><div class="compare-row-cell">8,900</div></div>
+
+        <!-- Verdict -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:24px">
+          <div style="background:var(--bg-surface);border:1px solid var(--border-default);border-radius:var(--radius-md);padding:16px">
+            <div style="font-size:13px;font-weight:700;margin-bottom:8px">🌊 Serum — Best for</div>
+            <ul style="font-size:11px;color:var(--text-secondary);line-height:1.8;padding-left:16px">
+              <li>Professional sound design</li>
+              <li>Extensive preset ecosystem</li>
+              <li>GPU-accelerated wavetable editor</li>
+              <li>Industry-standard workflow</li>
+            </ul>
+          </div>
+          <div style="background:var(--bg-surface);border:1px solid var(--border-default);border-radius:var(--radius-md);padding:16px">
+            <div style="font-size:13px;font-weight:700;margin-bottom:8px">🔮 Vital — Best for</div>
+            <ul style="font-size:11px;color:var(--text-secondary);line-height:1.8;padding-left:16px">
+              <li>Budget-conscious producers</li>
+              <li>Unlimited modulation routing</li>
+              <li>Linux support</li>
+              <li>Spectral wavetable synthesis</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <title>SoundHub — Serum</title>
+  <link rel="stylesheet" href="design-system/shared.css">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Inter',-apple-system,sans-serif; background:var(--bg-primary); color:var(--text-primary); overflow:hidden; height:100vh; }
+    .transport-bar { height:40px; background:var(--bg-panel); border-bottom:1px solid var(--border-default); display:flex; align-items:center; padding:0 12px; gap:16px; font-size:11px; }
+    .transport-logo { font-weight:800; font-size:13px; color:var(--brand-accent); }
+    .transport-logo span { color:var(--text-primary); }
+    .transport-divider { width:1px; height:20px; background:var(--border-default); }
+    .transport-group { display:flex; align-items:center; gap:6px; }
+    .transport-label { color:var(--text-muted); font-size:10px; text-transform:uppercase; letter-spacing:0.5px; }
+    .transport-value { background:var(--bg-primary); border:1px solid var(--border-default); border-radius:4px; padding:2px 8px; font-family:var(--font-mono); font-size:12px; font-weight:600; }
+    .transport-spacer { flex:1; }
+    .app-body { display:flex; height:calc(100vh - 40px); }
+    .sidebar { width:var(--sidebar-width); background:var(--bg-panel); border-right:1px solid var(--border-default); display:flex; flex-direction:column; }
+    .sidebar-search { padding:8px; border-bottom:1px solid var(--border-default); }
+    .sidebar-search input { width:100%; background:var(--bg-input); border:1px solid var(--border-default); border-radius:var(--radius-sm); padding:6px 8px 6px 28px; font-size:11px; color:var(--text-primary); outline:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2352525b' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:8px center; }
+    .sidebar-nav { flex:1; overflow-y:auto; padding:4px 0; }
+    .sidebar-section { padding:8px 12px 4px; font-size:9px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; font-weight:700; }
+    .sidebar-item { padding:6px 12px; font-size:11px; font-weight:500; color:var(--text-secondary); cursor:pointer; display:flex; align-items:center; gap:8px; border-left:2px solid transparent; transition:all 0.1s; }
+    .sidebar-item:hover { color:var(--text-primary); }
+    .sidebar-item.active { color:var(--brand-accent); background:rgba(234,88,8,0.08); border-left-color:var(--brand-accent); }
+    .content { flex:1; display:flex; flex-direction:column; min-width:0; overflow:hidden; }
+    .page-scroll { flex:1; overflow-y:auto; }
+
+    /* ── Hero ── */
+    .vst-hero { position:relative; padding:32px; display:flex; gap:24px; }
+    .vst-hero-visual {
+      width:200px; height:200px; border-radius:var(--radius-lg);
+      background:linear-gradient(135deg,rgba(234,88,8,0.2),rgba(234,179,8,0.1));
+      display:flex; align-items:center; justify-content:center; font-size:72px;
+      flex-shrink:0; position:relative; overflow:hidden; border:1px solid var(--border-default);
+    }
+    .vst-hero-visual .wave-overlay {
+      position:absolute; bottom:0; left:0; right:0; height:40px;
+      display:flex; align-items:flex-end; gap:2px; padding:0 16px 12px;
+    }
+    .vst-hero-visual .wave-bar { flex:1; background:var(--brand-accent); border-radius:1px; opacity:0.6; }
+    .vst-hero-info { flex:1; }
+    .vst-hero-maker { font-size:12px; color:var(--text-muted); margin-bottom:4px; }
+    .vst-hero-name { font-size:28px; font-weight:800; letter-spacing:-0.5px; margin-bottom:8px; }
+    .vst-hero-desc { font-size:13px; color:var(--text-secondary); line-height:1.6; margin-bottom:16px; max-width:600px; }
+    .vst-hero-tags { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:16px; }
+    .vst-hero-stats { display:flex; gap:20px; }
+    .vst-stat { text-align:center; }
+    .vst-stat-value { font-size:18px; font-weight:800; font-family:var(--font-mono); }
+    .vst-stat-label { font-size:9px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; }
+    .vst-hero-actions { display:flex; gap:8px; margin-top:16px; }
+    .btn { padding:8px 16px; border-radius:var(--radius-sm); font-size:12px; font-weight:600; cursor:pointer; border:1px solid var(--border-default); transition:all 0.15s; display:inline-flex; align-items:center; gap:6px; }
+    .btn-primary { background:var(--brand-accent); color:#fff; border-color:var(--brand-accent); }
+    .btn-primary:hover { filter:brightness(1.1); }
+    .btn-secondary { background:var(--bg-surface); color:var(--text-primary); }
+    .btn-secondary:hover { background:var(--bg-hover); }
+    .btn-outline { background:transparent; color:var(--brand-accent); border-color:var(--brand-accent); }
+
+    /* ── Tabs ── */
+    .detail-tabs { display:flex; gap:0; border-bottom:1px solid var(--border-default); padding:0 32px; }
+    .detail-tab { padding:10px 16px; font-size:12px; font-weight:500; color:var(--text-muted); cursor:pointer; border-bottom:2px solid transparent; transition:all 0.15s; }
+    .detail-tab:hover { color:var(--text-secondary); }
+    .detail-tab.active { color:var(--brand-accent); border-bottom-color:var(--brand-accent); font-weight:600; }
+
+    /* ── Content sections ── */
+    .detail-content { padding:24px 32px; }
+    .section-title { font-size:14px; font-weight:700; margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+    .spec-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:24px; }
+    .spec-card { background:var(--bg-surface); border:1px solid var(--border-default); border-radius:var(--radius-sm); padding:14px; }
+    .spec-label { font-size:10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px; }
+    .spec-value { font-size:13px; font-weight:600; }
+    .preset-row { display:flex; align-items:center; gap:12px; padding:10px 14px; background:var(--bg-surface); border:1px solid var(--border-default); border-radius:var(--radius-sm); margin-bottom:6px; cursor:pointer; transition:all 0.15s; }
+    .preset-row:hover { border-color:var(--border-hover); background:var(--bg-hover); }
+    .preset-play { width:28px; height:28px; border-radius:50%; background:var(--brand-accent); display:flex; align-items:center; justify-content:center; font-size:10px; color:#fff; flex-shrink:0; }
+    .preset-info { flex:1; }
+    .preset-name { font-size:12px; font-weight:600; }
+    .preset-meta { font-size:10px; color:var(--text-muted); }
+    .preset-tags { display:flex; gap:4px; }
+    .tag { padding:2px 6px; background:var(--bg-elevated); border-radius:3px; font-size:9px; color:var(--text-muted); }
+    .preset-price { font-size:12px; font-weight:600; font-family:var(--font-mono); color:var(--text-secondary); }
+    .review-item { padding:14px 0; border-bottom:1px solid rgba(39,39,42,0.5); }
+    .review-header { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
+    .review-avatar { width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; color:#fff; }
+    .review-stars { color:var(--color-warning); font-size:11px; margin-left:auto; }
+    .review-text { font-size:12px; color:var(--text-secondary); line-height:1.5; }
+    .review-time { font-size:10px; color:var(--text-muted); margin-top:4px; }
+  </style>
+</head>
+<body>
+  <div class="transport-bar">
+    <div class="transport-logo">Sound<span>Hub</span></div>
+    <div class="transport-divider"></div>
+    <div class="transport-group"><span class="transport-label">Instrument</span><div class="transport-value" style="color:var(--brand-accent)">Serum</div></div>
+    <div class="transport-group"><span class="transport-label">Presets</span><div class="transport-value">342</div></div>
+    <div class="transport-group"><span class="transport-label">Rating</span><div class="transport-value" style="color:var(--color-warning)">★ 4.9</div></div>
+    <div class="transport-spacer"></div>
+    <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted)">INSTRUMENT DETAIL</div>
+  </div>
+  <div class="app-body">
+    <div class="sidebar">
+      <div class="sidebar-search"><input type="text" placeholder="Search..."></div>
+      <div class="sidebar-nav">
+        <div class="sidebar-section">Main</div>
+        <div class="sidebar-item"><span class="icon">📊</span> Dashboard</div>
+        <div class="sidebar-item"><span class="icon">📁</span> Projects</div>
+        <div class="sidebar-item"><span class="icon">🛒</span> Marketplace</div>
+        <div class="sidebar-section">Instruments</div>
+        <div class="sidebar-item active"><span class="icon">🎹</span> VST Instruments</div>
+        <div class="sidebar-item"><span class="icon">🎛️</span> Effects</div>
+        <div class="sidebar-item"><span class="icon">📦</span> Sample Packs</div>
+        <div class="sidebar-section">Workspace</div>
+        <div class="sidebar-item"><span class="icon">💬</span> Reviews</div>
+        <div class="sidebar-item"><span class="icon">⚙️</span> Settings</div>
+      </div>
+    </div>
+    <div class="content">
+      <div class="page-scroll">
+        <!-- Hero -->
+        <div class="vst-hero">
+          <div class="vst-hero-visual">
+            🌊
+            <div class="wave-overlay">
+              <div class="wave-bar" style="height:40%"></div><div class="wave-bar" style="height:70%"></div>
+              <div class="wave-bar" style="height:55%"></div><div class="wave-bar" style="height:85%"></div>
+              <div class="wave-bar" style="height:60%"></div><div class="wave-bar" style="height:45%"></div>
+              <div class="wave-bar" style="height:75%"></div><div class="wave-bar" style="height:90%"></div>
+              <div class="wave-bar" style="height:50%"></div><div class="wave-bar" style="height:65%"></div>
+            </div>
+          </div>
+          <div class="vst-hero-info">
+            <div class="vst-hero-maker">by Xfer Records</div>
+            <div class="vst-hero-name">Serum</div>
+            <div class="vst-hero-desc">Advanced wavetable synthesizer with custom wavetable creation, extensive modulation capabilities, and built-in effects. Industry standard for electronic music production.</div>
+            <div class="vst-hero-tags">
+              <span class="tag" style="background:rgba(234,88,8,0.12);color:var(--brand-accent)">wavetable</span>
+              <span class="tag">synth</span>
+              <span class="tag">modulation</span>
+              <span class="tag">effects</span>
+              <span class="tag">mac/win</span>
+            </div>
+            <div class="vst-hero-stats">
+              <div class="vst-stat"><div class="vst-stat-value" style="color:var(--brand-accent)">$189</div><div class="vst-stat-label">Price</div></div>
+              <div class="vst-stat"><div class="vst-stat-value">342</div><div class="vst-stat-label">Presets</div></div>
+              <div class="vst-stat"><div class="vst-stat-value" style="color:var(--color-warning)">★ 4.9</div><div class="vst-stat-label">Rating</div></div>
+              <div class="vst-stat"><div class="vst-stat-value">12.4k</div><div class="vst-stat-label">Downloads</div></div>
+            </div>
+            <div class="vst-hero-actions">
+              <button class="btn btn-primary">🛒 Buy $189</button>
+              <button class="btn btn-outline">▶ Preview Sounds</button>
+              <button class="btn btn-secondary">📥 Add to Wishlist</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="detail-tabs">
+          <div class="detail-tab active">Overview</div>
+          <div class="detail-tab">Presets (342)</div>
+          <div class="detail-tab">Reviews (89)</div>
+          <div class="detail-tab">Specs</div>
+          <div class="detail-tab">Related</div>
+        </div>
+
+        <!-- Content -->
+        <div class="detail-content">
+          <!-- Specs -->
+          <div class="section-title">📋 Specifications</div>
+          <div class="spec-grid">
+            <div class="spec-card"><div class="spec-label">Type</div><div class="spec-value">Wavetable Synth</div></div>
+            <div class="spec-card"><div class="spec-label">Format</div><div class="spec-value">VST3 / AU / AAX</div></div>
+            <div class="spec-card"><div class="spec-label">Platform</div><div class="spec-value">macOS / Windows</div></div>
+            <div class="spec-card"><div class="spec-label">Oscillators</div><div class="spec-value">2 + Sub + Noise</div></div>
+            <div class="spec-card"><div class="spec-label">Filters</div><div class="spec-value">Multi-mode (LP/HP/BP)</div></div>
+            <div class="spec-card"><div class="spec-label">Effects</div><div class="spec-value">10 built-in FX</div></div>
+            <div class="spec-card"><div class="spec-label">Mod Sources</div><div class="spec-value">4 LFOs + 4 ENVs</div></div>
+            <div class="spec-card"><div class="spec-label">Polyphony</div><div class="spec-value">Unlimited</div></div>
+          </div>
+
+          <!-- Top Presets -->
+          <div class="section-title" style="margin-top:24px">🎛️ Top Presets on SoundHub</div>
+          <div class="preset-row">
+            <div class="preset-play">▶</div>
+            <div class="preset-info"><div class="preset-name">Dark Bass — Deep Impact</div><div class="preset-meta">by @bassDesigner · 24 plays</div></div>
+            <div class="preset-tags"><span class="tag">bass</span><span class="tag">dark</span></div>
+            <div class="preset-price">$2.99</div>
+          </div>
+          <div class="preset-row">
+            <div class="preset-play">▶</div>
+            <div class="preset-info"><div class="preset-name">Neon Lead — Saw Stack</div><div class="preset-meta">by @synthlord · 18 plays</div></div>
+            <div class="preset-tags"><span class="tag">lead</span><span class="tag">saw</span></div>
+            <div class="preset-price">$1.99</div>
+          </div>
+          <div class="preset-row">
+            <div class="preset-play">▶</div>
+            <div class="preset-info"><div class="preset-name">Ambient Pad — Celestial</div><div class="preset-meta">by @padmaster · 31 plays</div></div>
+            <div class="preset-tags"><span class="tag">pad</span><span class="tag">ambient</span></div>
+            <div class="preset-price free" style="color:var(--color-success)">Free</div>
+          </div>
+          <div class="preset-row">
+            <div class="preset-play">▶</div>
+            <div class="preset-info"><div class="preset-name">Pluck — Tropical</div><div class="preset-meta">by @plucksound · 12 plays</div></div>
+            <div class="preset-tags"><span class="tag">pluck</span><span class="tag">tropical</span></div>
+            <div class="preset-price">$1.49</div>
+          </div>
+
+          <!-- Reviews -->
+          <div class="section-title" style="margin-top:24px">💬 Reviews (89)</div>
+          <div class="review-item">
+            <div class="review-header">
+              <div class="review-avatar" style="background:linear-gradient(135deg,#22c55e,#16a34a)">R</div>
+              <span style="font-size:12px;font-weight:600">@remixer</span>
+              <span class="review-stars">★★★★★</span>
+            </div>
+            <div class="review-text">Best wavetable synth on the market. The modulation system is incredibly deep and the sound quality is unmatched. Essential for any electronic producer.</div>
+            <div class="review-time">2 weeks ago</div>
+          </div>
+          <div class="review-item">
+            <div class="review-header">
+              <div class="review-avatar" style="background:linear-gradient(135deg,#3b82f6,#6366f1)">M</div>
+              <span style="font-size:12px;font-weight:600">@mastering_guru</span>
+              <span class="review-stars">★★★★★</span>
+            </div>
+            <div class="review-text">Serum is my go-to for sound design. The wavetable editor alone is worth the price. GPU-accelerated rendering makes it lightweight on CPU.</div>
+            <div class="review-time">1 month ago</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

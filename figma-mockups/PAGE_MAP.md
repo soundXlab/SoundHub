@@ -139,6 +139,9 @@
 | A56 | DAW Plugin Config | ✅ | Max4Live, REAPER настройки — `A56-daw-plugin-config.html` |
 | A57 | CLI Reference | ✅ | snd команды — `A57-cli-reference.html` |
 | A58 | VST Instruments Catalog | ✅ | Каталог VST-инструментов — `A58-vst-instruments-catalog.html` |
+| A59 | VST Instrument Detail | ✅ | Страница инструмента — `A59-vst-detail.html` |
+| A60 | Preset Browser | ✅ | Браузер пресетов — `A60-preset-browser.html` |
+| A61 | VST Compare | ✅ | Сравнение инструментов — `A61-vst-compare.html` |
 
 ## Admin (если нужен)
 
@@ -189,6 +192,6 @@
 | Admin | 5 | 5 | 0 |
 | Mobile | 8 | 8 | 0 |
 | Special States | 6 | 6 | 0 |
-| **TOTAL** | **86** | **86** | **0** |
+| **TOTAL** | **89** | **89** | **0** |
 
 Все страницы покрыты макетами ✅
