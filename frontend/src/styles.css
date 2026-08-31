@@ -1482,6 +1482,23 @@ pre.diff-raw code {
   background: var(--green);
 }
 
+.rs-approval-confirm {
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--muted, #a1a1aa);
+  margin: 0;
+}
+
+.rs-approval-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.rs-approval-actions .rs-btn.approve {
+  flex: 1;
+}
+
 .rs-approved-note {
   color: var(--green);
   font-weight: 700;

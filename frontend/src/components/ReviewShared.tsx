@@ -234,11 +234,17 @@ export function ApprovalPanel({
   const [name, setName] = useState("");
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const [confirmApprove, setConfirmApprove] = useState(false);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (decision === "needs_changes" && !note.trim()) {
       setErr("A 'needs changes' decision requires a note — tell them what to fix.");
+      return;
+    }
+    if (decision === "approved" && !confirmApprove) {
+      setErr(null);
+      setConfirmApprove(true);
       return;
     }
     const approver = name.trim() || (token ? "Reviewer" : "me");
@@ -251,6 +257,7 @@ export function ApprovalPanel({
         await api.addApproval(sessionId, version.id, scope, decision === "approved", note.trim(), approver);
       }
       setNote("");
+      setConfirmApprove(false);
       await onDone();
     } catch (e) {
       setErr(e instanceof Error ? e.message : "Failed to submit approval");
@@ -288,14 +295,20 @@ export function ApprovalPanel({
             <button
               type="button"
               className={`rs-seg-btn ${decision === "approved" ? "active ok" : ""}`}
-              onClick={() => setDecision("approved")}
+              onClick={() => {
+                setDecision("approved");
+                setConfirmApprove(false);
+              }}
             >
               Approve
             </button>
             <button
               type="button"
               className={`rs-seg-btn ${decision === "needs_changes" ? "active changes" : ""}`}
-              onClick={() => setDecision("needs_changes")}
+              onClick={() => {
+                setDecision("needs_changes");
+                setConfirmApprove(false);
+              }}
             >
               Changes
             </button>
@@ -317,9 +330,31 @@ export function ApprovalPanel({
           className="rs-approval-note-input"
           rows={2}
         />
-        <button type="submit" className="rs-btn approve" disabled={busy}>
-          {busy ? "…" : decision === "approved" ? `Approve ${version.label} · ${scope}` : `Request changes · ${scope}`}
-        </button>
+        {confirmApprove && decision === "approved" && (
+          <p className="rs-approval-confirm">
+            You are approving <strong>{version.label}</strong> ({scope}). The engineer will treat this as the mix. You can still listen after.
+          </p>
+        )}
+        <div className="rs-approval-actions">
+          {confirmApprove && decision === "approved" && (
+            <button
+              type="button"
+              className="rs-btn ghost"
+              onClick={() => setConfirmApprove(false)}
+            >
+              Back
+            </button>
+          )}
+          <button type="submit" className="rs-btn approve" disabled={busy}>
+            {busy
+              ? "…"
+              : decision === "needs_changes"
+                ? `Request changes · ${scope}`
+                : confirmApprove
+                  ? `Confirm ${version.label} is the mix`
+                  : `Approve ${version.label} · ${scope}`}
+          </button>
+        </div>
         {err && <div className="error">{err}</div>}
       </form>
     </div>

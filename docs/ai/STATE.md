@@ -150,6 +150,22 @@
 - **Card** — CardHeader, CardTitle, CardDescription, CardContent, CardFooter
 - **Sidebar** — SidebarNavItem, SidebarSection, SidebarDivider
 
+
+### Frontend — исправления сборки и типов (сессия 4)
+- Исправлен путь импорта в src/api.ts: с "./\types" на "./types".
+- Добавлены недостающие TypeScript типы в импортный блок src/api.ts (Task, Retrospective, RetroItem, TestPlan, TestRun, Workflow, WorkflowRun, Incident, FeatureFlag, StatusPageData, Objective, KanbanBoard, Discussion).
+- Обновлены импорты Storybook с "@storybook/react" на "@storybook/react-vite" во всех файлах *.stories.tsx.
+- Добавлены явные типы параметров в функции render сторибуков: (args: any) => ... вместо (args) => ... .
+- Экспортирован интерфейс Filters из src/pages/MarketplacePage.tsx для использования в FilterPanel.tsx.
+- Убраны избыточные явные типовые аргументы из вызовов useList в src/pages/ProjectFeaturesHub.tsx, вызывавшие конфликты типов.
+- Добавлены недостающие поля в интерфейсы TypeScript в src/types.ts:
+  * velocity: number в интерфейс Sprint.
+  * name: string, state: string, item_count: number в интерфейс Retrospective.
+  * name: string, state: string в интерфейс TestPlan.
+  * impact: string в интерфейс Incident.
+- Убрано отображение версии из WikiTab в src/pages/ProjectFeaturesHub.tsx (свойство version отсутствует в WikiPage; используется WikiRevision для версий).
+
+После данных изменений сборка frontend (npm run build) и Storybook (npm run build-storybook) завершаются успешно.
 ## Backend
 - FastAPI + SQLAlchemy (Python 3.12)
 - systemd: `soundhub-backend.service` на автозапуске (порт 8000)
@@ -214,7 +230,10 @@
 
 ### Важно
 - **Макеты только!** Страницы React не трогаем до подтверждения
-- Пользователь хочет чтобы макеты были идеальными перед имплементацией
+- 70 DAW HTML (`figma-mockups/PAGE_MAP.md`) — exploration, **не** source of truth
+- Канон дизайна: `docs/ai/REVIEW_PLAYER_FIGMA_BRIEF.md` **v1.2** (CEO freeze 2026-08-31)
+- Key screen: **RP/D/05 Mix v2 with A/B**. Cover = D/05. Accent плеера `#E85D2A`, purple не CTA Review Player
+- Артборды: `figma-mockups/review-player/` — Foundations + 11 desktop + 7 mobile. Старт: `index.html`, прототип desktop: `RP-D-01.html`
 
 ## Production-Ready Аудит (2026-08-30)
 
@@ -235,7 +254,47 @@
 ### 🟢 Хорошо (10)
 SQL инъекции защищены, PBKDF2-SHA256 260K, хеш-цепочка ledger, LSB watermark, deposit gate, force lock с evidence
 
+## WSL — перенос на другой диск (2026-08-31)
+
+Не Ubuntu Server. Цель: **Ubuntu 26.04 LTS в WSL2 на этой же машине, VHDX на D:**.
+
+| Факт | Значение |
+|------|----------|
+| Сейчас | `Ubuntu-24.04` WSL2, running |
+| VHDX | `C:\Users\User\AppData\Local\wsl\{164bddf3-992d-4320-afb8-7a2f7ad06d8e}\ext4.vhdx` 127G |
+| Цель | `wsl --list --online` → `Ubuntu-26.04` |
+| Диск | **D:** (~1.0T свободно). C: 203G — тесно. E: 176G впритык. F: 38G нет |
+| Каталоги | `D:\WSL\Ubuntu-26.04`, `D:\WSL\backups` |
+| Скрипты | `/home/scatter/backup-kit/wsl/` и `D:\WSL\*.ps1` |
+
+Образ для развёртывания на свежей 26.04 (не клон rootfs 24.04):
+
+`D:\WSL\backups\ubuntu24-scatter-for-26.04-2026-08-31_10-27-39.tar.gz` (15G, sha256 OK на D:)
+
+Внутри: `home/scatter`, `usr/local`, `opt`, `srv`, `etc/wsl.conf`. Без `/etc/apt`, без `.cache`. Restore: `sudo ./restore-on-26.04.sh <archive>` на Ubuntu 26.04.
+
+Дописано 2026-08-31_10-54-10 (root-owned Docker не входил в 15G):
+
+- `D:\WSL\backups\docker-2026-08-31_10-54-10\` — mongodump LibreChat, datadir Mongo/Meili, pg_dump vectordb, volume Open WebUI (sha256 OK)
+- `D:\WSL\backups\ubuntu24-DESKTOP-6VDTJIF-2026-08-31_09-57-00.tar.gz` (14G, с `/etc`)
+
+## Уборка корня репозитория (2026-08-31)
+
+Корень репозитория очищен от внутренних документов:
+- **Было:** 36 `.md` файлов в корне
+- **Стало:** 7 публичных файлов (README, LICENSE, CONTRIBUTING, CHANGELOG, ARCHITECTURE, DESCRIPTION, DEPLOYMENT, LITEPAPER)
+- Внутренние документы перенесены в `docs/internal/` (26 файлов)
+- Blog посты → `docs/blog/` (2 файла)
+- Анализ конкурентов → `docs/analysis/` (2 файла)
+- **Коммит:** `9f41a3b` (docs: reorganize root)
+- **Ветка:** `feat/marketplace-uiux-redesign` запушена (23 коммита + 1 новый)
+- **Примечание:** в `.gitignore` правило `*_RU.md` — русскоязычные файлы не отслеживаются
+- **GitHub secret scanning:** mock Stripe key в figma-mockups разблокирован
+
 ## Следующий шаг
-- Исправить оставшиеся важные проблемы: N+1 query, race conditions, password validation, portfolio error masking
-- Продолжить работу над макетами (уточнить детали Dashboard, сделать остальные страницы в DAW-style)
-- Подготовка к релизу
+
+**Дизайн:** v1.3 после тестов. Approve = confirm с scope (`ReviewShared`). Лендинг: How it works вместо Marketplace в гостевом nav; hero без GitHub. Прототип: D/10 copy-link, D-confirm. Отчёт: `docs/ai/USER_TEST_RP_2026-08-31.md`. Дальше — три живых человека.
+
+**Инженерия (параллельно, не блокирует Figma):** N+1 в `list_sessions`, race `submit_feedback`/`upload_version`, `verify_password`, portfolio error masking.
+
+**WSL:** Ubuntu-26.04 на D: только когда понадобится машина; бэкап уже на `D:\WSL\backups`. 24.04 не удалять.

@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import Waveform from './Waveform';
 import { ThemeProvider } from '../theme/themeContext';
 
@@ -44,7 +44,7 @@ export const Empty: Story = {
 };
 
 export const LightTheme: Story = {
-  render: (args) => (
+  render: (args: any) => (
     <ThemeProvider>
       <Waveform {...args} />
     </ThemeProvider>
@@ -60,7 +60,7 @@ export const LightTheme: Story = {
 };
 
 export const DarkTheme: Story = {
-  render: (args) => (
+  render: (args: any) => (
     <ThemeProvider>
       <Waveform {...args} />
     </ThemeProvider>

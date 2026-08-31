@@ -183,7 +183,7 @@ function WikiTab({ pid }: { pid: number }) {
               <div className="commit-list-row" key={p.slug}>
                 <span>📄</span>
                 <span className="commit-msg">{p.title}</span>
-                <span className="muted" style={{ fontSize: 12 }}>v{p.version}</span>
+                
                 <span className="commit-meta">{shortDate(p.updated_at)}</span>
               </div>
             ))}
@@ -251,7 +251,7 @@ function SprintsTab({ pid }: { pid: number }) {
 
 // ── Retrospectives ──────────────────────────────────────────────────────────
 function RetrosTab({ pid }: { pid: number }) {
-  const { items, loading, reload } = useList<Retrospective[]>(() => api.listRetros(pid));
+  const { items, loading, reload } = useList(() => api.listRetros(pid));
   const [name, setName] = useState("");
   const [selected, setSelected] = useState<number | null>(null);
   const [retroItems, setRetroItems] = useState<RetroItem[]>([]);
@@ -345,9 +345,9 @@ function RetrosTab({ pid }: { pid: number }) {
 
 // ── Test Plans ──────────────────────────────────────────────────────────────
 function TestsTab({ pid }: { pid: number }) {
-  const { items: plans, loading, reload } = useList<TestPlan[]>(() => api.listTestPlans(pid));
+  const { items: plans, loading, reload } = useList(() => api.listTestPlans(pid));
   const [name, setName] = useState("");
-  const { items: runs } = useList<TestRun[]>(() => api.listTestRuns(pid));
+  const { items: runs } = useList(() => api.listTestRuns(pid));
 
   const create = async (e: FormEvent) => {
     e.preventDefault();
@@ -401,7 +401,7 @@ function TestsTab({ pid }: { pid: number }) {
 
 // ── Kanban ──────────────────────────────────────────────────────────────────
 function KanbanTab({ pid }: { pid: number }) {
-  const { items, loading } = useList<KanbanBoard[]>(() => api.listKanbanBoards(pid));
+  const { items, loading } = useList(() => api.listKanbanBoards(pid));
   return (
     <Section title="Kanban Boards">
       {loading ? <Empty text="Loading..." /> : items.length === 0 ? (
@@ -422,7 +422,7 @@ function KanbanTab({ pid }: { pid: number }) {
 
 // ── Tasks ───────────────────────────────────────────────────────────────────
 function TasksTab({ pid }: { pid: number }) {
-  const { items, loading, reload } = useList<Task[]>(() => api.listTasks(pid));
+  const { items, loading, reload } = useList(() => api.listTasks(pid));
   const [title, setTitle] = useState("");
   const [type, setType] = useState("task");
 
@@ -494,7 +494,7 @@ function PRsTab({ pid }: { pid: number }) {
 
 // ── Milestones ──────────────────────────────────────────────────────────────
 function MilestonesTab({ pid }: { pid: number }) {
-  const { items, loading } = useList<Milestone[]>(() => api.listMilestones(pid));
+  const { items, loading } = useList(() => api.listMilestones(pid));
   return (
     <Section title="Milestones">
       {loading ? <Empty text="Loading..." /> : items.length === 0 ? (
@@ -517,7 +517,7 @@ function MilestonesTab({ pid }: { pid: number }) {
 
 // ── Epics ───────────────────────────────────────────────────────────────────
 function EpicsTab({ pid }: { pid: number }) {
-  const { items, loading } = useList<Epic[]>(() => api.listEpics(pid));
+  const { items, loading } = useList(() => api.listEpics(pid));
   return (
     <Section title="Epics">
       {loading ? <Empty text="Loading..." /> : items.length === 0 ? (
@@ -540,7 +540,7 @@ function EpicsTab({ pid }: { pid: number }) {
 
 // ── Discussions ─────────────────────────────────────────────────────────────
 function DiscussionsTab({ pid }: { pid: number }) {
-  const { items, loading } = useList<Discussion[]>(() => api.listDiscussions(pid));
+  const { items, loading } = useList(() => api.listDiscussions(pid));
   return (
     <Section title="Discussions">
       {loading ? <Empty text="Loading..." /> : items.length === 0 ? (
@@ -563,14 +563,14 @@ function DiscussionsTab({ pid }: { pid: number }) {
 
 // ── Workflows ───────────────────────────────────────────────────────────────
 function WorkflowsTab({ pid }: { pid: number }) {
-  const { items: workflows, loading: wfLoading } = useList<Workflow[]>(() => api.listWorkflows(pid));
+  const { items: workflows, loading: wfLoading } = useList(() => api.listWorkflows(pid));
   const [selectedWorkflow, setSelectedWorkflow] = useState<number | null>(null);
 
   // Always call useList, but with a function that returns empty array when no workflow selected
   const workflowRunsFn = selectedWorkflow
     ? () => api.listWorkflowRuns(pid, selectedWorkflow)
     : () => Promise.resolve([]);
-  const { items: runs, loading: runLoading } = useList<WorkflowRun[]>(workflowRunsFn);
+  const { items: runs, loading: runLoading } = useList(workflowRunsFn);
 
   const statusColor = (s: string) =>
     s === "success" ? "#10b981" :
@@ -759,7 +759,7 @@ function ArtifactsTab({ pid }: { pid: number }) {
 
 // ── Incidents ───────────────────────────────────────────────────────────────
 function IncidentsTab({ pid }: { pid: number }) {
-  const { items, loading } = useList<Incident[]>(() => api.listIncidents(pid));
+  const { items, loading } = useList(() => api.listIncidents(pid));
   const sevColor = (s: string) => s === "critical" ? "var(--red)" : s === "major" ? "var(--yellow)" : "var(--muted)";
   return (
     <Section title="Incidents">
@@ -783,7 +783,7 @@ function IncidentsTab({ pid }: { pid: number }) {
 
 // ── Feature Flags ───────────────────────────────────────────────────────────
 function FlagsTab({ pid }: { pid: number }) {
-  const { items, loading, reload } = useList<FeatureFlag[]>(() => api.listFeatureFlags(pid));
+  const { items, loading, reload } = useList(() => api.listFeatureFlags(pid));
   return (
     <Section title="Feature Flags">
       {loading ? <Empty text="Loading..." /> : items.length === 0 ? (
@@ -853,7 +853,7 @@ function TimeTab({ pid }: { pid: number }) {
 
 // ── OKRs ────────────────────────────────────────────────────────────────────
 function OKRsTab({ pid }: { pid: number }) {
-  const { items, loading } = useList<Objective[]>(() => api.listOKRs(pid));
+  const { items, loading } = useList(() => api.listOKRs(pid));
   return (
     <Section title="Objectives & Key Results">
       {loading ? <Empty text="Loading..." /> : items.length === 0 ? (

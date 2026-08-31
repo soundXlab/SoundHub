@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Input } from './Input';
 import { ThemeProvider } from '../../theme/themeContext';
 
@@ -92,7 +92,7 @@ export const ReadOnly: Story = {
 };
 
 export const LightTheme: Story = {
-  render: (args) => (
+  render: (args: any) => (
     <ThemeProvider>
       <Input {...args} />
     </ThemeProvider>
@@ -108,7 +108,7 @@ export const LightTheme: Story = {
 };
 
 export const DarkTheme: Story = {
-  render: (args) => (
+  render: (args: any) => (
     <ThemeProvider>
       <Input {...args} />
     </ThemeProvider>

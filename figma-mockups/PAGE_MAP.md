@@ -1,6 +1,10 @@
 # SoundHub — Полная карта страниц
 
-## Статус: ✅ = готово, ❌ = не сделано
+> **CEO 2026-08-31:** этот файл — exploration HTML, **не** source of truth.
+> Канон: [`docs/ai/REVIEW_PLAYER_FIGMA_BRIEF.md`](../docs/ai/REVIEW_PLAYER_FIGMA_BRIEF.md) v1.2.
+> Не развивать остальные DAW-страницы, пока Review Player не пройдёт 3 пользовательских теста.
+
+## Статус: ✅ = HTML готов, ❌ = не сделано
 
 ---
 

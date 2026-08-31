@@ -176,13 +176,12 @@ export default function SiteHeader({ theme, onToggleTheme, showNav }: SiteHeader
 
   // All "other pages" live in the second row, bandcamp-style.
   const subnav: SubnavItem[] = [
-    { key: "workflow", label: "Workflow", to: onLanding ? "#workflow" : "/#workflow", icon: ICONS.workflow, kind: "anchor" },
+    { key: "workflow", label: "How it works", to: onLanding ? "#workflow" : "/#workflow", icon: ICONS.workflow, kind: "anchor" },
     { key: "diff", label: "Smart diff", to: onLanding ? "#diff" : "/#diff", icon: ICONS.diff, kind: "anchor" },
     { key: "docs", label: "Docs", to: "/docs", icon: <Icon d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z" extra="M9 7h6M9 11h6" />, kind: "route" },
     { key: "wiki", label: "Wiki", to: "https://deepwiki.com/soundXlab/SoundHub", icon: <Icon d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />, kind: "anchor" },
     { key: "cubase", label: "Cubase", to: "/integrations/cubase", icon: ICONS.cubase, kind: "route" },
     { key: "fl", label: "FL Studio", to: "/integrations/fl-studio", icon: ICONS.fl, kind: "route" },
-    { key: "market", label: "Marketplace", to: onLanding ? "#market" : "/#market", icon: ICONS.market, kind: "anchor" },
     { key: "faq", label: "FAQ", to: onLanding ? "#faq" : "/#faq", icon: ICONS.faq, kind: "anchor" },
   ];
   if (user) {

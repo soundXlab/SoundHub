@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from './Card';
 import { ThemeProvider } from '../../theme/themeContext';
 
@@ -128,7 +128,7 @@ export const PaddingLG: Story = {
 };
 
 export const LightTheme: Story = {
-  render: (args) => (
+  render: (args: any) => (
     <ThemeProvider>
       <Card {...args} />
     </ThemeProvider>
@@ -156,7 +156,7 @@ export const LightTheme: Story = {
 };
 
 export const DarkTheme: Story = {
-  render: (args) => (
+  render: (args: any) => (
     <ThemeProvider>
       <Card {...args} />
     </ThemeProvider>

@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Button } from './Button';
 import { ThemeProvider } from '../../theme/themeContext';
 
@@ -86,7 +86,7 @@ export const FullWidth: Story = {
 };
 
 export const LightTheme: Story = {
-  render: (args) => (
+  render: (args: any) => (
     <ThemeProvider>
       <Button {...args} />
     </ThemeProvider>
@@ -102,7 +102,7 @@ export const LightTheme: Story = {
 };
 
 export const DarkTheme: Story = {
-  render: (args) => (
+  render: (args: any) => (
     <ThemeProvider>
       <Button {...args} />
     </ThemeProvider>

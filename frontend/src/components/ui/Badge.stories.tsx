@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Badge } from './Badge';
 import { ThemeProvider } from '../../theme/themeContext';
 
@@ -88,7 +88,7 @@ export const SizeMD: Story = {
 };
 
 export const LightTheme: Story = {
-  render: (args) => (
+  render: (args: any) => (
     <ThemeProvider>
       <Badge {...args} />
     </ThemeProvider>
@@ -103,7 +103,7 @@ export const LightTheme: Story = {
 };
 
 export const DarkTheme: Story = {
-  render: (args) => (
+  render: (args: any) => (
     <ThemeProvider>
       <Badge {...args} />
     </ThemeProvider>

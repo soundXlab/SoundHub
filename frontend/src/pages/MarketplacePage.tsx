@@ -26,6 +26,9 @@ import {
   AudioPlayer,
 } from "../components/ui";
 import { FileText, Download, Settings2, ShoppingCart } from "lucide-react";
+import AssetCard from "../components/marketplace/AssetCard";
+import { FilterPanel } from "../components/marketplace/FilterPanel";
+import { ChevronDown, ChevronRight, Grid, List } from "lucide-react";
 
 interface Listing {
   id: bigint;
@@ -40,7 +43,7 @@ interface Listing {
   released: boolean;
 }
 
-interface Filters {
+export interface Filters {
   q: string;
   genre: string;
   key: string;
@@ -161,6 +164,9 @@ export default function MarketplacePage() {
   const [lUri, setLUri] = useState("");
   const [lPrice, setLPrice] = useState("");
   const [lLicense, setLLicense] = useState("1");
+  // UI state
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [view, setView] = useState<'grid' | 'list'>('grid');
 
   const ensureWallet = async (): Promise<boolean> => {
     if (!deployment) return false;
@@ -399,425 +405,328 @@ export default function MarketplacePage() {
 
   return (
     <FullPageLayout>
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '16px' }}>
-        <Card>
-          <CardHeader>
-            <CardTitle>🛒 Marketplace</CardTitle>
-            <CardDescription>
-              Find it. Preview it. Drop it into your track. — finished sounds with clear
-              commercial rights, paid for with SND.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {/* ---------- Catalog with filters + previews (public) ---------- */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Browse Assets</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="filter-bar">
-                  <Input
-                    placeholder="What are you making? Search presets, loops, packs…"
-                    value={filters.q}
-                    onChange={(e) => setFilter("q", e.target.value)}
-                    style={{ width: '100%' }}
-                  />
-                  <div className="row" style={{ marginTop: 10 }}>
-                    <select
-                      value={filters.genre}
-                      onChange={(e) => setFilter("genre", e.target.value)}
-                      style={{ width: 120 }}
-                    >
-                      <option value="">genre</option>
-                      {genreOptions.map((g) => (
-                        <option key={g} value={g}>{g}</option>
-                      ))}
-                    </select>
-                    <select
-                      value={filters.key}
-                      onChange={(e) => setFilter("key", e.target.value)}
-                      style={{ width: 80 }}
-                    >
-                      <option value="">key</option>
-                      {keyOptions.map((k) => (
-                        <option key={k} value={k}>{k}</option>
-                      ))}
-                    </select>
-                    <select
-                      value={filters.license}
-                      onChange={(e) => setFilter("license", e.target.value)}
-                      style={{ width: 80 }}
-                    >
-                      <option value="">license</option>
-                      {licenseOptions.map((l) => (
-                        <option key={l} value={l}>{l}</option>
-                      ))}
-                    </select>
-                    <select
-                      value={filters.format}
-                      onChange={(e) => setFilter("format", e.target.value)}
-                      style={{ width: 80 }}
-                    >
-                      <option value="">format</option>
-                      {formatOptions.map((f) => (
-                        <option key={f} value={f}>{f.toUpperCase()}</option>
-                      ))}
-                    </select>
-                    <select
-                      value={filters.plugin}
-                      onChange={(e) => setFilter("plugin", e.target.value)}
-                      style={{ width: 120 }}
-                    >
-                      <option value="">plugin</option>
-                      {pluginOptions.map((p) => (
-                        <option key={p} value={p}>{p}</option>
-                      ))}
-                    </select>
-                    <Input
-                      type="number"
-                      placeholder="BPM min"
-                      value={filters.bpmMin}
-                      onChange={(e) => setFilter("bpmMin", e.target.value)}
-                      style={{ width: 80 }}
-                    />
-                    <Input
-                      type="number"
-                      placeholder="BPM max"
-                      value={filters.bpmMax}
-                      onChange={(e) => setFilter("bpmMax", e.target.value)}
-                      style={{ width: 80 }}
-                    />
-                    <Button variant="ghost" size="sm" onClick={resetFilters}>
-                      reset
-                    </Button>
-                  </div>
-                </div>
+      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '16px', display: 'flex', gap: '16px' }}>
+        {/* Filter Panel */}
+        <div style={{ width: 260, flexShrink: 0 }}>
+          <Card>
+            <CardHeader>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span>Filters</span>
+                <Button variant="ghost" size="sm" onClick={() => setSidebarCollapsed(!sidebarCollapsed)}>
+                  {sidebarCollapsed ? <ChevronRight size={16} /> : <ChevronDown size={16} />}
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <FilterPanel
+                filters={filters}
+                genreOptions={genreOptions}
+                keyOptions={keyOptions}
+                licenseOptions={licenseOptions}
+                formatOptions={formatOptions}
+                pluginOptions={pluginOptions}
+                setFilter={setFilter}
+                resetFilters={resetFilters}
+                isCollapsed={sidebarCollapsed}
+                onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+              />
+            </CardContent>
+          </Card>
+        </div>
 
-                {catalogErr && (
-                  <div style={{ fontSize: '14px', color: 'red', marginTop: 10 }}>
-                    {catalogErr}
-                  </div>
-                )}
-
-                <p className="muted" style={{ margin: "14px 0 10px" }}>
-                  {filteredCount} {filteredCount === 1 ? "asset" : "assets"}
-                </p>
-
-                <div className="grid asset-grid">
-                  {catalog.map((a) => {
-                    const onchain = onchainFor(a.listing_id);
-                    const sold = onchain ? onchain.escrowed > 0n : false;
-                    const isMyListing =
-                      onchain && wallet.address?.toLowerCase() === onchain.seller.toLowerCase();
-                    const canBuy = Boolean(onchain && onchain.active && !sold && !isMyListing);
-                    return (
-                      <Card
-                        key={a.uri || a.listing_id}
-                        variant="interactive"
-                        onClick={() => window.open(`/assets/${a.listing_id}`, "_blank")}
-                        style={{ cursor: 'pointer', transition: 'transform 0.1s' }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.transform = 'translateY(-2px)';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.transform = 'translateY(0)';
-                        }}
-                      >
-                        <CardContent>
-                          <div className="row" style={{ alignItems: "flex-start" }}>
-                            <strong className="asset-name">{a.name}</strong>
-                            <span className="spacer" />
-                            {a.verified && <Badge variant="secondary">verified</Badge>}
-                          </div>
-                          <p className="muted asset-desc">{a.description}</p>
-                          <div className="row" style={{ gap: 6 }}>
-                            {a.format && <Badge variant="secondary">{a.format.toUpperCase()}</Badge>}
-                            <Badge variant="secondary">{a.license}</Badge>
-                            {a.bpm && (
-                              <Badge variant="secondary">{a.bpm[0]}–{a.bpm[1]} BPM</Badge>
-                            )}
-                            {a.key && <Badge variant="secondary">{a.key}</Badge>}
-                          </div>
-                          <Waveform
-                            peaks={a.waveform}
-                            progress={playingId === a.listing_id ? progress : 0}
-                            playing={playingId === a.listing_id}
-                          />
-                          <div className="row asset-foot">
-                            <button
-                              className="btn ghost sm"
-                              onClick={() => togglePlay(a)}
-                              disabled={!a.waveform.length}
-                            >
-                              {playingId === a.listing_id ? "❚❚ pause" : "▶ preview"}
-                            </button>
-                            <span className="spacer" />
-                            {a.duration_seconds > 0 && (
-                              <span className="muted" style={{ fontSize: 12 }}>
-                                {a.duration_seconds}s
-                              </span>
-                            )}
-                            <strong>{a.price_snd} SND</strong>
-                            {canBuy ? (
-                              <Button
-                                variant="secondary"
-                                size="sm"
-                                disabled={busy || !wallet.address}
-                                title={wallet.address ? "" : "connect wallet to buy"}
-                                onClick={() => onchain && buy(onchain)}
-                              >
-                                Buy
-                              </Button>
-                            ) : onchain ? (
-                              <Badge
-                                variant={sold ? "secondary" : isMyListing ? "secondary" : "ghost"}
-                              >
-                                {sold ? "sold" : isMyListing ? "yours" : "off market"}
-                              </Badge>
-                            ) : (
-                              <Badge variant="ghost">demo</Badge>
-                            )}
-                          </div>
-                          <div className="muted" style={{ fontSize: 12, marginTop: 8 }}>
-                            {a.plugins.length > 0
-                              ? `needs: ${a.plugins.join(", ")}`
-                              : "works without third-party plugins"}
-                          </div>
-                        </CardContent>
-                      </Card>
-                    );
-                  })}
-                </div>
-
-                {catalog.length === 0 && !catalogErr && (
-                  <div style={{ fontSize: '14px', color: 'var(--text-muted)', padding: '20px 0', textAlign: 'center' }}>
-                    No assets match — try wider filters.
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* ---------- On-chain sections (wallet required) ---------- */}
-            {!deployed ? (
+        {/* Main Content */}
+        <div style={{ flex: 1 }}>
+          <Card>
+            <CardHeader>
+              <CardTitle>🛒 Marketplace</CardTitle>
+              <CardDescription>
+                Find it. Preview it. Drop it into your track. — finished sounds with clear
+                commercial rights, paid for with SND.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {/* ---------- Catalog with Asset Cards (public) ---------- */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Notice</CardTitle>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                      <CardTitle>Browse Assets</CardTitle>
+                    </div>
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setView(view === 'grid' ? 'list' : 'grid')}
+                      >
+                        {view === 'grid' ? <List size={16} /> : <Grid size={16} />}
+                      </Button>
+                      <span className="muted" style={{ fontSize: 12 }}>
+                        {view === 'grid' ? 'List view' : 'Grid view'}
+                      </span>
+                    </div>
+                  </div>
                 </CardHeader>
                 <CardContent>
-                  <p className="muted">
-                    Contracts not deployed yet — catalog preview is still available above.
-                  </p>
-                </CardContent>
-              </Card>
-            ) : (
-              <>
-                <Card>
-                  <CardHeader>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <CardTitle>Listings & escrow</CardTitle>
-                      <Button variant="ghost" size="sm" onClick={refresh} disabled={busy}>
-                        ↻ refresh
-                      </Button>
+                  {catalogErr && (
+                    <div style={{ fontSize: '14px', color: 'red', marginTop: 10 }}>
+                      {catalogErr}
                     </div>
-                  </CardHeader>
-                  <CardContent>
-                    {listings.length === 0 && (
-                      <div style={{ fontSize: '14px', color: 'var(--text-muted)', padding: '20px 0', textAlign: 'center' }}>
-                        No assets listed yet. Be the first seller!
-                      </div>
-                    )}
-                    {listings.map((l) => {
-                      const isMyListing = wallet.address?.toLowerCase() === l.seller.toLowerCase();
-                      const amBuyer = wallet.address?.toLowerCase() === l.buyer.toLowerCase();
-                      const sold = l.escrowed > 0n;
+                  )}
+
+                  <p className="muted" style={{ margin: "14px 0 10px" }}>
+                    {filteredCount} {filteredCount === 1 ? "asset" : "assets"}
+                  </p>
+
+                  <div className="grid asset-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px' }}>
+                    {catalog.map((a) => {
+                      const onchain = onchainFor(a.listing_id);
+                      const sold = onchain ? onchain.escrowed > 0n : false;
+                      const isMyListing =
+                        onchain && wallet.address?.toLowerCase() === onchain.seller.toLowerCase();
+                      const canBuy = Boolean(onchain && onchain.active && !sold && !isMyListing);
                       return (
-                        <Card
-                          key={l.id.toString()}
-                          variant="interactive"
-                          onClick={() => window.open(`/listings/${l.id}`, "_blank")}
-                          style={{ cursor: 'pointer', transition: 'transform 0.1s' }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.transform = 'translateY(-2px)';
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.transform = 'translateY(0)';
-                          }}
-                        >
-                          <CardContent>
-                            <div className="file-row">
-                              <span className="file-icon"><Settings2 size={14} /></span>
-                              <div style={{ flex: 1 }}>
-                                <div>
-                                  <strong>{l.name}</strong>{" "}
-                                  <Badge variant="secondary">{LICENSE_NAMES[l.license]}</Badge>
-                                  {isMyListing && <Badge variant="secondary">yours</Badge>}
-                                </div>
-                                <div className="muted" style={{ fontSize: 12, fontFamily: "monospace" }}>
-                                  #{l.id.toString()} · {l.assetUri} · seller{" "}
-                                  {l.seller.slice(0, 6)}…{l.seller.slice(-4)}
-                                </div>
-                              </div>
-                              <strong>{formatEther(l.price)} SND</strong>
-                              {!sold && l.active && !isMyListing && (
-                                <Button
-                                  variant="secondary"
-                                  size="sm"
-                                  disabled={busy}
-                                  onClick={() => buy(l)}
-                                >
-                                  Buy
-                                </Button>
-                              )}
-                              {!sold && l.active && isMyListing && (
-                                <Badge variant="secondary">listed</Badge>
-                              )}
-                              {sold && !l.released && amBuyer && (
-                                <Button
-                                  variant="secondary"
-                                  size="sm"
-                                  disabled={busy}
-                                  onClick={() => confirm(l)}
-                                >
-                                  Confirm receipt
-                                </Button>
-                              )}
-                              {sold && !l.released && isMyListing && (
-                                <Badge
-                                  variant="secondary"
-                                  style={{ background: '#f5c54220', color: '#f5c542' }}
-                                >
-                                  in escrow
-                                </Badge>
-                              )}
-                              {l.released && <Badge variant="secondary">settled</Badge>}
-                            </div>
-                          </CardContent>
-                        </Card>
+                        <AssetCard
+                          key={a.uri || a.listing_id}
+                          asset={a}
+                          isPlaying={playingId === a.listing_id}
+                          onTogglePlay={togglePlay}
+                          onAssetDetail={() => window.open(`/assets/${a.listing_id}`, "_blank")}
+                          view={view}
+                        />
                       );
                     })}
-                  </CardContent>
-                </Card>
+                  </div>
 
+                  {catalog.length === 0 && !catalogErr && (
+                    <div style={{ fontSize: '14px', color: 'var(--text-muted)', padding: '20px 0', textAlign: 'center' }}>
+                      No assets match — try wider filters.
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* ---------- On-chain sections (wallet required) ---------- */}
+              {!deployed ? (
                 <Card>
                   <CardHeader>
-                    <CardTitle>Sell a finished sound</CardTitle>
+                    <CardTitle>Notice</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <form className="card" onSubmit={listAsset}>
-                      <div className="row" style={{ gap: 8 }}>
-                        <div>
-                          <Input
-                            label="Name"
-                            placeholder="e.g. 'Dark Bass Patch (Serum)'"
-                            value={lName}
-                            onChange={(e) => setLName(e.target.value)}
-                          />
-                        </div>
-                        <div>
-                          <Input
-                            label="Price in SND"
-                            value={lPrice}
-                            onChange={(e) => setLPrice(e.target.value)}
-                            style={{ width: 120 }}
-                          />
-                        </div>
-                        <div>
-                          <select
-                            value={lLicense}
-                            onChange={(e) => setLLicense(e.target.value)}
-                            style={{
-                              background: "var(--bg3)",
-                              color: "var(--text)",
-                              border: "1px solid var(--border)",
-                              borderRadius: 8,
-                              padding: "9px 12px",
-                            }}
-                          >
-                            {LICENSE_NAMES.map((n, i) => (
-                              <option key={n} value={i}>{n}</option>
-                            ))}
-                          </select>
-                        </div>
-                      </div>
-                      <Input
-                        label="Asset URI"
-                        placeholder="Asset URI (repo path or IPFS), e.g. soundhub://presets/dark-bass"
-                        value={lUri}
-                        onChange={(e) => setLUri(e.target.value)}
-                      />
-                      <div className="row" style={{ marginTop: 10 }}>
-                        <div className="muted" style={{ fontSize: 12 }}>
-                          Wallet:{' '}
-                          {wallet.address ? `${wallet.address.slice(0, 6)}…${wallet.address.slice(-4)}` : "not connected"}
-                        </div>
-                        <div className="spacer" />
-                        <Button
-                          variant="primary"
-                          size="sm"
-                          disabled={busy}
-                          onClick={listAsset}
-                        >
-                          {busy ? "…" : "List for SND"}
-                        </Button>
-                      </div>
-                    </form>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Wallet</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div style={{ fontSize: 24, fontWeight: 700 }}>
-                      {wallet.address ? `${sndBalance ?? "…"} SND` : "connect wallet"}
-                    </div>
-                    <div className="row" style={{ marginTop: 12 }}>
-                      {!wallet.connected && (
-                        <Button variant="primary" onClick={() => wallet.connect()}>
-                          Connect wallet
-                        </Button>
-                      )}
-                      {wallet.connected && !canClaim && (
-                        <Badge variant="secondary">claimed recently</Badge>
-                      )}
-                      {wallet.connected && canClaim && (
-                        <Button
-                          variant="primary"
-                          size="sm"
-                          onClick={claimFaucet}
-                          disabled={busy}
-                        >
-                          Claim 100 SND (testnet)
-                        </Button>
-                      )}
-                    </div>
-                    {msg && (
-                      <div style={{ fontSize: '14px', background: '#4CAF5020', color: '#4CAF50', padding: '8px', borderRadius: 4 }}>
-                        {msg}
-                      </div>
-                    )}
-                    {err && (
-                      <div style={{ fontSize: '14px', background: '#F4433620', color: '#F44336', padding: '8px', borderRadius: 4 }}>
-                        {err}
-                      </div>
-                    )}
-                    {receiptErr && (
-                      <div style={{ fontSize: '14px', background: '#F4433620', color: '#F44336', padding: '8px', borderRadius: 4 }}>
-                        {receiptErr}
-                      </div>
-                    )}
-                    {receipt && <LicenseReceiptCard receipt={receipt} />}
-                    <p className="muted" style={{ fontSize: 12, marginBottom: 0 }}>
-                      Testnet faucet: 100 SND per wallet per day — enough to try
-                      buying a preset.
+                    <p className="muted">
+                      Contracts not deployed yet — catalog preview is still available above.
                     </p>
                   </CardContent>
                 </Card>
-              </>
-            )}
-          </CardContent>
-        </Card>
+              ) : (
+                <>
+                  <Card>
+                    <CardHeader>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <CardTitle>Listings & escrow</CardTitle>
+                        <Button variant="ghost" size="sm" onClick={refresh} disabled={busy}>
+                          ↻ refresh
+                        </Button>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      {listings.length === 0 && (
+                        <div style={{ fontSize: '14px', color: 'var(--text-muted)', padding: '20px 0', textAlign: 'center' }}>
+                          No assets listed yet. Be the first seller!
+                        </div>
+                      )}
+                      {listings.map((l) => {
+                        const isMyListing = wallet.address?.toLowerCase() === l.seller.toLowerCase();
+                        const amBuyer = wallet.address?.toLowerCase() === l.buyer.toLowerCase();
+                        const sold = l.escrowed > 0n;
+                        return (
+                          <Card
+                            key={l.id.toString()}
+                            variant="interactive"
+                            onClick={() => window.open(`/listings/${l.id}`, "_blank")}
+                            style={{ cursor: 'pointer', transition: 'transform 0.1s' }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.transform = 'translateY(-2px)';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.transform = 'translateY(0)';
+                            }}
+                          >
+                            <CardContent>
+                              <div className="file-row">
+                                <span className="file-icon"><Settings2 size={14} /></span>
+                                <div style={{ flex: 1 }}>
+                                  <div>
+                                    <strong>{l.name}</strong>{" "}
+                                    <Badge variant="secondary">{LICENSE_NAMES[l.license]}</Badge>
+                                    {isMyListing && <Badge variant="secondary">yours</Badge>}
+                                  </div>
+                                  <div className="muted" style={{ fontSize: 12, fontFamily: "monospace" }}>
+                                    #{l.id.toString()} · {l.assetUri} · seller{" "}
+                                    {l.seller.slice(0, 6)}…{l.seller.slice(-4)}
+                                  </div>
+                                </div>
+                                <strong>{formatEther(l.price)} SND</strong>
+                                {!sold && l.active && !isMyListing && (
+                                  <Button
+                                    variant="secondary"
+                                    size="sm"
+                                    disabled={busy}
+                                    onClick={() => buy(l)}
+                                  >
+                                    Buy
+                                  </Button>
+                                )}
+                                {!sold && l.active && isMyListing && (
+                                  <Badge variant="secondary">listed</Badge>
+                                )}
+                                {sold && !l.released && amBuyer && (
+                                  <Button
+                                    variant="secondary"
+                                    size="sm"
+                                    disabled={busy}
+                                    onClick={() => confirm(l)}
+                                  >
+                                    Confirm receipt
+                                  </Button>
+                                )}
+                                {sold && !l.released && isMyListing && (
+                                  <Badge
+                                    variant="secondary"
+                                    style={{ background: '#f5c54220', color: '#f5c542' }}
+                                  >
+                                    in escrow
+                                  </Badge>
+                                )}
+                                {l.released && <Badge variant="secondary">settled</Badge>}
+                              </div>
+                            </CardContent>
+                          </Card>
+                        );
+                      })}
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Sell a finished sound</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <form className="card" onSubmit={listAsset}>
+                        <div className="row" style={{ gap: 8 }}>
+                          <div>
+                            <Input
+                              label="Name"
+                              placeholder="e.g. 'Dark Bass Patch (Serum)'"
+                              value={lName}
+                              onChange={(e) => setLName(e.target.value)}
+                            />
+                          </div>
+                          <div>
+                            <Input
+                              label="Price in SND"
+                              value={lPrice}
+                              onChange={(e) => setLPrice(e.target.value)}
+                              style={{ width: 120 }}
+                            />
+                          </div>
+                          <div>
+                            <select
+                              value={lLicense}
+                              onChange={(e) => setLLicense(e.target.value)}
+                              style={{
+                                background: "var(--bg3)",
+                                color: "var(--text)",
+                                border: "1px solid var(--border)",
+                                borderRadius: 8,
+                                padding: "9px 12px",
+                              }}
+                            >
+                              {LICENSE_NAMES.map((n, i) => (
+                                <option key={n} value={i}>{n}</option>
+                              ))}
+                            </select>
+                          </div>
+                        </div>
+                        <Input
+                          label="Asset URI"
+                          placeholder="Asset URI (repo path or IPFS), e.g. soundhub://presets/dark-bass"
+                          value={lUri}
+                          onChange={(e) => setLUri(e.target.value)}
+                        />
+                        <div className="row" style={{ marginTop: 10 }}>
+                          <div className="muted" style={{ fontSize: 12 }}>
+                            Wallet:{' '}
+                            {wallet.address ? `${wallet.address.slice(0, 6)}…${wallet.address.slice(-4)}` : "not connected"}
+                          </div>
+                          <div className="spacer" />
+                          <Button
+                            variant="primary"
+                            size="sm"
+                            disabled={busy}
+                            onClick={listAsset}
+                          >
+                            {busy ? "…" : "List for SND"}
+                          </Button>
+                        </div>
+                      </form>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Wallet</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div style={{ fontSize: 24, fontWeight: 700 }}>
+                        {wallet.address ? `${sndBalance ?? "…"} SND` : "connect wallet"}
+                      </div>
+                      <div className="row" style={{ marginTop: 12 }}>
+                        {!wallet.connected && (
+                          <Button variant="primary" onClick={() => wallet.connect()}>
+                            Connect wallet
+                          </Button>
+                        )}
+                        {wallet.connected && !canClaim && (
+                          <Badge variant="secondary">claimed recently</Badge>
+                        )}
+                        {wallet.connected && canClaim && (
+                          <Button
+                            variant="primary"
+                            size="sm"
+                            onClick={claimFaucet}
+                            disabled={busy}
+                          >
+                            Claim 100 SND (testnet)
+                          </Button>
+                        )}
+                      </div>
+                      {msg && (
+                        <div style={{ fontSize: '14px', background: '#4CAF5020', color: '#4CAF50', padding: '8px', borderRadius: 4 }}>
+                          {msg}
+                        </div>
+                      )}
+                      {err && (
+                        <div style={{ fontSize: '14px', background: '#F4433620', color: '#F44336', padding: '8px', borderRadius: 4 }}>
+                          {err}
+                        </div>
+                      )}
+                      {receiptErr && (
+                        <div style={{ fontSize: '14px', background: '#F4433620', color: '#F44336', padding: '8px', borderRadius: 4 }}>
+                          {receiptErr}
+                        </div>
+                      )}
+                      {receipt && <LicenseReceiptCard receipt={receipt} />}
+                      <p className="muted" style={{ fontSize: 12, marginBottom: 0 }}>
+                        Testnet faucet: 100 SND per wallet per day — enough to try
+                        buying a preset.
+                      </p>
+                    </CardContent>
+                  </Card>
+                </>
+              )}
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </FullPageLayout>
   );

@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import TopBar, { TopBarLink, TopBarSearch, TopBarUserMenu } from './TopBar';
 import { ThemeProvider } from '../../theme/themeContext';
 import { MemoryRouter } from 'react-router-dom';
@@ -108,7 +108,7 @@ export const AuthenticatedUser: Story = {
 };
 
 export const LightTheme: Story = {
-  render: (args) => (
+  render: (args: any) => (
     <ThemeProvider>
       <TopBar {...args} />
     </ThemeProvider>
@@ -130,7 +130,7 @@ export const LightTheme: Story = {
 };
 
 export const DarkTheme: Story = {
-  render: (args) => (
+  render: (args: any) => (
     <ThemeProvider>
       <TopBar {...args} />
     </ThemeProvider>

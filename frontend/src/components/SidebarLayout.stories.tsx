@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { SidebarLayout } from './SidebarLayout';
 import { ThemeProvider } from '../theme/themeContext';
 import { MemoryRouter } from 'react-router-dom';
@@ -24,7 +24,7 @@ export default meta;
 type Story = StoryObj<typeof SidebarLayout>;
 
 export const Default: Story = {
-  render: (args) => (
+  render: (args: any) => (
     <ThemeProvider>
       <MemoryRouter>
         <SidebarLayout {...args}>{mockContent}</SidebarLayout>
@@ -50,7 +50,7 @@ export const Default: Story = {
 };
 
 export const Expanded: Story = {
-  render: (args) => {
+  render: (args: any) => {
     // Override localStorage.getItem to return null (so collapsed = false)
     const originalGetItem = localStorage.getItem;
     localStorage.getItem = (key) => (key === 'sidebarCollapsed' ? null : originalGetItem.call(localStorage, key));
@@ -71,7 +71,7 @@ export const Expanded: Story = {
 };
 
 export const Collapsed: Story = {
-  render: (args) => {
+  render: (args: any) => {
     // Override localStorage.getItem to return 'true'
     const originalGetItem = localStorage.getItem;
     localStorage.getItem = (key) => (key === 'sidebarCollapsed' ? 'true' : originalGetItem.call(localStorage, key));
@@ -92,7 +92,7 @@ export const Collapsed: Story = {
 };
 
 export const LightTheme: Story = {
-  render: (args) => {
+  render: (args: any) => {
     // Override to expanded for consistency
     const originalGetItem = localStorage.getItem;
     localStorage.getItem = (key) => (key === 'sidebarCollapsed' ? null : originalGetItem.call(localStorage, key));
@@ -115,7 +115,7 @@ export const LightTheme: Story = {
 };
 
 export const DarkTheme: Story = {
-  render: (args) => {
+  render: (args: any) => {
     // Override to expanded for consistency
     const originalGetItem = localStorage.getItem;
     localStorage.getItem = (key) => (key === 'sidebarCollapsed' ? null : originalGetItem.call(localStorage, key));

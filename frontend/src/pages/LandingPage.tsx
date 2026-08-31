@@ -125,9 +125,7 @@ const DAW_ASSETS = [
 
 const MARKET_BENEFITS = [
   { title: "Buy without leaving the session", text: "A revision needs a tighter bass? The panel suggests verified, compatible patches — buy and load in place." },
-  { title: "Escrow protected", text: "Payments sit in escrow until you confirm receipt. Dispute window and refunds are part of the purchase." },
   { title: "Verified before you pay", text: "DAW-parsed metadata: BPM, key, plugins, samples. What you're buying is answered before checkout." },
-  { title: "License bound on-chain", text: "Personal / Commercial / Sync / Exclusive tiers attached to the purchase. Rights stay legible end to end." },
 ];
 
 const INTEGRATIONS = [
@@ -781,9 +779,8 @@ export default function LandingPage() {
             in folders and chat threads.
           </h1>
           <p className="cr-sub">
-            SoundHub brings GitHub-style version control, review, and automated
-            audio quality checks to DAW workflows — from the first idea to the
-            final release.
+            A review, versioning, and approval system for music projects — for
+            engineers, artists, and A&R. Clients open a link. No account.
           </p>
           <div className="bc-cta">
             <Link to={SAMPLE_REVIEW_URL} className="bc-btn bc-btn-primary">▶ Open a sample review</Link>
@@ -1179,7 +1176,7 @@ export default function LandingPage() {
         <div className="bc-footer-grid">
           <div className="bc-footer-brand">
             <img src="/logo.png" alt="SoundHub" className="bc-logo" />
-            <p>Review, versions and approvals for music — marketplace built in.</p>
+            <p>Review, versions and approvals for music.</p>
           </div>
           <div className="bc-footer-col">
             <h4>Product</h4>
