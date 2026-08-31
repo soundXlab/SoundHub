@@ -931,6 +931,17 @@ export const api = {
       method: "POST",
     }),
 
+  // ---------- Branch Protection ----------
+  getBranchProtections: (projectId: number) =>
+    request<BranchProtection[]>(`/api/projects/${projectId}/branch-protections`),
+  createBranchProtection: (projectId: number, protection: Omit<BranchProtection, "id" | "created_at" | "updated_at" | "project_id">) =>
+    request<BranchProtection>(`/api/projects/${projectId}/branch-protections`, {
+      method: "POST",
+      body: JSON.stringify(protection),
+    }),
+  deleteBranchProtection: (protectionId: number) =>
+    request<void>(`/api/branch-protections/${protectionId}`, { method: "DELETE" }),
+
   // ---------- Review Checks ----------
   listChecks: (sessionId: number) =>
     request<PreflightResult>(`/api/sessions/${sessionId}/checks`),
