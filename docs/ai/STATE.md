@@ -364,6 +364,24 @@ SQL инъекции защищены, PBKDF2-SHA256 260K, хеш-цепочка
 - ❌ 50+ inline styles, дублирует существующий AssetCard, не закоммичено
 - Рекомендация: использовать как референс, переписать с конвенциями проекта
 
+## Согласование Buffy + Claude
+
+### Зоны ответственности
+| Зона | Ответственный | Файлы |
+|------|---------------|-------|
+| Backend (модели, endpoints, тесты) | Buffy | `backend/app/models.py`, `routers/*.py`, `schemas.py`, `tests/` |
+| Frontend: Review/Commit фичи | Buffy | `ReviewSessionPage.tsx`, `VersionTagPicker`, `ReviewerPanel`, `ReviewChecklist`, `WaveformDiff`, `ReviewSummary`, `InlineCommentMarkers` |
+| Frontend: Marketplace redesign | Claude | `MarketplacePage.tsx`, `components/marketplace/`, `AssetCard.tsx`, `FilterPanel.tsx` |
+| Frontend: Dashboard/Settings/Other | Claude | `DashboardPage.tsx`, `SettingsPage.tsx`, `ProjectsPage.tsx`, `UploadPage.tsx` |
+| Документация | Buffy | `STATE.md`, `docs/internal/`, архитектурные планы |
+
+### Правила
+1. Не трогать файлы чужой зоны
+2. Каждый коммит — свою зону (не смешивать)
+3. Перед началом — проверить `git status`
+4. Shared файлы (`types.ts`, `api.ts`, `App.tsx`) — только через PR, не параллельно
+5. Если нужен новый shared компонент — обсудить в Telegram
+
 ## Следующий шаг
 
 **Sprint 3 (Claude):** Branch protection UI + Merge queue UI + расширенные QC checks + тесты. Задание отправлено в Telegram.
