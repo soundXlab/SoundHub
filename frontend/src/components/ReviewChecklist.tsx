@@ -71,8 +71,8 @@ export default function ReviewChecklist({ sessionId }: ReviewChecklistProps) {
   };
 
   // Separate audio checks from other checks
-  const audioChecks = checks.filter((c) => AUDIO_CHECK_TYPES[c.check_type]);
-  const otherChecks = checks.filter((c) => !AUDIO_CHECK_TYPES[c.check_type]);
+  const audioChecks = checks.filter((c) => c.check_type && AUDIO_CHECK_TYPES[c.check_type]);
+  const otherChecks = checks.filter((c) => !c.check_type || !AUDIO_CHECK_TYPES[c.check_type]);
 
   const passedCount = checks.filter((c) => c.status === "pass" || c.status === "ok").length;
   const failedCount = checks.filter((c) => c.status === "fail" || c.status === "block").length;
@@ -209,7 +209,7 @@ export default function ReviewChecklist({ sessionId }: ReviewChecklistProps) {
 
                 {/* Label */}
                 <span style={{ flex: 1, fontSize: 13, fontWeight: 500 }}>
-                  {AUDIO_CHECK_TYPES[c.check_type] || c.check_type}
+                  {(c.check_type && AUDIO_CHECK_TYPES[c.check_type]) || c.check_type || "check"}
                 </span>
 
                 {/* Detail / Value */}

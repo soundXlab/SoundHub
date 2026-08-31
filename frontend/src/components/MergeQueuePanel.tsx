@@ -1,29 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { api } from "../api";
 import type { MergeQueueEntry, ReviewVersion } from "../types";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-  CardFooter,
-  Button,
-  Input,
-  Badge,
-  Switch,
-} from "../components/ui";
-import {
-  GitBranch,
-  Check,
-  X,
-  Clock,
-  Zap,
-  TrendingUp,
-  List,
-  Plus,
-} from "lucide-react";
-import { useTheme } from "../theme/themeContext";
-import { colors, spacing, radii, typography } from "../design-tokens";
+import { GitBranch, Check, X, Clock, List, Plus } from "lucide-react";
 
 interface MergeQueuePanelProps {
   sessionId: number;
@@ -31,23 +9,19 @@ interface MergeQueuePanelProps {
 }
 
 export default function MergeQueuePanel({ sessionId, versions }: MergeQueuePanelProps) {
-  const { colors: themeColors } = useTheme();
   const [queue, setQueue] = useState<MergeQueueEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
 
-  useEffect(() => {
-    loadQueue();
-  }, [sessionId]);
+  useEffect(() => { loadQueue(); }, [sessionId]);
 
   const loadQueue = async () => {
     setLoading(true);
     try {
-      const data = await api.listMergeQueue(sessionId);
-      setQueue(data);
+      setQueue(await api.listMergeQueue(sessionId));
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load merge queue");
+      setError(err instanceof Error ? err.message : "Failed to load queue");
     } finally {
       setLoading(false);
     }
@@ -58,7 +32,7 @@ export default function MergeQueuePanel({ sessionId, versions }: MergeQueuePanel
       await api.enqueueVersion(sessionId, versionId);
       await loadQueue();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to add to merge queue");
+      setError(err instanceof Error ? err.message : "Failed to enqueue");
     }
   };
 
@@ -68,194 +42,104 @@ export default function MergeQueuePanel({ sessionId, versions }: MergeQueuePanel
       await api.mergeVersion(sessionId, queueId);
       await loadQueue();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to merge version");
+      setError(err instanceof Error ? err.message : "Failed to merge");
     } finally {
       setProcessing(false);
     }
   };
 
-  const handleRemove = async (queueId: number) => {
-    // In a real implementation, there would be a delete endpoint
-    // For now, we'll just remove from local state and show a message
-    setError("Removal from queue not implemented in API");
-  };
-
   if (loading) {
     return (
-      <Card className="w-full">
-        <CardHeader>
-          <CardTitle>Merge Queue</CardTitle>
-        </CardHeader>
-        <CardContent className="text-center py-8">
-          <div className="flex items-center justify-center gap-2">
-            <div className="h-5 w-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
-            <span className="text-sm text-muted-foreground">Loading queue...</span>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="card" style={{ padding: 18 }}>
+        <h3 style={{ margin: "0 0 12px" }}>Merge Queue</h3>
+        <p className="muted">Loading...</p>
+      </div>
     );
   }
 
-  // Get versions that are approved and not already in queue
   const approvedVersions = versions.filter(
-    v => v.status === "approved" && !queue.some(q => q.version_id === v.id)
+    (v) => v.status === "approved" && !queue.some((q) => q.version_id === v.id)
   );
 
   return (
-    <Card className="w-full">
-      <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-        <CardTitle className="text-lg font-semibold">Merge Queue</CardTitle>
-        <div className="flex items-center gap-2 mt-3 sm:mt-0">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => {
-              // Refresh queue
-              loadQueue();
-            }}
-          >
-            <List size={16} /> Refresh
-          </Button>
-        </div>
-      </CardHeader>
+    <div className="card" style={{ padding: 18 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+        <h3 style={{ margin: 0 }}>Merge Queue</h3>
+        <button className="btn ghost sm" onClick={loadQueue}>
+          <List size={14} /> Refresh
+        </button>
+      </div>
 
-      <CardContent className="space-y-6">
-        {/* Queue Section */}
-        <div className="space-y-4">
-          {queue.length === 0 ? (
-            <div className="text-center py-8">
-              <p className="text-muted-foreground">Merge queue is empty</p>
-              {approvedVersions.length > 0 && (
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => {
-                    // Auto-enqueue first approved version
-                    if (approvedVersions[0]) {
-                      handleEnqueue(approvedVersions[0].id);
-                    }
-                  }}
-                >
-                  Add First Approved Version
-                </Button>
-              )}
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {queue.map((entry) => (
-                <Card key={entry.id} className="border border-primary/20">
-                  <CardContent className="p-4">
-                    <div className="flex justify-between items-start">
-                      <div className="flex items-center gap-3">
-                        <GitBranch size={20} className="text-primary" />
-                        <div>
-                          <h3 className="font-medium">Position {queue.findIndex(e => e.id === entry.id) + 1}</h3>
-                          <p className="text-sm text-muted-foreground">
-                            Version {entry.version_id} • {new Date(entry.created_at).toLocaleTimeString()}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Badge
-                          variant={entry.status === "merged" ? "success" : entry.status === "processing" ? "warning" : "default"}
-                        >
-                          {entry.status.charAt(0).toUpperCase() + entry.status.slice(1)}
-                        </Badge>
-                        {entry.merged_at && (
-                          <span className="ml-2 text-xs text-muted-foreground">
-                            Merged: {new Date(entry.merged_at).toLocaleString()}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-
-                    {entry.status === "processing" && (
-                      <div className="mt-4">
-                        <div className="flex items-center gap-2 mb-2">
-                          <div className="h-3 w-3 bg-primary rounded-full animate-pulse" />
-                          <span className="text-sm text-muted-foreground">Processing merge...</span>
-                        </div>
-                        <div className="w-full bg-muted/50 h-2 rounded overflow-hidden">
-                          <div className="bg-primary h-2 rounded" style={{ width: "60%" }} />
-                        </div>
-                      </div>
-                    )}
-
-                    {entry.status === "pending" && (
-                      <div className="mt-4">
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={() => handleMerge(entry.id)}
-                          disabled={processing}
-                        >
-                          {processing ? "Merging..." : "Merge Now"}
-                        </Button>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+      {/* Queue */}
+      {queue.length === 0 ? (
+        <div style={{ textAlign: "center", padding: 20 }}>
+          <p className="muted">Queue is empty</p>
+          {approvedVersions.length > 0 && (
+            <button className="btn ghost sm" style={{ marginTop: 8 }}
+              onClick={() => approvedVersions[0] && handleEnqueue(approvedVersions[0].id)}>
+              Add First Approved
+            </button>
           )}
         </div>
-
-        {/* Add to Queue Section */}
-        {approvedVersions.length > 0 && (
-          <div className="space-y-4">
-            <div className="flex justify-between items-center">
-              <h3 className="font-semibold">Ready to Queue</h3>
-              <p className="text-xs text-muted-foreground">
-                {approvedVersions.length} approved version{approvedVersions.length !== 1 ? 's' : ''} available
-              </p>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          {queue.map((entry) => (
+            <div key={entry.id} className="card" style={{ padding: 12, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <GitBranch size={16} style={{ color: "var(--accent)" }} />
+                <div>
+                  <div style={{ fontWeight: 600, fontSize: 13 }}>
+                    Position {queue.findIndex((e) => e.id === entry.id) + 1}
+                  </div>
+                  <div style={{ fontSize: 12, color: "var(--muted)" }}>
+                    Version {entry.version_id} · {new Date(entry.created_at).toLocaleTimeString()}
+                  </div>
+                </div>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <span className="chip" style={{
+                  background: entry.status === "merged" ? "var(--green-soft)" : entry.status === "merging" ? "var(--accent-soft)" : "var(--bg3)",
+                  color: entry.status === "merged" ? "var(--green)" : entry.status === "merging" ? "var(--accent)" : "var(--muted)",
+                }}>
+                  {entry.status}
+                </span>
+                {entry.status === "queued" && (
+                  <button className="btn sm" onClick={() => handleMerge(entry.id)} disabled={processing}>
+                    {processing ? "..." : "Merge"}
+                  </button>
+                )}
+              </div>
             </div>
+          ))}
+        </div>
+      )}
 
-            <div className="space-y-3">
-              {approvedVersions.map((version) => (
-                <Card key={version.id} className="border hover:border-primary/20 transition-border cursor-pointer"
-                  onClick={() => handleEnqueue(version.id)}
-                >
-                  <CardContent className="p-4">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h3 className="font-medium">{version.label || `Version ${version.number}`}</h3>
-                        {version.message && (
-                          <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
-                            {version.message}
-                          </p>
-                        )}
-                      </div>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="ml-4"
-                      >
-                        <Plus size={16} /> Add to Queue
-                      </Button>
-                    </div>
-
-                    <div className="mt-3 text-xs text-muted-foreground grid grid-cols-2 gap-4">
-                      <div>Status: <span className="font-medium">{version.status}</span></div>
-                      <div>Created: <span className="font-medium">{new Date(version.created_at).toLocaleDateString()}</span></div>
-                      {version.duration_s && (
-                        <div>Duration: <span className="font-medium">{Math.floor(version.duration_s / 60)}:{String(version.duration_s % 60).padStart(2, '0')}</span></div>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+      {/* Ready to queue */}
+      {approvedVersions.length > 0 && (
+        <div style={{ marginTop: 16, borderTop: "1px solid var(--border)", paddingTop: 16 }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: "var(--muted)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 8 }}>
+            Ready to Queue ({approvedVersions.length})
           </div>
-        )}
-      </CardContent>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            {approvedVersions.map((v) => (
+              <div key={v.id} className="card" style={{ padding: 10, display: "flex", justifyContent: "space-between", alignItems: "center", cursor: "pointer" }}
+                onClick={() => handleEnqueue(v.id)}>
+                <div>
+                  <div style={{ fontWeight: 600, fontSize: 13 }}>{v.label || `Version ${v.number}`}</div>
+                  {v.message && <div style={{ fontSize: 12, color: "var(--muted)" }}>{v.message}</div>}
+                </div>
+                <button className="btn ghost sm"><Plus size={14} /> Queue</button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {error && (
-        <CardFooter className="flex justify-start">
-          <Badge variant="destructive">
-            {error}
-          </Badge>
-        </CardFooter>
+        <div style={{ marginTop: 12, padding: "8px 12px", background: "var(--error-muted)", borderRadius: 6, fontSize: 13, color: "var(--red)" }}>
+          {error}
+        </div>
       )}
-    </Card>
+    </div>
   );
 }
