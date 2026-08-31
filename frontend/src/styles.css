@@ -9946,3 +9946,205 @@ pre.diff-raw code {
   height: 24px;
   background: #1a1a1a;
 }
+
+/* ==========================================================================
+   Marketplace — two-column layout with filter sidebar
+   ========================================================================== */
+
+.marketplace-layout {
+  display: flex;
+  gap: 0;
+  min-height: calc(100vh - 60px);
+}
+
+.marketplace-filter-panel {
+  width: 260px;
+  min-width: 260px;
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  transition: width 0.2s ease, min-width 0.2s ease;
+  overflow: hidden;
+}
+
+.marketplace-filter-panel.collapsed {
+  width: 56px;
+  min-width: 56px;
+}
+
+.filter-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.filter-panel-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.filter-panel-body {
+  padding: 8px 12px;
+  overflow-y: auto;
+  max-height: calc(100vh - 100px);
+}
+
+.filter-group {
+  margin-bottom: 12px;
+}
+
+.filter-group label {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 12px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.filter-group select,
+.filter-group input {
+  width: 100%;
+  padding: 6px 10px;
+  font-size: 13px;
+  border-radius: var(--radius-md);
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+.filter-group select:focus,
+.filter-group input:focus {
+  border-color: var(--accent);
+  outline: none;
+}
+
+.marketplace-main {
+  flex: 1;
+  padding: 20px 24px;
+  overflow-y: auto;
+}
+
+.marketplace-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.marketplace-header h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.view-toggle {
+  display: flex;
+  gap: 4px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 2px;
+}
+
+.view-toggle button {
+  background: transparent;
+  border: none;
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.view-toggle button.active {
+  background: var(--accent);
+  color: var(--accent-text);
+}
+
+/* Asset card — grid view (default) */
+.asset-card {
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+}
+
+.asset-card.view-list {
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+}
+
+.asset-card .cover {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  background: var(--bg3);
+  border-radius: var(--radius-md);
+  margin-bottom: 12px;
+}
+
+.asset-card.view-list .cover {
+  min-height: 60px;
+  width: 60px;
+  margin-bottom: 0;
+  margin-right: 16px;
+  flex-shrink: 0;
+}
+
+.asset-card .content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.asset-card .asset-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.asset-card .asset-author {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.asset-card .asset-details {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.asset-card .asset-price {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+
+.asset-card .asset-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+/* BPM range inputs side by side */
+.bpm-range {
+  display: flex;
+  gap: 8px;
+}
+
+.bpm-range input {
+  width: 48%;
+}
+
+/* Reset button aligned right */
+.filter-reset {
+  text-align: right;
+  margin-top: 12px;
+}

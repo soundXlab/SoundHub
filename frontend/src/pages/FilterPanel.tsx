@@ -1,6 +1,6 @@
 import React from "react";
 import { Button, Input } from "../components/ui";
-import { LICENSE_NAMES } from "../web3/contracts";
+import { ChevronDown, ChevronRight } from "lucide-react";
 import { Filters } from "./MarketplacePage";
 
 interface FilterPanelProps {
@@ -12,6 +12,8 @@ interface FilterPanelProps {
   pluginOptions: string[];
   onFilterChange: (key: keyof Filters, value: string) => void;
   onResetFilters: () => void;
+  isCollapsed?: boolean;
+  onToggleCollapse?: () => void;
 }
 
 export default function FilterPanel({
@@ -23,14 +25,24 @@ export default function FilterPanel({
   pluginOptions,
   onFilterChange,
   onResetFilters,
+  isCollapsed = false,
+  onToggleCollapse,
 }: FilterPanelProps) {
   const handleChange = (key: keyof Filters, value: string) => {
     onFilterChange(key, value);
   };
 
   return (
-    <div className="filter-panel">
-      <h3>Filters</h3>
+    <div className={`marketplace-filter-panel${isCollapsed ? " collapsed" : ""}`}>
+      <div className="filter-panel-header">
+        {onToggleCollapse && (
+          <Button variant="ghost" size="sm" onClick={onToggleCollapse}>
+            {isCollapsed ? <ChevronRight size={16} /> : <ChevronDown size={16} />}
+          </Button>
+        )}
+        {!isCollapsed && <span className="filter-panel-title">Filters</span>}
+      </div>
+      {!isCollapsed && (<>
       <div className="filter-group">
         <label>Search:</label>
         <Input
@@ -127,11 +139,12 @@ export default function FilterPanel({
           />
         </div>
       </div>
-      <div className="filter-actions">
+      <div className="filter-group" style={{ textAlign: "right", marginTop: 12 }}>
         <Button variant="outline" size="sm" onClick={onResetFilters}>
           Clear all
         </Button>
       </div>
+      </>)}
     </div>
   );
 }

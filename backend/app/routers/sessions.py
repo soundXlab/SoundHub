@@ -2030,13 +2030,15 @@ def publish_version(
         raise HTTPException(status.HTTP_400_BAD_REQUEST, f"Version status is '{version.status}', expected 'draft'")
     version.status = "in_review"
     # ledger event
-    event = LedgerEvent(
+    ledger.append(
+        db,
+        event="version.published",
         session_id=session_id,
         actor=user.username,
-        event="version.published",
+        entity_type="version",
+        entity_id=version.id,
         payload={"version": version.label, "version_id": version.id},
     )
-    db.add(event)
     db.commit()
     db.refresh(version)
     return ReviewVersionOut.model_validate(version, from_attributes=True)
@@ -2144,14 +2146,17 @@ def invite_member(
         invited_by=user.username,
     )
     db.add(member)
+    db.flush()  # Assign ID before ledger entry
     # ledger event
-    event = LedgerEvent(
+    ledger.append(
+        db,
+        event="team.member_invited",
         session_id=session_id,
         actor=user.username,
-        event="team.member_invited",
+        entity_type="session_member",
+        entity_id=member.id,
         payload={"email": payload.email, "role": payload.role},
     )
-    db.add(event)
     db.commit()
     db.refresh(member)
     return SessionMemberOut.model_validate(member, from_attributes=True)
@@ -2168,14 +2173,16 @@ def remove_member(
     member = db.get(SessionMember, member_id)
     if member is None or member.session_id != session_id:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Member not found")
-    # ledger event
-    event = LedgerEvent(
+    # ledger event with hash chain
+    ledger.append(
+        db,
+        event="team.member_removed",
         session_id=session_id,
         actor=user.username,
-        event="team.member_removed",
+        entity_type="session_member",
+        entity_id=member.id,
         payload={"email": member.email, "role": member.role},
     )
-    db.add(event)
     db.delete(member)
     db.commit()
 
@@ -2248,15 +2255,17 @@ def merge_version(
         raise HTTPException(status.HTTP_400_BAD_REQUEST, f"Entry status is '{entry.status}', expected 'queued'")
     entry.status = "merged"
     entry.merged_at = utcnow()
-    # ledger event
+    # ledger event with hash chain
     version = db.get(ReviewVersion, entry.version_id)
-    event = LedgerEvent(
+    ledger.append(
+        db,
+        event="version.merged",
         session_id=session_id,
         actor=user.username,
-        event="version.merged",
+        entity_type="version",
+        entity_id=entry.version_id,
         payload={"version": version.label if version else "?", "version_id": entry.version_id},
     )
-    db.add(event)
     db.commit()
     db.refresh(entry)
     return MergeQueueEntryOut.model_validate(entry, from_attributes=True)

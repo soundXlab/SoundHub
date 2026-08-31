@@ -26,8 +26,8 @@ import {
   AudioPlayer,
 } from "../components/ui";
 import { FileText, Download, Settings2, ShoppingCart } from "lucide-react";
-import AssetCard from "../components/marketplace/AssetCard";
-import { FilterPanel } from "../components/marketplace/FilterPanel";
+import AssetCard from "./AssetCard";
+import FilterPanel from "./FilterPanel";
 import { ChevronDown, ChevronRight, Grid, List } from "lucide-react";
 
 interface Listing {
@@ -425,8 +425,8 @@ export default function MarketplacePage() {
                 licenseOptions={licenseOptions}
                 formatOptions={formatOptions}
                 pluginOptions={pluginOptions}
-                setFilter={setFilter}
-                resetFilters={resetFilters}
+                onFilterChange={setFilter}
+                onResetFilters={resetFilters}
                 isCollapsed={sidebarCollapsed}
                 onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
               />
