@@ -479,7 +479,21 @@ export const api = {
     if (opts.actor) q.set("actor", opts.actor);
     if (opts.password) q.set("password", opts.password);
     const qs = q.toString();
-    return request<ReviewSession>(`/api/sessions/public/${token}${qs ? `?${qs}` : ""}`);
+    const url = `/api/sessions/public/${token}${qs ? `?${qs}` : ""}`;
+    return fetch(url, { credentials: "omit" })
+      .then(async (res) => {
+        if (!res.ok) {
+          let detail = res.statusText;
+          try {
+            const body = await res.json();
+            detail = body.detail || detail;
+          } catch {
+            /* ignore */
+          }
+          throw new Error(detail);
+        }
+        return (await res.json()) as ReviewSession;
+      });
   },
   publicAddComment: (token: string, versionId: number, timeS: number, body: string, authorName: string) =>
     request<ReviewComment>(`/api/sessions/public/${token}/versions/${versionId}/comments`, {
