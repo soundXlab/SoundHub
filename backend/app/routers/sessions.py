@@ -1967,6 +1967,51 @@ def remove_version_tag(
 
 
 # ══════════════════════════════════════════════════════════════════════════════
+# Waveform Diff (visual comparison)
+# ══════════════════════════════════════════════════════════════════════════════
+
+from ..services import waveform as wf_service
+
+
+@router.get("/{session_id}/versions/{version_id}/waveform-diff")
+def waveform_diff(
+    session_id: int,
+    version_id: int,
+    compare_to: int,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Return waveform peaks for two versions side by side."""
+    _ = get_session_or_404(db, user, session_id)
+    v1 = db.get(ReviewVersion, version_id)
+    v2 = db.get(ReviewVersion, compare_to)
+    if v1 is None or v1.session_id != session_id:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Version not found")
+    if v2 is None or v2.session_id != session_id:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Compare version not found")
+
+    from ..services import storage
+
+    def _get_peaks(ver: ReviewVersion) -> list[float]:
+        data = storage.read_blob(ver.blob_sha)
+        wf = wf_service.generate(ver.blob_sha, data, ver.filename, ver.audio_format)
+        return wf.get("peaks", [])
+
+    peaks1 = _get_peaks(v1)
+    peaks2 = _get_peaks(v2)
+
+    # Compute difference peaks (sample-by-sample)
+    min_len = min(len(peaks1), len(peaks2))
+    diff_peaks = [abs(peaks1[i] - peaks2[i]) if i < min_len else 0.0 for i in range(max(len(peaks1), len(peaks2)))]
+
+    return {
+        "base": {"version_id": v1.id, "label": v1.label, "peaks": peaks1, "duration_s": v1.duration_s},
+        "compare": {"version_id": v2.id, "label": v2.label, "peaks": peaks2, "duration_s": v2.duration_s},
+        "diff_peaks": diff_peaks,
+    }
+
+
+# ══════════════════════════════════════════════════════════════════════════════
 # Draft → Publish
 # ══════════════════════════════════════════════════════════════════════════════
 

@@ -913,6 +913,12 @@ export const api = {
   getVersionSummary: (sessionId: number, versionId: number) =>
     request<VersionSummary>(`/api/sessions/${sessionId}/versions/${versionId}/summary`),
 
+  // ---------- Waveform Diff ----------
+  getWaveformDiff: (sessionId: number, versionId: number, compareVersionId: number) =>
+    request<{ base: { version_id: number; label: string; peaks: number[]; duration_s: number }; compare: { version_id: number; label: string; peaks: number[]; duration_s: number }; diff_peaks: number[] }>(
+      `/api/sessions/${sessionId}/versions/${versionId}/waveform-diff?compare_to=${compareVersionId}`
+    ),
+
   // ---------- Merge Queue ----------
   listMergeQueue: (sessionId: number) =>
     request<MergeQueueEntry[]>(`/api/sessions/${sessionId}/merge-queue`),

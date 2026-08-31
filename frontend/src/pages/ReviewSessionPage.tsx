@@ -9,6 +9,9 @@ import UsdcPayButton from "../components/UsdcPayButton";
 import VersionTagPicker from "../components/VersionTagPicker";
 import ReviewerPanel from "../components/ReviewerPanel";
 import ReviewChecklist from "../components/ReviewChecklist";
+import WaveformDiff from "../components/WaveformDiff";
+import ReviewSummary from "../components/ReviewSummary";
+import InlineCommentMarkers from "../components/InlineCommentMarkers";
 import {
   humanSize,
   shortDate,
@@ -1641,6 +1644,8 @@ function SessionDetail({ session, onBack }: { session: ReviewSession; onBack: ()
   const [diffBusy, setDiffBusy] = useState(false);
   const [diffErr, setDiffErr] = useState<string | null>(null);
   const [refCompare, setRefCompare] = useState<{ ref: ReferenceTrack; comp: ReferenceComparison } | null>(null);
+  const [waveformDiffCompare, setWaveformDiffCompare] = useState<number | null>(null);
+  const [highlightedComment, setHighlightedComment] = useState<number | null>(null);
   const [src, setSrc] = useState<string | null>(null);
   const [srcVersion, setSrcVersion] = useState<number | null>(null);
   const [copied, setCopied] = useState(false);
@@ -2093,6 +2098,16 @@ function SessionDetail({ session, onBack }: { session: ReviewSession; onBack: ()
             />
           )}
 
+          {/* waveform diff panel */}
+          {waveformDiffCompare && current && (
+            <WaveformDiff
+              sessionId={session.id}
+              baseVersionId={current.id}
+              compareVersionId={waveformDiffCompare}
+              onClose={() => setWaveformDiffCompare(null)}
+            />
+          )}
+
           {/* player */}
           <div className="rs-player">
             <div className="rs-wave-wrap">
@@ -2114,9 +2129,27 @@ function SessionDetail({ session, onBack }: { session: ReviewSession; onBack: ()
                 }}
                 highlightComment={highlight}
               />
+              {/* Inline comment markers */}
+              <InlineCommentMarkers
+                comments={current.comments}
+                durationS={current.duration_s}
+                onSeek={(t) => {
+                  if (audioRef.current) {
+                    audioRef.current.currentTime = t;
+                    setPosition(t);
+                  }
+                }}
+                onHighlight={setHighlightedComment}
+                highlightedId={highlightedComment}
+              />
               <div className="rs-time">{fmtClock(position)}</div>
               <div className="rs-time right">{fmtClock(current.duration_s)}</div>
             </div>
+
+            {/* Version summary */}
+            {versions.length > 1 && (
+              <ReviewSummary sessionId={session.id} versionId={current.id} />
+            )}
 
             <div className="rs-player-row">
               <div className="rs-seg">
@@ -2282,6 +2315,17 @@ function SessionDetail({ session, onBack }: { session: ReviewSession; onBack: ()
                           onClick={() => (diff?.version_label === v.label ? setDiff(null) : void showDiff(v))}
                         >
                           {diff?.version_label === v.label ? "✕" : "✦"}
+                        </button>
+                      )}
+                      {v.id !== current?.id && (
+                        <button
+                          type="button"
+                          className="rs-link rs-version-diff"
+                          title="Visual waveform diff with current version"
+                          onClick={() => setWaveformDiffCompare(waveformDiffCompare === v.id ? null : v.id)}
+                          style={{ fontSize: 12 }}
+                        >
+                          {waveformDiffCompare === v.id ? "✕" : "〜"}
                         </button>
                       )}
                     </div>
