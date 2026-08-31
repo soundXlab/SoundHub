@@ -4,9 +4,9 @@
 - Репозиторий: `/home/scatter/SoundHub`
 - Основная модель: MiMo 2.5
 - Язык отчётов: русский
-- Последний коммит: `173119f` (feat(api): add branch protection API methods)
+- Последний коммит: `c8e4c43` (fix: BranchProtectionPanel + MergeQueuePanel без Tailwind)
 - Ветка: `feat/marketplace-uiux-redesign` (запушена)
-- Не закоммиченные изменения: DashboardPage.tsx (inline styles от Клода)
+- Ошибки TypeScript: 11 (все в ProjectsPage.tsx — зона Клода)
 
 ## Текущий фокус
 - SoundHub задеплоен на Cloud Run ✅
@@ -382,12 +382,41 @@ SQL инъекции защищены, PBKDF2-SHA256 260K, хеш-цепочка
 4. Shared файлы (`types.ts`, `api.ts`, `App.tsx`) — только через PR, не параллельно
 5. Если нужен новый shared компонент — обсудить в Telegram
 
+## Неделя 01.09–05.09.2026 (CEO план)
+
+### ПН ✅
+- Исправлен ledger hash chain: `remove_member`, `invite_member`, `merge` теперь используют `ledger.append()` вместо прямого `LedgerEvent()` (был NOT NULL constraint на `event_hash`)
+- Восстановлены 34 теста в `test_sessions.py` (файл был повреждён, потеряны 2000+ строк)
+- Удалён дублирующий `components/marketplace/AssetCard.tsx`
+
+### ВТ ✅
+- Добавлен list view в оригинальный `AssetCard` через CSS классы
+- FilterPanel получил collapse + CSS классы в `styles.css`
+- 50+ inline styles от Клода → CSS классы
+- Импорты в MarketplacePage обновлены (pages/ вместо components/marketplace/)
+
+### СР ✅
+- BranchProtectionPanel переписан без Tailwind (inline styles + CSS variables)
+- MergeQueuePanel переписан без Tailwind
+- ReviewChecklist: исправлен null check для `c.check_type`
+- Итого TypeScript ошибок: 11 (все в ProjectsPage.tsx — зона Клода)
+
+### ЧТ ✅
+- 16 v2 макетов Review Player уже были готовы (сделано ранее в сессии)
+- Desktop: D/01–D/10 с metadata grids, improved UX
+- Mobile: M/01–M/07 с compact metadata, decision banners
+
+### ПТ
+- Деплой на Cloud Run
+- Smoke test
+- Обновить STATE.md
+
 ## Следующий шаг
 
-**Sprint 3 (Claude):** Branch protection UI + Merge queue UI + расширенные QC checks + тесты. Задание отправлено в Telegram.
+**Приоритет:** User testing Review Player (3 человека). Макеты D/05 v2 готовы.
 
-**Дизайн:** v1.3 после тестов. Approve = confirm с scope (`ReviewShared`). Лендинг: How it works вместо Marketplace в гостевом nav; hero без GitHub. Прототип: D/10 copy-link, D-confirm. Отчёт: `docs/ai/USER_TEST_RP_2026-08-31.md`. Дальше — три живых человека.
+**Sprint 3 (Claude):** Расширенные QC checks (LUFS, clipping, silence). ProjectsPage.tsx — исправить 11 TS ошибок.
 
-**Инженерия (параллельно, не блокирует Figma):** N+1 в `list_sessions`, race `submit_feedback`/`upload_version`, `verify_password`, portfolio error masking.
+**Дизайн:** v1.3 после тестов. Лендинг: How it works вместо Marketplace в гостевом nav.
 
-**WSL:** Ubuntu-26.04 на D: только когда понадобится машина; бэкап уже на `D:\WSL\backups`. 24.04 не удалять.
+**Инженерия:** Остальные исправления аудита (portfolio error masking уже исправлен).
