@@ -24,6 +24,15 @@ const STATUS_COLOR: Record<string, string> = {
   skip: "var(--text-secondary)",
 };
 
+// Audio check types and their display names
+const AUDIO_CHECK_TYPES: Record<string, string> = {
+  lufs_range: "LUFS Range",
+  clipping: "Clipping",
+  silence_start: "Silence >2s start",
+  sample_rate: "Sample Rate",
+  bit_depth: "Bit Depth",
+};
+
 export default function ReviewChecklist({ sessionId }: ReviewChecklistProps) {
   const [checks, setChecks] = useState<PreflightCheck[]>([]);
   const [passed, setPassed] = useState(true);
@@ -60,6 +69,10 @@ export default function ReviewChecklist({ sessionId }: ReviewChecklistProps) {
       setLoading(false);
     }
   };
+
+  // Separate audio checks from other checks
+  const audioChecks = checks.filter((c) => AUDIO_CHECK_TYPES[c.check_type]);
+  const otherChecks = checks.filter((c) => !AUDIO_CHECK_TYPES[c.check_type]);
 
   const passedCount = checks.filter((c) => c.status === "pass" || c.status === "ok").length;
   const failedCount = checks.filter((c) => c.status === "fail" || c.status === "block").length;
@@ -146,10 +159,90 @@ export default function ReviewChecklist({ sessionId }: ReviewChecklistProps) {
         </div>
       )}
 
-      {/* Check list */}
-      {checks.length > 0 && (
+      {/* Audio Checks Section */}
+      {audioChecks.length > 0 && (
+        <div style={{ marginTop: 16, marginBottom: 12 }}>
+          <div
+            style={{
+              fontSize: 13,
+              fontWeight: 600,
+              textTransform: "uppercase",
+              letterSpacing: "0.5px",
+              color: "var(--text-secondary)",
+              marginBottom: 6,
+            }}
+          >
+            Audio Checks
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+            {audioChecks.map((c) => (
+              <div
+                key={c.check_type}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  padding: "6px 10px",
+                  borderRadius: 4,
+                  background: "var(--bg-elevated)",
+                  border: `1px solid ${STATUS_COLOR[c.status] ?? "var(--border-default)"}22`,
+                }}
+              >
+                {/* Status icon */}
+                <span
+                  style={{
+                    width: 20,
+                    height: 20,
+                    borderRadius: "50%",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: 11,
+                    fontWeight: 700,
+                    background: STATUS_COLOR[c.status] ?? "#888",
+                    color: "#fff",
+                    flexShrink: 0,
+                  }}
+                >
+                  {STATUS_ICON[c.status] ?? "?"}
+                </span>
+
+                {/* Label */}
+                <span style={{ flex: 1, fontSize: 13, fontWeight: 500 }}>
+                  {AUDIO_CHECK_TYPES[c.check_type] || c.check_type}
+                </span>
+
+                {/* Detail / Value */}
+                <span style={{ fontSize: 12, color: "var(--text-secondary)" }}>
+                  {c.detail}
+                </span>
+
+                {/* Blocking badge */}
+                {c.blocking && (
+                  <span
+                    style={{
+                      fontSize: 9,
+                      fontWeight: 700,
+                      textTransform: "uppercase",
+                      padding: "1px 4px",
+                      borderRadius: 2,
+                      background: "#ef444422",
+                      color: "var(--error)",
+                    }}
+                  >
+                    blocking
+                  </span>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Other Checks List */}
+      {otherChecks.length > 0 && (
         <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-          {checks.map((c, i) => (
+          {otherChecks.map((c, i) => (
             <div
               key={`${c.check_type}-${i}`}
               style={{

@@ -11,10 +11,14 @@ import {
   CardFooter,
   Button,
   Input,
+  Badge,
 } from "../components/ui";
-import { Settings2 } from "lucide-react";
+import { Settings2, TrendingUp, Users, Clock, Loader } from "lucide-react";
+import { useTheme } from "../theme/themeContext";
+import { colors, spacing, radii, typography } from "../design-tokens";
 
 export default function ProjectsPage() {
+  const { colors: themeColors } = useTheme();
   const [projects, setProjects] = useState<Project[]>([]);
   const [name, setName] = useState("");
   const [desc, setDesc] = useState("");
@@ -65,40 +69,148 @@ export default function ProjectsPage() {
 
   return (
     <FullPageLayout>
-      <div style={{ maxWidth: '800px', margin: '0 auto', padding: '16px' }}>
-        <Card>
-          <CardHeader>
-            <CardTitle>Projects</CardTitle>
-            <CardDescription>{projects.length} repo(s)</CardDescription>
+      <div style={{
+        maxWidth: '1200px',
+        margin: '0 auto',
+        padding: `${spacing.xl} ${spacing['2xl']}`
+      }}>
+        <Card style={{ backgroundColor: themeColors.bg.elevated, border: `1px solid ${themeColors.border.default}` }}>
+          <CardHeader style={{
+            padding: `${spacing.md} ${spacing.lg}`,
+            borderBottom: `1px solid ${themeColors.border.subtle}`,
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: spacing.md
+          }}>
+            <div>
+              <CardTitle style={{
+                fontSize: typography.fontSize.h2,
+                fontWeight: typography.fontWeight.semiBold,
+                color: themeColors.text.primary,
+                display: 'flex',
+                alignItems: 'center',
+                gap: spacing.sm
+              }}>
+                <Settings2 size={20} /> Projects
+              </CardTitle>
+              <CardDescription style={{
+                fontSize: typography.fontSize.body,
+                color: themeColors.text.muted
+              }}>
+                {projects.length} {projects.length === 1 ? 'repo' : 'repos'}
+              </CardDescription>
+            </div>
+            <Button variant="outline" size="sm" onClick={() => window.location.href = '/projects/new'}>
+              <Settings2 size={16} /> New Project
+            </Button>
           </CardHeader>
-          <CardContent>
+          <CardContent style={{ padding: spacing.lg }}>
             {loading ? (
-              <p className="muted">Loading…</p>
+              <div style={{
+                textAlign: 'center',
+                padding: `${spacing.lg} 0`,
+                color: themeColors.text.muted
+              }}>
+                <Loader size={20} style={{ animation: 'spin 1s linear infinite' }} /> Loading…
+              </div>
             ) : projects.length === 0 ? (
-              <p className="muted">
-                No projects yet. Create your first repo above — upload an Ableton,
-                Cubase, REAPER or FL Studio project file.
-              </p>
+              <div style={{
+                textAlign: 'center',
+                padding: `${spacing.lg} 0`,
+                color: themeColors.text.muted
+              }}>
+                <div style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: spacing.lg
+                }}>
+                  <Folder size={48} style={{ color: themeColors.text.muted, opacity: 0.5 }} />
+                  <h3 style={{
+                    margin: 0,
+                    fontSize: typography.fontSize.h3,
+                    fontWeight: typography.fontWeight.medium,
+                    color: themeColors.text.primary
+                  }}>
+                    No projects yet
+                  </h3>
+                  <p style={{
+                    marginTop: spacing.xs,
+                    fontSize: typography.fontSize.body,
+                    color: themeColors.text.muted,
+                    maxWidth: '400px',
+                    textAlign: 'center'
+                  }}>
+                    Create your first repo above — upload an Ableton, Cubase, REAPER or FL Studio project file.
+                  </p>
+                  <Button variant="secondary" size="sm" onClick={() => window.location.href = '/projects/new'}>
+                    Create First Project
+                  </Button>
+                </div>
+              </div>
             ) : (
-              <div style={{ display: 'grid', gap: '12px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: spacing.lg }}>
                 {projects.map((p) => (
                   <Card
                     key={p.id}
                     variant="interactive"
                     onClick={() => window.location.href = `/projects/${p.id}`}
-                    style={{ cursor: 'pointer' }}
+                    style={{
+                      cursor: 'pointer',
+                      border: `1px solid transparent`,
+                      borderRadius: radii.md,
+                      transition: 'all 0.15s ease',
+                      backgroundColor: 'transparent'
+                    }}
+                    onMouseEnter={e => {
+                      e.currentTarget.style.backgroundColor = themeColors.bg.hover;
+                      e.currentTarget.style.borderColor = `1px solid ${themeColors.border.hover}`;
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                      e.currentTarget.style.borderColor = '1px solid transparent';
+                    }}
                   >
-                    <CardHeader>
-                      <CardTitle>
-                        <Settings2 size={14} /> {p.name}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardDescription>{p.description || "No description"}</CardDescription>
-                    <CardFooter>
-                      <span className="muted">@{p.owner.username}</span>
-                      <span className="muted">·</span>
-                      <span className="muted">{new Date(p.updated_at).toLocaleDateString()}</span>
-                    </CardFooter>
+                    <CardContent style={{ padding: spacing.lg }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                        <div>
+                          <CardTitle style={{
+                            fontSize: typography.fontSize.h3,
+                            fontWeight: typography.fontWeight.medium,
+                            color: themeColors.text.primary,
+                            marginBottom: spacing.xs
+                          }}>{p.name}</CardTitle>
+                          {p.description && (
+                            <CardDescription style={{
+                              fontSize: typography.fontSize.body,
+                              color: themeColors.text.muted,
+                              display: '-webkit-box',
+                              WebkitBoxOrient: 'vertical',
+                              WebkitLineClamp: 2,
+                              overflow: 'hidden'
+                            }}>
+                              {p.description}
+                            </CardDescription>
+                          )}
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: spacing.xs }}>
+                          <Badge variant="secondary" style={{
+                            fontSize: typography.fontSize.caption,
+                            padding: `${spacing.xs} ${spacing.sm}`
+                          }}>
+                            @{p.owner.username}
+                          </Badge>
+                          <Badge variant="secondary" style={{
+                            fontSize: typography.fontSize.caption,
+                            padding: `${spacing.xs} ${spacing.sm}`
+                          }}>
+                            {new Date(p.updated_at).toLocaleDateString()}
+                          </Badge>
+                        </div>
+                      </div>
+                    </CardContent>
                   </Card>
                 ))}
               </div>
@@ -106,13 +218,20 @@ export default function ProjectsPage() {
           </CardContent>
         </Card>
 
-        <Card style={{ marginTop: '20px' }}>
-          <CardHeader>
-            <CardTitle>New project</CardTitle>
+        <Card style={{ marginTop: spacing.lg, backgroundColor: themeColors.bg.elevated, border: `1px solid ${themeColors.border.default}` }}>
+          <CardHeader style={{
+            padding: `${spacing.md} ${spacing.lg}`,
+            borderBottom: `1px solid ${themeColors.border.subtle}`
+          }}>
+            <CardTitle style={{
+              fontSize: typography.fontSize.h3,
+              fontWeight: typography.fontWeight.semiBold,
+              color: themeColors.text.primary
+            }}>New project</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent style={{ padding: spacing.lg }}>
             <form onSubmit={create}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: spacing.lg }}>
                 <div>
                   <Input
                     label="Project name"
@@ -131,11 +250,13 @@ export default function ProjectsPage() {
                 </div>
               </div>
 
-              <div style={{ marginTop: '16px' }}>
-                <div style={{ fontWeight: 600, marginBottom: '8px' }}>Storage Policy</div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
+              <div style={{ marginTop: spacing.lg }}>
+                <div style={{ fontWeight: typography.fontWeight.medium, marginBottom: spacing.md }}>
+                  Storage Policy
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: spacing.md }}>
                   <div>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: spacing.xs }}>
                       Hot storage
                       <Input
                         type="number"
@@ -145,11 +266,11 @@ export default function ProjectsPage() {
                         max="365"
                         style={{ width: 80 }}
                       />
-                      <span>days</span>
+                      <span style={{ fontSize: typography.fontSize.caption, color: themeColors.text.muted }}>days</span>
                     </label>
                   </div>
                   <div>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: spacing.xs }}>
                       Warm storage
                       <Input
                         type="number"
@@ -159,11 +280,11 @@ export default function ProjectsPage() {
                         max="365"
                         style={{ width: 80 }}
                       />
-                      <span>days</span>
+                      <span style={{ fontSize: typography.fontSize.caption, color: themeColors.text.muted }}>days</span>
                     </label>
                   </div>
                   <div>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: spacing.xs }}>
                       Cold storage
                       <Input
                         type="number"
@@ -173,12 +294,12 @@ export default function ProjectsPage() {
                         max="365"
                         style={{ width: 80 }}
                       />
-                      <span>days</span>
+                      <span style={{ fontSize: typography.fontSize.caption, color: themeColors.text.muted }}>days</span>
                     </label>
                   </div>
                 </div>
-                <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <div style={{ marginTop: spacing.md, display: 'flex', alignItems: 'center', gap: spacing.md }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: spacing.xs }}>
                     <Input
                       type="checkbox"
                       checked={storagePolicy.enabled}
@@ -189,12 +310,24 @@ export default function ProjectsPage() {
                 </div>
               </div>
 
-              <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'flex-end' }}>
+              <div style={{ marginTop: spacing.lg, display: 'flex', justifyContent: 'flex-end', gap: spacing.md }}>
+                <Button variant="outline" size="sm" onClick={() => {
+                  setName("");
+                  setDesc("");
+                  setStoragePolicy({
+                    hot_days: 30,
+                    warm_days: 90,
+                    cold_days: 365,
+                    enabled: true
+                  });
+                }}>
+                  Cancel
+                </Button>
                 <Button variant="primary" type="submit">
                   Create repo
                 </Button>
                 {error && (
-                  <div style={{ marginLeft: '12px', color: 'red', fontSize: '14px' }}>
+                  <div style={{ marginLeft: spacing.md, color: themeColors.error, fontSize: typography.fontSize.caption }}>
                     {error}
                   </div>
                 )}
