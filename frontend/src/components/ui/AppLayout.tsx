@@ -179,7 +179,7 @@ export const SidebarNavItem: React.FC<SidebarNavItemProps> = ({
         marginBottom: '1px',
         borderRadius: radii.sm,
         textDecoration: 'none',
-        fontSize: typography.fontSize.body,
+        fontSize: '15px',
         fontWeight: typography.fontWeight.medium,
         color: active ? colors.text.primary : colors.text.secondary,
         background: active ? colors.bg.hover : 'transparent',
@@ -205,8 +205,8 @@ export const SidebarNavItem: React.FC<SidebarNavItemProps> = ({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          width: '14px',
-          height: '14px',
+          width: '18px',
+          height: '18px',
           flexShrink: 0,
         }}>
           {icon}

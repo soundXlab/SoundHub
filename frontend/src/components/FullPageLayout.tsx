@@ -100,7 +100,7 @@ export const FullPageLayout: React.FC<FullPageLayoutProps> = ({
       topbar={
         <TopBar
           title="SoundHub"
-          logo={<span style={{ color: colors.brand.primary, fontSize: '15px' }}>🎵</span>}
+          logo={<span style={{ color: colors.brand.primary, fontSize: '20px' }}>🎵</span>}
           actions={
             <div style={{ display: 'flex', alignItems: 'center', gap: spacing.md }}>
               <ConnectionIndicator />
@@ -136,16 +136,16 @@ export const FullPageLayout: React.FC<FullPageLayoutProps> = ({
       sidebar={
         <Sidebar collapsed={sidebarCollapsed} onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}>
           <SidebarSection title="Main" collapsed={sidebarCollapsed} />
-          <SidebarNavItem href="/dashboard" icon={<Home size={14} />} active={pathname === '/dashboard'} collapsed={sidebarCollapsed}>
+          <SidebarNavItem href="/dashboard" icon={<Home size={18} />} active={pathname === '/dashboard'} collapsed={sidebarCollapsed}>
             Dashboard
           </SidebarNavItem>
-          <SidebarNavItem href="/projects" icon={<Folder size={14} />} active={pathname.startsWith('/projects')} collapsed={sidebarCollapsed}>
+          <SidebarNavItem href="/projects" icon={<Folder size={18} />} active={pathname.startsWith('/projects')} collapsed={sidebarCollapsed}>
             Projects
           </SidebarNavItem>
-          <SidebarNavItem href="/marketplace" icon={<Music size={14} />} active={pathname === '/marketplace'} collapsed={sidebarCollapsed}>
+          <SidebarNavItem href="/marketplace" icon={<Music size={18} />} active={pathname === '/marketplace'} collapsed={sidebarCollapsed}>
             Marketplace
           </SidebarNavItem>
-          <SidebarNavItem href="/reviews" icon={<MessageSquare size={14} />} active={pathname === '/reviews'} collapsed={sidebarCollapsed}>
+          <SidebarNavItem href="/reviews" icon={<MessageSquare size={18} />} active={pathname === '/reviews'} collapsed={sidebarCollapsed}>
             Reviews
           </SidebarNavItem>
           <SidebarNavItem href="/upload" icon={<Upload size={14} />} active={pathname === '/upload'} collapsed={sidebarCollapsed}>
