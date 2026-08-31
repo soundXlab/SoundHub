@@ -168,8 +168,19 @@ app.include_router(graphql_app, prefix="/graphql")
 import os as _os
 _static_dir = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "static")
 if _os.path.isdir(_static_dir) and _os.path.isfile(_os.path.join(_static_dir, "index.html")):
-    app.frontend("/", directory=_static_dir, fallback="index.html")
+    from fastapi.staticfiles import StaticFiles
+    from starlette.responses import FileResponse
+    _index_html = _os.path.join(_static_dir, "index.html")
+    @app.get("/{full_path:path}", include_in_schema=False)
+    async def spa_fallback(full_path: str):
+        # Serve actual static files if they exist
+        file_path = _os.path.join(_static_dir, full_path)
+        if full_path and _os.path.isfile(file_path):
+            return FileResponse(file_path)
+        # SPA fallback: return index.html for all other routes
+        return FileResponse(_index_html)
 else:
     _dev_dist = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "..", "..", "frontend", "dist")
     if _os.path.isdir(_dev_dist) and _os.path.isfile(_os.path.join(_dev_dist, "index.html")):
-        app.frontend("/", directory=_dev_dist, fallback="index.html")
+        from fastapi.staticfiles import StaticFiles
+        app.mount("/", StaticFiles(directory=_dev_dist, html=True), name="static")
