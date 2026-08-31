@@ -6,6 +6,9 @@ import { Box, Wrench, Check, Folder, ExternalLink, Repeat, DollarSign, Mail, Use
 import ABCompare from "../components/ABCompare";
 import ReferenceCompare from "../components/ReferenceCompare";
 import UsdcPayButton from "../components/UsdcPayButton";
+import VersionTagPicker from "../components/VersionTagPicker";
+import ReviewerPanel from "../components/ReviewerPanel";
+import ReviewChecklist from "../components/ReviewChecklist";
 import {
   humanSize,
   shortDate,
@@ -2268,6 +2271,7 @@ function SessionDetail({ session, onBack }: { session: ReviewSession; onBack: ()
                           <span className="rs-version-note">
                             {fmtClock(v.duration_s)} · {v.comments.filter((c) => c.resolved).length} resolved
                           </span>
+                          <VersionTagPicker sessionId={session.id} versionId={v.id} compact />
                         </span>
                       </button>
                       {v.commit_id && (
@@ -2552,6 +2556,16 @@ function SessionDetail({ session, onBack }: { session: ReviewSession; onBack: ()
                       Save payment & portfolio settings
                     </button>
                   </div>
+                </div>
+
+                {/* Reviewers panel */}
+                <div className="rs-reviewers" style={{ padding: '12px', border: '1px solid var(--border-default)', borderRadius: 'var(--radius-md)', background: 'var(--bg-card)' }}>
+                  <ReviewerPanel sessionId={session.id} />
+                </div>
+
+                {/* QC Checklist */}
+                <div className="rs-checklist" style={{ padding: '12px', border: '1px solid var(--border-default)', borderRadius: 'var(--radius-md)', background: 'var(--bg-card)' }}>
+                  <ReviewChecklist sessionId={session.id} />
                 </div>
 
                 {events.length > 0 && (
