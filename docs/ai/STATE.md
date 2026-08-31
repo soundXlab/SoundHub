@@ -4,9 +4,10 @@
 - Репозиторий: `/home/scatter/SoundHub`
 - Основная модель: MiMo 2.5
 - Язык отчётов: русский
-- Последний коммит: `c8e4c43` (fix: BranchProtectionPanel + MergeQueuePanel без Tailwind)
+- Последний коммит: `71776ab` (fix(deploy): SPA fallback for Cloud Run)
 - Ветка: `feat/marketplace-uiux-redesign` (запушена)
-- Ошибки TypeScript: 11 (все в ProjectsPage.tsx — зона Клода)
+- TypeScript: 0 ошибок
+- Cloud Run: https://soundhub-634858473264.europe-west1.run.app
 
 ## Текущий фокус
 - SoundHub задеплоен на Cloud Run ✅
@@ -183,9 +184,11 @@
 - **Проект:** project-e9ee982d-db84-440b-ba1 (Free Trial $300)
 - **Образ:** us-docker.pkg.dev/project-e9ee982d-db84-440b-ba1/docker/soundhub
 - **Dockerfile:** multi-stage (frontend build + backend), корневой `Dockerfile`
-- **Env vars:** STORAGE_PROVIDER=gcs, GCS_BUCKET=soundhub-assets-project-e9ee982d-db84-440b-ba1, ENV=production, SECRET_KEY (auto-generated), CORS_ORIGINS=*
+- **Env vars:** STORAGE_PROVIDER=gcs, GCS_BUCKET=soundhub-assets-project-e9ee982d-db84-440b-ba1, ENV=production, CORS_ORIGINS=https://soundhub-634858473264.europe-west1.run.app
+- **SPA fallback:** catch-all route в main.py (FileResponse → index.html)
 - **Seed:** demo/demo123 при старте контейнера
 - **Деплой:** локально `docker build` + `docker push` + `gcloud run deploy`
+- **Последний деплой:** 2026-08-31, ревизия soundhub-00006-jkr
 
 ## Auth Inventory (2026-08-29)
 - Всего эндпоинтов: 500+
