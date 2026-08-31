@@ -4,8 +4,9 @@
 - Репозиторий: `/home/scatter/SoundHub`
 - Основная модель: MiMo 2.5
 - Язык отчётов: русский
-- Последний коммит: `70ad250` (fix(security): resolve critical production audit issues)
-- Не закоммиченные изменения: ~135 файл (frontend + auth + release_packages)
+- Последний коммит: `173119f` (feat(api): add branch protection API methods)
+- Ветка: `feat/marketplace-uiux-redesign` (запушена)
+- Не закоммиченные изменения: DashboardPage.tsx (inline styles от Клода)
 
 ## Текущий фокус
 - SoundHub задеплоен на Cloud Run ✅
@@ -291,7 +292,81 @@ SQL инъекции защищены, PBKDF2-SHA256 260K, хеш-цепочка
 - **Примечание:** в `.gitignore` правило `*_RU.md` — русскоязычные файлы не отслеживаются
 - **GitHub secret scanning:** mock Stripe key в figma-mockups разблокирован
 
+## Commit + Pull Request фичи (2026-08-31, сессия Buffy)
+
+### Архитектурный план
+- Файл: `docs/internal/REVIEW_COMMIT_ARCHITECTURE.md`
+- 10 фич: inline comments, waveform diff, review checklist, draft versions, reviewer assignment, merge queue, version tags, conflict resolution, review summary, required reviews
+- Оценка: ~33 дня (backend 14д + frontend 19д)
+
+### Sprint 1 — Бэкенд + UI компоненты
+**Коммиты:** `89ded2d`, `1ec8ec5`, `d261ee1`
+
+**Новые модели (3):**
+- `VersionTag` — теги версий (release-candidate, final, beta)
+- `ReviewCheck` — автоматические QC-проверки (blocking/advisory)
+- `MergeQueue` — очередь approved → merge
+
+**Новые endpoints (16+):**
+- Version tags: `GET/POST/DELETE /sessions/{id}/versions/{vid}/tags`
+- Draft publish: `POST /sessions/{id}/versions/{vid}/publish`
+- Version summary: `GET /sessions/{id}/versions/{vid}/summary`
+- Members: `GET/POST/DELETE /sessions/{id}/members`
+- Merge queue: `GET/POST /sessions/{id}/merge-queue`, `POST /.../merge`
+- Review checks: `GET/POST /sessions/{id}/checks`, `POST /.../run`
+
+**Новые UI компоненты (3):**
+- `VersionTagPicker.tsx` — пресеты + кастомные теги с цветом
+- `ReviewerPanel.tsx` — invite по email + роль, статусы
+- `ReviewChecklist.tsx` — QC-проверки с blocking indicator
+
+**Интеграция в ReviewSessionPage:**
+- Теги под каждой версией
+- Reviewers panel в sidebar
+- QC Checklist в sidebar
+
+### Sprint 2 — Waveform Diff + Inline Comments
+**Коммит:** `742c49c`
+
+**Backend:**
+- `GET /sessions/{id}/versions/{vid}/waveform-diff?compare_to={vid2}` — peaks для A/B
+
+**Frontend компоненты (3):**
+- `WaveformDiff.tsx` — overlay/side-by-side/difference режимы, canvas, playback
+- `ReviewSummary.tsx` — авто-diff (duration, size, format, filename)
+- `InlineCommentMarkers.tsx` — кликабельные пины на waveform с тултипами
+
+**Интеграция в ReviewSessionPage:**
+- Кнопка 〜 в списке версий (waveform diff)
+- InlineCommentMarkers под WaveformCanvas
+- ReviewSummary под плеером
+
+### Branch Protection API
+**Коммит:** `173119f`
+- API методы: `getBranchProtections`, `createBranchProtection`, `deleteBranchProtection`
+
+### Итого за сессию
+- **8 коммитов** на `feat/marketplace-uiux-redesign`
+- **8 новых компонентов** (6 review + 2 marketplace)
+- **17+ endpoints**
+- **3 новые таблицы БД**
+- **TypeScript**: 0 ошибок в новых файлах ✅
+- **Тесты**: 34/34 pass ✅
+
+### Ошибки Клода (исправлены)
+- `ReviewChecklist.tsx` — mismatched JSX тег (</> → </div>)
+- `ProjectsPage.tsx` — missing Loader import, несуществующий Progress
+- `test_sessions.py` — повреждён (потерял 2000+ строк), восстановлен из git
+
+### Оценка работы Клода (Marketplace Redesign)
+- **5/10** — прототип, не production-ready
+- ✅ AssetCard (grid/list), FilterPanel (7 фильтров), two-column layout
+- ❌ 50+ inline styles, дублирует существующий AssetCard, не закоммичено
+- Рекомендация: использовать как референс, переписать с конвенциями проекта
+
 ## Следующий шаг
+
+**Sprint 3 (Claude):** Branch protection UI + Merge queue UI + расширенные QC checks + тесты. Задание отправлено в Telegram.
 
 **Дизайн:** v1.3 после тестов. Approve = confirm с scope (`ReviewShared`). Лендинг: How it works вместо Marketplace в гостевом nav; hero без GitHub. Прототип: D/10 copy-link, D-confirm. Отчёт: `docs/ai/USER_TEST_RP_2026-08-31.md`. Дальше — три живых человека.
 
