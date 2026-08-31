@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=390">
+  <title>SoundHub — RP/M/07 v2</title>
+  <link rel="stylesheet" href="rp.css">
+  <style>
+    .m-meta { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; padding:10px 12px; background:var(--surface-2); border:1px solid var(--border); border-radius:8px; margin:0 12px 12px; }
+    .m-meta-item { display:flex; flex-direction:column; gap:2px; }
+    .m-meta-item .label { font:10px/1 var(--font); color:var(--text-4); text-transform:uppercase; letter-spacing:.4px; }
+    .m-meta-item .value { font:600 12px/1.3 var(--font); color:var(--text-1); }
+    .decision-banner { background:rgba(255,183,77,.1); border:1px solid rgba(255,183,77,.3); border-radius:10px; padding:14px 16px; margin:0 12px 12px; }
+    .decision-banner h4 { font:600 14px/1.3 var(--font); color:var(--amber); margin:0 0 4px; display:flex; align-items:center; gap:6px; }
+    .decision-banner p { font:13px/1.4 var(--font); color:var(--text-3); margin:0; }
+  </style>
+</head>
+<body class="studio">
+<div class="frame-meta mobile"><span class="fid">RP/M/07</span><span class="req hyp">HYPOTHESIS</span><span class="req verify">VERIFY</span><span class="req draft">DRAFT COPY</span><span class="frame-name">Changes requested</span></div>
+<div class="artboard mobile"><div class="rp">
+    <header class="m-header">
+      <span class="wordmark">Sound<span>Hub</span></span>
+      <div class="rp-title">Midnight Runner</div>
+      <span class="ver">Mix v2</span>
+    </header>
+
+    <div class="decision-banner">
+      <h4>⚠️ Changes requested</h4>
+      <p>The vocal still sits on top of the mix in the chorus. Please pull it 1–2 dB.</p>
+    </div>
+
+    <div class="m-meta">
+      <div class="m-meta-item"><span class="label">Dur</span><span class="value">3:41</span></div>
+      <div class="m-meta-item"><span class="label">SR</span><span class="value">48 kHz</span></div>
+      <div class="m-meta-item"><span class="label">Bit</span><span class="value">24-bit</span></div>
+    </div>
+
+    <section class="player m-player">
+      <div class="wave-stack">
+          <div class="wave-row" style="height:48px">
+            <span class="wave-label">A</span>
+            <svg class="wave" id="ma" data-variant="a" data-played="0.416" data-dim="true"></svg>
+            <div class="playhead" style="left:41.60%"></div>
+          </div>
+          <div class="wave-row" style="height:48px">
+            <span class="wave-label">B</span>
+            <svg class="wave" id="mb" data-variant="b" data-played="0.416"></svg>
+            <div class="playhead" style="left:41.60%"></div>
+            <div class="pin fixed" style="left:41.60%" title="1:32"><span class="hit"></span><span class="pin-lab">1:32</span></div>
+          </div>
+        </div>
+        <div class="ab" style="margin-top:8px">
+          <button class="ab-btn" aria-pressed="false">A Mix v1</button>
+          <button class="ab-btn" aria-pressed="true">B Mix v2</button>
+        </div>
+        <p class="hint" style="margin:8px 0 0">Hold A to hear Mix v1</p>
+      <div class="transport">
+        <button class="play m-play" aria-label="Play"><svg viewBox="0 0 14 14" aria-hidden="true"><polygon points="3,1 13,7 3,13"/></svg></button>
+        <span class="time">1:32 / 3:41</span>
+      </div>
+    </section>
+    <div class="m-thread">
+      <article class="card" style="margin-bottom:8px">
+          <div class="card-top">
+            <span class="who">You</span>
+            <span class="chip warn">Decision</span>
+            <span class="when">2 min ago</span>
+          </div>
+          <p>The vocal still sits on top of the mix in the chorus. Please pull it 1–2 dB.</p>
+          <p class="caption" style="margin-top:6px">Your note was sent to the engineer</p>
+        </article>
+      <article class="card">
+          <div class="card-top">
+            <button class="time-btn">1:32</button>
+            <span class="who">You</span>
+            <span class="chip fixed">Fixed in Mix v2</span>
+            <span class="when">5 min ago</span>
+          </div>
+          <p>Вокал слишком громкий — нужно снизить на 2–3 дБ</p>
+        </article>
+    </div>
+    <div class="sticky">
+      <a class="btn primary block" href="RP-M-approved.html" style="display:flex;align-items:center;justify-content:center;text-decoration:none">Approve Mix v2</a>
+    </div>
+</div></div>
+<script src="rp.js"></script>
+</body>
+</html>

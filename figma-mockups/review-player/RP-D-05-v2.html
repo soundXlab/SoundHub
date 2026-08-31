@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <title>SoundHub — RP/D/05 v2</title>
+  <link rel="stylesheet" href="rp.css">
+  <style>
+    /* D/05 v2 improvements */
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .meta-item {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--r-card);
+      padding: 12px;
+    }
+    .meta-label {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+    .meta-value {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .meta-value.highlight { color: var(--accent); }
+    .meta-value.success { color: var(--success-text); }
+
+    .stem-selector {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+      padding: 12px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-card);
+    }
+    .stem-btn {
+      height: 32px;
+      padding: 0 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--bg-elevated);
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .stem-btn:hover { border-color: var(--border-hover); color: var(--text-secondary); }
+    .stem-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+    .stem-btn .stem-icon { margin-right: 4px; }
+
+    .ref-section {
+      margin-top: 16px;
+    }
+    .ref-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .ref-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .ref-list {
+      display: flex;
+      gap: 8px;
+    }
+    .ref-card {
+      flex: 1;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--r-card);
+      padding: 8px 12px;
+      cursor: pointer;
+      transition: border-color 0.15s;
+    }
+    .ref-card:hover { border-color: var(--border-hover); }
+    .ref-card.active { border-color: var(--accent); }
+    .ref-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 2px;
+    }
+    .ref-artist {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+    .ref-purpose {
+      font-size: 10px;
+      color: var(--accent);
+      margin-top: 4px;
+    }
+
+    .version-compare {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .version-card {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--r-card);
+      padding: 12px;
+    }
+    .version-card.current {
+      border-color: var(--accent);
+      background: rgba(232, 93, 42, 0.08);
+    }
+    .version-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .version-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .version-stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+    .stat-item {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+    .stat-item strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .body-v2 {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 24px;
+      padding: 24px;
+      min-height: 0;
+      flex: 1;
+      overflow: hidden;
+    }
+    .sidebar-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+  </style>
+</head>
+<body class="studio">
+<div class="frame-meta">
+  <span class="fid">RP/D/05 v2</span>
+  <span class="req doc">DOC</span>
+  <span class="req verify">VERIFY</span>
+  <span class="frame-name">Client · Mix v2 with A/B — key screen (improved)</span>
+</div>
+<div class="artboard desktop"><div class="rp">
+
+    <header class="rp-header">
+      <span class="wordmark">Sound<span>Hub</span></span>
+      <div class="rp-header-main">
+        <div class="rp-title">Midnight Runner</div>
+        <span class="ver ok">Mix v2</span>
+        <span class="chip fixed" style="margin-left: 8px">Approved</span>
+      </div>
+      <div class="rp-header-actions">
+        <a class="btn primary" href="RP-D-confirm.html" style="display:inline-flex;align-items:center;text-decoration:none">Approve Mix v2</a>
+        <a class="btn secondary" href="RP-D-06.html" style="display:inline-flex;align-items:center;text-decoration:none">Request changes</a>
+      </div>
+    </header>
+
+    <div class="strip">
+      <span class="chip fixed">Mix v2 ready</span>
+      <span style="margin-left: auto; font-size: 12px; color: var(--text-muted)">Round 2 of 3 · Deadline: Dec 15</span>
+    </div>
+
+    <!-- Metadata Grid -->
+    <div style="padding: 16px 24px 0">
+      <div class="meta-grid">
+        <div class="meta-item">
+          <div class="meta-label">BPM</div>
+          <div class="meta-value">128</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-label">Key</div>
+          <div class="meta-value">F minor</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-label">LUFS</div>
+          <div class="meta-value highlight">-14.2</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-label">Duration</div>
+          <div class="meta-value">3:41</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stem Selector -->
+    <div style="padding: 0 24px">
+      <div class="stem-selector">
+        <span style="font-size: 12px; color: var(--text-muted); margin-right: 8px; align-self: center">Compare:</span>
+        <button class="stem-btn active"><span class="stem-icon">🎵</span> Full Mix</button>
+        <button class="stem-btn"><span class="stem-icon">🥁</span> Drums</button>
+        <button class="stem-btn"><span class="stem-icon">🎸</span> Bass</button>
+        <button class="stem-btn"><span class="stem-icon">🎤</span> Vocals</button>
+        <button class="stem-btn"><span class="stem-icon">🎹</span> Synths</button>
+        <button class="stem-btn"><span class="stem-icon">🔊</span> FX</button>
+      </div>
+    </div>
+
+    <!-- Player -->
+    <section class="player">
+      <div class="ab" role="group" aria-label="Version">
+        <button class="ab-btn" aria-pressed="false">A Mix v1</button>
+        <button class="ab-btn" aria-pressed="true">B Mix v2</button>
+        <span class="lm">Level match <span class="switch on"><i></i></span></span>
+      </div>
+      <div class="wave-stack">
+        <div class="wave-row">
+          <span class="wave-label">A</span>
+          <svg class="wave" id="wa" data-variant="a" data-played="0.416" data-dim="true"></svg>
+          <div class="playhead" style="left:41.60%"></div>
+        </div>
+        <div class="wave-row">
+          <span class="wave-label">B</span>
+          <svg class="wave" id="wb" data-variant="b" data-played="0.416"></svg>
+          <div class="playhead" style="left:41.60%"></div>
+          <div class="pin fixed" style="left:41.60%" title="1:32"><span class="hit"></span><span class="pin-lab">1:32</span></div>
+        </div>
+      </div>
+      <div class="transport">
+        <button class="play" aria-label="Play"><svg viewBox="0 0 14 14" aria-hidden="true"><rect x="2" y="1" width="3.5" height="12"/><rect x="8.5" y="1" width="3.5" height="12"/></svg></button>
+        <span class="time">1:32 / 3:41</span>
+        <button class="loop" aria-label="Loop" title="Loop">↻</button>
+        <span class="hint">Hold A to hear Mix v1 · Same position</span>
+      </div>
+    </section>
+
+    <!-- Main Content -->
+    <div class="body-v2">
+      <!-- Left: Thread + Versions -->
+      <div style="display: flex; flex-direction: column; gap: 16px; min-width: 0">
+        <!-- Comments Thread -->
+        <div class="thread">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px">
+            <span style="font-size: 12px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px">Comments</span>
+            <span class="chip sent">1 note</span>
+          </div>
+          <article class="card">
+            <div class="card-top">
+              <button class="time-btn">1:32</button>
+              <span class="who">You</span>
+              <span class="chip fixed">Fixed in Mix v2</span>
+              <span class="when">2 hours ago</span>
+            </div>
+            <p>Вокал слишком громкий на 1:32 — сравни с Mix v1</p>
+          </article>
+        </div>
+
+        <!-- Version Comparison -->
+        <div class="version-compare">
+          <div class="version-card">
+            <div class="version-header">
+              <span class="version-name">Mix v1</span>
+              <span class="chip sent">Previous</span>
+            </div>
+            <div class="version-stats">
+              <div class="stat-item"><strong>-13.8</strong> LUFS</div>
+              <div class="stat-item"><strong>3:39</strong> duration</div>
+              <div class="stat-item"><strong>48k</strong> sample rate</div>
+              <div class="stat-item"><strong>24-bit</strong> depth</div>
+            </div>
+          </div>
+          <div class="version-card current">
+            <div class="version-header">
+              <span class="version-name">Mix v2</span>
+              <span class="chip fixed">Current</span>
+            </div>
+            <div class="version-stats">
+              <div class="stat-item"><strong>-14.2</strong> LUFS</div>
+              <div class="stat-item"><strong>3:41</strong> duration</div>
+              <div class="stat-item"><strong>48k</strong> sample rate</div>
+              <div class="stat-item"><strong>24-bit</strong> depth</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Sidebar -->
+      <div class="sidebar-panel">
+        <!-- Reference Tracks -->
+        <div class="card">
+          <div class="ref-header">
+            <span class="ref-title">References</span>
+            <button class="btn secondary" style="height: 24px; font-size: 11px; padding: 0 8px">+ Add</button>
+          </div>
+          <div class="ref-list" style="flex-direction: column">
+            <div class="ref-card active">
+              <div class="ref-name">Blinding Lights</div>
+              <div class="ref-artist">The Weeknd</div>
+              <div class="ref-purpose">Overall tone</div>
+            </div>
+            <div class="ref-card">
+              <div class="ref-name">Levitating</div>
+              <div class="ref-artist">Dua Lipa</div>
+              <div class="ref-purpose">Low end</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Release Info -->
+        <div class="card">
+          <div style="font-size: 12px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px">Release Info</div>
+          <div style="display: flex; flex-direction: column; gap: 8px">
+            <div style="display: flex; justify-content: space-between; font-size: 13px">
+              <span style="color: var(--text-muted)">Status</span>
+              <span class="chip approved">Approved</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 13px">
+              <span style="color: var(--text-muted)">Deadline</span>
+              <span style="color: var(--text-primary)">Dec 15, 2026</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 13px">
+              <span style="color: var(--text-muted)">Rounds</span>
+              <span style="color: var(--text-primary)">2 of 3</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 13px">
+              <span style="color: var(--text-muted)">Service</span>
+              <span style="color: var(--text-primary)">Mix + Master</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="card">
+          <div style="font-size: 12px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px">Actions</div>
+          <div style="display: flex; flex-direction: column; gap: 8px">
+            <button class="btn primary" style="width: 100%; justify-content: center">Approve Mix v2</button>
+            <button class="btn secondary" style="width: 100%; justify-content: center">Request Changes</button>
+            <button class="btn secondary" style="width: 100%; justify-content: center">Download Mix v2</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+</div></div>
+<script src="rp.js"></script>
+</body>
+</html>

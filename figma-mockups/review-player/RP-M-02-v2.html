@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=390">
+  <title>SoundHub — RP/M/02 v2</title>
+  <link rel="stylesheet" href="rp.css">
+  <style>
+    .m-meta { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; padding:10px 12px; background:var(--surface-2); border:1px solid var(--border); border-radius:8px; margin:0 12px 12px; }
+    .m-meta-item { display:flex; flex-direction:column; gap:2px; }
+    .m-meta-item .label { font:10px/1 var(--font); color:var(--text-4); text-transform:uppercase; letter-spacing:.4px; }
+    .m-meta-item .value { font:600 12px/1.3 var(--font); color:var(--text-1); }
+    .sheet .char-count { font:11px var(--font); color:var(--text-4); text-align:right; margin-top:4px; }
+  </style>
+</head>
+<body class="studio">
+<div class="frame-meta mobile"><span class="fid">RP/M/02</span><span class="req doc">DOC</span><span class="req draft">DRAFT COPY</span><span class="frame-name">Composer sheet</span></div>
+<div class="artboard mobile"><div class="rp">
+    <header class="m-header">
+      <span class="wordmark">Sound<span>Hub</span></span>
+      <div class="rp-title">Midnight Runner</div>
+      <span class="ver">Mix v1</span>
+    </header>
+
+    <div class="m-meta">
+      <div class="m-meta-item"><span class="label">Dur</span><span class="value">3:41</span></div>
+      <div class="m-meta-item"><span class="label">SR</span><span class="value">48 kHz</span></div>
+      <div class="m-meta-item"><span class="label">Bit</span><span class="value">24-bit</span></div>
+    </div>
+
+    <section class="player m-player">
+      <div class="wave-row single">
+          <svg class="wave" id="mw" data-variant="b" data-played="0.416"></svg>
+          <div class="playhead" style="left:41.60%"></div>
+          <div class="pin selected" style="left:41.60%" title="1:32"><span class="hit"></span><span class="pin-lab">1:32</span></div>
+        </div>
+      <div class="transport">
+        <button class="play m-play" aria-label="Play"><svg viewBox="0 0 14 14" aria-hidden="true"><polygon points="3,1 13,7 3,13"/></svg></button>
+        <span class="time">1:32 / 3:41</span>
+      </div>
+    </section>
+    <div class="m-thread"></div>
+    <div class="sheet-scrim">
+      <form class="sheet">
+        <div class="grab"></div>
+        <div class="composer-time">📍 1:32</div>
+        <textarea class="field" placeholder="Describe what needs to change...">Вокал слишком громкий — нужно снизить на 2–3 дБ и добавить компрессию</textarea>
+        <div class="char-count">68 / 500</div>
+        <a class="btn accent block" href="RP-M-sent.html" style="display:flex;align-items:center;justify-content:center;text-decoration:none;margin-top:12px">Send comment</a>
+      </form>
+    </div>
+</div></div>
+<script src="rp.js"></script>
+</body>
+</html>

@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <title>SoundHub — RP/D/03 v2</title>
+  <link rel="stylesheet" href="rp.css">
+  <style>
+    .composer-v2 {
+      background: var(--bg-surface);
+      border: 1px solid var(--accent);
+      border-radius: var(--r-card);
+      padding: 16px;
+    }
+    .composer-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .composer-time-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background: rgba(232, 93, 42, 0.12);
+      border-radius: 6px;
+      font-family: var(--mono);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--accent);
+    }
+    .composer-time-badge svg {
+      width: 14px;
+      height: 14px;
+      fill: currentColor;
+    }
+    .composer-label {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .composer-field {
+      width: 100%;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      color: var(--text-primary);
+      font-size: 14px;
+      font-family: var(--font);
+      resize: vertical;
+      min-height: 80px;
+    }
+    .composer-field:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    .composer-field::placeholder {
+      color: var(--text-muted);
+    }
+    .composer-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 12px;
+    }
+    .composer-hint {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .composer-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .quick-replies {
+      display: flex;
+      gap: 6px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+    .quick-reply {
+      padding: 6px 10px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .quick-reply:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+  </style>
+</head>
+<body class="studio">
+<div class="frame-meta">
+  <span class="fid">RP/D/03 v2</span>
+  <span class="req doc">DOC</span>
+  <span class="req verify">VERIFY</span>
+  <span class="frame-name">Client · composer at 1:32 (improved)</span>
+</div>
+<div class="artboard desktop"><div class="rp">
+
+    <header class="rp-header">
+      <span class="wordmark">Sound<span>Hub</span></span>
+      <div class="rp-header-main">
+        <div class="rp-title">Midnight Runner</div>
+        <span class="ver">Mix v1</span>
+      </div>
+      <div class="rp-header-actions">
+        <button class="btn ghost" disabled>Approve Mix v1</button>
+      </div>
+    </header>
+
+    <div class="strip">
+      <span class="chip wait">Waiting for comments</span>
+      <span class="caption" style="margin-left: 8px">Write your feedback at 1:32</span>
+    </div>
+
+    <!-- Metadata -->
+    <div style="padding: 16px 24px 0">
+      <div class="meta-grid">
+        <div class="meta-item">
+          <div class="meta-label">BPM</div>
+          <div class="meta-value">128</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-label">Key</div>
+          <div class="meta-value">F minor</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-label">LUFS</div>
+          <div class="meta-value">-13.8</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-label">Duration</div>
+          <div class="meta-value">3:41</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Player -->
+    <section class="player">
+      <div class="player-shell">
+        <div class="wave-row single">
+          <svg class="wave" id="w0" data-variant="b" data-played="0.416"></svg>
+          <div class="playhead" style="left:41.60%"></div>
+          <div class="pin selected" style="left:41.60%" title="1:32">
+            <span class="hit"></span>
+            <span class="pin-lab">1:32</span>
+          </div>
+        </div>
+      </div>
+      <div class="transport">
+        <button class="play" aria-label="Play">
+          <svg viewBox="0 0 14 14" aria-hidden="true"><rect x="2" y="1" width="3.5" height="12"/><rect x="8.5" y="1" width="3.5" height="12"/></svg>
+        </button>
+        <span class="time">1:32 / 3:41</span>
+        <button class="loop" aria-label="Loop" title="Loop">↻</button>
+        <span class="hint">Pin placed at 1:32 — write your comment below</span>
+      </div>
+    </section>
+
+    <!-- Content -->
+    <div class="body-v2">
+      <div style="display: flex; flex-direction: column; gap: 16px">
+        <!-- Thread (empty) -->
+        <div class="thread">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px">
+            <span style="font-size: 12px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px">Comments</span>
+            <span class="chip wait">0 notes</span>
+          </div>
+          <div class="empty" style="text-align: center">
+            <div style="font-size: 32px; margin-bottom: 8px">💬</div>
+            <div style="font-size: 14px; color: var(--text-secondary)">Your comment will appear here</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar: Composer -->
+      <div class="sidebar-panel">
+        <div class="composer-v2">
+          <div class="composer-header">
+            <div class="composer-time-badge">
+              <svg viewBox="0 0 14 14"><polygon points="3,1 13,7 3,13"/></svg>
+              1:32
+            </div>
+            <div class="composer-label">New comment</div>
+          </div>
+
+          <label style="display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 6px">Your name</label>
+          <input class="composer-field" style="min-height: auto; height: 36px; margin-bottom: 12px" value="Alex" />
+
+          <label style="display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 6px">Comment</label>
+          <textarea class="composer-field" placeholder="What needs to change at this moment?">Вокал слишком громкий</textarea>
+
+          <!-- Quick Replies -->
+          <div class="quick-replies">
+            <button class="quick-reply">🎤 Too loud</button>
+            <button class="quick-reply">🔇 Too quiet</button>
+            <button class="quick-reply">🎵 Wrong note</button>
+            <button class="quick-reply">🔧 Fix this</button>
+            <button class="quick-reply">✨ Love it</button>
+          </div>
+
+          <div class="composer-footer">
+            <span class="composer-hint">⌘ Enter to send</span>
+            <div class="composer-actions">
+              <button class="btn ghost" style="height: 32px; font-size: 12px">Cancel</button>
+              <button class="btn primary" style="height: 32px; font-size: 12px">Send comment</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Release Info -->
+        <div class="card">
+          <div style="font-size: 12px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px">Release Info</div>
+          <div style="display: flex; flex-direction: column; gap: 8px">
+            <div style="display: flex; justify-content: space-between; font-size: 13px">
+              <span style="color: var(--text-muted)">Status</span>
+              <span class="chip wait">Pending</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 13px">
+              <span style="color: var(--text-muted)">Deadline</span>
+              <span style="color: var(--text-primary)">Dec 15, 2026</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 13px">
+              <span style="color: var(--text-muted)">Rounds</span>
+              <span style="color: var(--text-primary)">1 of 3</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+</div></div>
+<script src="rp.js"></script>
+</body>
+</html>

@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <title>SoundHub — RP/D/02 v2</title>
+  <link rel="stylesheet" href="rp.css">
+  <style>
+    .onboarding-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-card);
+      padding: 24px;
+      text-align: center;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+    .onboarding-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: rgba(232, 93, 42, 0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+      font-size: 24px;
+    }
+    .onboarding-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+    .onboarding-desc {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 20px;
+      margin-bottom: 16px;
+    }
+    .onboarding-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      text-align: left;
+    }
+    .step {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px;
+      background: var(--bg-elevated);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+    .step-num {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .step-text {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 18px;
+    }
+    .step-text strong { color: var(--text-primary); }
+  </style>
+</head>
+<body class="studio">
+<div class="frame-meta">
+  <span class="fid">RP/D/02 v2</span>
+  <span class="req doc">DOC</span>
+  <span class="req verify">VERIFY</span>
+  <span class="frame-name">Client · Mix v1 · empty state (improved)</span>
+</div>
+<div class="artboard desktop"><div class="rp">
+
+    <header class="rp-header">
+      <span class="wordmark">Sound<span>Hub</span></span>
+      <div class="rp-header-main">
+        <div class="rp-title">Midnight Runner</div>
+        <span class="ver">Mix v1</span>
+      </div>
+      <div class="rp-header-actions">
+        <button class="btn ghost" disabled>Approve Mix v1</button>
+      </div>
+    </header>
+
+    <div class="strip">
+      <span class="chip wait">Waiting for comments</span>
+      <span class="caption" style="margin-left: 8px">Listen first, then leave timestamped notes</span>
+    </div>
+
+    <!-- Metadata -->
+    <div style="padding: 16px 24px 0">
+      <div class="meta-grid">
+        <div class="meta-item">
+          <div class="meta-label">BPM</div>
+          <div class="meta-value">128</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-label">Key</div>
+          <div class="meta-value">F minor</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-label">LUFS</div>
+          <div class="meta-value">-13.8</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-label">Duration</div>
+          <div class="meta-value">3:41</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Player -->
+    <section class="player">
+      <div class="player-shell">
+        <div class="wave-row single">
+          <a href="RP-D-03.html" style="display:block;height:100%">
+            <svg class="wave" id="w0" data-variant="b" data-played="0.000"></svg>
+          </a>
+          <div class="playhead" style="left:0.00%"></div>
+        </div>
+      </div>
+      <div class="transport">
+        <button class="play" aria-label="Play">
+          <svg viewBox="0 0 14 14" aria-hidden="true"><polygon points="3,1 13,7 3,13"/></svg>
+        </button>
+        <span class="time">0:00 / 3:41</span>
+        <button class="loop" aria-label="Loop" title="Loop">↻</button>
+        <span class="hint">Click waveform to leave a comment at that moment</span>
+      </div>
+    </section>
+
+    <!-- Content -->
+    <div class="body-v2">
+      <div style="display: flex; flex-direction: column; gap: 16px">
+        <!-- Onboarding -->
+        <div class="onboarding-card">
+          <div class="onboarding-icon">🎧</div>
+          <div class="onboarding-title">How Review Player works</div>
+          <div class="onboarding-desc">
+            Listen to the mix and leave timestamped comments. Your engineer will fix the issues and upload a new version.
+          </div>
+          <div class="onboarding-steps">
+            <div class="step">
+              <div class="step-num">1</div>
+              <div class="step-text"><strong>Listen</strong> — Play the track and note moments that need changes</div>
+            </div>
+            <div class="step">
+              <div class="step-num">2</div>
+              <div class="step-text"><strong>Comment</strong> — Click the waveform at the exact timestamp and write your feedback</div>
+            </div>
+            <div class="step">
+              <div class="step-num">3</div>
+              <div class="step-text"><strong>Compare</strong> — When Mix v2 arrives, use A/B to hear the difference</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Empty thread -->
+        <div class="thread">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px">
+            <span style="font-size: 12px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px">Comments</span>
+            <span class="chip wait">0 notes</span>
+          </div>
+          <a class="empty" href="RP-D-03.html" style="display:block;text-decoration:none;color:inherit">
+            <div style="text-align: center; padding: 24px">
+              <div style="font-size: 32px; margin-bottom: 8px">💬</div>
+              <div style="font-size: 14px; color: var(--text-secondary); margin-bottom: 4px">No comments yet</div>
+              <div style="font-size: 12px; color: var(--text-muted)">Click the waveform to leave your first note</div>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="sidebar-panel">
+        <div class="card">
+          <div style="font-size: 12px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px">Release Info</div>
+          <div style="display: flex; flex-direction: column; gap: 8px">
+            <div style="display: flex; justify-content: space-between; font-size: 13px">
+              <span style="color: var(--text-muted)">Status</span>
+              <span class="chip wait">Pending</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 13px">
+              <span style="color: var(--text-muted)">Deadline</span>
+              <span style="color: var(--text-primary)">Dec 15, 2026</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 13px">
+              <span style="color: var(--text-muted)">Rounds</span>
+              <span style="color: var(--text-primary)">1 of 3</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 13px">
+              <span style="color: var(--text-muted)">Service</span>
+              <span style="color: var(--text-primary)">Mix + Master</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div style="font-size: 12px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px">Actions</div>
+          <div style="display: flex; flex-direction: column; gap: 8px">
+            <button class="btn primary" style="width: 100%; justify-content: center" disabled>Approve Mix v1</button>
+            <button class="btn secondary" style="width: 100%; justify-content: center" disabled>Request Changes</button>
+            <button class="btn secondary" style="width: 100%; justify-content: center">Download Mix v1</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+</div></div>
+<script src="rp.js"></script>
+</body>
+</html>

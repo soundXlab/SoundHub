@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=390">
+  <title>SoundHub — RP/M/05 v2</title>
+  <link rel="stylesheet" href="rp.css">
+  <style>
+    .gate { display:flex; align-items:center; justify-content:center; min-height:calc(100vh - 40px); padding:20px; }
+    .gate-card {
+      background:var(--surface-2); border:1px solid var(--border); border-radius:12px;
+      padding:36px 24px; width:100%; text-align:center;
+    }
+    .gate-card .gate-icon { font-size:40px; margin-bottom:12px; opacity:.6; }
+    .gate-card h1 { font:600 20px/1.3 var(--font); color:var(--text-1); margin:0 0 8px; }
+    .gate-card .gate-sub { font:13px/1.5 var(--font); color:var(--text-3); margin:0 0 24px; }
+    .gate-card .field {
+      width:100%; padding:12px 16px; background:var(--surface-1); border:1px solid var(--border);
+      border-radius:8px; color:var(--text-1); font:14px var(--font); box-sizing:border-box;
+    }
+    .gate-card .field:focus { border-color:var(--accent); outline:none; }
+    .gate-card .btn { margin-top:12px; }
+    .gate-card .gate-hint { font:12px var(--font); color:var(--text-4); margin-top:16px; }
+    .gate-card .gate-hint a { color:var(--accent); text-decoration:none; }
+  </style>
+</head>
+<body class="studio">
+<div class="frame-meta mobile"><span class="fid">RP/M/05</span><span class="req doc">DOC</span><span class="req draft">DRAFT COPY</span><span class="frame-name">Password gate</span></div>
+<div class="artboard mobile"><div class="rp">
+    <header class="m-header"><span class="wordmark">Sound<span>Hub</span></span></header>
+    <div class="gate">
+      <div class="gate-card">
+        <div class="gate-icon">🔒</div>
+        <h1>Password protected</h1>
+        <p class="gate-sub">Введите пароль для доступа к обзору.</p>
+        <form action="RP-M-01.html">
+          <input class="field" type="password" required placeholder="Enter password" />
+          <button class="btn accent block" type="submit">Open review</button>
+        </form>
+        <p class="gate-hint">Нет пароля? <a href="#">Свяжитесь с владельцем проекта</a></p>
+      </div>
+    </div>
+</div></div>
+<script src="rp.js"></script>
+</body>
+</html>

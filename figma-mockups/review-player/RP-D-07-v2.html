@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <title>SoundHub — RP/D/07 v2</title>
+  <link rel="stylesheet" href="rp.css">
+  <style>
+    .meta-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; padding:12px 16px; background:var(--surface-2); border:1px solid var(--border); border-radius:8px; margin-bottom:16px; }
+    .meta-item { display:flex; flex-direction:column; gap:2px; }
+    .meta-item .label { font:11px/1 var(--font); color:var(--text-4); text-transform:uppercase; letter-spacing:.5px; }
+    .meta-item .value { font:600 14px/1.3 var(--font); color:var(--text-1); }
+    .approved-banner { background:rgba(72,199,142,.1); border:1px solid rgba(72,199,142,.3); border-radius:12px; padding:20px 24px; margin-bottom:16px; display:flex; align-items:center; gap:16px; }
+    .approved-banner .icon { font-size:32px; }
+    .approved-banner .info h3 { font:600 16px/1.3 var(--font); color:var(--green); margin:0; }
+    .approved-banner .info p { font:13px/1.4 var(--font); color:var(--text-3); margin:4px 0 0; }
+    .delivery-card { background:var(--surface-2); border:1px solid var(--border); border-radius:12px; padding:20px; margin-top:16px; }
+    .delivery-card h4 { font:600 14px/1.3 var(--font); color:var(--text-1); margin:0 0 12px; }
+    .delivery-row { display:flex; gap:12px; align-items:center; }
+    .delivery-row .file-icon { width:40px; height:40px; background:var(--surface-3); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:18px; }
+    .delivery-row .file-info { flex:1; }
+    .delivery-row .file-name { font:600 13px/1.3 var(--font); color:var(--text-1); }
+    .delivery-row .file-meta { font:12px/1.3 var(--font); color:var(--text-4); }
+    .delivery-actions { display:flex; gap:8px; margin-top:16px; }
+  </style>
+</head>
+<body class="studio">
+<div class="frame-meta"><span class="fid">RP/D/07</span><span class="req doc">DOC</span><span class="req draft">DRAFT COPY</span><span class="frame-name">Client · approved</span></div>
+<div class="artboard desktop"><div class="rp">
+    <header class="rp-header">
+      <span class="wordmark">Sound<span>Hub</span></span>
+      <div class="rp-header-main">
+        <div class="rp-title">Midnight Runner</div>
+        <span class="ver ok">Mix v2</span>
+      </div>
+      <div class="rp-header-actions"><span class="chip approved">Mix v2 approved</span></div>
+    </header>
+
+    <div class="approved-banner">
+      <div class="icon">✅</div>
+      <div class="info">
+        <h3>Mix v2 Approved</h3>
+        <p>Approved by You · 2 minutes ago · After 1 revision</p>
+      </div>
+    </div>
+
+    <div style="padding:0 0 8px">
+      <div class="meta-grid">
+        <div class="meta-item"><span class="label">Duration</span><span class="value">3:41</span></div>
+        <div class="meta-item"><span class="label">Sample Rate</span><span class="value">48 kHz</span></div>
+        <div class="meta-item"><span class="label">Bit Depth</span><span class="value">24-bit</span></div>
+        <div class="meta-item"><span class="label">LUFS</span><span class="value">-14.2</span></div>
+        <div class="meta-item"><span class="label">Format</span><span class="value">WAV</span></div>
+        <div class="meta-item"><span class="label">Size</span><span class="value">38.4 MB</span></div>
+      </div>
+    </div>
+
+    <div class="strip"><span class="chip approved">Approved</span></div>
+    <section class="player">
+      <div class="ab" role="group" aria-label="Version">
+          <button class="ab-btn" aria-pressed="false">A Mix v1</button>
+          <button class="ab-btn" aria-pressed="true">B Mix v2</button>
+          <span class="lm">Level match <span class="switch"><i></i></span></span>
+        </div>
+      <div class="wave-stack">
+          <div class="wave-row">
+            <span class="wave-label">A</span>
+            <svg class="wave" id="wa" data-variant="a" data-played="0.416" data-dim="true"></svg>
+            <div class="playhead" style="left:41.60%"></div>
+          </div>
+          <div class="wave-row">
+            <span class="wave-label">B</span>
+            <svg class="wave" id="wb" data-variant="b" data-played="0.416"></svg>
+            <div class="playhead" style="left:41.60%"></div>
+            <div class="pin fixed" style="left:41.60%" title="1:32"><span class="hit"></span><span class="pin-lab">1:32</span></div>
+          </div>
+        </div>
+      <div class="transport">
+        <button class="play" aria-label="Play"><svg viewBox="0 0 14 14" aria-hidden="true"><polygon points="3,1 13,7 3,13"/></svg></button>
+        <span class="time">1:32 / 3:41</span>
+        <button class="loop" aria-label="Loop" title="Loop">↻</button>
+        <span class='hint'>Hold A to hear Mix v1 · Same position</span>
+      </div>
+    </section>
+
+    <div class="body">
+      <div class="thread">
+        <article class="card">
+          <div class="card-top">
+            <button class="time-btn">1:32</button>
+            <span class="who">You</span>
+            <span class="chip fixed">Fixed in Mix v2</span>
+            <span class="when">2 min ago</span>
+          </div>
+          <p>Вокал слишком громкий — нужно снизить на 2–3 дБ</p>
+        </article>
+        <article class="card" style="margin-top:8px">
+          <div class="card-top">
+            <span class="who">Engineer</span>
+            <span class="chip sent">Reply</span>
+            <span class="when">1 min ago</span>
+          </div>
+          <p>Готово — снизил вокал на 2 дБ, добавил компрессию 3:1. Проверь новый микс.</p>
+        </article>
+      </div>
+
+      <!-- Delivery -->
+      <div class="delivery-card">
+        <h4>📦 Delivery Package</h4>
+        <div class="delivery-row">
+          <div class="file-icon">🎵</div>
+          <div class="file-info">
+            <div class="file-name">Midnight_Runner_Mix_v2_Final.wav</div>
+            <div class="file-meta">48 kHz · 24-bit · WAV · 38.4 MB</div>
+          </div>
+          <button class="btn accent">Download</button>
+        </div>
+        <div class="delivery-actions">
+          <button class="btn ghost">Download stems</button>
+          <button class="btn ghost">View audit trail</button>
+        </div>
+      </div>
+    </div>
+</div></div>
+<script src="rp.js"></script>
+</body>
+</html>

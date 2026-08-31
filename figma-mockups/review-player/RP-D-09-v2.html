@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <title>SoundHub — RP/D/09 v2</title>
+  <link rel="stylesheet" href="rp.css">
+  <style>
+    .meta-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; padding:12px 16px; background:var(--surface-2); border:1px solid var(--border); border-radius:8px; margin-bottom:16px; }
+    .meta-item { display:flex; flex-direction:column; gap:2px; }
+    .meta-item .label { font:11px/1 var(--font); color:var(--text-4); text-transform:uppercase; letter-spacing:.5px; }
+    .meta-item .value { font:600 14px/1.3 var(--font); color:var(--text-1); }
+    .error-banner { background:rgba(255,107,107,.1); border:1px solid rgba(255,107,107,.3); border-radius:12px; padding:20px 24px; margin-bottom:16px; display:flex; align-items:center; gap:16px; }
+    .error-banner .icon { font-size:28px; }
+    .error-banner .info h3 { font:600 15px/1.3 var(--font); color:var(--red); margin:0; }
+    .error-banner .info p { font:13px/1.4 var(--font); color:var(--text-3); margin:4px 0 0; }
+  </style>
+</head>
+<body class="studio">
+<div class="frame-meta"><span class="fid">RP/D/09</span><span class="req verify">VERIFY</span><span class="req draft">DRAFT COPY</span><span class="frame-name">Playback error</span></div>
+<div class="artboard desktop"><div class="rp">
+    <header class="rp-header">
+      <span class="wordmark">Sound<span>Hub</span></span>
+      <div class="rp-header-main">
+        <div class="rp-title">Midnight Runner</div>
+        <span class="ver">Mix v1</span>
+      </div>
+      <div class="rp-header-actions"><button class="btn ghost">Approve Mix v1</button></div>
+    </header>
+
+    <div class="error-banner">
+      <div class="icon">⚠️</div>
+      <div class="info">
+        <h3>Couldn't load audio</h3>
+        <p>The audio file may be corrupted or temporarily unavailable. Try refreshing the page.</p>
+      </div>
+    </div>
+
+    <div style="padding:0 0 8px">
+      <div class="meta-grid">
+        <div class="meta-item"><span class="label">Duration</span><span class="value">3:41</span></div>
+        <div class="meta-item"><span class="label">Sample Rate</span><span class="value">48 kHz</span></div>
+        <div class="meta-item"><span class="label">Bit Depth</span><span class="value">24-bit</span></div>
+        <div class="meta-item"><span class="label">LUFS</span><span class="value">—</span></div>
+        <div class="meta-item"><span class="label">Format</span><span class="value">WAV</span></div>
+        <div class="meta-item"><span class="label">Size</span><span class="value">38.4 MB</span></div>
+      </div>
+    </div>
+
+    <div class="strip"><span class="chip err">Playback error</span></div>
+    <section class="player">
+      <div class="player-shell">
+          <div class="wave-row single">
+            <svg class="wave" id="w0" data-variant="b" data-played="0.416"></svg>
+            <div class="playhead" style="left:41.60%"></div>
+            <div class="pin selected" style="left:41.60%" title="1:32"><span class="hit"></span><span class="pin-lab">1:32</span></div>
+            <div class="overlay-error"><div>
+          <p style="font:500 15px var(--font)">Couldn't load audio</p>
+          <p style="font:13px var(--font);color:var(--text-4);margin-top:4px">Check your connection and try again</p>
+          <button class="btn accent" style="margin-top:16px">↻ Retry</button>
+        </div></div>
+          </div>
+        </div>
+      <div class="transport">
+        <button class="play" aria-label="Play"><svg viewBox="0 0 14 14" aria-hidden="true"><polygon points="3,1 13,7 3,13"/></svg></button>
+        <span class="time">1:32 / 3:41</span>
+        <button class="loop" aria-label="Loop" title="Loop">↻</button>
+      </div>
+    </section>
+
+    <div class="body">
+      <div class="thread"><article class="card">
+          <div class="card-top">
+            <button class="time-btn">1:32</button>
+            <span class="who">You</span>
+            <span class="chip sent">Sent</span>
+            <span class="when">just now</span>
+          </div>
+          <p>Вокал слишком громкий — нужно снизить на 2–3 дБ</p>
+        </article></div>
+    </div>
+</div></div>
+<script src="rp.js"></script>
+</body>
+</html>
