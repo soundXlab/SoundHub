@@ -1158,3 +1158,103 @@ class KanbanCardOut(BaseModel):
 
 KanbanBoardOut.model_rebuild()
 KanbanColumnOut.model_rebuild()
+
+
+# ---------- Version Tags ----------
+class VersionTagCreate(BaseModel):
+    name: str = Field(min_length=1, max_length=64)
+    color: str = Field(default="#888888", pattern=r"^#[0-9a-fA-F]{6}$")
+
+
+class VersionTagOut(ORMModel):
+    id: int
+    version_id: int
+    name: str
+    color: str
+    created_by: int
+    created_at: datetime
+
+
+# ---------- Review Checks ----------
+class ReviewCheckOut(ORMModel):
+    id: int
+    session_id: int
+    version_id: int | None = None
+    check_type: str
+    status: str
+    label: str
+    detail: str
+    blocking: bool
+    created_at: datetime
+
+
+class PreflightResultOut(BaseModel):
+    checks: list[ReviewCheckOut]
+    passed: bool
+    blocking: bool
+
+
+# ---------- Merge Queue ----------
+class MergeQueueEntryOut(ORMModel):
+    id: int
+    session_id: int
+    version_id: int
+    status: str
+    created_at: datetime
+    merged_at: datetime | None = None
+
+
+# ---------- Branch Protection ----------
+class BranchProtectionCreate(BaseModel):
+    branch_name: str = Field(min_length=1, max_length=64)
+    require_pull_request: bool = False
+    required_reviewers: int = Field(default=0, ge=0, le=10)
+    require_status_checks: bool = False
+    restrict_pushes: bool = False
+    allow_force_push: bool = False
+    allow_deletions: bool = False
+
+
+class BranchProtectionOut(ORMModel):
+    id: int
+    project_id: int
+    branch_name: str
+    require_pull_request: bool
+    required_reviewers: int
+    require_status_checks: bool
+    restrict_pushes: bool
+    allow_force_push: bool
+    allow_deletions: bool
+    created_at: datetime
+    updated_at: datetime
+
+
+# ---------- Session Members ----------
+class SessionMemberCreate(BaseModel):
+    email: str = Field(min_length=1, max_length=256)
+    role: str = Field(default="reviewer", pattern=r"^(reviewer|commenter|viewer)$")
+
+
+class SessionMemberOut(ORMModel):
+    id: int
+    session_id: int
+    email: str
+    role: str
+    invited_by: str
+    status: str = "pending"  # pending | reviewed | approved
+    created_at: datetime
+
+
+# ---------- Version Summary ----------
+class VersionDiffField(BaseModel):
+    field: str
+    old: str | float | int | None = None
+    new: str | float | int | None = None
+    unit: str = ""
+
+
+class VersionSummaryOut(BaseModel):
+    version_id: int
+    previous_version_id: int | None = None
+    changes: list[VersionDiffField]
+    summary_text: str

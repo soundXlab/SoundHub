@@ -2756,3 +2756,56 @@ class AuditLog(Base):
     ip_address: Mapped[str] = mapped_column(String(45), default="")
     user_agent: Mapped[str] = mapped_column(String(256), default="")
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+
+class VersionTag(Base):
+    """Tags for review versions (e.g. v1.0, beta, release-candidate)."""
+
+    __tablename__ = "version_tags"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    version_id: Mapped[int] = mapped_column(ForeignKey("review_versions.id"), index=True)
+    name: Mapped[str] = mapped_column(String(64))
+    color: Mapped[str] = mapped_column(String(7), default="#888888")
+    created_by: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+    __table_args__ = (UniqueConstraint("version_id", "name", name="uq_version_tag_name"),)
+
+    version: Mapped["ReviewVersion"] = relationship()
+    creator: Mapped["User"] = relationship()
+
+
+class ReviewCheck(Base):
+    """Automated QC checks for review versions (blocking or advisory)."""
+
+    __tablename__ = "review_checks"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    session_id: Mapped[int] = mapped_column(ForeignKey("review_sessions.id"), index=True)
+    version_id: Mapped[int | None] = mapped_column(ForeignKey("review_versions.id"), nullable=True)
+    check_type: Mapped[str] = mapped_column(String(32))
+    status: Mapped[str] = mapped_column(String(16))
+    label: Mapped[str] = mapped_column(String(128))
+    detail: Mapped[str] = mapped_column(Text, default="")
+    blocking: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+    session: Mapped["ReviewSession"] = relationship()
+    version: Mapped["ReviewVersion"] = relationship()
+
+
+class MergeQueue(Base):
+    """Queue for approved versions waiting to be merged/released."""
+
+    __tablename__ = "merge_queue"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    session_id: Mapped[int] = mapped_column(ForeignKey("review_sessions.id"), index=True)
+    version_id: Mapped[int] = mapped_column(ForeignKey("review_versions.id"), index=True)
+    status: Mapped[str] = mapped_column(String(16), default="queued")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+    merged_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+    session: Mapped["ReviewSession"] = relationship()
+    version: Mapped["ReviewVersion"] = relationship()

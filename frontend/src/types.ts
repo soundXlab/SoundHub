@@ -238,7 +238,66 @@ export interface SessionMember {
   email: string;
   role: string;
   invited_by: string;
+  status: string;
   created_at: string;
+}
+
+export interface VersionTag {
+  id: number;
+  version_id: number;
+  name: string;
+  color: string;
+  created_by: number;
+  created_at: string;
+}
+
+export interface ReviewCheck {
+  id: number;
+  session_id: number;
+  version_id: number | null;
+  check_type: string;
+  status: string;
+  label: string;
+  detail: string;
+  blocking: boolean;
+  created_at: string;
+}
+
+export interface MergeQueueEntry {
+  id: number;
+  session_id: number;
+  version_id: number;
+  status: string;
+  created_at: string;
+  merged_at: string | null;
+}
+
+export interface BranchProtection {
+  id: number;
+  project_id: number;
+  branch_name: string;
+  require_pull_request: boolean;
+  required_reviewers: number;
+  require_status_checks: boolean;
+  restrict_pushes: boolean;
+  allow_force_push: boolean;
+  allow_deletions: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface VersionDiffField {
+  field: string;
+  old: string | number | null;
+  new: string | number | null;
+  unit: string;
+}
+
+export interface VersionSummary {
+  version_id: number;
+  previous_version_id: number | null;
+  changes: VersionDiffField[];
+  summary_text: string;
 }
 
 export interface ShareAccessEvent {
@@ -487,9 +546,16 @@ export interface ReleaseTemplate {
 }
 
 export interface PreflightCheck {
-  status: "ok" | "warn" | "block";
+  status: string;
   label: string;
   detail: string;
+  // extended fields from review_checks table
+  id?: number;
+  session_id?: number;
+  version_id?: number | null;
+  check_type?: string;
+  blocking?: boolean;
+  created_at?: string;
 }
 
 export interface PreflightResult {
@@ -788,6 +854,7 @@ export interface Sprint {
   id: number;
   name: string;
   goal?: string;
+  velocity: number;
   state: string; // e.g., 'todo', 'in_progress', 'done'
   start_date?: string;
   end_date?: string;
@@ -799,6 +866,9 @@ export interface Retrospective {
   session_id: number;
   notes: string;
   created_at: string;
+  name: string;
+  state: string;
+  item_count: number;
 }
 
 export interface RetroItem {
@@ -814,6 +884,8 @@ export interface TestPlan {
   title: string;
   description: string;
   created_at: string;
+  name: string;
+  state: string;
 }
 
 export interface TestRun {
@@ -897,6 +969,7 @@ export interface Incident {
   title: string;
   severity: string; // e.g., 'critical', 'major', 'minor'
   status: string;
+  impact: string;
 }
 
 export interface FeatureFlag {

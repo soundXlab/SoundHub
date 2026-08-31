@@ -1897,3 +1897,418 @@ def delete_session(session_id: int, user: User = Depends(get_current_user), db: 
     session = get_session_or_404(db, user, session_id)
     db.delete(session)
     db.commit()
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Version Tags
+# ══════════════════════════════════════════════════════════════════════════════
+
+from ..models import VersionTag
+from ..schemas import VersionTagCreate, VersionTagOut
+
+
+@router.get("/{session_id}/versions/{version_id}/tags", response_model=list[VersionTagOut])
+def list_version_tags(
+    session_id: int,
+    version_id: int,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    _ = get_session_or_404(db, user, session_id)
+    tags = db.execute(
+        select(VersionTag).where(VersionTag.version_id == version_id)
+    ).scalars().all()
+    return [VersionTagOut.model_validate(t, from_attributes=True) for t in tags]
+
+
+@router.post("/{session_id}/versions/{version_id}/tags", response_model=VersionTagOut, status_code=status.HTTP_201_CREATED)
+def add_version_tag(
+    session_id: int,
+    version_id: int,
+    payload: VersionTagCreate,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    _ = get_session_or_404(db, user, session_id)
+    existing = db.execute(
+        select(VersionTag).where(
+            VersionTag.version_id == version_id,
+            VersionTag.name == payload.name,
+        )
+    ).scalar_one_or_none()
+    if existing:
+        raise HTTPException(status.HTTP_409_CONFLICT, "Tag already exists")
+    tag = VersionTag(
+        version_id=version_id,
+        name=payload.name,
+        color=payload.color,
+        created_by=user.id,
+    )
+    db.add(tag)
+    db.commit()
+    db.refresh(tag)
+    return VersionTagOut.model_validate(tag, from_attributes=True)
+
+
+@router.delete("/{session_id}/versions/{version_id}/tags/{tag_id}", status_code=status.HTTP_204_NO_CONTENT)
+def remove_version_tag(
+    session_id: int,
+    version_id: int,
+    tag_id: int,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    _ = get_session_or_404(db, user, session_id)
+    tag = db.get(VersionTag, tag_id)
+    if tag is None or tag.version_id != version_id:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Tag not found")
+    db.delete(tag)
+    db.commit()
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Draft → Publish
+# ══════════════════════════════════════════════════════════════════════════════
+
+@router.post("/{session_id}/versions/{version_id}/publish", response_model=ReviewVersionOut)
+def publish_version(
+    session_id: int,
+    version_id: int,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    session = get_session_or_404(db, user, session_id)
+    version = db.get(ReviewVersion, version_id)
+    if version is None or version.session_id != session_id:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Version not found")
+    if version.status != "draft":
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, f"Version status is '{version.status}', expected 'draft'")
+    version.status = "in_review"
+    # ledger event
+    event = LedgerEvent(
+        session_id=session_id,
+        actor=user.username,
+        event="version.published",
+        payload={"version": version.label, "version_id": version.id},
+    )
+    db.add(event)
+    db.commit()
+    db.refresh(version)
+    return ReviewVersionOut.model_validate(version, from_attributes=True)
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Version Summary (auto-generated diff)
+# ══════════════════════════════════════════════════════════════════════════════
+
+@router.get("/{session_id}/versions/{version_id}/summary")
+def version_summary(
+    session_id: int,
+    version_id: int,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    _ = get_session_or_404(db, user, session_id)
+    version = db.get(ReviewVersion, version_id)
+    if version is None or version.session_id != session_id:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Version not found")
+
+    # find previous version
+    prev = db.execute(
+        select(ReviewVersion).where(
+            ReviewVersion.session_id == session_id,
+            ReviewVersion.number < version.number,
+        ).order_by(ReviewVersion.number.desc()).limit(1)
+    ).scalar_one_or_none()
+
+    changes = []
+    if prev:
+        if version.duration_s != prev.duration_s:
+            changes.append({"field": "duration", "old": round(prev.duration_s, 2), "new": round(version.duration_s, 2), "unit": "s"})
+        if version.size != prev.size:
+            changes.append({"field": "size", "old": prev.size, "new": version.size, "unit": "bytes"})
+        if version.audio_format != prev.audio_format:
+            changes.append({"field": "format", "old": prev.audio_format, "new": version.audio_format})
+        if version.filename != prev.filename:
+            changes.append({"field": "filename", "old": prev.filename, "new": version.filename})
+
+    # build summary text
+    parts = []
+    for c in changes:
+        if c["field"] == "duration":
+            parts.append(f"duration {c['old']}s → {c['new']}s")
+        elif c["field"] == "size":
+            old_mb = round(c["old"] / 1048576, 1)
+            new_mb = round(c["new"] / 1048576, 1)
+            parts.append(f"size {old_mb}MB → {new_mb}MB")
+        elif c["field"] == "format":
+            parts.append(f"format {c['old']} → {c['new']}")
+        elif c["field"] == "filename":
+            parts.append(f"file {c['old']} → {c['new']}")
+    summary_text = ", ".join(parts) if parts else "No changes detected"
+
+    return {
+        "version_id": version_id,
+        "previous_version_id": prev.id if prev else None,
+        "changes": changes,
+        "summary_text": summary_text,
+    }
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Session Members (reviewer assignment)
+# ══════════════════════════════════════════════════════════════════════════════
+
+from ..models import SessionMember
+from ..schemas import SessionMemberCreate, SessionMemberOut
+
+
+@router.get("/{session_id}/members", response_model=list[SessionMemberOut])
+def list_members(
+    session_id: int,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    _ = get_session_or_404(db, user, session_id)
+    members = db.execute(
+        select(SessionMember).where(SessionMember.session_id == session_id)
+    ).scalars().all()
+    return [SessionMemberOut.model_validate(m, from_attributes=True) for m in members]
+
+
+@router.post("/{session_id}/members", response_model=SessionMemberOut, status_code=status.HTTP_201_CREATED)
+def invite_member(
+    session_id: int,
+    payload: SessionMemberCreate,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    session = get_session_or_404(db, user, session_id)
+    existing = db.execute(
+        select(SessionMember).where(
+            SessionMember.session_id == session_id,
+            SessionMember.email == payload.email,
+        )
+    ).scalar_one_or_none()
+    if existing:
+        raise HTTPException(status.HTTP_409_CONFLICT, "Member already invited")
+    member = SessionMember(
+        session_id=session_id,
+        email=payload.email,
+        role=payload.role,
+        invited_by=user.username,
+    )
+    db.add(member)
+    # ledger event
+    event = LedgerEvent(
+        session_id=session_id,
+        actor=user.username,
+        event="team.member_invited",
+        payload={"email": payload.email, "role": payload.role},
+    )
+    db.add(event)
+    db.commit()
+    db.refresh(member)
+    return SessionMemberOut.model_validate(member, from_attributes=True)
+
+
+@router.delete("/{session_id}/members/{member_id}", status_code=status.HTTP_204_NO_CONTENT)
+def remove_member(
+    session_id: int,
+    member_id: int,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    _ = get_session_or_404(db, user, session_id)
+    member = db.get(SessionMember, member_id)
+    if member is None or member.session_id != session_id:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Member not found")
+    # ledger event
+    event = LedgerEvent(
+        session_id=session_id,
+        actor=user.username,
+        event="team.member_removed",
+        payload={"email": member.email, "role": member.role},
+    )
+    db.add(event)
+    db.delete(member)
+    db.commit()
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Merge Queue
+# ══════════════════════════════════════════════════════════════════════════════
+
+from ..models import MergeQueue
+from ..schemas import MergeQueueEntryOut
+
+
+@router.get("/{session_id}/merge-queue", response_model=list[MergeQueueEntryOut])
+def list_merge_queue(
+    session_id: int,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    _ = get_session_or_404(db, user, session_id)
+    entries = db.execute(
+        select(MergeQueue).where(
+            MergeQueue.session_id == session_id,
+            MergeQueue.status.in_(["queued", "merging"]),
+        ).order_by(MergeQueue.created_at)
+    ).scalars().all()
+    return [MergeQueueEntryOut.model_validate(e, from_attributes=True) for e in entries]
+
+
+@router.post("/{session_id}/merge-queue", response_model=MergeQueueEntryOut, status_code=status.HTTP_201_CREATED)
+def enqueue_version(
+    session_id: int,
+    version_id: int,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    session = get_session_or_404(db, user, session_id)
+    version = db.get(ReviewVersion, version_id)
+    if version is None or version.session_id != session_id:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Version not found")
+    if version.status != "approved":
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "Only approved versions can be queued for merge")
+    existing = db.execute(
+        select(MergeQueue).where(
+            MergeQueue.session_id == session_id,
+            MergeQueue.version_id == version_id,
+            MergeQueue.status.in_(["queued", "merging"]),
+        )
+    ).scalar_one_or_none()
+    if existing:
+        raise HTTPException(status.HTTP_409_CONFLICT, "Version already in queue")
+    entry = MergeQueue(session_id=session_id, version_id=version_id)
+    db.add(entry)
+    db.commit()
+    db.refresh(entry)
+    return MergeQueueEntryOut.model_validate(entry, from_attributes=True)
+
+
+@router.post("/{session_id}/merge-queue/{queue_id}/merge", response_model=MergeQueueEntryOut)
+def merge_version(
+    session_id: int,
+    queue_id: int,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    session = get_session_or_404(db, user, session_id)
+    entry = db.get(MergeQueue, queue_id)
+    if entry is None or entry.session_id != session_id:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Queue entry not found")
+    if entry.status != "queued":
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, f"Entry status is '{entry.status}', expected 'queued'")
+    entry.status = "merged"
+    entry.merged_at = utcnow()
+    # ledger event
+    version = db.get(ReviewVersion, entry.version_id)
+    event = LedgerEvent(
+        session_id=session_id,
+        actor=user.username,
+        event="version.merged",
+        payload={"version": version.label if version else "?", "version_id": entry.version_id},
+    )
+    db.add(event)
+    db.commit()
+    db.refresh(entry)
+    return MergeQueueEntryOut.model_validate(entry, from_attributes=True)
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Review Checks (preflight QC)
+# ══════════════════════════════════════════════════════════════════════════════
+
+from ..models import ReviewCheck
+from ..schemas import ReviewCheckOut, PreflightResultOut
+
+
+@router.get("/{session_id}/checks", response_model=PreflightResultOut)
+def list_checks(
+    session_id: int,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    _ = get_session_or_404(db, user, session_id)
+    checks = db.execute(
+        select(ReviewCheck).where(ReviewCheck.session_id == session_id)
+        .order_by(ReviewCheck.created_at.desc())
+    ).scalars().all()
+    # deduplicate: keep latest per check_type
+    seen = {}
+    for c in checks:
+        if c.check_type not in seen:
+            seen[c.check_type] = c
+    latest = list(seen.values())
+    failed = [c for c in latest if c.status == "fail"]
+    blocking = [c for c in latest if c.blocking]
+    return PreflightResultOut(
+        checks=[ReviewCheckOut.model_validate(c, from_attributes=True) for c in latest],
+        passed=len(failed) == 0,
+        blocking=len([c for c in failed if c.blocking]) > 0,
+    )
+
+
+@router.post("/{session_id}/checks/run", response_model=PreflightResultOut)
+def run_checks(
+    session_id: int,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    session = get_session_or_404(db, user, session_id)
+    # get latest version
+    version = db.execute(
+        select(ReviewVersion).where(ReviewVersion.session_id == session_id)
+        .order_by(ReviewVersion.number.desc()).limit(1)
+    ).scalar_one_or_none()
+    if not version:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "No versions to check")
+
+    checks_data = []
+
+    # Duration check
+    if version.duration_s < 10:
+        checks_data.append({"check_type": "duration", "status": "warn", "label": "Duration < 10s", "detail": f"{version.duration_s:.1f}s", "blocking": False})
+    else:
+        checks_data.append({"check_type": "duration", "status": "pass", "label": "Duration OK", "detail": f"{version.duration_s:.1f}s", "blocking": False})
+
+    # Format check
+    if version.audio_format not in ("wav", "flac", "aiff", "aif"):
+        checks_data.append({"check_type": "format", "status": "warn", "label": "Non-standard format", "detail": version.audio_format, "blocking": False})
+    else:
+        checks_data.append({"check_type": "format", "status": "pass", "label": "Format OK", "detail": version.audio_format, "blocking": False})
+
+    # File size check (sanity)
+    if version.size < 1000:
+        checks_data.append({"check_type": "file_size", "status": "fail", "label": "File too small", "detail": f"{version.size} bytes — likely corrupt", "blocking": True})
+    else:
+        checks_data.append({"check_type": "file_size", "status": "pass", "label": "File size OK", "detail": f"{version.size // 1024}KB", "blocking": True})
+
+    # Save checks
+    for cd in checks_data:
+        check = ReviewCheck(
+            session_id=session_id,
+            version_id=version.id,
+            **cd,
+        )
+        db.add(check)
+    db.commit()
+
+    # Return result
+    all_checks = db.execute(
+        select(ReviewCheck).where(ReviewCheck.session_id == session_id)
+        .order_by(ReviewCheck.created_at.desc())
+    ).scalars().all()
+    seen = {}
+    for c in all_checks:
+        if c.check_type not in seen:
+            seen[c.check_type] = c
+    latest = list(seen.values())
+    failed = [c for c in latest if c.status == "fail"]
+    return PreflightResultOut(
+        checks=[ReviewCheckOut.model_validate(c, from_attributes=True) for c in latest],
+        passed=len(failed) == 0,
+        blocking=len([c for c in failed if c.blocking]) > 0,
+    )

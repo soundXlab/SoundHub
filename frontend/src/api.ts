@@ -2,45 +2,61 @@ import type {
   ApprovalPolicy,
   AudioAnalysis,
   Branch,
+  CatalogAsset,
   ChangeOrder,
   CheckoutOut,
-  UsdcCheckoutOut,
-  UsdcVerifyOut,
   Commit,
   CommitDetail,
   Deliverable,
   DeliveryPage,
   Diff,
+  Discussion,
+  FeatureFlag,
+  GhBranch,
+  GhCommit,
+  Incident,
+  KanbanBoard,
   LedgerResponse,
   LedgerVerify,
+  LicenseReceipt,
+  Objective,
   Portfolio,
   PreflightResult,
+  Project,
   ReferenceComparison,
   ReferenceTrack,
   ReleasePackage,
-  SearchResults,
   ReleaseTemplate,
   ReminderSettings,
   RemindersEvalResult,
-  SessionRemindersResponse,
-  VersionComparison,
-  VersionDiff,
-  GhBranch,
-  GhCommit,
-  CatalogAsset,
-  LicenseReceipt,
-  Project,
+  RetroItem,
+  Retrospective,
   ReviewApproval,
   ReviewComment,
   ReviewSession,
   ReviewVersion,
+  SearchResults,
   SessionMember,
+  SessionRemindersResponse,
+  Sprint,
+  StatusPageData,
   StemAsset,
+  Task,
+  TestPlan,
+  TestRun,
   TokenResponse,
   Tree,
+  UsdcCheckoutOut,
+  UsdcVerifyOut,
+  VersionComparison,
+  VersionDiff,
   WikiPage,
   WikiRevision,
-  Sprint,
+  Workflow,
+  WorkflowRun,
+  VersionTag,
+  MergeQueueEntry,
+  VersionSummary,
 } from "./types";
 
 const TOKEN_KEY = "soundhub_token";
@@ -876,6 +892,44 @@ export const api = {
         ? r.json().then((rows) => ghCommits(rows as Array<Record<string, unknown>>))
         : Promise.reject(new Error("GitHub API error"))
     ),
+
+  // ---------- Version Tags ----------
+  listVersionTags: (sessionId: number, versionId: number) =>
+    request<VersionTag[]>(`/api/sessions/${sessionId}/versions/${versionId}/tags`),
+  addVersionTag: (sessionId: number, versionId: number, name: string, color: string) =>
+    request<VersionTag[]>(`/api/sessions/${sessionId}/versions/${versionId}/tags`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, color }),
+    }),
+  removeVersionTag: (sessionId: number, versionId: number, tagId: number) =>
+    request(`/api/sessions/${sessionId}/versions/${versionId}/tags/${tagId}`, { method: "DELETE" }),
+
+  // ---------- Draft → Publish ----------
+  publishVersion: (sessionId: number, versionId: number) =>
+    request<ReviewVersion>(`/api/sessions/${sessionId}/versions/${versionId}/publish`, { method: "POST" }),
+
+  // ---------- Version Summary ----------
+  getVersionSummary: (sessionId: number, versionId: number) =>
+    request<VersionSummary>(`/api/sessions/${sessionId}/versions/${versionId}/summary`),
+
+  // ---------- Merge Queue ----------
+  listMergeQueue: (sessionId: number) =>
+    request<MergeQueueEntry[]>(`/api/sessions/${sessionId}/merge-queue`),
+  enqueueVersion: (sessionId: number, versionId: number) =>
+    request<MergeQueueEntry>(`/api/sessions/${sessionId}/merge-queue?version_id=${versionId}`, {
+      method: "POST",
+    }),
+  mergeVersion: (sessionId: number, queueId: number) =>
+    request<MergeQueueEntry>(`/api/sessions/${sessionId}/merge-queue/${queueId}/merge`, {
+      method: "POST",
+    }),
+
+  // ---------- Review Checks ----------
+  listChecks: (sessionId: number) =>
+    request<PreflightResult>(`/api/sessions/${sessionId}/checks`),
+  runChecks: (sessionId: number) =>
+    request<PreflightResult>(`/api/sessions/${sessionId}/checks/run`, { method: "POST" }),
 };
 
 function encodePath(path: string): string {
