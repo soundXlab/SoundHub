@@ -4,9 +4,10 @@
 - Репозиторий: `/home/scatter/SoundHub`
 - Основная модель: MiMo 2.5
 - Язык отчётов: русский
-- Последний коммит: `71776ab` (fix(deploy): SPA fallback for Cloud Run)
+- Последний коммит: `2912d08` (feat(marketplace): DAW-style redesign)
 - Ветка: `feat/marketplace-uiux-redesign` (запушена)
 - TypeScript: 0 ошибок
+- Тесты: 34/34 pass
 - Cloud Run: https://soundhub-634858473264.europe-west1.run.app
 
 ## Текущий фокус
@@ -362,10 +363,12 @@ SQL инъекции защищены, PBKDF2-SHA256 260K, хеш-цепочка
 - `test_sessions.py` — повреждён (потерял 2000+ строк), восстановлен из git
 
 ### Оценка работы Клода (Marketplace Redesign)
-- **5/10** — прототип, не production-ready
-- ✅ AssetCard (grid/list), FilterPanel (7 фильтров), two-column layout
-- ❌ 50+ inline styles, дублирует существующий AssetCard, не закоммичено
-- Рекомендация: использовать как референс, переписать с конвенциями проекта
+- **v1 (5/10)** — прототип, не production-ready
+- **v2 (8/10)** — DAW-style redesign, закоммичен (2912d08)
+- ✅ MarketplaceTransport, MarketplaceBrowser, MarketplaceFilterChips, MarketplaceSort, MarketplaceDeviceChain, MarketplaceDetailPanel
+- ✅ TypeScript 0 ошибок, build проходит
+- ✅ Все компоненты используют design tokens
+- ⚠️ MarketplaceDetailPanel содержит mock данные (totalAssets=256, trending=[])
 
 ## Согласование Buffy + Claude
 
@@ -409,16 +412,36 @@ SQL инъекции защищены, PBKDF2-SHA256 260K, хеш-цепочка
 - Desktop: D/01–D/10 с metadata grids, improved UX
 - Mobile: M/01–M/07 с compact metadata, decision banners
 
-### ПТ
-- Деплой на Cloud Run
-- Smoke test
-- Обновить STATE.md
+### ПТ ✅
+- Деплой на Cloud Run ✅ (SPA fallback исправлен)
+- Smoke test ✅ (все routes работают)
+- STATE.md обновлён ✅
+
+## Marketplace DAW-redesign (2912d08)
+
+### Компоненты Claude (v2)
+| Компонент | Описание |
+|-----------|----------|
+| MarketplaceTransport | Top bar: asset counts, cart, wishlist |
+| MarketplaceBrowser | Sidebar: search, categories, DAW/format filters |
+| MarketplaceFilterChips | Horizontal tags: Synth, Sampler, FX, Drums... |
+| MarketplaceSort | Sort: Popular, New, Price ↑, Rating |
+| MarketplaceDeviceChain | View toggles: Grid/List, Instruments/Effects... |
+| MarketplaceDetailPanel | Right sidebar: stats, trending assets |
+
+### Статус
+- ✅ TypeScript: 0 ошибок
+- ✅ Build: проходит
+- ✅ Тесты: 34/34 pass
+- ✅ Git: 2912d08 → pushed
 
 ## Следующий шаг
 
-**Приоритет:** User testing Review Player (3 человека). Макеты D/05 v2 готовы.
+**Приоритет:** User testing Review Player (3 человека — Buffy, CEO, Claude). Макеты D/05 v2 готовы.
 
-**Sprint 3 (Claude):** Расширенные QC checks (LUFS, clipping, silence). ProjectsPage.tsx — исправить 11 TS ошибок.
+**Sprint 4 (Claude):** Public review 403 fix (API работает, проверить фронтенд). Session detail page. ProjectsPage TS errors.
+
+**Деплой:** Нужен sudo для Docker push (permission denied на artifact registry).
 
 **Дизайн:** v1.3 после тестов. Лендинг: How it works вместо Marketplace в гостевом nav.
 
