@@ -74,14 +74,14 @@ export const typography = {
     mono: '"JetBrains Mono", "SF Mono", "Fira Code", Consolas, monospace',
   },
   fontSize: {
-    display: '36px',     // was 48px — tighter
-    h1: '22px',          // was 32px
-    h2: '15px',          // was 24px
-    h3: '13px',          // was 20px
-    body: '12px',        // was 16px
-    caption: '11px',     // was 14px
-    small: '10px',       // was 12px
-    tiny: '9px',
+    display: '42px',     // hero headings
+    h1: '28px',          // page titles
+    h2: '20px',          // section headings
+    h3: '16px',          // subsection headings
+    body: '14px',        // body text
+    caption: '12px',     // captions, labels
+    small: '11px',       // small print
+    tiny: '10px',
   },
   fontWeight: {
     regular: 400,
