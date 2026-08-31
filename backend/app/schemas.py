@@ -1232,7 +1232,7 @@ class BranchProtectionOut(ORMModel):
 # ---------- Session Members ----------
 class SessionMemberCreate(BaseModel):
     email: str = Field(min_length=1, max_length=256)
-    role: str = Field(default="reviewer", pattern=r"^(reviewer|commenter|viewer)$")
+    role: str = Field(default="reviewer", pattern=r"^(reviewer|commenter|viewer|producer|artist|label)$")
 
 
 class SessionMemberOut(ORMModel):

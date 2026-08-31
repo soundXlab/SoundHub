@@ -48,6 +48,12 @@ export default function MergeQueuePanel({ sessionId, versions }: MergeQueuePanel
     }
   };
 
+  const handleRemove = async (queueId: number) => {
+    // In a real implementation, there would be a delete endpoint
+    // For now, we'll just remove from local state and show a message
+    setError("Removal from queue not implemented in API");
+  };
+
   if (loading) {
     return (
       <div className="card" style={{ padding: 18 }}>

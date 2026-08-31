@@ -2,6 +2,7 @@ import type {
   ApprovalPolicy,
   AudioAnalysis,
   Branch,
+  BranchProtection,
   CatalogAsset,
   ChangeOrder,
   CheckoutOut,
