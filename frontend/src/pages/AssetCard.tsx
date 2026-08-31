@@ -20,7 +20,15 @@ export default function AssetCard({
   onAssetDetail,
   view = "grid",
 }: AssetCardProps) {
-  const { name, bpm, key, genres, price_snd, license, waveform } = asset;
+  const { name, bpm, key, genres, price_snd, license, waveform, uri } = asset;
+
+  // Determine if it's free based on price or license
+  const isFree = price_snd === "0" || license.toLowerCase().includes("free");
+
+  // Determine license type for display
+  const licenseType = license.toLowerCase();
+  const isPaidLicense = licenseType.includes("paid") || licenseType.includes("commercial") || licenseType.includes("royalty");
+  const isFreeLicense = licenseType.includes("free") || licenseType.includes("open") || licenseType.includes("creative");
 
   return (
     <div className={`asset-card view-${view}`}>
@@ -35,6 +43,26 @@ export default function AssetCard({
           ) : (
             <Music size={24} />
           )}
+          {/* License badge */}
+          <div className="badge" style={{
+            position: "absolute",
+            top: "4px",
+            right: "4px",
+            padding: "1px 5px",
+            borderRadius: "2px",
+            fontSize: "8px",
+            fontWeight: "600",
+            backgroundColor: isFreeLicense ? "rgba(34, 197, 94, 0.15)" :
+                           isPaidLicense ? "rgba(234, 88, 8, 0.15)" :
+                           "rgba(16, 185, 129, 0.15)",
+            color: isFreeLicense ? "#22c55e" :
+                   isPaidLicense ? "#ea5808" :
+                   "#10b981"
+          }}>
+            {isFreeLicense && "FREE"}
+            {isPaidLicense && "PAID"}
+            {!isFreeLicense && !isPaidLicense && "PREMIUM"}
+          </div>
         </div>
         <div className="content">
           <CardContent>
@@ -52,9 +80,18 @@ export default function AssetCard({
                 )}
               </div>
             </div>
-            <div className="asset-price">
-              <Badge variant="secondary">{formatEther(BigInt(price_snd))} SND</Badge>
-              <Badge variant="secondary">{license}</Badge>
+            <div className="asset-footer">
+              <div className="asset-price" style={{
+                fontSize: "11px",
+                fontWeight: "700",
+                fontFamily: '"JetBrains Mono", monospace',
+                color: isFree ? "#22c55e" :
+                       isPaidLicense ? "#ea5808" :
+                       "#eab308"
+              }}>
+                {isFree && "Free"}
+                {!isFree && `$${formatEther(BigInt(price_snd))}`}
+              </div>
             </div>
           </CardContent>
           <CardFooter>

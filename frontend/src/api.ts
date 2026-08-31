@@ -931,6 +931,10 @@ export const api = {
     request<MergeQueueEntry>(`/api/sessions/${sessionId}/merge-queue/${queueId}/merge`, {
       method: "POST",
     }),
+  removeFromQueue: (sessionId: number, queueId: number) =>
+    request<void>(`/api/sessions/${sessionId}/merge-queue/${queueId}`, {
+      method: "DELETE",
+    }),
 
   // ---------- Branch Protection ----------
   getBranchProtections: (projectId: number) =>

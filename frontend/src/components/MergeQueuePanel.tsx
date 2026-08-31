@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { api } from "../api";
 import type { MergeQueueEntry, ReviewVersion } from "../types";
-import { GitBranch, Check, X, Clock, List, Plus } from "lucide-react";
+import { GitBranch, Check, X, Clock, List, Plus, Trash2 } from "lucide-react";
 
 interface MergeQueuePanelProps {
   sessionId: number;
@@ -12,7 +12,8 @@ export default function MergeQueuePanel({ sessionId, versions }: MergeQueuePanel
   const [queue, setQueue] = useState<MergeQueueEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [processing, setProcessing] = useState(false);
+  const [merging, setMerging] = useState(false);
+  const [removing, setRemoving] = useState(false);
 
   useEffect(() => { loadQueue(); }, [sessionId]);
 
@@ -37,21 +38,27 @@ export default function MergeQueuePanel({ sessionId, versions }: MergeQueuePanel
   };
 
   const handleMerge = async (queueId: number) => {
-    setProcessing(true);
+    setMerging(true);
     try {
       await api.mergeVersion(sessionId, queueId);
       await loadQueue();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to merge");
     } finally {
-      setProcessing(false);
+      setMerging(false);
     }
   };
 
   const handleRemove = async (queueId: number) => {
-    // In a real implementation, there would be a delete endpoint
-    // For now, we'll just remove from local state and show a message
-    setError("Removal from queue not implemented in API");
+    setRemoving(true);
+    try {
+      await api.removeFromQueue(sessionId, queueId);
+      await loadQueue();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to remove from queue");
+    } finally {
+      setRemoving(false);
+    }
   };
 
   if (loading) {
@@ -110,9 +117,14 @@ export default function MergeQueuePanel({ sessionId, versions }: MergeQueuePanel
                   {entry.status}
                 </span>
                 {entry.status === "queued" && (
-                  <button className="btn sm" onClick={() => handleMerge(entry.id)} disabled={processing}>
-                    {processing ? "..." : "Merge"}
-                  </button>
+                  <>
+                    <button className="btn sm" onClick={() => handleMerge(entry.id)} disabled={merging}>
+                      {merging ? "..." : "Merge"}
+                    </button>
+                    <button className="btn ghost sm" onClick={() => handleRemove(entry.id)} disabled={removing}>
+                      {removing ? "..." : <X size={14} />}
+                    </button>
+                  </>
                 )}
               </div>
             </div>
